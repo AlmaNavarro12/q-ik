@@ -1,0 +1,70 @@
+<form action="#" onsubmit="return false;" id="form-comisiones">
+    <div class="col-md-12"><div class="label-sub" id="contenedor-titulo-form-comision">Comisiones de Ventas </div> </div>
+    <div class="row">
+        <div class="col-md-6">
+            <label class="label-form text-right" for="id-usuario">Usuario</label>
+            <div class="form-group">
+                <select class="form-control text-center input-form" id="id-usuario" name="id-usuario" onchange="loaddatosUsuario();" >
+                    <option value="" id="option-default-usuario">- - - -</option>
+                    <optgroup id="usuarios" class="contenedor-usuarios text-left"> </optgroup>
+                </select>
+                <div id="id-usuario-errors"></div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <label class="label-form text-right" for="tipo-usuario"> Tipo de usuario</label>
+            <div class="form-group">
+                <input class="form-control text-center input-form" id="tipo-usuario" name="tipo-usuario" placeholder="Tipo de Usuario" type="text" disabled=""/>
+                <div id="tipo-usuario-errors">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <label class="label-form text-right" for="titulo"> Porcentaje Comision</label>
+            <div class="form-group">
+                <input class="form-control text-center input-form" id="porcentaje-comision" name="porcentaje-comision" placeholder="Porcentaje de comision" type="number"/>
+                <div id="porcentaje-comision-errors">
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <fieldset>
+                <label class="label-form text-right" for="titulo">Calcular: </label>
+                <div class="form-group">
+                    <label class="label-radio">
+                        <input class="input-radio" type="radio" id="calculo1" name="calculo" value="1" checked=""> Antes de Impuestos
+                    </label>
+                    <label class="label-radio">
+                        <input class="input-radio" type="radio" id="calculo2" name="calculo" value="2"> Despues de Impuestos
+                    </label>
+                </div>
+
+            </fieldset>
+        </div>
+
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+
+            <label class="label-form text-right" for="chcom">Usar configuracion en General?</label>
+            <div class="form-group">
+                <div class="new-tooltip icon tip">
+                    <input class="input-check" id="chcom" name="chcom" type="checkbox"/>&nbsp;
+                    <span class="glyphicon glyphicon-question-sign"></span>
+                    <span class="tiptext">Seleccionando esta opcion se usara la configuracion actual de comisiones para todos los usuarios.</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class="row text-right">
+        <button class="button-form btn-danger" onclick="loadView('config');" >Cancelar <span class="glyphicon glyphicon-remove"></span></button>
+        <button class="button-form btn-primary" onclick="insertarComision();" id="btn-form-comision" >Guardar <span class="glyphicon glyphicon-floppy-disk"></span></button>
+    </div>
+</form>
+<br/><br/>
+<script src="js/scriptconfig.js"></script>
