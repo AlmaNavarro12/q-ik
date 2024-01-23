@@ -41,8 +41,7 @@ if (isset($_POST['transaccion'])) {
     }
 }
 
-function obtenerDatosFolio()
-{
+function obtenerDatosFolio(){
     $f = new Folio();
     $f->setSerie($_POST['serie']);
     $f->setLetra($_POST['letra']);

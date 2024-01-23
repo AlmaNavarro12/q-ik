@@ -128,30 +128,45 @@ function obtenerDatosFolio() {
     var serie = $("#serie").val();
     var letra = $("#folio-letra").val();
     var folio = $("#folio-inicio").val();
-    var usofolio = $("input[name='chusofolio']:checked").map(function () {
+    var usofolio = $("input[name='chusofolio']:checked").map(function () { //obtener un array de valores
         return $(this).val();
-    }).get().join("-");
+    }).get().join("-"); // unir valores con un guion ("-").
     
     return {serie, letra, folio, usofolio};
 }
 
-function insertarFolio() {
+function insertarFolio(idfolio = null) {
     var datosFolio = obtenerDatosFolio();
-    if (isnEmpty(datosFolio.serie, "serie") && isnEmpty(datosFolio.folio, "folio-inicio") && isnEmpty(datosFolio.usofolio, "btn-uso")) {
-        cargandoHide();
+    if ((idfolio == null && isnEmpty(datosFolio.serie, "serie") && isnEmpty(datosFolio.folio, "folio-inicio") && isnEmpty(datosFolio.usofolio, "btn-uso")) ||
+        (idfolio != null && isnEmpty(datosFolio.serie, "serie") && isnEmpty(datosFolio.folio, "folio-inicio"))) {
+    cargandoHide();
         cargandoShow();
+        var transaccion = (idfolio == null) ? "insertarfolio" : "actualizarfolio";
         $.ajax({
             url: "com.sine.enlace/enlaceconfig.php",
             type: "POST",
-            data: {transaccion: "insertarfolio", serie: datosFolio.serie, letra: datosFolio.letra, folio: datosFolio.folio, usofolio: datosFolio.usofolio},
+            data: {
+                transaccion: transaccion,
+                idfolio: idfolio,
+                serie: datosFolio.serie,
+                letra: datosFolio.letra,
+                folio: datosFolio.folio,
+                usofolio: datosFolio.usofolio,
+                inicio: datosFolio.folio
+            },
             success: function (datos) {
                 var texto = datos.toString();
                 var bandera = texto.substring(0, 1);
                 var res = texto.substring(1, 1000);
+
                 if (bandera == '0') {
                     alertify.error(res);
                 } else {
-                    alertify.success('Datos guardados.');
+                    if (transaccion === "insertarfolio") {
+                        alertify.success('Datos guardados.');
+                    } else {
+                        alertify.success('Folio actualizado.');
+                    }
                     loadViewConfig('listafolio');
                 }
                 cargandoHide();
@@ -181,11 +196,17 @@ function editarFolio(idfolio) {
         }
     });
 }
+
 function setValoresEditarFolio(datos) {
     changeText("#contenedor-titulo-form-folio", "Editar Folio");
     changeText("#btn-form-folio", "Guardar cambios <span class='far fa-save'></span></a>");
 
-    var [idfolio, serie, letra, numinicio, uso] = datos.split("</tr>");
+    var array = datos.split("</tr>");
+    var idfolio = array[0];
+    var serie = array[1];
+    var letra = array[2];
+    var numinicio = array[3];
+    var uso = array[4];
 
     $("#btn-uso").dropdown('toggle');
     uso.split("-").forEach(function (item) {
@@ -193,38 +214,14 @@ function setValoresEditarFolio(datos) {
         $("#chspan" + item).removeClass('far fa-square').addClass('far fa-check-square');
     });
 
-    $("#serie, #folio-letra, #folio-inicio, #uso-folio").val(function (index) {
-        return index == 0 ? serie : index == 1 ? letra : index == 2 ? numinicio : uso;
-    });
+    $("#serie").val(serie);
+    $("#folio-letra").val(letra);
+    $("#folio-inicio").val(numinicio);
+    $("#uso-folio").val(uso);
 
     $("#form-folio").append("<input type='hidden' id='numinicio' name='numinicio' value='" + numinicio + "'/>");
-    $("#btn-form-folio").attr("onclick", "actualizarFolio(" + idfolio + ");");
+    $("#btn-form-folio").attr("onclick", "insertarFolio(" + idfolio + ");");
     cargandoHide();
-}
-
-function actualizarFolio(idfolio) {
-    var datosFolio = obtenerDatosFolio();
-    if (isnEmpty(datosFolio.serie, "serie") && isnEmpty(datosFolio.folio, "folio-inicio")) {
-        cargandoHide();
-        cargandoShow();
-        $.ajax({
-            url: "com.sine.enlace/enlaceconfig.php",
-            type: "POST",
-            data: {transaccion: "actualizarfolio", idfolio: idfolio, serie: datosFolio.serie, letra: datosFolio.letra, folio: datosFolio.folio, usofolio: datosFolio.usofolio, inicio: datosFolio.folio},
-            success: function (datos) {
-                var texto = datos.toString();
-                var bandera = texto.substring(0, 1);
-                var res = texto.substring(1, 1000);
-                if (bandera == '0') {
-                    alertify.error(res);
-                } else {
-                    alertify.success('Folio actualizado');
-                    loadViewConfig('listafolio');
-                }
-                cargandoHide();
-            }
-        });
-    }
 }
 
 function eliminarFolio(idfolio) {
@@ -250,7 +247,6 @@ function eliminarFolio(idfolio) {
         });
     }).set({title: "Q-ik"});
 }
-
 
 //--------------------------------TABLAS
 function loadFormato() {
