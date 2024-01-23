@@ -200,11 +200,11 @@ class ControladorConfiguracion
                            <span class='caret'></span></button>
                            <ul class='dropdown-menu dropdown-menu-right'>";
             if ($permisos[0] == '1') {
-                $datos .= "<li class='notification-link py-1'><a class='text-decoration-none text-capitalize text-secondary-emphasis' title='Editar Folio' onclick='editarFolio($idfolio)'>Editar folio <span class='text-muted fas fa-edit small'></span></a></li>";
+                $datos .= "<li class='notification-link py-1'><a class='text-decoration-none text-capitalize text-secondary-emphasis' title='Editar folio' onclick='editarFolio($idfolio)'>Editar folio <span class='text-muted fas fa-edit small'></span></a></li>";
             }
 
             if ($permisos[1] == '1') {
-                $datos .= "<li class='notification-link py-1'><a class='text-decoration-none text-capitalize text-secondary-emphasis' title='Eliminar Folio' onclick='eliminarFolio($idfolio)'>Eliminar folio <span class='text-muted fas fa-times'></span></a></li>";
+                $datos .= "<li class='notification-link py-1'><a class='text-decoration-none text-capitalize text-secondary-emphasis' title='Eliminar folio' onclick='eliminarFolio($idfolio)'>Eliminar folio <span class='text-muted fas fa-times'></span></a></li>";
             }
             $datos .= "        </ul>
                         </div>

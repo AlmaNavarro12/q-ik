@@ -11,6 +11,10 @@ function changeText(elemento, texto) {
     $(elemento).html(texto);
 }
 
+function validarNum(input) {
+    input.value = input.value.replace(/[^0-9]/g, '');
+}
+
 //Validacion de campos vacios
 function isnEmpty(val, id) {
     if (val == "") {

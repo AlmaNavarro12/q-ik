@@ -89,10 +89,6 @@ function getViewConfig(view) {
     });
 }
 
-function validarNum(input) {
-    input.value = input.value.replace(/[^0-9]/g, '');
-}
-
 //-----------------------------FOLIO---------------------------
 function loadListaFolio(pag = "") {
     $.ajax({

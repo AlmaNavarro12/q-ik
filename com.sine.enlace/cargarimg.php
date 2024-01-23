@@ -8,7 +8,9 @@ if (isset($_FILES["imagen"])) {
 
     $sessionid = session_id();
     $idusuario = $_SESSION[sha1("idusuario")];
-    $fecha = date("mdYHis");
+    $f = getdate();
+    //sprintf — Devuelve un string formateado
+    $fecha = sprintf("%02d%04d%02d%02d%02d%02d", $f['mon'], $f['year'], $f['mday'], $f['hours'], $f['minutes'], $f['seconds']);
 
     //str_shuffle — Reordena aleatoriamente una cadena
     $ranstr = substr(str_shuffle("0123456789011121314151617181920"), 0, 5);
