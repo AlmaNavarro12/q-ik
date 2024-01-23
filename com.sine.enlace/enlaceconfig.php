@@ -32,7 +32,7 @@ if (isset($_POST['transaccion'])) {
         case 'loadexcel':
             $fnm = $_POST['fnm'];
             $tabla = $_POST['tabla'];
-            echo ($datos = $cc->importTable($fnm, $tabla)) != "" ? $datos : "0No hay datos registrados.";
+            echo ($datos = $cc->importTable($fnm, $tabla)) != "" ? $datos : "0Error: El archivo no contiene los campos esperados. O bien, no contiene datos.";
             break;
     }
 

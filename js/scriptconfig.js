@@ -89,6 +89,10 @@ function getViewConfig(view) {
     });
 }
 
+function validarNum(input) {
+    input.value = input.value.replace(/[^0-9]/g, '');
+}
+
 //-----------------------------FOLIO---------------------------
 function loadListaFolio(pag = "") {
     $.ajax({
@@ -287,7 +291,7 @@ function loadFormato() {
                 </ul>
             </div>
         </div>
-        <button class='button-form btn btn-success col-md-7 float-end my-2' onclick='descargarEjemplo(1)'>Descargar ejemplo
+        <button class='button-form btn btn-success col-md-7 col-12 float-end my-2' onclick='descargarEjemplo(1)'>Descargar ejemplo
             <span class='fas fa-download'></span></button>
     </div>`;
     } else if (tabla == '2') {
@@ -318,7 +322,7 @@ function loadFormato() {
                 </ul>
             </div>
         </div>
-        <button class='button-form btn btn-success col-md-7 float-end my-2'
+        <button class='button-form btn btn-success col-md-7 col-12 float-end my-2'
             onclick='descargarEjemplo(2)'>Descargar ejemplo
             <span class='fas fa-download'></span></button>
     </div>`;

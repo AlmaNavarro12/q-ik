@@ -34,7 +34,7 @@
                 class="fw-bold text-danger">*</label>
             <div class="form-group">
                 <input class="form-control text-center input-form" id="folio-inicio" name="folio-inicio"
-                    placeholder="N° de inicio de folios" type="number" />
+                    placeholder="N° de inicio de folios" type="text" oninput="validarNum(this)" />
                 <div id="folio-inicio-errors">
                 </div>
             </div>
@@ -51,31 +51,31 @@
                             Usar en: <span class="caret"></span>
                         </button>
                         <ul class="dropdown-menu">
-                            <li class="px-3">
+                            <li class="ps-3">
                                 <label class="dropdown-menu-item checkbox">
                                     <input type="checkbox" value="1" name="chusofolio" id="chusofolio1">
                                     <span id="chspan1" class="far fa-square"></span> <small>Facturas</small>
                                 </label>
                             </li>
-                            <li class="px-3">
+                            <li class="ps-3">
                                 <label class="dropdown-menu-item checkbox">
                                     <input type="checkbox" value="2" name="chusofolio" id="chusofolio2">
                                     <span id="chspan2" class="far fa-square"></span> <small>Notas de crédito</small>
                                 </label>
                             </li>
-                            <li class="px-3">
+                            <li class="ps-3">
                                 <label class="dropdown-menu-item checkbox">
                                     <input type="checkbox" value="3" name="chusofolio" id="chusofolio3">
                                     <span id="chspan3" class="far fa-square"></span> <small>Pagos</small>
                                 </label>
                             </li>
-                            <li class="px-3">
+                            <li class="ps-3">
                                 <label class="dropdown-menu-item checkbox">
                                     <input type="checkbox" value="4" name="chusofolio" id="chusofolio4">
                                     <span id="chspan4" class="far fa-square"></span> <small>Carta porte</small>
                                 </label>
                             </li>
-                            <li class="px-3">
+                            <li class="ps-3">
                                 <label class="dropdown-menu-item checkbox">
                                     <input type="checkbox" value="5" name="chusofolio" id="chusofolio5">
                                     <span id="chspan5" class="far fa-square"></span> <small>Cotizaciones</small>

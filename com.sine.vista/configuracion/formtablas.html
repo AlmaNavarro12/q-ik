@@ -7,7 +7,7 @@
                     class="mark-required text-right text-danger">*</label>
                 <div class="form-group">
                     <select class="form-select input-form" id="tabla-datos" name="tabla-datos"
-                        onchange="loadFormato();">
+                        onchange="loadFormato();" required>
                         <option value="" id="option-default-tabla" class="text-center">- - - -</option>
                         <optgroup id="tabladatos" class="contenedor-tablas text-left">
                             <option value="1" id="tabla1">Clientes</option>
@@ -21,7 +21,7 @@
             <div class="col-md-12 mt-3">
                 <label class="label-form"></label>
                 <div class="form-group">
-                    <label class="button-file col-md-12 col-12" for="imagen"><span class="glyphicon glyphicon-file"></span>
+                    <label class="button-file col-md-12 col-12" for="imagen"><span class="fas fa-file"></span>
                         Seleccionar
                         archivo</label>
                     <input class="form-control text-center upload" id="imagen" hidden name="imagen" type="file"
@@ -41,7 +41,7 @@
                     </div>
                 </div>
                 <div class="col-md-6 col-sm-12">
-                    <button class="button-form btn btn-danger col-12 col-md-12" onclick="loadView('tablas')">
+                    <button class="button-form btn btn-danger col-12 col-md-12" onclick="loadView('config')">
                         Cancelar
                         <span class="fas fa-times"></span>
                     </button>

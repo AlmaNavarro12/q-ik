@@ -13,17 +13,20 @@ class ControladorConfiguracion
 
     private $consultas;
 
-    function __construct(){
+    function __construct()
+    {
         $this->consultas = new Consultas();
     }
 
-    public function valFolio($f){
+    public function valFolio($f)
+    {
         $insertar = "";
         $insertar = $this->insertarFolio($f);
         return $insertar;
     }
 
-    private function insertarFolio($f){
+    private function insertarFolio($f)
+    {
         $insertado = false;
         $consulta = "INSERT INTO `folio` VALUES (:id, :serie, :letra, :numinicio, :consecutivo, :uso);";
         $valores = array(
@@ -38,14 +41,16 @@ class ControladorConfiguracion
         return $insertado;
     }
 
-    private function getNumrowsAux($con){
+    private function getNumrowsAux($con)
+    {
         $consultado = false;
         $consulta = "SELECT count(*) numrows FROM folio $con;";
         $consultado = $this->consultas->getResults($consulta, null);
         return $consultado;
     }
 
-    private function getNumrows($condicion){
+    private function getNumrows($condicion)
+    {
         $numrows = 0;
         $rows = $this->getNumrowsAux($condicion);
         foreach ($rows as $actual) {
@@ -54,7 +59,8 @@ class ControladorConfiguracion
         return $numrows;
     }
 
-    private function getFolios($con = ""){
+    private function getFolios($con = "")
+    {
         $consultado = false;
         $consulta = "SELECT * FROM folio $con;";
         $consultas = new Consultas();
@@ -62,7 +68,8 @@ class ControladorConfiguracion
         return $consultado;
     }
 
-    private function getPermisoById($idusuario){
+    private function getPermisoById($idusuario)
+    {
         $consultado = false;
         $c = new Consultas();
         $consulta = "SELECT p.editarfolio, p.eliminarfolio FROM usuariopermiso p WHERE permiso_idusuario=:idusuario;";
@@ -71,7 +78,8 @@ class ControladorConfiguracion
         return $consultado;
     }
 
-    private function getPermisos($idusuario){
+    private function getPermisos($idusuario)
+    {
         $datos = "";
         $permisos = $this->getPermisoById($idusuario);
         foreach ($permisos as $actual) {
@@ -82,7 +90,8 @@ class ControladorConfiguracion
         return $datos;
     }
 
-    private function getFoliosById($id){
+    private function getFoliosById($id)
+    {
         $consultado = false;
         $consulta = "SELECT * FROM folio WHERE idfolio=:id;";
         $consultas = new Consultas();
@@ -91,7 +100,8 @@ class ControladorConfiguracion
         return $consultado;
     }
 
-    public function getDatosFolio($id){
+    public function getDatosFolio($id)
+    {
         $datos = "";
         $folios = $this->getFoliosById($id);
         foreach ($folios as $actual) {
@@ -105,13 +115,15 @@ class ControladorConfiguracion
         return $datos;
     }
 
-    public function valFolioActualizar($f){
+    public function valFolioActualizar($f)
+    {
         $insertar = "";
         $insertar = $this->actualizarFolio($f);
         return $insertar;
     }
 
-    private function actualizarFolio($f){
+    private function actualizarFolio($f)
+    {
         $actualizado = false;
         $inicio = $f->getActualizarinicio();
         if ($f->getNuminicio() != $f->getActualizarinicio()) {
@@ -130,7 +142,8 @@ class ControladorConfiguracion
         return $actualizado;
     }
 
-    public function eliminarFolio($id){
+    public function eliminarFolio($id)
+    {
         $insertado = false;
         $consulta = "DELETE FROM `folio` where idfolio=:id;";
         $valores = array("id" => $id);
@@ -138,7 +151,8 @@ class ControladorConfiguracion
         return $insertado;
     }
 
-    public function listaFolios($pag, $REF, $numreg){
+    public function listaFolios($pag, $REF, $numreg)
+    {
         require_once '../com.sine.common/pagination.php';
 
         $datos = "<thead class='sin-paddding'>
@@ -206,7 +220,8 @@ class ControladorConfiguracion
         return $datos;
     }
 
-    private function getUsoFolio($iduso){
+    private function getUsoFolio($iduso)
+    {
         $usos = ["Facturas", "Notas de crédito", "Pagos", "Cartas porte", "Cotizaciones"];
         $divuso = explode("-", $iduso);
         $usofolio = implode(", ", array_map(function ($uso) use ($usos) {
@@ -216,7 +231,11 @@ class ControladorConfiguracion
         return $usofolio;
     }
 
-    public function importTable($fn, $tabla) {
+    public function importTable($fn, $tabla)
+    {
+        if (!$fn) {
+            return "0Error: Falta seleccionar un archivo excel (.xls, .xlsx)..";
+        }
         $targetPath = '../temporal/tmp/' . $fn;
         $ext = pathinfo($targetPath, PATHINFO_EXTENSION); //obtener la extensión del archivo
         if (!in_array($ext, ['xls', 'xlsx'])) {
@@ -225,86 +244,91 @@ class ControladorConfiguracion
         return $tabla == '1' ? $this->tablaClientes($fn) : ($tabla == '2' ? $this->tablaProductos($fn) : null);
     }
 
-    private function tablaClientes($fn) {
+    private function tablaClientes($fn)
+    {
         $targetPath = '../temporal/tmp/' . $fn;
         $Reader = new Xlsx();
         $hoja = $Reader->load($targetPath);
         $fileexcel = $hoja->getActiveSheet()->toArray();
         $insert = false;
-    
+
         foreach ($fileexcel as $row) {
-            $consulta = "INSERT INTO cliente VALUES (:id, :nombre, :apaterno, :amaterno, :empresa, :correoinfo, :correofact, :correogerencia, :telefono, :idbanco, :cuenta, :clabe, :idbanco1, :cuenta1, :clabe1, :idbanco2, :cuenta2, :clabe2, :idbanco3, :cuenta3, :clabe3, :rfc, :razon, :regimen, :calle, :interior, :exterior, :localidad, :municipio, :estado, :pais, :codpostal, :correoalt1, :correoalt2, :correoalt3);";
-            $valores = array(
-                "id" => null,
-                "nombre" => $row[0],
-                "apaterno" => $row[1],
-                "amaterno" => $row[2],
-                "empresa" => $row[3],
-                "correoinfo" => $row[4],
-                "correofact" => $row[5],
-                "correogerencia" => $row[6],
-                "telefono" => $row[7],
-                "idbanco" => $this->getBanco($row[8]),
-                "cuenta" => $row[9],
-                "clabe" => $row[10],
-                "idbanco1" => '0',
-                "cuenta1" => '',
-                "clabe1" => '',
-                "idbanco2" => '0',
-                "cuenta2" => '',
-                "clabe2" => '',
-                "idbanco3" => '0',
-                "cuenta3" => '',
-                "clabe3" => '',
-                "rfc" => $row[11],
-                "razon" => $row[12],
-                "regimen" => $row[13],
-                "calle" => $row[14],
-                "interior" => $row[15],
-                "exterior" => $row[16],
-                "localidad" => $row[17],
-                "municipio" => $this->getMunicipio($row[19], $this->getEstado($row[18])),
-                "estado" => $this->getEstado($row[18]),
-                "pais" => 'México',
-                "codpostal" => $row[20],
-                "correoalt1" => '',
-                "correoalt2" => '',
-                "correoalt3" => ''
-            );
-            $insert = $this->consultas->execute($consulta, $valores);
+            if (count($row) == 21) {
+                $consulta = "INSERT INTO cliente VALUES (:id, :nombre, :apaterno, :amaterno, :empresa, :correoinfo, :correofact, :correogerencia, :telefono, :idbanco, :cuenta, :clabe, :idbanco1, :cuenta1, :clabe1, :idbanco2, :cuenta2, :clabe2, :idbanco3, :cuenta3, :clabe3, :rfc, :razon, :regimen, :calle, :interior, :exterior, :localidad, :municipio, :estado, :pais, :codpostal, :correoalt1, :correoalt2, :correoalt3);";
+                $valores = array(
+                    "id" => null,
+                    "nombre" => $row[0],
+                    "apaterno" => $row[1],
+                    "amaterno" => $row[2],
+                    "empresa" => $row[3],
+                    "correoinfo" => $row[4],
+                    "correofact" => $row[5],
+                    "correogerencia" => $row[6],
+                    "telefono" => $row[7],
+                    "idbanco" => $this->getBanco($row[8]),
+                    "cuenta" => $row[9],
+                    "clabe" => $row[10],
+                    "idbanco1" => '0',
+                    "cuenta1" => '',
+                    "clabe1" => '',
+                    "idbanco2" => '0',
+                    "cuenta2" => '',
+                    "clabe2" => '',
+                    "idbanco3" => '0',
+                    "cuenta3" => '',
+                    "clabe3" => '',
+                    "rfc" => $row[11],
+                    "razon" => $row[12],
+                    "regimen" => $row[13],
+                    "calle" => $row[14],
+                    "interior" => $row[15],
+                    "exterior" => $row[16],
+                    "localidad" => $row[17],
+                    "municipio" => $this->getMunicipio($row[19], $this->getEstado($row[18])),
+                    "estado" => $this->getEstado($row[18]),
+                    "pais" => 'México',
+                    "codpostal" => $row[20],
+                    "correoalt1" => '',
+                    "correoalt2" => '',
+                    "correoalt3" => ''
+                );
+                $insert = $this->consultas->execute($consulta, $valores);
+            }
         }
         return $insert;
     }
 
-    private function tablaProductos($fn) {
+    private function tablaProductos($fn){
         $targetPath = '../temporal/tmp/' . $fn;
         $Reader = new Xlsx();
         $hoja = $Reader->load($targetPath);
         $fileexcel = $hoja->getActiveSheet()->toArray();
         $insert = false;
-    
+
         foreach ($fileexcel as $row) {
-            $consulta = "INSERT INTO `productos_servicios` VALUES (:id, :codproducto, :producto, :clvunidad, :unidad, :descripcion, :pcompra, :porcentaje, :ganancia, :pventa, :tipo, :clvfiscal, :descfiscal, :idproveedor, :imagen, :chinventario, :cantidad);";
-            $valores = array(
-                "id" => null,
-                "codproducto" => $row[0],
-                "producto" => $row[1],
-                "clvunidad" => $row[2],
-                "unidad" => $row[3],
-                "descripcion" => $row[4],
-                "pcompra" => $row[5],
-                "porcentaje" => $row[6],
-                "ganancia" => $row[7],
-                "pventa" => $row[8],
-                "tipo" => $row[9],
-                "clvfiscal" => $row[10],
-                "descfiscal" => $row[11],
-                "idproveedor" => '0',
-                "imagen" => '',
-                "chinventario" => $row[12],
-                "cantidad" => $row[13]
-            );
-            $insert = $this->consultas->execute($consulta, $valores);
+            if (count($row) == 14) {
+                $consulta = "INSERT INTO `productos_servicios` VALUES (:id, :codproducto, :producto, :clvunidad, :unidad, :descripcion, :pcompra, :porcentaje, :ganancia, :pventa, :tipo, :clvfiscal, :descfiscal, :idproveedor, :imagen, :chinventario, :cantidad);";
+                $valores = array(
+                    "id" => null,
+                    "codproducto" => $row[0],
+                    "producto" => $row[1],
+                    "clvunidad" => $row[2],
+                    "unidad" => $row[3],
+                    "descripcion" => $row[4],
+                    "pcompra" => $row[5],
+                    "porcentaje" => $row[6],
+                    "ganancia" => $row[7],
+                    "pventa" => $row[8],
+                    "tipo" => $row[9],
+                    "clvfiscal" => $row[10],
+                    "descfiscal" => $row[11],
+                    "idproveedor" => '0',
+                    "imagen" => '',
+                    "chinventario" => $row[12],
+                    "cantidad" => $row[13]
+                );
+                $insert = $this->consultas->execute($consulta, $valores);
+            }
         }
         return $insert;
     }
@@ -313,29 +337,34 @@ class ControladorConfiguracion
         $consulta = "SELECT idcatalogo_banco FROM catalogo_banco WHERE nombre_banco LIKE '%$banco%' OR descripcion_banco LIKE '%$banco%';";
         return $this->consultas->getResults($consulta, null);
     }
-    
-    private function getBanco($banco){
+
+    private function getBanco($banco)
+    {
         $datos = $this->getBancoAux($banco);
         return $datos ? $datos[0]['idcatalogo_banco'] : "0";
     }
-    
-    private function getEstadoAux($estado){
+
+    private function getEstadoAux($estado)
+    {
         $consulta = "SELECT id_estado FROM estado WHERE estado LIKE '%$estado%';";
         return $this->consultas->getResults($consulta, null);
     }
-    
-    private function getEstado($estado){
+
+    private function getEstado($estado)
+    {
         $datos = $this->getEstadoAux($estado);
         return $datos ? $datos[0]['id_estado'] : "0";
     }
-    
-    private function getMunicipioAux($municipio, $idestado){
+
+    private function getMunicipioAux($municipio, $idestado)
+    {
         $consulta = "SELECT id_municipio FROM municipio WHERE municipio LIKE '%$municipio%' AND id_estado=:idestado;";
         $val = array("municipio" => $municipio, "idestado" => $idestado);
         return $this->consultas->getResults($consulta, $val);
     }
-    
-    private function getMunicipio($municipio, $idestado){
+
+    private function getMunicipio($municipio, $idestado)
+    {
         $datos = $this->getMunicipioAux($municipio, $idestado);
         return $datos ? $datos[0]['id_municipio'] : "0";
     }
