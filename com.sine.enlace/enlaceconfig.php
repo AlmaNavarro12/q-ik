@@ -8,8 +8,9 @@ if (isset($_POST['transaccion'])) {
     $transaccion = $_POST['transaccion'];
     $c = new Configuracion();
     $cc = new ControladorConfiguracion();
-    //-------------------------------------- FOLIO
+    
     switch ($transaccion) {
+        //------------------------------------ FOLIO
         case 'insertarfolio':
             $insertado = $cc->valFolio(obtenerDatosFolio());
             break;

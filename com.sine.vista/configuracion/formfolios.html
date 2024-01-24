@@ -42,7 +42,8 @@
     </div>
     <div class="row mt-4">
         <div class="col-md-6">
-            <label class="label-form text-right" for="btn-uso">Usar en:</label>
+            <label class="label-form text-right" for="btn-uso">Usar en:</label> <label
+            class="fw-bold text-danger">*</label>
             <div class="form-group">
                 <div class='input-group'>
                     <div class="dropdown btn-group dropend">
@@ -88,10 +89,10 @@
                 </div>
             </div>
         </div>
-        <div class="row col-md-6 d-flex justify-content-end mt-4">
-            <button class="button-form btn btn-danger col-auto mx-1" onclick="loadViewConfig('listafolio')">Cancelar
+        <div class="row col-md-6 d-flex justify-content-end mt-4 px-0">
+            <button class="button-form btn btn-danger col-auto me-2" onclick="loadViewConfig('listafolio')">Cancelar
                 <span class="fas fa-times"></span></button>
-            <button class="button-form btn btn-primary col-auto mx-1" onclick="insertarFolio()"
+            <button class="button-form btn btn-primary col-auto" onclick="insertarFolio()"
                 id="btn-form-folio">Guardar <span class="fas fa-save"></span></button>
         </div>
     </div>

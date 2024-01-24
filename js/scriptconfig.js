@@ -131,14 +131,12 @@ function obtenerDatosFolio() {
     var usofolio = $("input[name='chusofolio']:checked").map(function () { //obtener un array de valores
         return $(this).val();
     }).get().join("-"); // unir valores con un guion ("-").
-    
     return {serie, letra, folio, usofolio};
 }
 
 function insertarFolio(idfolio = null) {
     var datosFolio = obtenerDatosFolio();
-    if ((idfolio == null && isnEmpty(datosFolio.serie, "serie") && isnEmpty(datosFolio.folio, "folio-inicio") && isnEmpty(datosFolio.usofolio, "btn-uso")) ||
-        (idfolio != null && isnEmpty(datosFolio.serie, "serie") && isnEmpty(datosFolio.folio, "folio-inicio"))) {
+    if ((isnEmpty(datosFolio.serie, "serie") && isnEmpty(datosFolio.folio, "folio-inicio") && isnEmpty(datosFolio.usofolio, "btn-uso"))) {
     cargandoHide();
         cargandoShow();
         var transaccion = (idfolio == null) ? "insertarfolio" : "actualizarfolio";
@@ -250,7 +248,7 @@ function eliminarFolio(idfolio) {
 
 //--------------------------------TABLAS
 function loadFormato() {
-    var tabla = $("#tabla-datos").val();
+    var tabla = $("#datos").val();
     var data = "";
     if (tabla == '1') {
         data = `<div class='container'>
@@ -359,24 +357,30 @@ function cargarArchivoTabla() {
 
 function loadArchivo() {
     var fnm = $("#filename").val();
-    var tabla = $("#tabla-datos").val();
-    cargandoHide();
-    cargandoShow();
-    $.ajax({
-        url: "com.sine.enlace/enlaceconfig.php",
-        type: "POST",
-        data: {transaccion: "loadexcel", fnm: fnm, tabla: tabla},
-        success: function (datos) {
-            var texto = datos.toString();
-            var bandera = texto.substring(0, 1);
-            var res = texto.substring(1, 1000);
-            if (bandera == '0') {
-                alertify.error(res);
-            } else {
-                alertify.success('Datos guardados correctamente.');
-                loadViewConfig('tablas');
+    var tabla = $("#datos").val();
+
+    if (isnEmpty(tabla, "datos") && isnEmpty(fnm, "imagen")) {
+        cargandoHide();
+        cargandoShow();
+        $.ajax({
+            url: "com.sine.enlace/enlaceconfig.php",
+            type: "POST",
+            data: {transaccion: "loadexcel", fnm: fnm, tabla: tabla},
+            success: function (datos) {
+                var texto = datos.toString();
+                var bandera = texto.substring(0, 1);
+                var res = texto.substring(1, 1000);
+
+                if (bandera == '0') {
+                    alertify.error(res);
+                } else {
+                    alertify.success('Datos guardados correctamente.');
+                    loadViewConfig('tablas');
+                }
+                cargandoHide();
             }
-            cargandoHide();
-        }
-    });
+        });
+    }
 }
+
+//--------------------------------USUARIOS

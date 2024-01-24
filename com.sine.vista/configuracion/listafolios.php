@@ -19,8 +19,8 @@
     </div>
 </form>
 
-<div class="scrollX">
-    <table class="table table-hover table-condensed table-responsive table-row table-head" id="body-lista-folios">
+<div class="scrollX table-responsive">
+    <table class="table table-hover table-row table-head" id="body-lista-folios">
         <thead class="p-0">
             <tr>
             <th class="col-2">Serie</th>

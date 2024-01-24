@@ -19,7 +19,7 @@ function validarNum(input) {
 function isnEmpty(val, id) {
     if (val == "") {
         $("#" + id).css("border-color", "red");
-        $("#" + id + "-errors").text("Este campo no puede estar vacío");
+        $("#" + id + "-errors").text("Este campo no puede estar vacío.");
         $("#" + id + "-errors").css("color", "red");
         $("#" + id).focus();
         return false;

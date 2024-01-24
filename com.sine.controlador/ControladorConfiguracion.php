@@ -233,9 +233,6 @@ class ControladorConfiguracion
 
     public function importTable($fn, $tabla)
     {
-        if (!$fn) {
-            return "0Error: Falta seleccionar un archivo excel (.xls, .xlsx)..";
-        }
         $targetPath = '../temporal/tmp/' . $fn;
         $ext = pathinfo($targetPath, PATHINFO_EXTENSION); //obtener la extensión del archivo
         if (!in_array($ext, ['xls', 'xlsx'])) {

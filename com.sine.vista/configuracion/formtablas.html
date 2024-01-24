@@ -3,18 +3,18 @@
     <div class="row">
         <div class="col-md-4">
             <div class="col-md-12">
-                <label class="label-form" for="tabla-datos">Tabla</label> <label
+                <label class="label-form" for="datos">Tabla</label> <label
                     class="mark-required text-right text-danger">*</label>
                 <div class="form-group">
-                    <select class="form-select input-form" id="tabla-datos" name="tabla-datos"
-                        onchange="loadFormato();" required>
+                    <select class="form-select input-form" id="datos" name="datos"
+                        onchange="loadFormato();">
                         <option value="" id="option-default-tabla" class="text-center">- - - -</option>
-                        <optgroup id="tabladatos" class="contenedor-tablas text-left">
+                        <optgroup id="tabladatos" class="contenedor-tablas">
                             <option value="1" id="tabla1">Clientes</option>
                             <option value="2" id="tabla2">Productos</option>
                         </optgroup>
                     </select>
-                    <div id="tabla-datos-errors">
+                    <div id="datos-errors">
                     </div>
                 </div>
             </div>
