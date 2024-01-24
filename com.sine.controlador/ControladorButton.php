@@ -4,7 +4,9 @@ require_once '../com.sine.dao/Consultas.php';
 
 class ControladorButton {
 
-    function __construct() {}
+    function __construct() {
+        
+    }
 
     public function getPermisoById() {
         session_start();
@@ -51,57 +53,57 @@ class ControladorButton {
         switch ($view) {
             case "factura":
                 if ($crearfactura == '1') {
-                    $btn = "<button onclick=\"loadView('factura');\" >Crear Factura <span class='lnr lnr-plus-circle icon-size'></span></button>";
+                    $btn = "<button class='button-create' onclick=\"loadView('factura');\" >Crear Factura <span class='lnr lnr-plus-circle icon-size'></span></button>";
                 }
                 break;
             case "pago":
                 if ($crearpago == '1') {
-                    $btn = "<button onclick=\"loadView('pago');\">Crear Pago <span class='lnr lnr-plus-circle icon-size'></span></button>";
+                    $btn = "<button class='button-create' onclick=\"loadView('pago');\">Crear Pago <span class='lnr lnr-plus-circle icon-size'></span></button>";
                 }
                 break;
             case 'cotizacion':
                 if ($crearcotizacion == '1') {
-                    $btn = "<button onclick=\"loadView('cotizacion');\">Crear Cotizacion <span class='lnr lnr-plus-circle icon-size'></span></button>";
+                    $btn = "<button class='button-create' onclick=\"loadView('cotizacion');\">Crear Cotizacion <span class='lnr lnr-plus-circle icon-size'></span></button>";
                 }
                 break;
             case 'cliente':
                 if ($crearcliente == '1') {
-                    $btn = "<button onclick=\"loadView('nuevocliente');\">Nuevo Cliente <span class='lnr lnr-plus-circle icon-size'></span></button>";
+                    $btn = "<button class='button-create' onclick=\"loadView('nuevocliente');\">Nuevo Cliente <span class='lnr lnr-plus-circle icon-size'></span></button>";
                 }
                 break;
             case "comunicado":
                 if ($crearcomunicado == '1') {
-                    $btn = "<button onclick=\"loadView('comunicado');\">Crear Comunicado <span class='lnr lnr-plus-circle icon-size'></span></button>";
+                    $btn = "<button class='button-create' onclick=\"loadView('comunicado');\">Crear Comunicado <span class='lnr lnr-plus-circle icon-size'></span></button>";
                 }
                 break;
             case 'producto':
                 if ($crearproducto == '1') {
-                    $btn = "<button onclick=\"loadView('nuevoproducto');\">Crear producto <span class='lnr lnr-plus-circle icon-size'></span></button>";
+                    $btn = "<button class='button-create' onclick=\"loadView('nuevoproducto');\">Crear producto <span class='lnr lnr-plus-circle icon-size'></span></button>";
                 }
                 break;
             case "proveedor":
                 if ($crearproveedor == '1') {
-                    $btn = "<button onclick=\"loadView('nuevoproveedor');\">Nuevo Proveedor <span class='lnr lnr-plus-circle icon-size'></span></button>";
+                    $btn = "<button class='button-create' onclick=\"loadView('nuevoproveedor');\">Nuevo Proveedor <span class='lnr lnr-plus-circle icon-size'></span></button>";
                 }
                 break;
             case 'impuesto':
                 if ($crearimpuesto == '1') {
-                    $btn = "<button onclick=\"loadView('impuesto');\">Crear impuesto <span class='lnr lnr-plus-circle icon-size'></span></button>";
+                    $btn = "<button class='button-create' onclick=\"loadView('impuesto');\">Crear impuesto <span class='lnr lnr-plus-circle icon-size'></span></button>";
                 }
                 break;
             case "datos":
                 if ($creardatos == '1') {
-                    $btn = "<button onclick=\"loadView('datosempresa');\">Alta Datos <span class='lnr lnr-plus-circle icon-size'></span></button>";
+                    $btn = "<button class='button-create' onclick=\"loadView('datosempresa');\">Alta Datos <span class='lnr lnr-plus-circle icon-size'></span></button>";
                 }
                 break;
             case 'contrato':
                 if ($crearcontrato == '1') {
-                    $btn = "<button onclick=\"loadView('nuevocontrato');\">Crear Factura <span class='lnr lnr-plus-circle icon-size'></span></button>";
+                    $btn = "<button class='button-create' onclick=\"loadView('nuevocontrato');\">Crear Factura <span class='lnr lnr-plus-circle icon-size'></span></button>";
                 }
                 break;
             case 'usuario':
                 if ($crearusuario == '1') {
-                    $btn = "<button onclick=\"loadView('nuevousuario');\">Crear usuario <span class='lnr lnr-plus-circle icon-size'></span></button>";
+                    $btn = "<button class='button-create' onclick=\"loadView('nuevousuario');\">Crear usuario <span class='lnr lnr-plus-circle icon-size'></span></button>";
                 }
                 break;
             case 'config':
@@ -114,37 +116,37 @@ class ControladorButton {
                 break;
             case 'empleado':
                 if ($crearempleado == '1') {
-                    $btn = "<button onclick=\"loadView('empleado');\">Registrar Empleado <span class='lnr lnr-plus-circle icon-size'></span></button>";
+                    $btn = "<button class='button-create' onclick=\"loadView('empleado');\">Registrar Empleado <span class='lnr lnr-plus-circle icon-size'></span></button>";
                 }
                 break;
             case 'nomina':
                 if ($crearnomina == '1') {
-                    $btn = "<button onclick=\"loadView('nomina');\">Crear Nomina <span class='lnr lnr-plus-circle icon-size'></span></button>";
+                    $btn = "<button class='button-create' onclick=\"loadView('nomina');\">Crear Nomina <span class='lnr lnr-plus-circle icon-size'></span></button>";
                 }
                 break;
             case 'destino':
                 if ($crearubicacion == '1') {
-                    $btn = "<button onclick=\"loadView('direccion');\">Crear Ubicacion <span class='lnr lnr-plus-circle icon-size'></span></button>";
+                    $btn = "<button class='button-create' onclick=\"loadView('direccion');\">Crear Ubicacion <span class='lnr lnr-plus-circle icon-size'></span></button>";
                 }
                 break;
             case 'transporte':
                 if ($creartransporte == '1') {
-                    $btn = "<button onclick=\"loadView('transporte');\">Crear Transporte <span class='lnr lnr-plus-circle icon-size'></span></button>";
+                    $btn = "<button class='button-create' onclick=\"loadView('transporte');\">Crear Transporte <span class='lnr lnr-plus-circle icon-size'></span></button>";
                 }
                 break;
             case 'remolque':
                 if ($crearremolque == '1') {
-                    $btn = "<button onclick=\"loadView('remolque');\">Crear Remolque <span class='lnr lnr-plus-circle icon-size'></span></button>";
+                    $btn = "<button class='button-create' onclick=\"loadView('remolque');\">Crear Remolque <span class='lnr lnr-plus-circle icon-size'></span></button>";
                 }
                 break;
             case 'operador':
                 if ($crearoperador == '1') {
-                    $btn = "<button onclick=\"loadView('operador');\">Crear Operador <span class='lnr lnr-plus-circle icon-size'></span></button>";
+                    $btn = "<button class='button-create' onclick=\"loadView('operador');\">Crear Operador <span class='lnr lnr-plus-circle icon-size'></span></button>";
                 }
                 break;
             case 'carta':
                 if ($crearcarta == '1') {
-                    $btn = "<button onclick=\"loadView('carta');\">Crear Carta <span class='lnr lnr-plus-circle icon-size'></span></button>";
+                    $btn = "<button class='button-create' onclick=\"loadView('carta');\">Crear Carta <span class='lnr lnr-plus-circle icon-size'></span></button>";
                 }
                 break;
             default:

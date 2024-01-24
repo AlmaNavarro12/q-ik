@@ -382,5 +382,3 @@ function loadArchivo() {
         });
     }
 }
-
-//--------------------------------USUARIOS

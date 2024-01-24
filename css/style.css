@@ -546,7 +546,6 @@ article{
 }
 
 .div-form {
-    padding: 40px;
     border-radius: 15px;
     box-shadow: 0px 17px 19px -6px rgba(197, 197, 213, 0.4);
 }
@@ -666,6 +665,22 @@ article{
     display: none;
 }
 
+.button-create{
+    outline:none !important;
+    width: 257px;
+    height: 65px;
+    background: none;
+    border: 2px solid #CECEE2;
+    box-sizing: border-box;
+    border-radius: 5px;
+    font-family: sans-serif;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 17px;
+    line-height: 250.7%;
+    text-align: center;
+    color: #17177C;
+}
 /*--------------------------------FORMULARIO DE FOLIO CONFIGURACION --------------------*/
 .label-sub{
     font-family: sans-serif;

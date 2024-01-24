@@ -218,6 +218,21 @@ function loadView(vista) {
     }
 }
 
+function loadBtnCrear(view) {
+    $.ajax({
+        url: "com.sine.enlace/enlacepermiso.php",
+        type: "POST",
+        data: {transaccion: "loadbtn", view: view},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 1000);
+            $("#btn-crear").html(datos);
+            cargandoHide();
+        }
+    });
+}
+
 function logout() {
     cargandoShow();
     $.ajax({
