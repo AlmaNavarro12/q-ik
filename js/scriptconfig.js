@@ -43,6 +43,7 @@ function loadBtnConfig(view) {
         }
     });
 }
+
 function loadViewConfig(vista) {
     getViewConfig(vista);
 

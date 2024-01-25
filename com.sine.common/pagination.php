@@ -3,7 +3,7 @@
 function paginate($page, $tpages, $adjacents, $function) {
     $prevlabel = "&lsaquo; Anterior";
     $nextlabel = "Siguiente &rsaquo;";
-    $out = '<ul class="pagination pagination-sm justify-content-end">';
+    $out = '<ul class="col-12 mb-0 mt-2 mx-auto pagination pagination-sm justify-content-end">';
 
     // previous label
     if ($page == 1) {

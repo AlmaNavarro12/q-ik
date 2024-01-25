@@ -1,11 +1,14 @@
-<div class="col-md-12"><div class="titulo-lista">Usuarios</div></div>
-<form class="form-horizontal px-3" onsubmit="return false;">
+<div class="col-md-12">
+    <div class="titulo-lista">Usuarios</div>
+</div>
+<form class="form-horizontal ps-3" onsubmit="return false;">
     <div class="row col-12 p-0">
         <div class="col-sm-6 py-1">
-            <input type="text" class="form-control input-search text-secondary-emphasis" id="buscar-usuario" placeholder="Buscar usuario (Usuario o nombre/apellidos)" oninput="buscarUsuario()">
+            <input type="text" class="form-control input-search text-secondary-emphasis" id="buscar-usuario"
+                placeholder="Buscar usuario (Usuario o nombre/apellidos)" oninput="filtrarUsuario()">
         </div>
         <div class="col-sm-2 py-1">
-            <select class="form-select input-search" id="num-reg" name="num-reg" onchange="buscarUsuario()">
+            <select class="form-select input-search text-center" id="num-reg" name="num-reg" onchange="filtrarUsuario()">
                 <option value="10"> 10</option>
                 <option value="15"> 15</option>
                 <option value="20"> 20</option>
@@ -21,18 +24,18 @@
 <div class="scrollX div-form mw-100 bg-light mx-3 mt-3 border border-secondary-subtle">
     <table class="table tab-hover table-condensed table-responsive table-row table-head" id="body-lista-usuarios-altas">
         <thead class="p-0">
-            <tr >
-                <th>Usuario </th>
-                <th>Nombre </th>
-                <th>Apellido paterno </th>
-                <th>Apellido Materno </th>
-                <th>Correo </th>
-                <th>Celular </th>
-                <th>Teléfono </th>
-                <th class="col-2 text-center">Opción <span class='fas fa-ellipsis-v text-muted'></span></th>
+            <tr>
+                <th class="col-auto">Usuario</th>
+                <th class="col-auto">Nombre</th>
+                <th class="col-auto">Apellido paterno</th>
+                <th class="col-auto">Apellido materno</th>
+                <th class="col-auto">Correo</th>
+                <th class="col-auto">Celular</th>
+                <th class="col-auto">Teléfono</th>
+                <th class="col-auto">Opción</th>
             </tr>
         </thead>
-        <tbody >
+        <tbody>
         </tbody>
     </table>
 </div>

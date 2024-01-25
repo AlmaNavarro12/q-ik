@@ -5,7 +5,7 @@
             <input type="text" class="form-control input-search text-secondary-emphasis" id="buscar-folio" placeholder="Buscar folio por serie o letra" oninput="loadListaFolio()">
         </div>
         <div class="col-sm-2 py-1">
-            <select class="form-select input-search" id="num-reg" name="num-reg" onchange="loadListaFolio()">
+            <select class="form-select input-search text-center" id="num-reg" name="num-reg" onchange="loadListaFolio()">
                 <option value="10"> 10</option>
                 <option value="15"> 15</option>
                 <option value="20"> 20</option>
@@ -14,7 +14,7 @@
                 <option value="100">100</option>
             </select>
         </div>
-        <div class="col-sm-4 py-1 d-flex justify-content-end" id="btn-crear-folio">
+        <div class="col-sm-4 py-1 d-flex justify-content-end px-0" id="btn-crear-folio">
         </div>
     </div>
 </form>

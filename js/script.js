@@ -30,6 +30,44 @@ function isnEmpty(val, id) {
     }
 }
 
+function isPhoneNumber(val, id) {
+    if (!isNaN(val)) {
+        var n = val.toString();
+        if (n.length > 6 && n.length < 11) {
+            $("#" + id + "-errors").text("");
+            $("#" + id).css("border-color", "green");
+            return true;
+        } else {
+            $("#" + id).css("border-color", "red");
+            $("#" + id + "-errors").text("Los numeros de telefono deben tener entre 7 y 10 digitos");
+            $("#" + id + "-errors").css("color", "red");
+            $("#" + id).focus();
+            return false;
+        }
+    } else {
+        $("#" + id).css("border-color", "red");
+        $("#" + id + "-errors").text("Debes escribir solo numeros");
+        $("#" + id + "-errors").css("color", "red");
+        $("#" + id).focus();
+        return false;
+    }
+}
+
+function isEmail(val, id) {
+    expr = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+    if (!expr.test(val)) {
+        $("#" + id).css("border-color", "red");
+        $("#" + id + "-errors").text("La direccion de correo (Email) no es valida");
+        $("#" + id + "-errors").css("color", "red");
+        $("#" + id).focus();
+        return false;
+    } else {
+        $("#" + id + "-errors").text("");
+        $("#" + id).css("border-color", "green");
+        return true;
+    }
+}
+
 //Función para ocultar el menu responsivo
 function resetMenu() {
     if (window.innerWidth >= 700) {
