@@ -39,17 +39,11 @@ function isPhoneNumber(val, id) {
             return true;
         } else {
             $("#" + id).css("border-color", "red");
-            $("#" + id + "-errors").text("Los numeros de telefono deben tener entre 7 y 10 digitos");
+            $("#" + id + "-errors").text("Los números de teléfono deben tener entre 7 y 10 dígitos.");
             $("#" + id + "-errors").css("color", "red");
             $("#" + id).focus();
             return false;
         }
-    } else {
-        $("#" + id).css("border-color", "red");
-        $("#" + id + "-errors").text("Debes escribir solo numeros");
-        $("#" + id + "-errors").css("color", "red");
-        $("#" + id).focus();
-        return false;
     }
 }
 
@@ -57,7 +51,7 @@ function isEmail(val, id) {
     expr = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
     if (!expr.test(val)) {
         $("#" + id).css("border-color", "red");
-        $("#" + id + "-errors").text("La direccion de correo (Email) no es valida");
+        $("#" + id + "-errors").text("La dirección de correo (email) no es válida.");
         $("#" + id + "-errors").css("color", "red");
         $("#" + id).focus();
         return false;
@@ -182,7 +176,7 @@ function loadView(vista) {
         'paginicio': ["getUserFirstSession()", 300, "getSaldo()", 350, "datosGrafica()", 400, "loadopcionesAno()", 450],
         'notificacion': ["filtrarNotificaciones()", 350],
         'comprar': [],
-        'nuevousuario': ["checkUsuario()", 350, "truncateTmp()", 400, "truncateTmpCot()", 400, "loadOpcionesEstado()", 450],
+        'nuevousuario': ["checkUsuario()", 350, /** "truncateTmp()", 400, "truncateTmpCot()", 400, "loadOpcionesEstado()", 450 */],
         'listasuarioaltas': ["truncateTmp()", 300, "truncateTmpCot()", 350, "loadBtnCrear('usuario')", 370, "filtrarUsuario()", 400],
         'asignarpermisos': ["truncateTmp()", 300, "truncateTmpCot()", 350],
         'categoria': [],

@@ -11,7 +11,7 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-md-3">
+            <div class="col-md-3 col-sm-12 pb-3">
                 <label class="button-file" for="imagen"><span class="fas fa-image"></span>
                     Imagen de Perfil</label>
                 <div class="form-group">
@@ -22,7 +22,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-3 ex-profile" id="muestraimagen">
+            <div class="col-md-3 ps-0 ex-profile text-center" id="muestraimagen">
             </div>
             <div class="col-md-6 py-2">
                 <label class="label-form" for="nombre">Nombre</label> <label
@@ -92,8 +92,7 @@
                 <div class="form-group">
                     <input class="form-control text-center input-form" id="correo" name="correo" placeholder="Correo"
                         type="email" />
-                    <div id="correo-errors">
-                    </div>
+                    <div id="correo-errors"></div>
                 </div>
             </div>
             <div class="col-md-6 py-2">
@@ -101,7 +100,7 @@
                     class="mark-required text-danger fw-bold">*</label>
                 <div class="form-group">
                     <input class="form-control text-center input-form" id="telefono" name="telefono"
-                        placeholder="Telefono" type="number" />
+                        placeholder="Telefono" type="text" maxlength="10" oninput="validarNum(this)"/>
                     <div id="telefono-errors">
                     </div>
                 </div>
@@ -112,7 +111,7 @@
                 <label class="label-form" for="celular">Celular</label>
                 <div class="form-group">
                     <input class="form-control text-center input-form" id="celular" name="celular" placeholder="Celular"
-                        type="number" />
+                        type="text" maxlength="10" oninput="validarNum(this)" />
                     <div id="correo-errors">
                     </div>
                 </div>
@@ -143,7 +142,3 @@
 </form>
 <br />
 <script type="text/javascript" src="js/scriptusuario.js"></script>
-<script>
-    window.addEventListener('resize', resetDiv);
-    resetDiv();
-</script>

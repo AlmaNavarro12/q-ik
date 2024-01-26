@@ -3,7 +3,7 @@ function loadListaUsuariosaltas() {
     $.ajax({
         url: "com.sine.enlace/enlaceusuario.php",
         type: "POST",
-        data: {transaccion: "listausuariosaltas"},
+        data: { transaccion: "listausuariosaltas" },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -19,12 +19,10 @@ function loadListaUsuariosaltas() {
 }
 
 function filtrarUsuario(pag = "") {
-    var US = $("#buscar-usuario").val();
-    var numreg = $("#num-reg").val();
     $.ajax({
         url: "com.sine.enlace/enlaceusuario.php",
         type: "POST",
-        data: {transaccion: "filtrarusuario", US: US, numreg: numreg, pag: pag},
+        data: { transaccion: "filtrarusuario", US: $("#buscar-usuario").val(), numreg: $("#num-reg").val(), pag: pag },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -40,33 +38,63 @@ function filtrarUsuario(pag = "") {
     });
 }
 
-function insertarUsuario() {
-    var img = $("#filename").val();
-    var nombre = $("#nombre").val();
-    var apellidopaterno = $("#apellido-paterno").val();
-    var apellidomaterno = $("#apellido-materno").val();
-    var telefono = $("#telefono").val();
-    var celular = $("#celular").val();
-    var correo = $("#correo").val();
-    var usuario = $("#usuario").val();
-    var contrasena = $("#contrasena").val();
-    var estatus = $("#estatus").val();
-    var tipo = $("#tipo-usuario").val();
+function obtenerDatosUsuario() {
+    return {
+        nombre: $("#nombre").val(),
+        apellidopaterno: $("#apellido-paterno").val(),
+        apellidomaterno: $("#apellido-materno").val(),
+        telefono: $("#telefono").val(),
+        celular: $("#celular").val(),
+        usuario: $("#usuario").val(),
+        password: $("#contrasena").val(),
+        correo: $("#correo").val(),
+        tipo: $("#tipo-usuario").val(),
+        img: $("#filename").val(),
+        chpass: ($("#chpass").prop('checked')) ? 1 : 0,
+        imgactualizar: $("#imgactualizar").val()
+    };
+}
 
-    if (isnEmpty(nombre, "nombre") && isnEmpty(apellidopaterno, "apellido-paterno") && isnEmpty(apellidomaterno, "apellido-materno") && isnEmpty(usuario, "usuario") && isnEmpty(contrasena, "contrasena") && isEmail(correo, "correo") && isPhoneNumber(telefono, "telefono") && isnEmpty(tipo, "tipo-usuario")) {
+function insertarUsuario(idusuario = null) {
+    var datosUsuario = obtenerDatosUsuario();
+    if ((idusuario == null && isnEmpty(datosUsuario.nombre, "nombre") && isnEmpty(datosUsuario.apellidopaterno, "apellido-paterno") && isnEmpty(datosUsuario.apellidomaterno, "apellido-materno") && isnEmpty(datosUsuario.usuario, "usuario") && isnEmpty(datosUsuario.password, "contrasena") && isEmail(datosUsuario.correo, "correo") && isPhoneNumber(datosUsuario.telefono, "telefono") && isnEmpty(datosUsuario.tipo, "tipo-usuario")) 
+    || (idusuario != null && isnEmpty(datosUsuario.nombre, "nombre") && isnEmpty(datosUsuario.apellidopaterno, "apellido-paterno") &&  isnEmpty(datosUsuario.usuario, "usuario") && isEmail(datosUsuario.correo, "correo") && isPhoneNumber(datosUsuario.telefono, "telefono") && isnEmpty(datosUsuario.tipo, "tipo-usuario"))){
+        var transaccion = (idusuario == null) ? "insertarusuario" : "actualizarusuario";
         $.ajax({
             url: "com.sine.enlace/enlaceusuario.php",
             type: "POST",
-            data: {transaccion: "insertrausuario", nombre: nombre, apellidopaterno: apellidopaterno, apellidomaterno: apellidomaterno, telefono: telefono, celular: celular, usuario: usuario, password: contrasena, correo: correo, estatus: estatus, tipo: tipo, img: img},
+            data: {
+                transaccion: transaccion,
+                idusuario: idusuario,
+                transaccion: transaccion,
+                idusuario: idusuario,
+                nombre: datosUsuario.nombre,
+                apellidopaterno: datosUsuario.apellidopaterno,
+                apellidomaterno: datosUsuario.apellidomaterno,
+                telefono: datosUsuario.telefono,
+                celular: datosUsuario.celular,
+                usuario: datosUsuario.usuario,
+                password: datosUsuario.password,
+                correo: datosUsuario.correo,
+                tipo: datosUsuario.tipo,
+                img: datosUsuario.img,
+                chpass: datosUsuario.chpass,
+                imgactualizar: datosUsuario.imgactualizar
+            },
             success: function (datos) {
                 var texto = datos.toString();
                 var bandera = texto.substring(0, 1);
                 var res = texto.substring(1, 1000);
+
                 if (bandera == '0') {
                     alertify.error(res);
                 } else {
-                    alertify.success('Datos de usuario registrado');
-                    loadView('listasuarioaltas');
+                    alertify.success('Se guardaron los datos correctamente ');
+                    if (datosUsuario.img != "" && idusuario != null) {
+                        location.href = 'home.php';
+                    } else {
+                        loadView('listasuarioaltas');
+                    }
                 }
             }
         });
@@ -79,7 +107,7 @@ function editarUsuario(idusuario) {
     $.ajax({
         url: "com.sine.enlace/enlaceusuario.php",
         type: "POST",
-        data: {transaccion: "editarusuario", idusuario: idusuario},
+        data: { transaccion: "editarusuario", idusuario: idusuario },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -109,8 +137,6 @@ function setValoresEditarUsuario(datos) {
     var celular = array[6];
     var correo = array[5];
     var usuario = array[4];
-    var estatus = array[8];
-    var contraseña = array[9];
     var tipo = array[10];
     var idlogin = array[11];
     var tipologin = array[12];
@@ -125,8 +151,8 @@ function setValoresEditarUsuario(datos) {
     $("#correo").val(correo);
     $("#usuario").val(usuario);
     $("#tipo-usuario").val(tipo);
-    
-    if(imgnm != ''){
+
+    if (imgnm != '') {
         $("#muestraimagen").html(img);
         $("#filename").val(imgnm);
     }
@@ -136,17 +162,16 @@ function setValoresEditarUsuario(datos) {
     }
     if (idusuario == idlogin || tipologin == '1') {
         $("#div-user").addClass('col-md-11');
-        $("#span-user").addClass('col-md-1 ps-0');
+        $("#span-user").addClass('col-md-1 ps-0 py-2');
         $("#span-user").append("<input class='input-check' type='checkbox' id='chuser' onclick='checkUser()' title='Cambiar nombre de usuario'/>");
-        
+
         $("#div-pass").addClass('col-md-11');
-        $("#span-pass").addClass('col-md-1 ps-0');
+        $("#span-pass").addClass('col-md-1 ps-0 py-2');
         $("#span-pass").append("<input class='input-check' type='checkbox' id='chpass' onclick='checkContrasena()' title='Cambiar contraseña'/>");
     }
     $("#contrasena").val("");
-
     $("#form-usuario").append("<input type='hidden' id='id-usuario' name='id-usuario' value='" + idusuario + "'/><input type='hidden' id='imgactualizar' name='imgactualizar' value='" + img + "'/>")
-    $("#btn-form-usuario").attr("onclick", "actualizarUsuario();");
+    $("#btn-form-usuario").attr("onclick", "insertarUsuario(" + idusuario + ");");
 }
 
 function checkUser() {
@@ -161,7 +186,7 @@ function checkUser() {
             $("#usuario").removeAttr('disabled');
         }, function () {
             $("#chuser").removeAttr('checked');
-        }).set({title: "Q-ik"});
+        }).set({ title: "Q-ik" });
     }
 }
 
@@ -178,7 +203,7 @@ function checkContrasena() {
             $("#contrasena").removeAttr('disabled');
         }, function () {
             $("#chpass").removeAttr('checked');
-        }).set({title: "Q-ik"});
+        }).set({ title: "Q-ik" });
     }
 }
 
@@ -204,55 +229,14 @@ function cargarImgUsuario() {
     }
 }
 
-function actualizarUsuario() {
-    var idusuario = $("#id-usuario").val();
-    var nombre = $("#nombre").val();
-    var apellidopaterno = $("#apellido-paterno").val();
-    var apellidomaterno = $("#apellido-materno").val();
-    var telefono = $("#telefono").val();
-    var celular = $("#celular").val();
-    var correo = $("#correo").val();
-    var usuario = $("#usuario").val();
-    var contrasena = $("#contrasena").val();
-    var tipo = $("#tipo-usuario").val();
-    var img = $("#filename").val();
-    var imgactualizar = $("#imgactualizar").val();
-    var chpass = 0;
-    if ($("#chpass").prop('checked')) {
-        chpass = 1;
-    }
-    if (isnEmpty(nombre, "nombre") && isnEmpty(apellidopaterno, "apellido-paterno") && isnEmpty(apellidomaterno, "apellido-materno") && isPhoneNumber(telefono, "telefono") && isPhoneNumber(celular, "celular") && isnEmpty(usuario, "usuario") && isEmail(correo, "correo")) {
-        $.ajax({
-            url: "com.sine.enlace/enlaceusuario.php",
-            type: "POST",
-            data: {transaccion: "actualizarusuario", idusuario: idusuario, nombre: nombre, apellidopaterno: apellidopaterno, apellidomaterno: apellidomaterno, telefono: telefono, usuario: usuario, contrasena: contrasena, celular: celular, correo: correo, tipo: tipo, chpass: chpass, img: img, imgactualizar:imgactualizar},
-            success: function (datos) {
-                var texto = datos.toString();
-                var bandera = texto.substring(0, 1);
-                var res = texto.substring(1, 1000);
-                if (bandera == '0') {
-                    alertify.error(res);
-                } else {
-                    alertify.success('Se guardaron los datos correctamente ');
-                    if (img != "") {
-                        location.href = 'home.php';
-                    } else {
-                        loadView('listasuarioaltas');
-                    }
-                }
-            }
-        });
-    }
-}
-
 function eliminarUsuario(idusuario) {
-    alertify.confirm("Estas seguro que quieres eliminar este usuario?", function () {
+    alertify.confirm("¿Estás seguro que quieres eliminar este usuario?", function () {
         cargandoHide();
         cargandoShow();
         $.ajax({
             url: "com.sine.enlace/enlaceusuario.php",
             type: "POST",
-            data: {transaccion: "eliminarusuario", idusuario: idusuario},
+            data: { transaccion: "eliminarusuario", idusuario: idusuario },
             success: function (datos) {
                 var texto = datos.toString();
                 var bandera = texto.substring(0, 1);
@@ -265,14 +249,14 @@ function eliminarUsuario(idusuario) {
                 }
             }
         });
-    }).set({title: "Q-ik"});
+    }).set({ title: "Q-ik" });
 }
 
 function crearIMG() {
     $.ajax({
         url: "com.sine.enlace/enlaceusuario.php",
         type: "POST",
-        data: {transaccion: "crearimg"},
+        data: { transaccion: "crearimg" },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -284,4 +268,61 @@ function crearIMG() {
             }
         }
     });
+}
+
+function checkUsuario() {
+    $.ajax({
+        url: "com.sine.enlace/enlaceusuario.php",
+        type: "POST",
+        data: {transaccion: "gettipousuario"},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 1000);
+            if (bandera == '0') {
+                alertify.error(res);
+            } else {
+                if (datos == '2') {
+                    $("#tipo-usuario").val('2');
+                    $("#tipo-usuario").attr('disabled', true);
+                }
+            }
+        }
+    });
+}
+
+function asignarPermisos(idusuario) {
+    cargandoHide();
+    cargandoShow();
+    $.ajax({
+        url: "com.sine.enlace/enlaceusuario.php",
+        type: "POST",
+        data: {transaccion: "asignarpermiso", idusuario: idusuario},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 1000);
+            if (bandera == '0') {
+                cargandoHide();
+                alertify.error(res);
+            } else {
+                cargandoHide();
+                loadView('asignarpermisos');
+                window.setTimeout("setValoresAsignarPermisos('" + datos + "')", 400);
+            }
+        }
+    });
+}
+
+function checkAll() {
+    var checkAllCheckbox = $("#checkall");
+    if (checkAllCheckbox.prop('checked')) {
+        $(".collapse-permission").removeClass('show');
+        $(".collapse-permission").addClass('hidden');
+        $("input:checkbox").prop('checked', false);
+    } else {
+        $(".collapse-permission").removeClass('hidden');
+        $(".collapse-permission").addClass('show');
+        $("input:checkbox").prop('checked', true);
+    }
 }

@@ -607,6 +607,27 @@ article{
     cursor: pointer;
 }
 
+
+.button-submit{
+    outline:none !important;
+    border: 2px solid #CECEE2;
+    box-sizing: border-box;
+    border-radius: 5px;
+    padding: 2px 15px;
+    font-family: sans-serif;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 17px;
+    line-height: 250.7%;
+    text-align: center;
+    color: #17177C;    
+}
+
+.button-submit:hover{
+    color: #17177C;    
+    background: #EDEDF4;
+}
+
 .button-agregar{
     outline:none !important;
     min-width: 150px;
@@ -851,4 +872,24 @@ table.table-row tr td {
 .ex-profile img{
     border-radius: 50%;
     padding-bottom: 10px;
+    box-shadow:#444444;
+    border: 1px solid #444444;
+}
+
+
+
+.panel-head-style{
+    padding: 10px 15px;
+    border-bottom: 1px solid transparent;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    box-sizing: border-box;
+    font-family: sans-serif;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 17px;
+    line-height: 250.7%;
+    color: #17177C;
+    text-decoration: none;
+    text-transform: uppercase;
 }
