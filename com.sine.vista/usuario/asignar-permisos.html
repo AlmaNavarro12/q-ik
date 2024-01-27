@@ -7,8 +7,9 @@
     </div>
     <div class="row">
         <div class="col-md-5 col-sm-12 mb-3">
-            <button id="btn-all-permisos" class="button-form btn btn-success col-12" onclick="checkAll();">Asignar /
-                Quitar todos los permisos <span class="fas fa-check"></span></button>
+            <button id="btn-all-permisos" class="button-form btn btn-success col-12" onclick="checkAll();">
+                Asignar / Quitar todos los permisos <span class="fas fa-check"></span>
+            </button>
             <input type="checkbox" id="checkall" hidden/>
         </div>
         <div class="col-md-1"></div>
@@ -24,7 +25,7 @@
                 </button>
             </div>
         </div>
-    </div>
+    </div>    
     <form action="com.sine.enlace/enlaceusuario.php" onsubmit="return false;" id="form-permisos">
         <div class="row">
             <div class="col-md-6">
@@ -35,16 +36,16 @@
                             <span class="fas fa-list small mx-1"></span> Facturas
                         </div>
                     </a>
-                    <div id="collapse1" class="panel-collapse collapse collapse-permission hidden">
+                    <div id="collapse1" class="panel-collapse collapse collapse-permission">
                         <div class="card-body row row-cols-1 row-cols-md-2 g-2 mx-auto">
-                            <label class="label-form col-md-4" for="nuevafactura">Crear factura:</label>
+                            <label class="label-form col-md-4" for="crearfactura">Crear factura:</label>
                             <div class="col-md-2">
                                 <div class="input-group">
-                                    <input class="input-check" id="nuevafactura" name="nuevafactura" type="checkbox" />
+                                    <input class="input-check" id="crearfactura" name="crearfactura" type="checkbox" />
                                 </div>
-                                <div id="nuevafactura-errors"></div>
+                                <div id="crearfactura-errors"></div>
                             </div>
-                            <label class="label-form col-md-4" for="nuevafactura">Editar factura:</label>
+                            <label class="label-form col-md-4" for="editarfactura">Editar factura:</label>
                             <div class="col-md-2">
                                 <div class="input-group">
                                     <input class="input-check" id="editarfactura" name="editarfactura"
@@ -52,7 +53,7 @@
                                 </div>
                                 <div id="editarfactura-errors"></div>
                             </div>
-                            <label class="label-form col-md-4" for="nuevafactura">Eliminar factura:</label>
+                            <label class="label-form col-md-4" for="eliminarfactura">Eliminar factura:</label>
                             <div class="col-md-2">
                                 <div class="input-group">
                                     <input class="input-check" id="eliminarfactura" name="eliminarfactura"
@@ -79,7 +80,7 @@
                             <span class="fas fa-list small mx-1"></span> Pagos
                         </div>
                     </a>
-                    <div id="collapse2" class="panel-collapse collapse collapse-permission hidden">
+                    <div id="collapse2" class="panel-collapse collapse collapse-permission">
                         <div class="card-body row row-cols-1 row-cols-md-2 g-2 mx-auto">
                             <label class="label-form col-md-4" for="crearpago">Crear pago:</label>
                             <div class="col-md-2">
@@ -88,14 +89,14 @@
                                 </div>
                                 <div id="crearpago-errors"></div>
                             </div>
-                            <label class="label-form col-md-4" for="nuevafactura">Editar pago:</label>
+                            <label class="label-form col-md-4" for="editarpago">Editar pago:</label>
                             <div class="col-md-2">
                                 <div class="input-group">
                                     <input class="input-check" id="editarpago" name="editarpago" type="checkbox" />
                                 </div>
                                 <div id="editarpago-errors"></div>
                             </div>
-                            <label class="label-form col-md-4" for="nuevafactura">Eliminar pago:</label>
+                            <label class="label-form col-md-4" for="eliminarpago">Eliminar pago:</label>
                             <div class="col-md-2">
                                 <div class="input-group">
                                     <input class="input-check" id="eliminarpago" name="eliminarpago" type="checkbox" />
@@ -124,7 +125,7 @@
                             <span class="fas fa-list small mx-1"></span> Nóminas
                         </div>
                     </a>
-                    <div id="collapse14" class="panel-collapse collapse collapse-permission hidden">
+                    <div id="collapse14" class="panel-collapse collapse collapse-permission">
                         <div class="card-body row row-cols-1 row-cols-md-2 g-2 mx-auto">
                             <label class="label-form col-md-4" for="listaempleado">Lista empleado:</label>
                             <div class="col-md-2">
@@ -134,13 +135,13 @@
                                 </div>
                                 <div id="listaempleado-errors"></div>
                             </div>
-                            <label class="label-form col-md-4" for="nuevoempleado">Crear empleado:</label>
+                            <label class="label-form col-md-4" for="crearempleado">Crear empleado:</label>
                             <div class="col-md-2">
                                 <div class="input-group">
-                                    <input class="input-check" id="nuevoempleado" name="nuevoempleado"
+                                    <input class="input-check" id="crearempleado" name="crearempleado"
                                         type="checkbox" />
                                 </div>
-                                <div id="nuevoempleado-errors"></div>
+                                <div id="crearempleado-errors"></div>
                             </div>
                             <label class="label-form col-md-4" for="editarempleado">Editar empleado:</label>
                             <div class="col-md-2">
@@ -167,12 +168,12 @@
                                 </div>
                                 <div id="listanomina-errors"></div>
                             </div>
-                            <label class="label-form col-md-4" for="nuevanomina">Crear nómina:</label>
+                            <label class="label-form col-md-4" for="crearnomina">Crear nómina:</label>
                             <div class="col-md-2">
                                 <div class="input-group">
-                                    <input class="input-check" id="nuevanomina" name="nuevanomina" type="checkbox" />
+                                    <input class="input-check" id="crearnomina" name="crearnomina" type="checkbox" />
                                 </div>
-                                <div id="nuevanomina-errors"></div>
+                                <div id="crearnomina-errors"></div>
                             </div>
                             <label class="label-form col-md-4" for="editarnomina">Editar nómina:</label>
                             <div class="col-md-2">
@@ -193,192 +194,70 @@
                     </div>
                 </div>
             </div>
-
+            
             <div class="col-md-6">
                 <div class="card shadow-sm rounded-1 mt-4">
-                    <a class="text-decoration-none" href="#collapse15" data-bs-toggle="collapse" role="button"
+                    <a class="text-decoration-none" href="#collapse12" data-bs-toggle="collapse" role="button"
                         aria-expanded="false" data-parent='#accordion'>
-                        <div class="ps-5 panel-head-style" role="tab" id='heading2'>
-                            <span class="fas fa-list small mx-1"></span> Carta Porte
+                        <div class="ps-5 panel-head-style" role="tab" id='heading12'>
+                            <span class="fas fa-list small mx-1"></span> Configuración
                         </div>
                     </a>
-                    <div id="collapse15" class="panel-collapse collapse collapse-permission hidden">
+                    <div id="collapse12" class="panel-collapse collapse collapse-permission">
                         <div class="card-body row row-cols-1 row-cols-md-2 g-2 mx-auto">
-                            <label class="label-form col-md-4" for="listaubicacion">Ubicaciones:</label>
+                            <label class="label-form col-md-4" for="addfolio">Agregar folios:</label>
                             <div class="col-md-2">
                                 <div class="input-group">
-                                    <input class="input-check" id="listaubicacion" name="listaubicacion"
-                                        type="checkbox" />
+                                    <input class="input-check" id="addfolio" name="addfolio" type="checkbox" />
                                 </div>
-                                <div id="listaubicacion-errors"></div>
-                            </div>
-                            <label class="label-form col-md-4" for="nuevaubicacion">Crear ubicación:</label>
-                            <div class="col-md-2">
-                                <div class="input-group">
-                                    <input class="input-check" id="nuevaubicacion" name="nuevaubicacion"
-                                        type="checkbox" />
-                                </div>
-                                <div id="nuevaubicacion-errors"></div>
-                            </div>
-                            <label class="label-form col-md-4" for="editarubicacion">Editar
-                                ubicacion:</label>
-                            <div class="col-md-2">
-                                <div class="input-group">
-                                    <input class="input-check" id="editarubicacion" name="editarubicacion"
-                                        type="checkbox" />
-                                </div>
-                                <div id="editarubicacion-errors"></div>
-                            </div>
-                            <label class="label-form col-md-4" for="eliminarubicacion">Eliminar
-                                ubicacion:</label>
-                            <div class="col-md-2">
-                                <div class="input-group">
-                                    <input class="input-check" id="eliminarubicacion" name="eliminarubicacion"
-                                        type="checkbox" />
-                                </div>
-                                <div id="eliminarubicacion-errors"></div>
+                                <div id="addfolio-errors"></div>
                             </div>
 
-                            <br />
-
-                            <label class="label-form col-md-4" for="listatransporte">Transportes:</label>
+                            <label class="label-form col-md-4" for="listafolio">Lista folios:</label>
                             <div class="col-md-2">
                                 <div class="input-group">
-                                    <input class="input-check" id="listatransporte" name="listatransporte"
-                                        type="checkbox" />
+                                    <input class="input-check" id="listafolio" name="listafolio" type="checkbox" />
                                 </div>
-                                <div id="listatransporte-errors"></div>
-                            </div>
-                            <label class="label-form col-md-4" for="nuevotransporte">Crear
-                                transporte:</label>
-                            <div class="col-md-2">
-                                <div class="input-group">
-                                    <input class="input-check" id="nuevotransporte" name="nuevotransporte"
-                                        type="checkbox" />
-                                </div>
-                                <div id="nuevotransporte-errors"></div>
-                            </div>
-                            <label class="label-form col-md-4" for="editartransporte">Editar
-                                transporte:</label>
-                            <div class="col-md-2">
-                                <div class="input-group">
-                                    <input class="input-check" id="editartransporte" name="editartransporte"
-                                        type="checkbox" />
-                                </div>
-                                <div id="editartransporte-errors"></div>
-                            </div>
-                            <label class="label-form col-md-4" for="eliminartransporte">Eliminar
-                                transporte:</label>
-                            <div class="col-md-2">
-                                <div class="input-group">
-                                    <input class="input-check" id="eliminartransporte" name="eliminartransporte"
-                                        type="checkbox" />
-                                </div>
-                                <div id="eliminartransporte-errors"></div>
+                                <div id="listafolio-errors"></div>
                             </div>
 
-                            <br />
-
-                            <label class="label-form col-md-4" for="listaremolque">Remolques:</label>
+                            <label class="label-form col-md-4" for="editarfolio">Editar folios:</label>
                             <div class="col-md-2">
                                 <div class="input-group">
-                                    <input class="input-check" id="listaremolque" name="listaremolque"
-                                        type="checkbox" />
+                                    <input class="input-check" id="editarfolio" name="editarfolio" type="checkbox" />
                                 </div>
-                                <div id="listaremolque-errors"></div>
-                            </div>
-                            <label class="label-form col-md-4" for="nuevoremolque">Crear remolque:</label>
-                            <div class="col-md-2">
-                                <div class="input-group">
-                                    <input class="input-check" id="nuevoremolque" name="nuevoremolque"
-                                        type="checkbox" />
-                                </div>
-                                <div id="nuevoremolque-errors"></div>
-                            </div>
-                            <label class="label-form col-md-4" for="editarremolque">Editar remolque:</label>
-                            <div class="col-md-2">
-                                <div class="input-group">
-                                    <input class="input-check" id="editarremolque" name="editarremolque"
-                                        type="checkbox" />
-                                </div>
-                                <div id="editarremolque-errors"></div>
-                            </div>
-                            <label class="label-form col-md-4" for="eliminarremolque">Eliminar
-                                remolque:</label>
-                            <div class="col-md-2">
-                                <div class="input-group">
-                                    <input class="input-check" id="eliminarremolque" name="eliminarremolque"
-                                        type="checkbox" />
-                                </div>
-                                <div id="eliminarremolque-errors"></div>
+                                <div id="editarfolio-errors"></div>
                             </div>
 
-                            <br />
-
-                            <label class="label-form col-md-4" for="listaoperador">Operadores:</label>
+                            <label class="label-form col-md-4" for="eliminarfolio">Eliminar folios:</label>
                             <div class="col-md-2">
-                                <div class="input-group">
-                                    <input class="input-check" id="listaoperador" name="listaoperador"
-                                        type="checkbox" />
-                                </div>
-                                <div id="listaoperador-errors"></div>
-                            </div>
-                            <label class="label-form col-md-4" for="nuevooperador">Crear operador:</label>
-                            <div class="col-md-2">
-                                <div class="input-group">
-                                    <input class="input-check" id="nuevooperador" name="nuevooperador"
-                                        type="checkbox" />
-                                </div>
-                                <div id="nuevooperador-errors"></div>
-                            </div>
-                            <label class="label-form col-md-4" for="editaroperador">Editar operador:</label>
-                            <div class="col-md-2">
-                                <div class="input-group">
-                                    <input class="input-check" id="editaroperador" name="editaroperador"
-                                        type="checkbox" />
-                                </div>
-                                <div id="editaroperador-errors"></div>
-                            </div>
-                            <label class="label-form col-md-4" for="eliminaroperador">Eliminar
-                                operador:</label>
-                            <div class="col-md-2">
-                                <div class="input-group">
-                                    <input class="input-check" id="eliminaroperador" name="eliminaroperador"
-                                        type="checkbox" />
-                                </div>
-                                <div id="eliminaroperador-errors"></div>
+                                <input class="input-check" id="eliminarfolio" name="eliminarfolio" type="checkbox" />
+                                <div id="eliminarfolio-errors"></div>
                             </div>
 
-                            <br />
+                            <label class="label-form col-md-4" for="addcomision">Comisiones:</label>
+                            <div class="col-md-2">
+                                <input class="input-check" id="addcomision" name="addcomision" type="checkbox" />
+                                <div id="addcomision-errors"></div>
+                            </div>
 
-                            <label class="label-form col-md-4" for="listacarta">Lista carta porte:</label>
+                            <label class="label-form col-md-4" for="encabezados">Conf. de
+                                encabezados:</label>
                             <div class="col-md-2">
-                                <div class="input-group">
-                                    <input class="input-check" id="listacarta" name="listacarta" type="checkbox" />
-                                </div>
-                                <div id="listacarta-errors"></div>
+                                <input class="input-check" id="encabezados" name="encabezados" type="checkbox" />
+                                <div id="encabezados-errors"></div>
                             </div>
-                            <label class="label-form col-md-4" for="nuevacarta">Crear carta porte:</label>
+
+                            <label class="label-form col-md-4" for="confcorreo">Conf. de correo:</label>
                             <div class="col-md-2">
-                                <div class="input-group">
-                                    <input class="input-check" id="nuevacarta" name="nuevacarta" type="checkbox" />
-                                </div>
-                                <div id="nuevacarta-errors"></div>
+                                <input class="input-check" id="confcorreo" name="confcorreo" type="checkbox" />
+                                <div id="confcorreo-errors"></div>
                             </div>
-                            <label class="label-form col-md-4" for="editarcarta">Editar carta porte:</label>
+
+                            <label class="label-form col-md-4" for="importar">Importar tablas:</label>
                             <div class="col-md-2">
-                                <div class="input-group">
-                                    <input class="input-check" id="editarcarta" name="editarcarta" type="checkbox" />
-                                </div>
-                                <div id="editarcarta-errors"></div>
-                            </div>
-                            <label class="label-form col-md-4" for="eliminarcarta">Eliminar carta:</label>
-                            <div class="col-md-2">
-                                <div class="input-group">
-                                    <input class="input-check" id="eliminarcarta" name="eliminarcarta"
-                                        type="checkbox" />
-                                </div>
-                                <div id="eliminarcarta-errors"></div>
+                                <input class="input-check" id="importar" name="importar" type="checkbox" />
+                                <div id="importar-errors"></div>
                             </div>
                         </div>
                     </div>
@@ -395,7 +274,7 @@
                             <span class="fas fa-list small mx-1"></span> Usuarios
                         </div>
                     </a>
-                    <div id="collapse10" class="panel-collapse collapse collapse-permission hidden">
+                    <div id="collapse10" class="panel-collapse collapse collapse-permission">
                         <div class="card-body row row-cols-1 row-cols-md-2 g-2 mx-auto">
                             <label class="label-form col-md-4" for="crearusuario">Nuevo usuario:</label>
                             <div class="col-md-2">
@@ -420,12 +299,12 @@
                                 </div>
                                 <div id="eliminarusuario-errors"></div>
                             </div>
-                            <label class="label-form col-md-4" for="crearusuario">Asignar permisos:</label>
+                            <label class="label-form col-md-4" for="asignarpermiso">Asignar permisos:</label>
                             <div class="col-md-2">
                                 <div class="input-group">
-                                    <input class="input-check" id="asgpermiso" name="asgpermiso" type="checkbox" />
+                                    <input class="input-check" id="asignarpermiso" name="asignarpermiso" type="checkbox" />
                                 </div>
-                                <div id="asgpermiso-errors"></div>
+                                <div id="asignarpermiso-errors"></div>
                             </div>
                         </div>
                     </div>
@@ -440,7 +319,7 @@
                             <span class="fas fa-list small mx-1"></span> Clientes
                         </div>
                     </a>
-                    <div id="collapse4" class="panel-collapse collapse collapse-permission hidden">
+                    <div id="collapse4" class="panel-collapse collapse collapse-permission">
                         <div class="card-body row row-cols-1 row-cols-md-2 g-2 mx-auto">
                             <label class="label-form col-md-4" for="crearcliente">Crear cliente:</label>
                             <div class="col-md-2">
@@ -488,7 +367,7 @@
                             <span class="fas fa-list small mx-1"></span> Comunicados
                         </div>
                     </a>
-                    <div id="collapse5" class="panel-collapse collapse collapse-permission hidden">
+                    <div id="collapse5" class="panel-collapse collapse collapse-permission">
                         <div class="card-body row row-cols-1 row-cols-md-2 g-2 mx-auto">
                             <label class="label-form col-md-4" for="crearcomunicado">Crear
                                 comunicado:</label>
@@ -539,7 +418,7 @@
                             <span class="fas fa-list small mx-1"></span> Productos
                         </div>
                     </a>
-                    <div id="collapse6" class="panel-collapse collapse collapse-permission hidden">
+                    <div id="collapse6" class="panel-collapse collapse collapse-permission">
                         <div class="card-body row row-cols-1 row-cols-md-2 g-2 mx-auto">
                             <label class="label-form col-md-4" for="crearproducto">Crear producto:</label>
                             <div class="col-md-2">
@@ -590,7 +469,7 @@
                             <span class="fas fa-list small mx-1"></span> Proveedor
                         </div>
                     </a>
-                    <div id="collapse7" class="panel-collapse collapse collapse-permission hidden">
+                    <div id="collapse7" class="panel-collapse collapse collapse-permission">
                         <div class="card-body row row-cols-1 row-cols-md-2 g-2 mx-auto">
                             <label class="label-form col-md-4" for="crearproveedor">Crear proveedor:</label>
                             <div class="col-md-2">
@@ -639,7 +518,7 @@
                             <span class="fas fa-list small mx-1"></span> Impuestos
                         </div>
                     </a>
-                    <div id="collapse13" class="panel-collapse collapse collapse-permission hidden">
+                    <div id="collapse13" class="panel-collapse collapse collapse-permission">
                         <div class="card-body row row-cols-1 row-cols-md-2 g-2 mx-auto">
                             <label class="label-form col-md-4" for="crearimpuesto">Crear impuesto:</label>
                             <div class="col-md-2">
@@ -689,7 +568,7 @@
                             <span class="fas fa-list small mx-1"></span> Datos de facturación
                         </div>
                     </a>
-                    <div id="collapse8" class="panel-collapse collapse collapse-permission hidden">
+                    <div id="collapse8" class="panel-collapse collapse collapse-permission">
                         <div class="card-body row row-cols-1 row-cols-md-2 g-2 mx-auto">
                             <label class="label-form col-md-4" for="creardatos">Alta datos:</label>
                             <div class="col-md-2">
@@ -725,7 +604,7 @@
                             <span class="fas fa-list small mx-1"></span> Contratos
                         </div>
                     </a>
-                    <div id="collapse9" class="panel-collapse collapse collapse-permission hidden">
+                    <div id="collapse9" class="panel-collapse collapse collapse-permission">
                         <div class="card-body row row-cols-1 row-cols-md-2 g-2 mx-auto">
                             <label class="label-form col-md-4" for="crearcontrato">Nuevo contrato:</label>
                             <div class="col-md-2">
@@ -776,38 +655,38 @@
                             <span class="fas fa-list small mx-1"></span> Cotizaciones
                         </div>
                     </a>
-                    <div id="collapse3" class="panel-collapse collapse collapse-permission hidden">
+                    <div id="collapse3" class="panel-collapse collapse collapse-permission">
                         <div class="card-body row row-cols-1 row-cols-md-2 g-2 mx-auto">
-                            <label class="label-form col-md-4" for="crearcot">Crear cotización:</label>
+                            <label class="label-form col-md-4" for="crearcotizacion">Crear cotización:</label>
                             <div class="col-md-2">
                                 <div class="input-group">
-                                    <input class="input-check" id="crearcot" name="crearcot" type="checkbox" />
+                                    <input class="input-check" id="crearcotizacion" name="crearcotizacion" type="checkbox" />
                                 </div>
-                                <div id="crearcot-errors"></div>
+                                <div id="crearcotizacion-errors"></div>
                             </div>
-                            <label class="label-form col-md-4" for="nuevafactura">Editar cotización:</label>
+                            <label class="label-form col-md-4" for="editarcotizacion">Editar cotización:</label>
                             <div class="col-md-2">
                                 <div class="input-group">
-                                    <input class="input-check" id="editarcot" name="editarcot" type="checkbox" />
+                                    <input class="input-check" id="editarcotizacion" name="editarcotizacion" type="checkbox" />
                                 </div>
-                                <div id="editarcot-errors"></div>
+                                <div id="editarcotizacion-errors"></div>
                             </div>
-                            <label class="label-form col-md-4" for="nuevafactura">Eliminar:</label>
+                            <label class="label-form col-md-4" for="eliminarcotizacion">Eliminar:</label>
                             <div class="col-md-2">
                                 <div class="input-group">
-                                    <input class="input-check" id="eliminarcot" name="eliminarcot" type="checkbox" />
+                                    <input class="input-check" id="eliminarcotizacion" name="eliminarcotizacion" type="checkbox" />
                                 </div>
-                                <div id="eliminarcot-errors"></div>
+                                <div id="eliminarcotizacion-errors"></div>
                             </div>
-                            <label class="label-form col-md-4" for="listacot">Lista cotización:</label>
+                            <label class="label-form col-md-4" for="listacotizacion">Lista cotización:</label>
                             <div class="col-md-2">
                                 <div class="input-group">
-                                    <input class="input-check" id="listacot" name="listacot" type="checkbox" />
+                                    <input class="input-check" id="listacotizacion" name="listacotizacion" type="checkbox" />
                                 </div>
-                                <div id="listacot-errors"></div>
+                                <div id="listacotizacion-errors"></div>
                             </div>
 
-                            <label class="label-form col-md-4" for="listacot">Anticipos:</label>
+                            <label class="label-form col-md-4" for="anticipo">Anticipos:</label>
                             <div class="col-md-2">
                                 <div class="input-group">
                                     <input class="input-check" id="anticipo" name="anticipo" type="checkbox" />
@@ -826,50 +705,50 @@
                             <span class="fas fa-list small mx-1"></span> Reportes
                         </div>
                     </a>
-                    <div id="collapse11" class="panel-collapse collapse collapse-permission hidden">
+                    <div id="collapse11" class="panel-collapse collapse collapse-permission">
                         <div class="card-body row row-cols-1 row-cols-md-2 g-2 mx-auto">
-                            <label class="label-form col-md-4" for="repfactura">Reporte facturas:</label>
+                            <label class="label-form col-md-4" for="reportefactura">Reporte facturas:</label>
                             <div class="col-md-2">
                                 <div class="input-group">
-                                    <input class="input-check" id="repfactura" name="repfactura" type="checkbox" />
+                                    <input class="input-check" id="reportefactura" name="reportefactura" type="checkbox" />
                                 </div>
-                                <div id="repfactura-errors"></div>
+                                <div id="reportefactura-errors"></div>
                             </div>
-                            <label class="label-form col-md-4" for="reppago">Reporte pagos:</label>
+                            <label class="label-form col-md-4" for="reportepago">Reporte pagos:</label>
                             <div class="col-md-2">
                                 <div class="input-group">
-                                    <input class="input-check" id="reppago" name="reppago" type="checkbox" />
+                                    <input class="input-check" id="reportepago" name="reportepago" type="checkbox" />
                                 </div>
-                                <div id="reppago-errors"></div>
+                                <div id="reportepago-errors"></div>
                             </div>
-                            <label class="label-form col-md-4" for="repgrafica">Reporte gráfico:</label>
+                            <label class="label-form col-md-4" for="reportegrafica">Reporte gráfico:</label>
                             <div class="col-md-2">
                                 <div class="input-group">
-                                    <input class="input-check" id="repgrafica" name="repgrafica" type="checkbox" />
+                                    <input class="input-check" id="reportegrafica" name="reportegrafica" type="checkbox" />
                                 </div>
-                                <div id="repgrafica-errors"></div>
+                                <div id="reportegrafica-errors"></div>
                             </div>
-                            <label class="label-form col-md-4" for="repiva">Reporte impuestos:</label>
+                            <label class="label-form col-md-4" for="reporteiva">Reporte impuestos:</label>
                             <div class="col-md-2">
                                 <div class="input-group">
-                                    <input class="input-check" id="repiva" name="repiva" type="checkbox" />
+                                    <input class="input-check" id="reporteiva" name="reporteiva" type="checkbox" />
                                 </div>
-                                <div id="repiva-errors"></div>
+                                <div id="reporteiva-errors"></div>
                             </div>
-                            <label class="label-form col-md-4" for="listaiva">Lista impuestos de
+                            <label class="label-form col-md-4" for="datosiva">Lista impuestos de
                                 recargo:</label>
                             <div class="col-md-2">
                                 <div class="input-group">
-                                    <input class="input-check" id="listaiva" name="listaiva" type="checkbox" />
+                                    <input class="input-check" id="datosiva" name="datosiva" type="checkbox" />
                                 </div>
-                                <div id="listaiva-errors"></div>
+                                <div id="datosiva-errors"></div>
                             </div>
-                            <label class="label-form col-md-4" for="listaiva">Reporte de ventas:</label>
+                            <label class="label-form col-md-4" for="reporteventas">Reporte de ventas:</label>
                             <div class="col-md-2">
                                 <div class="input-group">
-                                    <input class="input-check" id="repventas" name="repventas" type="checkbox" />
+                                    <input class="input-check" id="reporteventas" name="reporteventas" type="checkbox" />
                                 </div>
-                                <div id="repventas-errors"></div>
+                                <div id="reporteventas-errors"></div>
                             </div>
                         </div>
                     </div>
@@ -880,67 +759,189 @@
         <div class="row">
             <div class="col-md-6">
                 <div class="card shadow-sm rounded-1 mt-4">
-                    <a class="text-decoration-none" href="#collapse12" data-bs-toggle="collapse" role="button"
+                    <a class="text-decoration-none" href="#collapse15" data-bs-toggle="collapse" role="button"
                         aria-expanded="false" data-parent='#accordion'>
-                        <div class="ps-5 panel-head-style" role="tab" id='heading12'>
-                            <span class="fas fa-list small mx-1"></span> Configuración
+                        <div class="ps-5 panel-head-style" role="tab" id='heading2'>
+                            <span class="fas fa-list small mx-1"></span> Carta Porte
                         </div>
                     </a>
-                    <div id="collapse12" class="panel-collapse collapse collapse-permission hidden">
+                    <div id="collapse15" class="panel-collapse collapse collapse-permission">
                         <div class="card-body row row-cols-1 row-cols-md-2 g-2 mx-auto">
-                            <label class="label-form col-md-4" for="confencabezado">Agregar folios:</label>
+                            <label class="label-form col-md-4" for="listaubicacion">Ubicaciones:</label>
                             <div class="col-md-2">
                                 <div class="input-group">
-                                    <input class="input-check" id="addfolio" name="addfolio" type="checkbox" />
+                                    <input class="input-check" id="listaubicacion" name="listaubicacion"
+                                        type="checkbox" />
                                 </div>
-                                <div id="addfolio-errors"></div>
+                                <div id="listaubicacion-errors"></div>
                             </div>
-
-                            <label class="label-form col-md-4" for="confcorreo">Lista folios:</label>
+                            <label class="label-form col-md-4" for="crearubicacion">Crear ubicación:</label>
                             <div class="col-md-2">
                                 <div class="input-group">
-                                    <input class="input-check" id="listfolio" name="listfolio" type="checkbox" />
+                                    <input class="input-check" id="crearubicacion" name="crearubicacion"
+                                        type="checkbox" />
                                 </div>
-                                <div id="listfolio-errors"></div>
+                                <div id="crearubicacion-errors"></div>
                             </div>
-
-                            <label class="label-form col-md-4" for="confencabezado">Editar folios:</label>
+                            <label class="label-form col-md-4" for="editarubicacion">Editar
+                                ubicacion:</label>
                             <div class="col-md-2">
                                 <div class="input-group">
-                                    <input class="input-check" id="editfolio" name="editfolio" type="checkbox" />
+                                    <input class="input-check" id="editarubicacion" name="editarubicacion"
+                                        type="checkbox" />
                                 </div>
-                                <div id="editfolio-errors"></div>
+                                <div id="editarubicacion-errors"></div>
+                            </div>
+                            <label class="label-form col-md-4" for="eliminarubicacion">Eliminar
+                                ubicacion:</label>
+                            <div class="col-md-2">
+                                <div class="input-group">
+                                    <input class="input-check" id="eliminarubicacion" name="eliminarubicacion"
+                                        type="checkbox" />
+                                </div>
+                                <div id="eliminarubicacion-errors"></div>
                             </div>
 
-                            <label class="label-form col-md-4" for="confcorreo">Eliminar folios:</label>
+                            <br />
+
+                            <label class="label-form col-md-4" for="listatransporte">Transportes:</label>
                             <div class="col-md-2">
-                                <input class="input-check" id="delfolio" name="delfolio" type="checkbox" />
-                                <div id="delfolio-errors"></div>
+                                <div class="input-group">
+                                    <input class="input-check" id="listatransporte" name="listatransporte"
+                                        type="checkbox" />
+                                </div>
+                                <div id="listatransporte-errors"></div>
+                            </div>
+                            <label class="label-form col-md-4" for="creartransporte">Crear
+                                transporte:</label>
+                            <div class="col-md-2">
+                                <div class="input-group">
+                                    <input class="input-check" id="creartransporte" name="creartransporte"
+                                        type="checkbox" />
+                                </div>
+                                <div id="creartransporte-errors"></div>
+                            </div>
+                            <label class="label-form col-md-4" for="editartransporte">Editar
+                                transporte:</label>
+                            <div class="col-md-2">
+                                <div class="input-group">
+                                    <input class="input-check" id="editartransporte" name="editartransporte"
+                                        type="checkbox" />
+                                </div>
+                                <div id="editartransporte-errors"></div>
+                            </div>
+                            <label class="label-form col-md-4" for="eliminartransporte">Eliminar
+                                transporte:</label>
+                            <div class="col-md-2">
+                                <div class="input-group">
+                                    <input class="input-check" id="eliminartransporte" name="eliminartransporte"
+                                        type="checkbox" />
+                                </div>
+                                <div id="eliminartransporte-errors"></div>
                             </div>
 
-                            <label class="label-form col-md-4" for="confcorreo">Comisiones:</label>
+                            <br />
+
+                            <label class="label-form col-md-4" for="listaremolque">Remolques:</label>
                             <div class="col-md-2">
-                                <input class="input-check" id="addcomision" name="addcomision" type="checkbox" />
-                                <div id="addcomision-errors"></div>
+                                <div class="input-group">
+                                    <input class="input-check" id="listaremolque" name="listaremolque"
+                                        type="checkbox" />
+                                </div>
+                                <div id="listaremolque-errors"></div>
+                            </div>
+                            <label class="label-form col-md-4" for="crearremolque">Crear remolque:</label>
+                            <div class="col-md-2">
+                                <div class="input-group">
+                                    <input class="input-check" id="crearremolque" name="crearremolque"
+                                        type="checkbox" />
+                                </div>
+                                <div id="crearremolque-errors"></div>
+                            </div>
+                            <label class="label-form col-md-4" for="editarremolque">Editar remolque:</label>
+                            <div class="col-md-2">
+                                <div class="input-group">
+                                    <input class="input-check" id="editarremolque" name="editarremolque"
+                                        type="checkbox" />
+                                </div>
+                                <div id="editarremolque-errors"></div>
+                            </div>
+                            <label class="label-form col-md-4" for="eliminarremolque">Eliminar
+                                remolque:</label>
+                            <div class="col-md-2">
+                                <div class="input-group">
+                                    <input class="input-check" id="eliminarremolque" name="eliminarremolque"
+                                        type="checkbox" />
+                                </div>
+                                <div id="eliminarremolque-errors"></div>
                             </div>
 
-                            <label class="label-form col-md-4" for="confencabezado">Conf. de
-                                encabezados:</label>
+                            <br />
+
+                            <label class="label-form col-md-4" for="listaoperador">Operadores:</label>
                             <div class="col-md-2">
-                                <input class="input-check" id="confencabezado" name="confencabezado" type="checkbox" />
-                                <div id="confencabezado-errors"></div>
+                                <div class="input-group">
+                                    <input class="input-check" id="listaoperador" name="listaoperador"
+                                        type="checkbox" />
+                                </div>
+                                <div id="listaoperador-errors"></div>
+                            </div>
+                            <label class="label-form col-md-4" for="crearoperador">Crear operador:</label>
+                            <div class="col-md-2">
+                                <div class="input-group">
+                                    <input class="input-check" id="crearoperador" name="crearoperador"
+                                        type="checkbox" />
+                                </div>
+                                <div id="crearoperador-errors"></div>
+                            </div>
+                            <label class="label-form col-md-4" for="editaroperador">Editar operador:</label>
+                            <div class="col-md-2">
+                                <div class="input-group">
+                                    <input class="input-check" id="editaroperador" name="editaroperador"
+                                        type="checkbox" />
+                                </div>
+                                <div id="editaroperador-errors"></div>
+                            </div>
+                            <label class="label-form col-md-4" for="eliminaroperador">Eliminar
+                                operador:</label>
+                            <div class="col-md-2">
+                                <div class="input-group">
+                                    <input class="input-check" id="eliminaroperador" name="eliminaroperador"
+                                        type="checkbox" />
+                                </div>
+                                <div id="eliminaroperador-errors"></div>
                             </div>
 
-                            <label class="label-form col-md-4" for="confcorreo">Conf. de correo:</label>
-                            <div class="col-md-2">
-                                <input class="input-check" id="confcorreo" name="confcorreo" type="checkbox" />
-                                <div id="confcorreo-errors"></div>
-                            </div>
+                            <br />
 
-                            <label class="label-form col-md-4" for="imptablas">Importar tablas:</label>
+                            <label class="label-form col-md-4" for="listacarta">Lista carta porte:</label>
                             <div class="col-md-2">
-                                <input class="input-check" id="imptablas" name="imptablas" type="checkbox" />
-                                <div id="imptablas-errors"></div>
+                                <div class="input-group">
+                                    <input class="input-check" id="listacarta" name="listacarta" type="checkbox" />
+                                </div>
+                                <div id="listacarta-errors"></div>
+                            </div>
+                            <label class="label-form col-md-4" for="crearcarta">Crear carta porte:</label>
+                            <div class="col-md-2">
+                                <div class="input-group">
+                                    <input class="input-check" id="crearcarta" name="crearcarta" type="checkbox" />
+                                </div>
+                                <div id="crearcarta-errors"></div>
+                            </div>
+                            <label class="label-form col-md-4" for="editarcarta">Editar carta porte:</label>
+                            <div class="col-md-2">
+                                <div class="input-group">
+                                    <input class="input-check" id="editarcarta" name="editarcarta" type="checkbox" />
+                                </div>
+                                <div id="editarcarta-errors"></div>
+                            </div>
+                            <label class="label-form col-md-4" for="eliminarcarta">Eliminar carta:</label>
+                            <div class="col-md-2">
+                                <div class="input-group">
+                                    <input class="input-check" id="eliminarcarta" name="eliminarcarta"
+                                        type="checkbox" />
+                                </div>
+                                <div id="eliminarcarta-errors"></div>
                             </div>
                         </div>
                     </div>

@@ -116,7 +116,7 @@ function editarUsuario(idusuario) {
                 alertify.error(res);
             } else {
                 cargandoHide();
-                loadView('nuevousuario');
+                loadView('crearusuario');
                 window.setTimeout("setValoresEditarUsuario('" + datos + "')", 400);
             }
         }
@@ -317,12 +317,123 @@ function asignarPermisos(idusuario) {
 function checkAll() {
     var checkAllCheckbox = $("#checkall");
     if (checkAllCheckbox.prop('checked')) {
-        $(".collapse-permission").removeClass('show');
-        $(".collapse-permission").addClass('hidden');
+        $(".collapse-permission").removeClass('show').addClass('hidden');
         $("input:checkbox").prop('checked', false);
     } else {
-        $(".collapse-permission").removeClass('hidden');
-        $(".collapse-permission").addClass('show');
+        $(".collapse-permission").removeClass('hidden').addClass('show');
         $("input:checkbox").prop('checked', true);
     }
+}
+
+function setValoresAsignarPermisos(datos) {
+    var array = datos.split("</tr>");
+    var permisos = [
+        "idusuario", "nombre", 
+        "facturas", "crearfactura", "editarfactura", "eliminarfactura", "listafactura",
+        "pago", "crearpago", "editarpago", "eliminarpago", "listapago",
+        "nomina", "listaempleado", "crearempleado", "editarempleado", "eliminarempleado",
+        "listanomina", "crearnomina", "editarnomina", "eliminarnomina",
+        "cartaporte", "listaubicacion", "crearubicacion", "editarubicacion", "eliminarubicacion",
+        "listatransporte", "creartransporte", "editartransporte", "eliminartransporte",
+        "listaremolque", "crearremolque", "editarremolque", "eliminarremolque",
+        "listaoperador", "crearoperador", "editaroperador", "eliminaroperador",
+        "listacarta", "crearcarta", "editarcarta", "eliminarcarta",
+        "cotizacion", "crearcotizacion", "editarcotizacion", "eliminarcotizacion", "listacotizacion",
+        "anticipo", "cliente", "crearcliente", "editarcliente", "eliminarcliente", "listacliente",
+        "comunicado", "crearcomunicado", "editarcomunicado", "eliminarcomunicado", "listacomunicado",
+        "producto", "crearproducto", "editarproducto", "eliminarproducto", "listaproducto",
+        "proveedor", "crearproveedor", "editarproveedor", "eliminarproveedor", "listaproveedor",
+        "impuesto", "crearimpuesto", "editarimpuesto", "eliminarimpuesto", "listaimpuesto",
+        "datosfacturacion", "creardatos", "editardatos", "listadatos",
+        "contrato", "crearcontrato", "editarcontrato", "eliminarcontrato", "listacontrato",
+        "usuarios", "crearusuario", "listausuario", "eliminarusuario", "asignarpermiso",
+        "reporte", "reportefactura", "reportepago", "reportegrafica", "reporteiva", "datosiva", "reporteventas",
+        "configuracion", "addfolio", "listafolio", "editarfolio", "eliminarfolio", "addcomision", "encabezados", "confcorreo",
+        "importar", "accion", "idlogin"
+    ];
+
+    var permissionsMap = {};
+
+    for (var i = 0; i < permisos.length; i++) {
+        permissionsMap[permisos[i]] = array[i];
+    }
+
+    changeText("#titulo-asignar", "Asignando permisos a: " + permissionsMap.nombre);
+
+    for (var permiso in permissionsMap) {
+        if (permissionsMap[permiso] == '1') { 
+            $(".collapse-permission").removeClass('hidden').addClass('show');
+            $("#" + permiso).attr('checked', true);
+        } else {
+            $(".collapse-permission").removeClass('show').addClass('hidden');
+
+        }
+    }    
+
+    $("#form-permisos").append("<input type='hidden' id='idlogin' value='" + permissionsMap.idlogin + "'/>");
+    $("#form-permisos").append("<input type='hidden' id='accion' value='" + permissionsMap.accion + "'/>");
+    $("#btn-guardar-permisos").attr("onclick", "actualizarPermisos(" + permissionsMap.idusuario + ");");
+}
+
+function actualizarPermisos(idusuario) {
+    var idlogin = $("#idlogin").val();
+    var accion = $("#accion").val();
+
+    var categorias = {
+        facturas: ["crearfactura", "editarfactura", "eliminarfactura", "listafactura"],
+        pago: ["crearpago", "editarpago", "eliminarpago", "listapago"],
+        nomina: ["listaempleado", "crearempleado", "editarempleado", "eliminarempleado", "listanomina", "crearnomina", "editarnomina", "eliminarnomina"],
+        cartaporte: ["listaubicacion", "crearubicacion", "editarubicacion", "eliminarubicacion", "listatransporte", "creartransporte", "editartransporte", "eliminartransporte", "listaremolque", "crearremolque", "editarremolque", "eliminarremolque", "listaoperador", "crearoperador", "editaroperador", "eliminaroperador", "listacarta", "crearcarta", "editarcarta", "eliminarcarta"],
+        cotizacion: ["crearcotizacion", "editarcotizacion", "eliminarcotizacion", "listacotizacion", "anticipo"], 
+        cliente: ["crearcliente", "editarcliente", "eliminarcliente", "listacliente"],
+        comunicado: ["crearcomunicado", "editarcomunicado", "eliminarcomunicado", "listacomunicado"],
+        producto: ["crearproducto", "editarproducto", "eliminarproducto", "listaproducto"],
+        proveedor: ["crearproveedor", "editarproveedor", "eliminarproveedor", "listaproveedor"],
+        impuesto: ["crearimpuesto", "editarimpuesto", "eliminarimpuesto", "listaimpuesto"],
+        datosfacturacion: ["creardatos", "editardatos", "listadatos"],
+        contrato: ["crearcontrato", "editarcontrato", "eliminarcontrato", "listacontrato"],
+        usuarios: ["crearusuario", "listausuario", "eliminarusuario", "asignarpermiso"],
+        reporte: ["reportefactura", "reportepago", "reportegrafica", "reporteiva", "datosiva", "reporteventas"],
+        configuracion: ["addfolio", "listafolio", "editarfolio", "eliminarfolio", "addcomision", "encabezados", "confcorreo", "importar"]
+    };
+
+    var parametros = {
+        transaccion: "actualizarpermisos",
+        idusuario: idusuario,
+        accion: accion
+    };
+
+    for (var categoria in categorias) {
+        parametros[categoria] = 0;
+    
+        for (var i = 0; i < categorias[categoria].length; i++) {
+            var permiso = categorias[categoria][i];
+            var valorCheckbox = $("#" + permiso).prop('checked') ? 1 : 0;
+            parametros[permiso] = valorCheckbox;
+    
+            if (valorCheckbox == 1) {
+                parametros[categoria] = 1;
+            }
+        }
+    }    
+    $.ajax({
+        url: "com.sine.enlace/enlaceusuario.php",
+        type: "POST",
+        data: parametros,
+        success: function(datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 1000);
+            if (bandera == '0') {
+                alertify.error(res);
+            } else {
+                if (idlogin != idusuario) {
+                    loadView('listasuarioaltas');
+                } else {
+                    location.href = 'home.php';
+                }
+                alertify.success('Se guardaron los datos correctamente');
+            }
+        }
+    });
 }

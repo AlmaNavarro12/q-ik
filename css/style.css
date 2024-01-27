@@ -869,15 +869,6 @@ table.table-row tr td {
     height: 22px;
 }
 
-.ex-profile img{
-    border-radius: 50%;
-    padding-bottom: 10px;
-    box-shadow:#444444;
-    border: 1px solid #444444;
-}
-
-
-
 .panel-head-style{
     padding: 10px 15px;
     border-bottom: 1px solid transparent;

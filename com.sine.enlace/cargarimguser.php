@@ -79,7 +79,7 @@ if (isset($_FILES["imgprof"]) || isset($_FILES["imagen"])) {
             imagecopyresampled($dst_img, $src_img, 0, 0, $w_point, 0, $max_width, $max_height, $width_new, $height);
         }
 
-        $image($dst_img, $carpeta . $nombre, $quality);
+        $image($dst_img, $carpeta . $nombre);
 
         if ($dst_img) imagedestroy($dst_img);
         if ($src_img) imagedestroy($src_img);
@@ -88,6 +88,6 @@ if (isset($_FILES["imgprof"]) || isset($_FILES["imagen"])) {
         $data = file_get_contents($carpeta . $nombre);
         $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
 
-        echo "<img src='$base64' width='200px' id='img'><corte>$nombre";
+        echo "<img src='$base64' width='200' class='rounded-circle border border-secondary shadow-sm' id='img'><corte>$nombre";
     }
 }
