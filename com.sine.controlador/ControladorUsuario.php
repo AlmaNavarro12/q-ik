@@ -269,7 +269,7 @@ class ControladorUsuario
 
             $guardado = $this->consultas->execute($consulta, $valores);
 
-            if ($u->getIdUsuario() === 0) {
+            if ($u->getIdUsuario() == 0) {
                 $idusuario = $this->getUserID($u->getNombre() . $u->getApellidoPaterno() . $u->getApellidoMaterno(), $u->getUsuario(), $u->getCorreo());
                 $permisos = $this->insertarPermisos($idusuario);
             }
@@ -780,20 +780,12 @@ class ControladorUsuario
             $idusuario = $usuarioactual['permiso_idusuario'];
             $nombreusuario = $usuarioactual['nombre'] . ' ' . $usuarioactual['apellido_paterno'] . ' ' . $usuarioactual['apellido_materno'];
 
-            // Obtener todas las columnas disponibles
             $columnas = array_keys($usuarioactual);
-
-            // Inicializar el string de datos
             $datos = "$idusuario</tr>$nombreusuario";
-
-            // Iterar sobre las columnas y agregar los valores al string de datos
             foreach ($columnas as $columna) {
                 $datos .= "</tr>{$usuarioactual[$columna]}";
             }
-
-            // Agregar el valor de $usuariologin al final del string de datos
             $datos .= "</tr>0</tr>$usuariologin";
-
             break;
         }
 

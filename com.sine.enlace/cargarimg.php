@@ -25,8 +25,8 @@ function generateRandomString($length = 5) {
 
 function resizeImage($tempfile, $newwidth, $newheight) {
     list($width, $height) = getimagesize($tempfile);
-    $image_create_func = 'imagecreatefromjpeg'; // default
-    $image_save_func = 'imagejpeg'; // default
+    $image_create_func = 'imagecreatefromjpeg'; 
+    $image_save_func = 'imagejpeg'; 
 
     if ($width < $height) {
         $image_create_func = 'imagecreatefrompng';

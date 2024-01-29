@@ -15,6 +15,10 @@ function validarNum(input) {
     input.value = input.value.replace(/[^0-9]/g, '');
 }
 
+function validarLet(input) {
+    input.value = input.value.replace(/[^A-Za-z. ]/g, '');
+}
+
 //Validacion de campos vacios
 function isnEmpty(val, id) {
     if (val == "") {

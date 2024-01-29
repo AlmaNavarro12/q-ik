@@ -10,9 +10,11 @@
                 <label class="fw-bold text-danger small">* Campo obligatorio</label>
             </div>
         </div>
-        <div class="row">
+        <div class="row ">
             <div class="col-md-6">
-                <div class="col-md-9 col-sm-12 pb-3 mx-auto" id="label">
+                <div class="col-md-12 ps-0 text-center" id="muestraimagen"></div>
+                <label class="label-form" for="perfil"> &nbsp; </label>
+                <div class="col-md-11 col-sm-12 pb-3 mx-auto py-1" id="label">
                     <label class="button-file col-12" for="imagen"><span class="fas fa-image"></span>
                         Imagen de perfil</label>
                     <div class="form-group">
@@ -23,14 +25,13 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-12 ps-0 text-center" id="muestraimagen"></div>
             </div>
-            <div class="col-md-6 py-2">
+            <div class="col-md-6">
                 <label class="label-form" for="nombre">Nombre</label> <label
                     class="mark-required text-danger fw-bold">*</label>
                 <div class="form-group">
-                    <input class="form-control text-center input-form" id="nombre" name="nombre" placeholder="Nombre"
-                        type="text" />
+                    <input class="form-control text-center input-form text-capitalize" id="nombre" name="nombre" placeholder="Nombre"
+                        type="text"  oninput="validarLet(this)"/>
                     <div id="nombre-errors">
                     </div>
                 </div>
@@ -41,8 +42,8 @@
                 <label class="label-form" for="apellido-paterno">Apellido paterno</label> <label
                     class="mark-required text-danger fw-bold">*</label>
                 <div class="form-group">
-                    <input class="form-control text-center input-form" id="apellido-paterno" name="apellido-paterno"
-                        placeholder="Apellido paterno" type="text" />
+                    <input class="form-control text-center input-form text-capitalize" id="apellido-paterno" name="apellido-paterno"
+                        placeholder="Apellido paterno" type="text"  oninput="validarLet(this)"/>
                     <div id="apellido-paterno-errors"></div>
                 </div>
             </div>
@@ -50,8 +51,8 @@
                 <label class="label-form" for="apellido-materno">Apellido materno</label> <label
                     class="mark-required text-danger fw-bold">*</label>
                 <div class="form-group">
-                    <input class="form-control text-center input-form" id="apellido-materno" name="apellido-materno"
-                        placeholder="Apellido materno" type="text" />
+                    <input class="form-control text-center input-form text-capitalize" id="apellido-materno" name="apellido-materno"
+                        placeholder="Apellido materno" type="text"  oninput="validarLet(this)"/>
                     <div id="apellido-materno-errors">
                     </div>
                 </div>
