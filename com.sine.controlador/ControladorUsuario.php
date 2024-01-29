@@ -172,7 +172,7 @@ class ControladorUsuario
                     $type = pathinfo($imgfile, PATHINFO_EXTENSION);
                     $data = file_get_contents($imgfile);
                     $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
-                    $img = "<img src=\"$base64\" width=\"200px\">";
+                    $img = "<img src=\"$base64\" class=\"rounded-circle border border-secondary shadow-sm\" width=\"200px\">";
                 }
             }
 
@@ -190,52 +190,92 @@ class ControladorUsuario
         $consultado = $this->consultas->getResults($consulta, $valores);
         return $consultado;
     }
-    
+
     public function nuevoUsuario($u)
     {
-        $existe = $this->validarExistenciaUsuario($u->getNombre() . "" . $u->getApellidoPaterno() . "" . $u->getApellidoMaterno(), $u->getUsuario(), $u->getCorreo(), 0);
-        $insertado = false;
+        $existe = $u->getIdUsuario() != 0 ?
+            $this->validarExistenciaUsuario($u->getNombre() . $u->getApellidoPaterno() . $u->getApellidoMaterno(), $u->getUsuario(), $u->getCorreo(), $u->getIdUsuario()) :
+            $this->validarExistenciaUsuario($u->getNombre() . $u->getApellidoPaterno() . $u->getApellidoMaterno(), $u->getUsuario(), $u->getCorreo(), 0);
+
+        $guardado = false;
         if (!$existe) {
-            $insertado = $this->insertarUsuario($u);
+            $guardado = $this->guardarUsuario($u);
         }
-        return $insertado;
+        return $guardado;
     }
 
-    private function insertarUsuario($u)
+    public function guardarUsuario($u)
     {
-        $registrado = false;
-        $img = $u->getImg();
-        $acceso = $this->getTAcceso();
-        $div = explode("</tr>", $acceso);
+        $existe = $u->getIdUsuario() != 0 ?
+            $this->validarExistenciaUsuario($u->getNombre() . $u->getApellidoPaterno() . $u->getApellidoMaterno(), $u->getUsuario(), $u->getCorreo(), $u->getIdUsuario()) :
+            $this->validarExistenciaUsuario($u->getNombre() . $u->getApellidoPaterno() . $u->getApellidoMaterno(), $u->getUsuario(), $u->getCorreo(), 0);
 
-        if ($img == '') {
-            $img = $this->crearImg($u->getNombre());
-        } else {
-            rename('../temporal/tmp/' . $img, '../img/usuarios/' . $img);
+        $guardado = false;
+
+        if (!$existe) {
+            $pass = "";
+            if ($u->getChpass() == '1') {
+                $pass = " password=sha1(:contrasena),";
+            }
+
+            $img = $u->getImg();
+            if ($img == '') {
+                $img = $u->getImgactualizar();
+            } else if ($img != $u->getImgactualizar()) {
+                if ($img != "") {
+                    rename('../temporal/tmp/' . $img, '../img/usuarios/' . $img);
+                    unlink("../img/usuarios/" . $u->getImgactualizar());
+                }
+            }
+
+            $acceso = $u->getIdUsuario() != 0 ? '' : $this->getTAcceso();
+            $div = explode("</tr>", $acceso);
+
+            $consulta = $u->getIdUsuario() != 0 ?
+                "UPDATE `usuario` SET  nombre=:nombre, apellido_paterno=:apellidopaterno, apellido_materno=:apellidomaterno, usuario=:usuario, email=:correo,$pass celular=:celular, telefono_fijo=:telefono, tipo=:tipo, imgperfil=:img WHERE idusuario=:id;" :
+                "INSERT INTO `usuario` VALUES (null, :nombre, :apellidopaterno, :apellidomaterno, :usuario, :contrasena, :correo, :celular, :telefono, :estatus, :tipo, :acceso, :paq, :fecha, :img, :fts);";
+
+            $valores = $u->getIdUsuario() != 0 ?
+                [
+                    "nombre" => $u->getNombre(),
+                    "apellidopaterno" => $u->getApellidoPaterno(),
+                    "apellidomaterno" => $u->getApellidoMaterno(),
+                    "usuario" => $u->getUsuario(),
+                    "correo" => $u->getCorreo(),
+                    "celular" => $u->getCelular(),
+                    "contrasena" => $u->getContrasena(),
+                    "telefono" => $u->getTelefono(),
+                    "tipo" => $u->getTipo(),
+                    "img" => $img,
+                    "id" => $u->getIdUsuario()
+                ] :
+                [
+                    "nombre" => $u->getNombre(),
+                    "apellidopaterno" => $u->getApellidoPaterno(),
+                    "apellidomaterno" => $u->getApellidoMaterno(),
+                    "usuario" => $u->getUsuario(),
+                    "contrasena" => $u->getContrasena(),
+                    "correo" => $u->getCorreo(),
+                    "celular" => $u->getCelular(),
+                    "telefono" => $u->getTelefono(),
+                    "estatus" => $u->getEstatus(),
+                    "tipo" => $u->getTipo(),
+                    "acceso" => $div[0],
+                    "paq" => $div[1],
+                    "fecha" => $this->getFechaReg(),
+                    "img" => $img,
+                    "fts" => '0'
+                ];
+
+            $guardado = $this->consultas->execute($consulta, $valores);
+
+            if ($u->getIdUsuario() === 0) {
+                $idusuario = $this->getUserID($u->getNombre() . $u->getApellidoPaterno() . $u->getApellidoMaterno(), $u->getUsuario(), $u->getCorreo());
+                $permisos = $this->insertarPermisos($idusuario);
+            }
         }
-        $consulta = "INSERT INTO `usuario` VALUES (:id, :nombre, :apellidopaterno, :apellidomaterno, :usuario, :contrasena, :correo, :celular, :telefono, :estatus, :tipo, :acceso, :paq, :fecha, :img, :fts);";
-        $valores = array(
-            "id" => null,
-            "nombre" => $u->getNombre(),
-            "apellidopaterno" => $u->getApellidoPaterno(),
-            "apellidomaterno" => $u->getApellidoMaterno(),
-            "usuario" => $u->getUsuario(),
-            "contrasena" => $u->getContrasena(),
-            "correo" => $u->getCorreo(),
-            "celular" => $u->getCelular(),
-            "telefono" => $u->getTelefono(),
-            "estatus" => $u->getEstatus(),
-            "tipo" => $u->getTipo(),
-            "acceso" => $div[0],
-            "paq" => $div[1],
-            "fecha" => $this->getFechaReg(),
-            "img" => $img,
-            "fts" => '0'
-        );
-        $registrado = $this->consultas->execute($consulta, $valores);
-        $idusuario = $this->getUserID($u->getNombre() . $u->getApellidoPaterno() . $u->getApellidoMaterno(), $u->getUsuario(), $u->getCorreo());
-        $permisos = $this->insertarPermisos($idusuario);
-        return $registrado;
+
+        return $guardado;
     }
 
     private function insertarPermisos($idusuario)
@@ -358,7 +398,7 @@ class ControladorUsuario
         foreach ($usuarios as $usuarioactual) {
             $idusuarioactual = $usuarioactual['idusuario'];
             if ($idusuarioactual != $idusuario) {
-                echo "0Ya existe un usuario con este mismo nombre y apellidos";
+                echo "0Ya existe un usuario con este mismo nombre y apellidos.";
                 $existe = true;
                 break;
             }
@@ -368,7 +408,7 @@ class ControladorUsuario
             foreach ($usuarios as $usuarioactual) {
                 $idusuarioactual = $usuarioactual['idusuario'];
                 if ($idusuarioactual != $idusuario) {
-                    echo "0Ya existe este nombre de usuario, intenta con otro";
+                    echo "0Ya existe este nombre de usuario, intenta con otro.";
                     $existe = true;
                     break;
                 }
@@ -379,7 +419,7 @@ class ControladorUsuario
             foreach ($usuarios as $usuarioactual) {
                 $idusuarioactual = $usuarioactual['idusuario'];
                 if ($idusuarioactual != $idusuario) {
-                    echo "0Ya existe este correo, intenta con otro";
+                    echo "0Ya existe este correo, intenta con otro.";
                     $existe = true;
                     break;
                 }
@@ -388,7 +428,7 @@ class ControladorUsuario
         return $existe;
     }
 
-    public function getUsuarioByNombreCompleto($nombrecompleto)
+    private function getUsuarioByNombreCompleto($nombrecompleto)
     {
         $consultado = false;
         $consulta = "SELECT * FROM usuario WHERE concat(nombre,apellido_paterno,apellido_materno)=:nombrecompleto;";
@@ -397,7 +437,7 @@ class ControladorUsuario
         return $consultado;
     }
 
-    public function getUsuarioByNombreUsuario($nombreusuario)
+    private function getUsuarioByNombreUsuario($nombreusuario)
     {
         $consultado = false;
         $consulta = "SELECT * FROM usuario WHERE usuario=:usuario;";
@@ -406,7 +446,7 @@ class ControladorUsuario
         return $consultado;
     }
 
-    public function getUsuarioByCorreo($correo)
+    private function getUsuarioByCorreo($correo)
     {
         $consultado = false;
         $consulta = "SELECT * FROM usuario WHERE email=:correo;";
@@ -442,43 +482,6 @@ class ControladorUsuario
         $consulta = "SELECT fecharegistro, acceso, paquete FROM usuario ORDER BY idusuario ASC limit 1;";
         $consultado = $c->getResults($consulta, null);
         return $consultado;
-    }
-
-    private function crearImg($nombre)
-    {
-        $sn = substr($nombre, 0, 1);
-        $f = getdate();
-        $d = $f['mday'];
-        $m = $f['mon'];
-        $y = $f['year'];
-        $h = $f['hours'];
-        $mi = $f['minutes'];
-        $s = $f['seconds'];
-        if ($d < 10) {
-            $d = "0$d";
-        }
-        if ($m < 10) {
-            $m = "0$m";
-        }
-        if ($h < 10) {
-            $h = "0$h";
-        }
-        if ($mi < 10) {
-            $mi = "0$mi";
-        }
-        if ($s < 10) {
-            $s = "0$s";
-        }
-        $hoy = $y . '-' . $m . '-' . $d . 'T' . $h . '.' . $mi . '.' . $s;
-        header("Content-Type: image/png");
-        $im = @imagecreate(20, 20) or die("Cannot Initialize new GD image stream");
-        $color_fondo = imagecolorallocate($im, 9, 9, 107);
-        $color_texto = imagecolorallocate($im, 255, 255, 255);
-        imagestring($im, 5, 6, 2.8, "$sn", $color_texto);
-        $imgname = "$sn$hoy.png";
-        imagepng($im, '../img/usuarios/' . $imgname);
-        imagedestroy($im);
-        return $imgname;
     }
 
     private function getUserIDAux($concat)
@@ -526,58 +529,17 @@ class ControladorUsuario
         $eliminado = $this->consultas->execute($consulta, $valores);
         return $eliminado;
     }
-
-    public function modificarUsuario($u) {
-        $existe = $this->validarExistenciaUsuario($u->getNombre() . "" . $u->getApellidoPaterno() . "" . $u->getApellidoMaterno(), $u->getUsuario(), $u->getCorreo(), $u->getIdUsuario());
-        $actualizado = false;
-        if (!$existe) {
-            $actualizado = $this->actualizarUsuario($u);
-        }
-        return $actualizado;
-    }
-    
-    private function actualizarUsuario($u) {
-        $actualizado = false;
-        $pass = "";
-        if ($u->getChpass() == '1') {
-            $pass = " password=sha1(:contrasena),";
-        }
-
-        $img = $u->getImg();
-        if ($img == '') {
-            $img = $u->getImgactualizar();
-        } else if ($img != $u->getImgactualizar()) {
-            if ($img != "") {
-                rename('../temporal/tmp/' . $img, '../img/usuarios/' . $img);
-                unlink("../img/usuarios/" . $u->getImgactualizar());
-            }
-        }
-
-        $consulta = "UPDATE `usuario` SET  nombre=:nombre, apellido_paterno=:apellidopaterno, apellido_materno=:apellidomaterno, usuario=:usuario, email=:correo,$pass celular=:celular, telefono_fijo=:telefono, tipo=:tipo, imgperfil=:img WHERE idusuario=:id;";
-        $valores = array("nombre" => $u->getNombre(),
-            "apellidopaterno" => $u->getApellidoPaterno(),
-            "apellidomaterno" => $u->getApellidoMaterno(),
-            "usuario" => $u->getUsuario(),
-            "correo" => $u->getCorreo(),
-            "celular" => $u->getCelular(),
-            "contrasena" => $u->getContrasena(),
-            "telefono" => $u->getTelefono(),
-            "tipo" => $u->getTipo(),
-            "img" => $img,
-            "id" => $u->getIdUsuario());
-        $actualizado = $this->consultas->execute($consulta, $valores);
-        return $actualizado;
-    }
-
-    public function getTipoLogin() {
+    public function getTipoLogin()
+    {
         session_start();
         $usuariologin = $_SESSION[sha1("idusuario")];
         $tipologin = $_SESSION[sha1("tipousuario")];
         return $tipologin;
     }
 
-    
-    public function actualizarImgPerfil($u) {
+
+    public function actualizarImgPerfil($u)
+    {
         $actualizado = false;
         $img = $u->getImg();
         if ($img == '') {
@@ -589,17 +551,21 @@ class ControladorUsuario
             }
         }
         $consulta = "UPDATE `usuario` SET imgperfil=:img WHERE idusuario=:id;";
-        $valores = array("img" => $img,
-            "id" => $u->getIdUsuario());
+        $valores = array(
+            "img" => $img,
+            "id" => $u->getIdUsuario()
+        );
         $actualizado = $this->consultas->execute($consulta, $valores);
         return $actualizado;
     }
 
 
-    public function insertarPermisosList($u) {
+    public function insertarPermisosList($u)
+    {
         $actualizado = false;
         $consulta = "INSERT INTO `usuariopermiso` VALUES (:id, :idusuario, :facturas, :crearfactura, :editarfactura, :eliminarfactura, :listafactura, :pago, :crearpago, :editarpago, :eliminarpago, :listapago, :nomina, :listaempleado, :crearempleado, :editarempleado, :eliminarempleado, :listanomina, :crearnomina, :editarnomina, :eliminarnomina, :cartaporte, :listaubicacion, :crearubicacion, :editarubicacion, :eliminarubicacion, :listatransporte, :creartransporte, :editartransporte, :eliminartransporte, :listaremolque, :crearremolque, :editarremolque, :eliminarremolque, :listaoperador, :crearoperador, :editaroperador, :eliminaroperador, :listacarta, :crearcarta, :editarcarta, :eliminarcarta, :cotizacion, :crearcotizacion, :editarcotizacion, :eliminarcotizacion, :listacotizacion, :anticipo, :cliente, :crearcliente, :editarcliente, :eliminarcliente, :listacliente, :comunicado, :crearcomunicado, :editarcomunicado, :eliminarcomunicado, :listacomunicado, :producto, :crearproducto, :editarproducto, :eliminarproducto, :listaproducto, :proveedor, :crearproveedor, :editarproveedor, :eliminarproveedor, :listaproveedor, :impuesto, :crearimpuesto, :editarimpuesto, :eliminarimpuesto, :listaimpuesto, :datosfacturacion, :creardatos, :editardatos, :listadatos, :contrato, :crearcontrato, :editarcontrato, :eliminarcontrato, :listacontrato, :usuario, :crearusuario, :listausuario, :eliminarusuario, :asignarpermiso, :reporte, :reportefactura, :reportepago, :reportegrafica, :reporteiva, :datosiva, :reporteventa, :configuracion, :addfolio, :listafolio, :editarfolio, :eliminarfolio, :addcomision, :encabezados, :confcorreo, :importar);";
-        $valores = array("id" => null,
+        $valores = array(
+            "id" => null,
             "idusuario" => $u->getIdUsuario(),
             "facturas" => $u->getFacturas(),
             "crearfactura" => $u->getCrearfactura(),
@@ -701,13 +667,14 @@ class ControladorUsuario
             "addcomision" => $u->getAddcomision(),
             "encabezados" => $u->getEncabezados(),
             "confcorreo" => $u->getConfcorreo(),
-            "importar" => $u->getImportar());
+            "importar" => $u->getImportar()
+        );
         $actualizado = $this->consultas->execute($consulta, $valores);
         return $actualizado;
     }
 
-    public function checkAccion($u) {
-        echo 'Hola ' . var_export($u, true);
+    public function checkAccion($u)
+    {
         $datos = false;
         if ($u->getAccion() == '1') {
             $datos = $this->insertarPermisosList($u);
@@ -716,121 +683,55 @@ class ControladorUsuario
         }
         return $datos;
     }
-    
 
-    private function actualizarPermisos($u) {
-        
+    private function actualizarPermisos($u)
+    {
         $actualizado = false;
-        $consulta = "UPDATE usuariopermiso SET  facturas=:facturas, crearfactura=:crearfactura, editarfactura=:editarfactura, eliminarfactura=:eliminarfactura, listafactura=:listafactura, pago=:pago, crearpago=:crearpago, editarpago=:editarpago, eliminarpago=:eliminarpago, listapago=:listapago, nomina=:nomina, listaempleado=:listaempleado, crearempleado=:crearempleado, editarempleado=:editarempleado, eliminarempleado=:eliminarempleado, listanomina=:listanomina, crearnomina=:crearnomina, editarnomina=:editarnomina, eliminarnomina=:eliminarnomina, cartaporte=:cartaporte, listaubicacion=:listaubicacion, crearubicacion=:crearubicacion, editarubicacion=:editarubicacion, eliminarubicacion=:eliminarubicacion, listatransporte=:listatransporte, creartransporte=:creartransporte, editartransporte=:editartransporte, eliminartransporte=:eliminartransporte, listaremolque=:listaremolque, crearremolque=:crearremolque, editarremolque=:editarremolque, eliminarremolque=:eliminarremolque, listaoperador=:listaoperador, crearoperador=:crearoperador, editaroperador=:editaroperador, eliminaroperador=:eliminaroperador, listacarta=:listacarta, crearcarta=:crearcarta, editarcarta=:editarcarta, eliminarcarta=:eliminarcarta, cotizacion=:cotizacion, crearcotizacion=:crearcotizacion, editarcotizacion=:editarcotizacion, eliminarcotizacion=:eliminarcotizacion, listacotizacion=:listacotizacion, anticipo=:anticipo, cliente=:cliente, crearcliente=:crearcliente, editarcliente=:editarcliente, eliminarcliente=:eliminarcliente, listacliente=:listacliente, comunicado=:comunicado, crearcomunicado=:crearcomunicado, editarcomunicado=:editarcomunicado, eliminarcomunicado=:eliminarcomunicado, listacomunicado=:listacomunicado, producto=:producto, crearproducto=:crearproducto, editarproducto=:editarproducto, eliminarproducto=:eliminarproducto, listaproducto=:listaproducto, proveedor=:proveedor, crearproveedor=:crearproveedor, editarproveedor=:editarproveedor, eliminarproveedor=:eliminarproveedor, listaproveedor=:listaproveedor, impuesto=:impuesto, crearimpuesto=:crearimpuesto, editarimpuesto=:editarimpuesto, eliminarimpuesto=:eliminarimpuesto, listaimpuesto=:listaimpuesto, datosfacturacion=:datosfacturacion, creardatos=:creardatos, editardatos=:editardatos, listadatos=:listadatos, contrato=:contrato, crearcontrato=:crearcontrato, editarcontrato=:editarcontrato, eliminarcontrato=:eliminarcontrato, listacontrato=:listacontrato, usuario=:usuario, crearusuario=:crearusuario, listausuario=:listausuario, eliminarusuario=:eliminarusuario, asignarpermiso=:asignarpermiso, reporte=:reporte, reportefactura=:reportefactura, reportepago=:reportepago, reportegrafica=:reportegrafica, reporteiva=:reporteiva, datosiva=:datosiva, reporteventa=:reporteventa, configuracion=:configuracion, addfolio=:addfolio, listafolio=:listafolio, editarfolio=:editarfolio, eliminarfolio=:eliminarfolio, addcomision=:addcomision, encabezados=:encabezados, confcorreo=:confcorreo, importar=:importar WHERE permiso_idusuario=:id;";
-        $valores = array("facturas" => $u->getFacturas(),
-            "crearfactura" => $u->getCrearfactura(),
-            "editarfactura" => $u->getEditarfactura(),
-            "eliminarfactura" => $u->getEliminarfactura(),
-            "listafactura" => $u->getListafactura(),
-            "pago" => $u->getPago(),
-            "crearpago" => $u->getCrearpago(),
-            "editarpago" => $u->getEditarpago(),
-            "eliminarpago" => $u->getEliminarpago(),
-            "listapago" => $u->getListapago(),
-            "nomina" => $u->getNomina(),
-            "listaempleado" => $u->getListaempleado(),
-            "crearempleado" => $u->getCrearempleado(),
-            "editarempleado" => $u->getEditarempleado(),
-            "eliminarempleado" => $u->getEliminarempleado(),
-            "listanomina" => $u->getListanomina(),
-            "crearnomina" => $u->getCrearnomina(),
-            "editarnomina" => $u->getEditarnomina(),
-            "eliminarnomina" => $u->getEliminarnomina(),
-            "cartaporte" => $u->getCartaporte(),
-            "listaubicacion" => $u->getListaubicacion(),
-            "crearubicacion" => $u->getCrearubicacion(),
-            "editarubicacion" => $u->getEditarubicacion(),
-            "eliminarubicacion" => $u->getEliminarubicacion(),
-            "listatransporte" => $u->getListatransporte(),
-            "creartransporte" => $u->getCreartransporte(),
-            "editartransporte" => $u->getEditartransporte(),
-            "eliminartransporte" => $u->getEliminartransporte(),
-            "listaremolque" => $u->getListaremolque(),
-            "crearremolque" => $u->getCrearremolque(),
-            "editarremolque" => $u->getEditarremolque(),
-            "eliminarremolque" => $u->getEliminarremolque(),
-            "listaoperador" => $u->getListaoperador(),
-            "crearoperador" => $u->getCrearoperador(),
-            "editaroperador" => $u->getEditaroperador(),
-            "eliminaroperador" => $u->getEliminaroperador(),
-            "listacarta" => $u->getListacarta(),
-            "crearcarta" => $u->getCrearcarta(),
-            "editarcarta" => $u->getEditarcarta(),
-            "eliminarcarta" => $u->getEliminarcarta(),
-            "cotizacion" => $u->getCotizacion(),
-            "crearcotizacion" => $u->getCrearcotizacion(),
-            "editarcotizacion" => $u->getEditarcot(),
-            "eliminarcotizacion" => $u->getEliminarcot(),
-            "listacotizacion" => $u->getListacotizacion(),
-            "anticipo" => $u->getAnticipo(),
-            "cliente" => $u->getCliente(),
-            "crearcliente" => $u->getCrearcliente(),
-            "editarcliente" => $u->getEditarcliente(),
-            "eliminarcliente" => $u->getEliminarcliente(),
-            "listacliente" => $u->getListacliente(),
-            "comunicado" => $u->getComunicado(),
-            "crearcomunicado" => $u->getCrearcomunicado(),
-            "editarcomunicado" => $u->getEditarcomunicado(),
-            "eliminarcomunicado" => $u->getEliminarcomunicado(),
-            "listacomunicado" => $u->getListacomunicado(),
-            "producto" => $u->getProducto(),
-            "crearproducto" => $u->getCrearproducto(),
-            "editarproducto" => $u->getEditarproducto(),
-            "eliminarproducto" => $u->getEliminarproducto(),
-            "listaproducto" => $u->getListaproducto(),
-            "proveedor" => $u->getProveedor(),
-            "crearproveedor" => $u->getCrearproveedor(),
-            "editarproveedor" => $u->getEditarproveedor(),
-            "eliminarproveedor" => $u->getEliminarproveedor(),
-            "listaproveedor" => $u->getListaproveedor(),
-            "impuesto" => $u->getImpuesto(),
-            "crearimpuesto" => $u->getCrearimpuesto(),
-            "editarimpuesto" => $u->getEditarimpuesto(),
-            "eliminarimpuesto" => $u->getEliminarimpuesto(),
-            "listaimpuesto" => $u->getListaimpuesto(),
-            "datosfacturacion" => $u->getDatosfacturacion(),
-            "creardatos" => $u->getCreardatos(),
-            "editardatos" => $u->getEditardatos(),
-            "listadatos" => $u->getListadatos(),
-            "contrato" => $u->getContrato(),
-            "crearcontrato" => $u->getCrearcontrato(),
-            "editarcontrato" => $u->getEditarcontrato(),
-            "eliminarcontrato" => $u->getEliminarcontrato(),
-            "listacontrato" => $u->getListacontrato(),
-            "usuario" => $u->getUsuarios(),
-            "crearusuario" => $u->getCrearusuario(),
-            "listausuario" => $u->getListausuario(),
-            "eliminarusuario" => $u->getEliminarusuario(),
-            "asignarpermiso" => $u->getAsignarpermisos(),
-            "reporte" => $u->getReporte(),
-            "reportefactura" => $u->getReportefactura(),
-            "reportepago" => $u->getReportepago(),
-            "reportegrafica" => $u->getReportegrafica(),
-            "reporteiva" => $u->getReporteiva(),
-            "datosiva" => $u->getDatosiva(),
-            "reporteventa" => $u->getReporteventas(),
-            "configuracion" => $u->getConfiguracion(),
-            "addfolio" => $u->getAddfolio(),
-            "listafolio" => $u->getListafolio(),
-            "editarfolio" => $u->getEditfolio(),
-            "eliminarfolio" => $u->getEliminarfolio(),
-            "addcomision" => $u->getAddcomision(),
-            "encabezados" => $u->getEncabezados(),
-            "confcorreo" => $u->getConfcorreo(),
-            "importar" => $u->getImportar(),
-            "id" => $u->getIdUsuario());
+
+        $mapeoGet = array(
+            "editarcotizacion" => "getEditarcot",
+            "eliminarcotizacion" => "getEliminarcot",
+            "crearnomina" => "getCrearnomina",
+            "usuario" => "getUsuarios",
+            "reporteventa" => "getReporteventas",
+            "editarfolio" => "getEditfolio",
+            "asignarpermiso" => "getAsignarpermisos",
+        );
+
+        $columnas = array(
+            "facturas", "crearfactura", "editarfactura", "eliminarfactura", "listafactura",
+            "pago", "crearpago", "editarpago", "eliminarpago", "listapago",
+            "nomina", "listaempleado", "crearempleado", "editarempleado", "eliminarempleado", "listanomina", "crearnomina", "editarnomina", "eliminarnomina",
+            "cartaporte", "listaubicacion", "crearubicacion", "editarubicacion", "eliminarubicacion", "listatransporte", "creartransporte", "editartransporte", "eliminartransporte", "listaremolque", "crearremolque", "editarremolque", "eliminarremolque", "listaoperador", "crearoperador", "editaroperador", "eliminaroperador", "listacarta", "crearcarta", "editarcarta", "eliminarcarta",
+            "cotizacion", "crearcotizacion", "editarcotizacion", "eliminarcotizacion", "listacotizacion",
+            "anticipo", "cliente", "crearcliente", "editarcliente", "eliminarcliente", "listacliente",
+            "comunicado", "crearcomunicado", "editarcomunicado", "eliminarcomunicado", "listacomunicado",
+            "producto", "crearproducto", "editarproducto", "eliminarproducto", "listaproducto",
+            "proveedor", "crearproveedor", "editarproveedor", "eliminarproveedor", "listaproveedor",
+            "impuesto", "crearimpuesto", "editarimpuesto", "eliminarimpuesto", "listaimpuesto",
+            "datosfacturacion", "creardatos", "editardatos", "listadatos",
+            "contrato", "crearcontrato", "editarcontrato", "eliminarcontrato", "listacontrato",
+            "usuario", "crearusuario", "listausuario", "eliminarusuario", "asignarpermiso",
+            "reporte", "reportefactura", "reportepago", "reportegrafica", "reporteiva", "datosiva", "reporteventa",
+            "configuracion", "addfolio", "listafolio", "editarfolio", "eliminarfolio", "addcomision", "encabezados", "confcorreo", "importar"
+        );
+
+        $consulta = "UPDATE usuariopermiso SET ";
+        foreach ($columnas as $columna) {
+            $getter = isset($mapeoGet[$columna]) ? $mapeoGet[$columna] : "get" . $columna;
+            $consulta .= "$columna=:$columna, ";
+            $valores[$columna] = method_exists($u, $getter) ? $u->$getter() : null;
+        }
+        //quitar la ultima coma de las columnas
+        $consulta = rtrim($consulta, ", ") . " WHERE permiso_idusuario=:id;";
+
+        $valores["id"] = $u->getIdUsuario();
         $actualizado = $this->consultas->execute($consulta, $valores);
-        echo $actualizado;
         return $actualizado;
     }
 
-    
-    public function checkPermisos($idusuario) {
+    public function checkPermisos($idusuario)
+    {
         $datos = "";
         $check = $this->checkPermisosAux($idusuario);
         if ($check) {
@@ -841,7 +742,8 @@ class ControladorUsuario
         return $datos;
     }
 
-    private function checkPermisosAux($idusuario) {
+    private function checkPermisosAux($idusuario)
+    {
         $existe = false;
         $get = $this->getPermisoById($idusuario);
         foreach ($get as $actual) {
@@ -850,7 +752,8 @@ class ControladorUsuario
         return $existe;
     }
 
-    private function getInsertPermisos($idusuario) {
+    private function getInsertPermisos($idusuario)
+    {
         $usuario = $this->getUsuarioById($idusuario);
         $datos = "";
         foreach ($usuario as $usuarioactual) {
@@ -865,119 +768,35 @@ class ControladorUsuario
         return $datos;
     }
 
-    public function getPermisosUsuario($idusuario) {
+    public function getPermisosUsuario($idusuario)
+    {
         $usuario = $this->getPermisoById($idusuario);
         $datos = "";
+
         foreach ($usuario as $usuarioactual) {
             session_start();
             $usuariologin = $_SESSION[sha1("idusuario")];
+
             $idusuario = $usuarioactual['permiso_idusuario'];
             $nombreusuario = $usuarioactual['nombre'] . ' ' . $usuarioactual['apellido_paterno'] . ' ' . $usuarioactual['apellido_materno'];
-            $facturas = $usuarioactual['facturas'];
-            $crearfactura = $usuarioactual['crearfactura'];
-            $editarfactura = $usuarioactual['editarfactura'];
-            $eliminarfactura = $usuarioactual['eliminarfactura'];
-            $listafactura = $usuarioactual['listafactura'];
-            $pago = $usuarioactual['pago'];
-            $crearpago = $usuarioactual['crearpago'];
-            $editarpago = $usuarioactual['editarpago'];
-            $eliminarpago = $usuarioactual['eliminarpago'];
-            $listapago = $usuarioactual['listapago'];
-            $nomina = $usuarioactual['nomina'];
-            $listaempleado = $usuarioactual['listaempleado'];
-            $crearempleado = $usuarioactual['crearempleado'];
-            $editarempleado = $usuarioactual['editarempleado'];
-            $eliminarempleado = $usuarioactual['eliminarempleado'];
-            $listanomina = $usuarioactual['listanomina'];
-            $crearnomina = $usuarioactual['crearnomina'];
-            $editarnomina = $usuarioactual['editarnomina'];
-            $eliminarnomina = $usuarioactual['eliminarnomina'];
-            $cartaporte = $usuarioactual['cartaporte'];
-            $listaubicacion = $usuarioactual['listaubicacion'];
-            $crearubicacion = $usuarioactual['crearubicacion'];
-            $editarubicacion = $usuarioactual['editarubicacion'];
-            $eliminarubicacion = $usuarioactual['eliminarubicacion'];
-            $listatransporte = $usuarioactual['listatransporte'];
-            $creartransporte = $usuarioactual['creartransporte'];
-            $editartransporte = $usuarioactual['editartransporte'];
-            $eliminartransporte = $usuarioactual['eliminartransporte'];
-            $listaremolque = $usuarioactual['listaremolque'];
-            $crearremolque = $usuarioactual['crearremolque'];
-            $editarremolque = $usuarioactual['editarremolque'];
-            $eliminarremolque = $usuarioactual['eliminarremolque'];
-            $listaoperador = $usuarioactual['listaoperador'];
-            $crearoperador = $usuarioactual['crearoperador'];
-            $editaroperador = $usuarioactual['editaroperador'];
-            $eliminaroperador = $usuarioactual['eliminaroperador'];
-            $listacarta = $usuarioactual['listacarta'];
-            $crearcarta = $usuarioactual['crearcarta'];
-            $editarcarta = $usuarioactual['editarcarta'];
-            $eliminarcarta = $usuarioactual['eliminarcarta'];
-            $cotizacion = $usuarioactual['cotizacion'];
-            $crearcotizacion = $usuarioactual['crearcotizacion'];
-            $editarcotizacion = $usuarioactual['editarcotizacion'];
-            $eliminarcotizacion = $usuarioactual['eliminarcotizacion'];
-            $listacotizacion = $usuarioactual['listacotizacion'];
-            $anticipo = $usuarioactual['anticipo'];
-            $cliente = $usuarioactual['cliente'];
-            $crearcliente = $usuarioactual['crearcliente'];
-            $editarcliente = $usuarioactual['editarcliente'];
-            $eliminarcliente = $usuarioactual['eliminarcliente'];
-            $listacliente = $usuarioactual['listacliente'];
-            $comunicado = $usuarioactual['comunicado'];
-            $crearcomunicado = $usuarioactual['crearcomunicado'];
-            $editarcomunicado = $usuarioactual['editarcomunicado'];
-            $eliminarcomunicado = $usuarioactual['eliminarcomunicado'];
-            $listacomunicado = $usuarioactual['listacomunicado'];
-            $producto = $usuarioactual['producto'];
-            $crearproduto = $usuarioactual['crearproducto'];
-            $editarproducto = $usuarioactual['editarproducto'];
-            $eliminarproducto = $usuarioactual['eliminarproducto'];
-            $listaproducto = $usuarioactual['listaproducto'];
-            $proveedor = $usuarioactual['proveedor'];
-            $crearproveedor = $usuarioactual['crearproveedor'];
-            $editarproveedor = $usuarioactual['editarproveedor'];
-            $eliminarproveedor = $usuarioactual['eliminarproveedor'];
-            $listaproveedor = $usuarioactual['listaproveedor'];
-            $impuesto = $usuarioactual['impuesto'];
-            $crearimpuesto = $usuarioactual['crearimpuesto'];
-            $editarimpuesto = $usuarioactual['editarimpuesto'];
-            $eliminarimpuesto = $usuarioactual['eliminarimpuesto'];
-            $listaimpuesto = $usuarioactual['listaimpuesto'];
-            $datosfacturacion = $usuarioactual['datosfacturacion'];
-            $creardatos = $usuarioactual['creardatos'];
-            $editardatos = $usuarioactual['editardatos'];
-            $listadatos = $usuarioactual['listadatos'];
-            $contrato = $usuarioactual['contrato'];
-            $crearcontrato = $usuarioactual['crearcontrato'];
-            $editarcontrato = $usuarioactual['editarcontrato'];
-            $eliminarcontrato = $usuarioactual['eliminarcontrato'];
-            $listacontrato = $usuarioactual['listacontrato'];
-            $usuarios = $usuarioactual['usuario'];
-            $crearusuario = $usuarioactual['crearusuario'];
-            $listausuario = $usuarioactual['listausuario'];
-            $eliminarusuario = $usuarioactual['eliminarusuario'];
-            $asignarpermiso = $usuarioactual['asignarpermiso'];
-            $reporte = $usuarioactual['reporte'];
-            $reportefactura = $usuarioactual['reportefactura'];
-            $reportepago = $usuarioactual['reportepago'];
-            $reportegrafica = $usuarioactual['reportegrafica'];
-            $reporteiva = $usuarioactual['reporteiva'];
-            $datosiva = $usuarioactual['datosiva'];
-            $reporteventa = $usuarioactual['reporteventa'];
-            $configuracion = $usuarioactual['configuracion'];
-            $addfolio = $usuarioactual['addfolio'];
-            $listafolio = $usuarioactual['listafolio'];
-            $editarfolio = $usuarioactual['editarfolio'];
-            $eliminarfolio = $usuarioactual['eliminarfolio'];
-            $comision = $usuarioactual['addcomision'];
-            $encabezados = $usuarioactual['encabezados'];
-            $confcorreo = $usuarioactual['confcorreo'];
-            $importar = $usuarioactual['importar'];
 
-            $datos = "$idusuario</tr>$nombreusuario</tr>$facturas</tr>$crearfactura</tr>$editarfactura</tr>$eliminarfactura</tr>$listafactura</tr>$pago</tr>$crearpago</tr>$editarpago</tr>$eliminarpago</tr>$listapago</tr>$nomina</tr>$listaempleado</tr>$crearempleado</tr>$editarempleado</tr>$eliminarempleado</tr>$listanomina</tr>$crearnomina</tr>$editarnomina</tr>$eliminarnomina</tr>$cartaporte</tr>$listaubicacion</tr>$crearubicacion</tr>$editarubicacion</tr>$eliminarubicacion</tr>$listatransporte</tr>$creartransporte</tr>$editartransporte</tr>$eliminartransporte</tr>$listaremolque</tr>$crearremolque</tr>$editarremolque</tr>$eliminarremolque</tr>$listaoperador</tr>$crearoperador</tr>$editaroperador</tr>$eliminaroperador</tr>$listacarta</tr>$crearcarta</tr>$editarcarta</tr>$eliminarcarta</tr>$cotizacion</tr>$crearcotizacion</tr>$editarcotizacion</tr>$eliminarcotizacion</tr>$listacotizacion</tr>$anticipo</tr>$cliente</tr>$crearcliente</tr>$editarcliente</tr>$eliminarcliente</tr>$listacliente</tr>$comunicado</tr>$crearcomunicado</tr>$editarcomunicado</tr>$eliminarcomunicado</tr>$listacomunicado</tr>$producto</tr>$crearproduto</tr>$editarproducto</tr>$eliminarproducto</tr>$listaproducto</tr>$proveedor</tr>$crearproveedor</tr>$editarproveedor</tr>$eliminarproveedor</tr>$listaproveedor</tr>$impuesto</tr>$crearimpuesto</tr>$editarimpuesto</tr>$eliminarimpuesto</tr>$listaimpuesto</tr>$datosfacturacion</tr>$creardatos</tr>$editardatos</tr>$listadatos</tr>$contrato</tr>$crearcontrato</tr>$editarcontrato</tr>$eliminarcontrato</tr>$listacontrato</tr>$usuarios</tr>$crearusuario</tr>$listausuario</tr>$eliminarusuario</tr>$asignarpermiso</tr>$reporte</tr>$reportefactura</tr>$reportepago</tr>$reportegrafica</tr>$reporteiva</tr>$datosiva</tr>$reporteventa</tr>$configuracion</tr>$addfolio</tr>$listafolio</tr>$editarfolio</tr>$eliminarfolio</tr>$comision</tr>$encabezados</tr>$confcorreo</tr>$importar</tr>0</tr>$usuariologin";
+            // Obtener todas las columnas disponibles
+            $columnas = array_keys($usuarioactual);
+
+            // Inicializar el string de datos
+            $datos = "$idusuario</tr>$nombreusuario";
+
+            // Iterar sobre las columnas y agregar los valores al string de datos
+            foreach ($columnas as $columna) {
+                $datos .= "</tr>{$usuarioactual[$columna]}";
+            }
+
+            // Agregar el valor de $usuariologin al final del string de datos
+            $datos .= "</tr>0</tr>$usuariologin";
+
             break;
         }
+
         return $datos;
     }
 }

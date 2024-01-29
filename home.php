@@ -98,7 +98,7 @@ require_once 'Enrutador.php';
                 <div class="img-user mx-3">
                     <div class="dropdown text-center" style="height: 70px;">
                         <button class="btn button-home" title="Notificaciones" type="button" data-bs-toggle="dropdown">
-                            <img src="img/<?php echo $imgperfil; ?>" />
+                            <img src="img/usuarios/<?php echo $imgperfil; ?>" />
                         </button>
                         <ul class="dropdown-menu user-option" id="list-notificaciones">
                             <li class="py-1">
@@ -160,7 +160,7 @@ require_once 'Enrutador.php';
                                         <a href='#colnomina' data-bs-toggle="collapse" role="button" aria-expanded="false">
                                             <li class='list-element'>
                                                 <div class='marker'></div>
-                                                <div class='pad'></div><label> N&oacute;minas</label>
+                                                <div class='pad'></div><label> Nóminas</label>
                                             </li>
                                         </a>
                                         <div id='colnomina' class='panel-collapse collapse'>

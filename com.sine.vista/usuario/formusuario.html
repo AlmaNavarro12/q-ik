@@ -11,18 +11,19 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-md-3 col-sm-12 pb-3">
-                <label class="button-file col-12" for="imagen"><span class="fas fa-image"></span>
-                    Imagen de perfil</label>
-                <div class="form-group">
-                    <input class="form-control text-center upload" hidden id="imagen" name="imagen" type="file"
-                        onchange="cargarImgUsuario();" />
-                    <input id="filename" name="filename" type="hidden" />
-                    <div id="imagen-errors">
+            <div class="col-md-6">
+                <div class="col-md-9 col-sm-12 pb-3 mx-auto" id="label">
+                    <label class="button-file col-12" for="imagen"><span class="fas fa-image"></span>
+                        Imagen de perfil</label>
+                    <div class="form-group">
+                        <input class="form-control text-center upload" hidden id="imagen" name="imagen" type="file" accept=".png, .jpeg, .jpg, .gif"
+                            onchange="cargarImgUsuario();" />
+                        <input id="filename" name="filename" type="hidden" />
+                        <div id="imagen-errors">
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-md-3 ps-0 text-center" id="muestraimagen">
+                <div class="col-md-12 ps-0 text-center" id="muestraimagen"></div>
             </div>
             <div class="col-md-6 py-2">
                 <label class="label-form" for="nombre">Nombre</label> <label

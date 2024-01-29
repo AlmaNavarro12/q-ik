@@ -20,7 +20,7 @@ if (isset($_POST['transaccion'])) {
             $u = obtenerDatosUsuario();
             $u->setIdUsuario($_POST['idusuario']);
             $u->setImgactualizar($_POST['imgactualizar']);
-            $insertado = $cu->modificarUsuario($u);
+            $insertado = $cu->nuevoUsuario($u);
             break;
         case 'eliminarusuario':
             $insertado = $cu->quitarUsuario($_POST['idusuario']);
@@ -83,7 +83,7 @@ function obtenerDatosPermisos()
     $p->setEditarempleado($_POST['editarempleado']);
     $p->setEliminarempleado($_POST['eliminarempleado']);
     $p->setListanomina($_POST['listanomina']);
-    $p->setCrearempleado($_POST['crearnomina']);
+    $p->setCrearnomina($_POST['crearnomina']);
     $p->setEditarnomina($_POST['editarnomina']);
     $p->setEliminarnomina($_POST['eliminarnomina']);
     $p->setListanomina($_POST['listanomina']);

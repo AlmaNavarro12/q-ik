@@ -5,21 +5,21 @@
     <div>
         <label class="label-sub text-uppercase" id="titulo-asignar">Asignando permisos a:</label>
     </div>
-    <div class="row">
-        <div class="col-md-5 col-sm-12 mb-3">
+    <div class="row" id="contenedor-button">
+        <div class="col-md-5 mb-3" id="buno">
             <button id="btn-all-permisos" class="button-form btn btn-success col-12" onclick="checkAll();">
                 Asignar / Quitar todos los permisos <span class="fas fa-check"></span>
             </button>
             <input type="checkbox" id="checkall" hidden/>
         </div>
-        <div class="col-md-1"></div>
-        <div class="col-md-6 col-sm-12 row d-flex justify-content-end px-0 mx-0">
-            <div class="col-md-6 col-sm-12 mb-3">
+        <div class="col-md-1" id="extra"></div>
+        <div class="col-md-6 row d-flex justify-content-end px-0 mx-0" id="bdos">
+            <div class="col-md-6 mb-3">
                 <button id="btn-guardar-permisos" class="button-submit btn btn-lg col-12" onclick="">
                     Asignar permisos <span class="fas fa-check"></span>
                 </button>
             </div>
-            <div class="col-md-6 col-sm-12">
+            <div class="col-md-6">
                 <button class="button-form btn btn-danger col-12" onclick="loadView('listasuarioaltas');">
                     Cancelar <span class="fas fa-times"></span>
                 </button>
@@ -950,3 +950,8 @@
         </div>
     </form>
 </div>
+<script type="text/javascript" src="js/scriptusuario.js"></script>
+<script>
+    window.addEventListener('resize', resposiveButton);
+    resposiveButton();
+</script>

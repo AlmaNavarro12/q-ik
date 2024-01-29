@@ -58,7 +58,7 @@ function obtenerDatosUsuario() {
 function insertarUsuario(idusuario = null) {
     var datosUsuario = obtenerDatosUsuario();
     if ((idusuario == null && isnEmpty(datosUsuario.nombre, "nombre") && isnEmpty(datosUsuario.apellidopaterno, "apellido-paterno") && isnEmpty(datosUsuario.apellidomaterno, "apellido-materno") && isnEmpty(datosUsuario.usuario, "usuario") && isnEmpty(datosUsuario.password, "contrasena") && isEmail(datosUsuario.correo, "correo") && isPhoneNumber(datosUsuario.telefono, "telefono") && isnEmpty(datosUsuario.tipo, "tipo-usuario")) 
-    || (idusuario != null && isnEmpty(datosUsuario.nombre, "nombre") && isnEmpty(datosUsuario.apellidopaterno, "apellido-paterno") &&  isnEmpty(datosUsuario.usuario, "usuario") && isEmail(datosUsuario.correo, "correo") && isPhoneNumber(datosUsuario.telefono, "telefono") && isnEmpty(datosUsuario.tipo, "tipo-usuario"))){
+    || (idusuario != null && isnEmpty(datosUsuario.nombre, "nombre") && isnEmpty(datosUsuario.apellidopaterno, "apellido-paterno") && isnEmpty(datosUsuario.apellidomaterno, "apellido-materno") &&  isnEmpty(datosUsuario.usuario, "usuario") && isEmail(datosUsuario.correo, "correo") && isPhoneNumber(datosUsuario.telefono, "telefono") && isnEmpty(datosUsuario.tipo, "tipo-usuario"))){
         var transaccion = (idusuario == null) ? "insertarusuario" : "actualizarusuario";
         $.ajax({
             url: "com.sine.enlace/enlaceusuario.php",
@@ -116,7 +116,7 @@ function editarUsuario(idusuario) {
                 alertify.error(res);
             } else {
                 cargandoHide();
-                loadView('crearusuario');
+                loadView('nuevousuario');
                 window.setTimeout("setValoresEditarUsuario('" + datos + "')", 400);
             }
         }
@@ -185,7 +185,7 @@ function checkUser() {
         alertify.confirm("¿Estás seguro que deseas cambiar el nombre de usuario?", function () {
             $("#usuario").removeAttr('disabled');
         }, function () {
-            $("#chuser").removeAttr('checked');
+            $("#chuser").prop('checked', false);
         }).set({ title: "Q-ik" });
     }
 }
@@ -202,7 +202,7 @@ function checkContrasena() {
         alertify.confirm("¿Estás seguro que deseas cambiar la contraseña de este usuario?", function () {
             $("#contrasena").removeAttr('disabled');
         }, function () {
-            $("#chpass").removeAttr('checked');
+            $("#chpass").prop('checked', false);
         }).set({ title: "Q-ik" });
     }
 }
@@ -331,13 +331,8 @@ function setValoresAsignarPermisos(datos) {
         "idusuario", "nombre", 
         "facturas", "crearfactura", "editarfactura", "eliminarfactura", "listafactura",
         "pago", "crearpago", "editarpago", "eliminarpago", "listapago",
-        "nomina", "listaempleado", "crearempleado", "editarempleado", "eliminarempleado",
-        "listanomina", "crearnomina", "editarnomina", "eliminarnomina",
-        "cartaporte", "listaubicacion", "crearubicacion", "editarubicacion", "eliminarubicacion",
-        "listatransporte", "creartransporte", "editartransporte", "eliminartransporte",
-        "listaremolque", "crearremolque", "editarremolque", "eliminarremolque",
-        "listaoperador", "crearoperador", "editaroperador", "eliminaroperador",
-        "listacarta", "crearcarta", "editarcarta", "eliminarcarta",
+        "nomina", "listaempleado", "crearempleado", "editarempleado", "eliminarempleado", "listanomina", "crearnomina", "editarnomina", "eliminarnomina",
+        "cartaporte", "listaubicacion", "crearubicacion", "editarubicacion", "eliminarubicacion", "listatransporte", "creartransporte", "editartransporte", "eliminartransporte", "listaremolque", "crearremolque", "editarremolque", "eliminarremolque", "listaoperador", "crearoperador", "editaroperador", "eliminaroperador", "listacarta", "crearcarta", "editarcarta", "eliminarcarta",
         "cotizacion", "crearcotizacion", "editarcotizacion", "eliminarcotizacion", "listacotizacion",
         "anticipo", "cliente", "crearcliente", "editarcliente", "eliminarcliente", "listacliente",
         "comunicado", "crearcomunicado", "editarcomunicado", "eliminarcomunicado", "listacomunicado",
@@ -352,16 +347,16 @@ function setValoresAsignarPermisos(datos) {
         "importar", "accion", "idlogin"
     ];
 
-    var permissionsMap = {};
+    var permisosMapa = {};
 
     for (var i = 0; i < permisos.length; i++) {
-        permissionsMap[permisos[i]] = array[i];
+        permisosMapa[permisos[i]] = array[i];
     }
 
-    changeText("#titulo-asignar", "Asignando permisos a: " + permissionsMap.nombre);
+    changeText("#titulo-asignar", "Asignando permisos a: " + permisosMapa.nombre);
 
-    for (var permiso in permissionsMap) {
-        if (permissionsMap[permiso] == '1') { 
+    for (var permiso in permisosMapa) {
+        if (permisosMapa[permiso] == '1') { 
             $(".collapse-permission").removeClass('hidden').addClass('show');
             $("#" + permiso).attr('checked', true);
         } else {
@@ -370,9 +365,9 @@ function setValoresAsignarPermisos(datos) {
         }
     }    
 
-    $("#form-permisos").append("<input type='hidden' id='idlogin' value='" + permissionsMap.idlogin + "'/>");
-    $("#form-permisos").append("<input type='hidden' id='accion' value='" + permissionsMap.accion + "'/>");
-    $("#btn-guardar-permisos").attr("onclick", "actualizarPermisos(" + permissionsMap.idusuario + ");");
+    $("#form-permisos").append("<input type='hidden' id='idlogin' value='" + permisosMapa.idlogin + "'/>");
+    $("#form-permisos").append("<input type='hidden' id='accion' value='" + permisosMapa.accion + "'/>");
+    $("#btn-guardar-permisos").attr("onclick", "actualizarPermisos(" + permisosMapa.idusuario + ");");
 }
 
 function actualizarPermisos(idusuario) {
@@ -397,29 +392,29 @@ function actualizarPermisos(idusuario) {
         configuracion: ["addfolio", "listafolio", "editarfolio", "eliminarfolio", "addcomision", "encabezados", "confcorreo", "importar"]
     };
 
-    var parametros = {
+    var datos = {
         transaccion: "actualizarpermisos",
         idusuario: idusuario,
         accion: accion
     };
 
     for (var categoria in categorias) {
-        parametros[categoria] = 0;
+        datos[categoria] = 0;
     
         for (var i = 0; i < categorias[categoria].length; i++) {
             var permiso = categorias[categoria][i];
             var valorCheckbox = $("#" + permiso).prop('checked') ? 1 : 0;
-            parametros[permiso] = valorCheckbox;
+            datos[permiso] = valorCheckbox;
     
             if (valorCheckbox == 1) {
-                parametros[categoria] = 1;
+                datos[categoria] = 1;
             }
         }
     }    
     $.ajax({
         url: "com.sine.enlace/enlaceusuario.php",
         type: "POST",
-        data: parametros,
+        data: datos,
         success: function(datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -436,4 +431,18 @@ function actualizarPermisos(idusuario) {
             }
         }
     });
+}
+
+function resposiveButton() {
+    if (window.innerWidth <= 1240) {
+        $("#contenedor-button").removeClass('row').addClass('flex-column');
+        $("#buno").removeClass('col-md-5').addClass('col-12 mb-3');
+        $("#bdos").removeClass('col-md-6 row d-flex justify-content-end px-0 mx-0').addClass('col-12 mb-3');
+        $("#bdos > div").removeClass('col-md-6 mb-3').addClass('col-12 mb-3');
+    } else {
+        $("#contenedor-button").removeClass('flex-column').addClass('row');
+        $("#buno").removeClass('col-12 mb-3').addClass('col-md-5');
+        $("#bdos").removeClass('col-12 mb-3').addClass('col-md-6 row d-flex justify-content-end px-0 mx-0');
+        $("#bdos > div").removeClass('col-12 mb-3').addClass('col-md-6 mb-3');
+    }
 }
