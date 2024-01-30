@@ -5,7 +5,7 @@ require_once '../com.sine.modelo/Session.php';
 require_once '../com.sine.modelo/Configuracion.php';
 require_once '../vendor/autoload.php'; //Carga automatica
 
-use PhpOffice\PhpSpreadsheet\Reader\Xlsx; //Biblioteca 
+use PhpOffice\PhpSpreadsheet\Reader\Xlsx; //Biblioteca Xlsx 
 date_default_timezone_set("America/Mexico_City");
 
 class ControladorConfiguracion
@@ -250,6 +250,7 @@ class ControladorConfiguracion
 
         foreach ($fileexcel as $row) {
             if (count($row) == 21) {
+                // Validar RFC una vez hecho controlador cliente
                 $consulta = "INSERT INTO cliente VALUES (:id, :nombre, :apaterno, :amaterno, :empresa, :correoinfo, :correofact, :correogerencia, :telefono, :idbanco, :cuenta, :clabe, :idbanco1, :cuenta1, :clabe1, :idbanco2, :cuenta2, :clabe2, :idbanco3, :cuenta3, :clabe3, :rfc, :razon, :regimen, :calle, :interior, :exterior, :localidad, :municipio, :estado, :pais, :codpostal, :correoalt1, :correoalt2, :correoalt3);";
                 $valores = array(
                     "id" => null,

@@ -103,7 +103,7 @@ $(function () {
         var submenu = $(this).attr("data-submenu");
         $('.list-element').removeClass("menu-active");
         $('.marker').removeClass("marker-active");
-        $('.panel-collapse').removeClass("in");
+        $('.panel-collapse').removeClass("show");
         $('.lista-submenu-elemento').removeClass("sub-active");
         if (submenu != "") {
             loadView(submenu);
@@ -137,7 +137,7 @@ $(function () {
         $('.list-element').removeClass("menu-active");
         $('.marker').removeClass("marker-active");
         if ($(this).hasClass("list-menu")) {
-            $('.panel-collapse').removeClass("in");
+            $('.panel-collapse').removeClass("show");
             $('.lista-submenu-elemento').removeClass("sub-active");
         }
         $(this).addClass("menu-active");

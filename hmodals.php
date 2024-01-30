@@ -2,7 +2,7 @@
 <div class="modal fade" id="modal-profile-img" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog modal-sm" role="document">
         <div class="modal-content">
-            <button type="button" class="close-modal" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <button type="button" class="" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
             <h4 class="titulo-modal" id="myModalLabel">Imagen de Perfil</h4>
             <div class="modal-body">
                 <form action="com.sine.enlace/enlaceusuario.php" onsubmit="return false;" id="form-profile">

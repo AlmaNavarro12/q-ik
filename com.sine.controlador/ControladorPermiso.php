@@ -141,11 +141,11 @@ class ControladorPermiso {
             $notificacion = substr($notificacion, 0, 40);
             $msg = "$date $hora<br/> $notificacion...";
 
-            $datos .= "<li><a data-toggle='modal' data-target='#modal-notification' onclick='getNotification($id)' class='notification-link $unread'><div $marker></div> $msg </a></li>";
+            $datos .= "<li class='py-1'><a data-toggle='modal' data-target='#modal-notification' onclick='getNotification($id)' class='notification-link $unread'><div $marker></div> $msg </a></li>";
             $count++;
         }
         if ($count == 0) {
-            $datos .= "<li><a class='notification-link '>No hay notificaciones </a></li>";
+            $datos .= "<li class='py-1'><a class='notification-link list-conf'>No hay notificaciones</a></li>";
         }
         $datos .= "<corte>$num";
         return $datos;

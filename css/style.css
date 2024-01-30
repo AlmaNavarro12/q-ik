@@ -230,8 +230,7 @@ header {
 }
 
 .dropdown .notification-link:hover {
-    color: #4285F4;
-    background-color: #d7d7e6be;
+    color: #28436f;
 }
 
 .dropdown .logout-link {
@@ -724,6 +723,7 @@ article {
     line-height: 250.7%;
     text-align: center;
     color: #17177C;
+    white-space: nowrap;
 }
 
 /*--------------------------------FORMULARIO DE FOLIO CONFIGURACION --------------------*/

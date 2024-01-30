@@ -149,7 +149,7 @@ require_once 'Enrutador.php';
                                     ?>
                                         <li id="pago-menu" class='list-element mt-1 list-menu ps-5' data-submenu='listapago'>
                                             <div class='marker'></div>
-                                            <div class='pad'></div><label> Pagos</label>
+                                            <div class='pad'></div><label> Pagos </label>
                                         </li>
                                     <?php
                                     }
@@ -157,10 +157,10 @@ require_once 'Enrutador.php';
                                 case '3':
                                     if ($nomina == '1') {
                                     ?>
-                                        <a href='#colnomina' data-bs-toggle="collapse" role="button" aria-expanded="false">
-                                            <li class='list-element'>
-                                                <div class='marker'></div>
-                                                <div class='pad'></div><label> Nóminas</label>
+                                        <a href="#colnomina" class="text-white" style="text-decoration: none;" data-bs-toggle="collapse" href="#colreporte" role="button" aria-expanded="false">
+                                            <li class="list-element mt-1 ps-5">
+                                                <div class="marker"></div>
+                                                <div class="pad"></div><label> Nóminas</label>
                                             </li>
                                         </a>
                                         <div id='colnomina' class='panel-collapse collapse'>
@@ -168,12 +168,12 @@ require_once 'Enrutador.php';
                                                 <?php
                                                 if ($listaempleado == '1') {
                                                 ?>
-                                                    <li class='lista-submenu-elemento p-5' data-submenu='listaempleado'> Empleados</li>
+                                                    <li class='lista-submenu-elemento ps-5 list-menu' data-submenu='listaempleado'> Empleados</li>
                                                 <?php
                                                 }
                                                 if ($listanomina == '1') {
                                                 ?>
-                                                    <li class='lista-submenu-elemento p-5' data-submenu='listanomina'> N&oacute;minas</li>
+                                                    <li class='lista-submenu-elemento ps-5 list-menu' data-submenu='listanomina'> N&oacute;minas</li>
                                                 <?php
                                                 }
                                                 ?>
@@ -185,10 +185,10 @@ require_once 'Enrutador.php';
                                 case '4':
                                     if ($cartaporte == '1') {
                                     ?>
-                                        <a href='#colcartaporte' data-toggle='collapse'>
-                                            <li class='list-element'>
-                                                <div class='marker'></div>
-                                                <div class='pad'></div><label> Carta Porte</label>
+                                        <a href="#colcartaporte" class="text-white" style="text-decoration: none;" data-bs-toggle="collapse" data-bs-target="#colcartaporte" href="#colreporte" role="button" aria-expanded="false">
+                                            <li class="list-element mt-1 ps-5">
+                                                <div class="marker"></div>
+                                                <div class="pad"></div><label> Carta Porte</label>
                                             </li>
                                         </a>
                                         <div id='colcartaporte' class='panel-collapse collapse'>
@@ -196,27 +196,27 @@ require_once 'Enrutador.php';
                                                 <?php
                                                 if ($listaubicacion == '1') {
                                                 ?>
-                                                    <li class='lista-submenu-elemento ps-5' data-submenu='listadireccion'> Ubicaciones</li>
+                                                    <li class='lista-submenu-elemento ps-5 list-menu' data-submenu='listadireccion'> Ubicaciones</li>
                                                 <?php
                                                 }
                                                 if ($listatransporte == '1') {
                                                 ?>
-                                                    <li class='lista-submenu-elemento ps-5' data-submenu='listatransporte'> Transportes</li>
+                                                    <li class='lista-submenu-elemento ps-5 list-menu' data-submenu='listatransporte'> Transportes</li>
                                                 <?php
                                                 }
                                                 if ($listaremolque == '1') {
                                                 ?>
-                                                    <li class='lista-submenu-elemento ps-5' data-submenu='listaremolque'> Remolques</li>
+                                                    <li class='lista-submenu-elemento ps-5 list-menu' data-submenu='listaremolque'> Remolques</li>
                                                 <?php
                                                 }
                                                 if ($listaoperador == '1') {
                                                 ?>
-                                                    <li class='lista-submenu-elemento ps-5' data-submenu='listaoperador'> Operadores</li>
+                                                    <li class='lista-submenu-elemento ps-5 list-menu' data-submenu='listaoperador'> Operadores</li>
                                                 <?php
                                                 }
                                                 if ($listacarta == '1') {
                                                 ?>
-                                                    <li class='lista-submenu-elemento ps-5' data-submenu='listacarta'> Carta Porte</li>
+                                                    <li class='lista-submenu-elemento ps-5 list-menu' data-submenu='listacarta'> Carta Porte</li>
                                                 <?php
                                                 }
                                                 ?>
