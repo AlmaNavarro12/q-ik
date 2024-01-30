@@ -357,16 +357,21 @@ function setValoresAsignarPermisos(datos) {
 
     changeText("#titulo-asignar", "Asignando permisos a: " + permisosMapa.nombre);
 
+    var tienePermisos = false; 
     for (var permiso in permisosMapa) {
         if (permisosMapa[permiso] == '1') {
-            $(".collapse-permission").removeClass('hidden').addClass('show');
             $("#" + permiso).attr('checked', true);
-            changeText("#btn-all-permisos", "Quitar todos los permisos <span class='fas fa-times'></span></a>");
-        } else {
-            $(".collapse-permission").removeClass('show').addClass('hidden');
-            changeText("#btn-all-permisos", "Asignar todos los permisos <span class='fas fa-check'></span></a>");
+            tienePermisos = true;
         }
-    }    
+    }
+
+    if (tienePermisos) {
+        $(".collapse-permission").removeClass('hidden').addClass('show');
+        changeText("#btn-all-permisos", "Quitar todos los permisos <span class='fas fa-times'></span></a>");
+    } else {
+        $(".collapse-permission").removeClass('show').addClass('hidden');
+        changeText("#btn-all-permisos", "Asignar todos los permisos <span class='fas fa-check'></span></a>");
+    }
 
     $("#form-permisos").append("<input type='hidden' id='idlogin' value='" + permisosMapa.idlogin + "'/>");
     $("#form-permisos").append("<input type='hidden' id='accion' value='" + permisosMapa.accion + "'/>");
