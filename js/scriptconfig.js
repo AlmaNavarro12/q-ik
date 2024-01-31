@@ -137,7 +137,7 @@ function obtenerDatosFolio() {
 
 function insertarFolio(idfolio = null) {
     var datosFolio = obtenerDatosFolio();
-    if (isnEmpty(datosFolio.serie, "serie") && isnEmpty(datosFolio.folio, "folio-inicio") && isnEmpty(datosFolio.usofolio, "btn-uso")) {
+    if (isnEmpty(datosFolio.serie, "serie") && isNumber(datosFolio.folio, "folio-inicio") && isnEmpty(datosFolio.usofolio, "btn-uso")) {
     cargandoHide();
         cargandoShow();
         var transaccion = (idfolio == null) ? "insertarfolio" : "actualizarfolio";
@@ -360,7 +360,7 @@ function loadArchivo() {
     var fnm = $("#filename").val();
     var tabla = $("#datos").val();
 
-    if (isnEmpty(tabla, "datos") && isnEmpty(fnm, "imagen")) {
+    if (isnEmpty(tabla,"datos") && isnEmpty(fnm, "imagen")) {
         cargandoHide();
         cargandoShow();
         $.ajax({

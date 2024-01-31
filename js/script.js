@@ -66,6 +66,22 @@ function isEmail(val, id) {
     }
 }
 
+function isNumber(val, id) {
+    if (!isNaN(val)) {
+        if (val > 0) {
+            $("#" + id + "-errors").text("");
+            $("#" + id).css("border-color", "green");
+            return true;
+        } else {
+            $("#" + id).css("border-color", "red");
+            $("#" + id + "-errors").text("El número debe ser mayor a 0.");
+            $("#" + id + "-errors").css("color", "red");
+            $("#" + id).focus();
+            return false;
+        }
+    }
+}
+
 //Función para ocultar el menu responsivo
 function resetMenu() {
     if (window.innerWidth >= 700) {
@@ -292,6 +308,7 @@ function logout() {
         }
     });
 }
+
 $(function () {
     $(document).on('click', '.dropdown-menu li', function (event) {
         var $checkbox = $(this).find('.checkbox');
@@ -332,3 +349,109 @@ $(function () {
         return false;
     });
 });
+
+function loadImgPerfil(id) {
+    cargandoHide();
+    cargandoShow();
+    $.ajax({
+        url: "com.sine.enlace/enlaceusuario.php",
+        type: "POST",
+        data: {transaccion: "editarusuario", idusuario: id},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 1000);
+            if (bandera == '0') {
+                alertify.error(res);
+                cargandoHide();
+            } else {
+                setImgUsuario(datos);
+            }
+        }
+    });
+}
+
+function setImgUsuario(datos) {
+    var array = datos.split("</tr>");
+    var idusuario = array[0];
+    var idlogin = array[11];
+    var tipologin = array[12];
+    var imgnm = array[13];
+    var img = array[14];
+
+    if (imgnm !== '') {
+        $("#profimg").html(img);
+        $("#fileuser").val(imgnm);
+    }
+
+    $("#form-profile").append("<input type='hidden' id='profactualizar' name='profactualizar' value='" + imgnm + "'/>")
+    $("#btn-edit-profile").attr("onclick", "editarPerfil(" + idusuario + ");");
+    $("#btn-form-profile").attr("onclick", "actualizarImgPerfil(" + idusuario + ");");
+    cargandoHide();
+}
+
+function actualizarImgPerfil(idusuario) {
+    var img = $("#fileuser").val();
+    var imgactualizar = $("#profactualizar").val();
+    $.ajax({
+        url: "com.sine.enlace/enlaceusuario.php",
+        type: "POST",
+        data: {transaccion: "actualizarimg", idusuario: idusuario, img: img, imgactualizar: imgactualizar},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 1000);
+            if (bandera == '0') {
+                alertify.error(res);
+            } else {
+                alertify.success('Se guardaron los datos correctamente ');
+                location.href = 'home.php';
+            }
+        }
+    });
+}
+
+function cargarImgPerfil() {
+    var formData = new FormData(document.getElementById("form-profile"));
+    var img = $("#imgprof").val();
+    if (isnEmpty(img, 'imgprof')) {
+        $.ajax({
+            url: 'com.sine.enlace/cargarimguser.php',
+            type: "POST",
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function (datos) {
+                var array = datos.split("<corte>");
+                var view = array[0];
+                var fn = array[1];
+                $("#profimg").html(view);
+                $("#fileuser").val(fn);
+                $("#imgprof").val('');
+            }
+        });
+    }
+}
+
+function editarPerfil(idusuario) {
+    cargandoHide();
+    cargandoShow();
+    $.ajax({
+        url: "com.sine.enlace/enlaceusuario.php",
+        type: "POST",
+        data: {transaccion: "editarusuario", idusuario: idusuario},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 1000);
+            if (bandera == '0') {
+                alertify.error(res);
+            } else {
+                cargandoHide();
+                loadView('nuevousuario');
+                $("#modal-profile-img").modal('hide');
+                window.setTimeout("setValoresEditarUsuario('" + datos + "')", 400);
+            }
+        }
+    });
+}

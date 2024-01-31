@@ -9,28 +9,28 @@
         </div>
 
         <div class="col-md-4">
-            <label class="label-form text-right" for="serie">Serie</label> <label class="fw-bold text-danger">*</label>
+            <label class="label-form" for="serie">Serie</label> <label class="fw-bold text-danger">*</label>
             <div class="form-group">
                 <input class="form-control text-center input-form" id="serie" name="serie"
-                    placeholder="Serie (máx 25 caracteres)" type="text" maxlength="25" />
+                    placeholder="Serie (máx 25 caracteres)" type="text" maxlength="25" oninput="validarLet(this)" />
                 <div id="serie-errors">
                 </div>
             </div>
         </div>
 
         <div class="col-md-4">
-            <label class="label-form text-right" for="folio-letra">Letra folio</label>
+            <label class="label-form" for="folio-letra">Letra folio</label>  <label class="fw-bold text-white"> </label>
             <div class="form-group">
                 <input class="form-control text-center input-form" id="folio-letra" name="folio-letra"
                     placeholder="Letra de inicio de folio (Ej. F0001 máx 4 caracteres)"
-                    title="Letra de inicio de folio (Ej. F0001 máx 4 caracteres)" type="text" maxlength="4" />
+                    title="Letra de inicio de folio (Ej. F0001 máx 4 caracteres)" type="text" maxlength="4" oninput="validarLet(this)" />
                 <div id="folio-letra-errors">
                 </div>
             </div>
         </div>
 
         <div class="col-md-4">
-            <label class="label-form text-right" for="folio-inicio">N° Inicio</label> <label
+            <label class="label-form" for="folio-inicio">N° Inicio</label> <label
                 class="fw-bold text-danger">*</label>
             <div class="form-group">
                 <input class="form-control text-center input-form" id="folio-inicio" name="folio-inicio"
@@ -85,8 +85,6 @@
                         </ul>
                     </div>
                 </div>
-                <div id="btn-uso-errors">
-                </div>
             </div>
         </div>
         <div class="row col-md-6 d-flex justify-content-end mt-4 px-0">
@@ -95,6 +93,8 @@
             <button class="button-form btn btn-primary col-auto" onclick="insertarFolio()"
                 id="btn-form-folio">Guardar <span class="fas fa-save"></span></button>
         </div>
+    </div>
+    <div id="btn-uso-errors">
     </div>
     </div>
 </form>

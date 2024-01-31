@@ -5370,7 +5370,6 @@ textarea.form-control-lg {
   height: 1em;
   padding: 0.25em 0.25em;
   color: var(--bs-btn-close-color);
-  background: transparent var(--bs-btn-close-bg) center/1em auto no-repeat;
   border: 0;
   border-radius: 0.375rem;
   opacity: var(--bs-btn-close-opacity);
@@ -5591,8 +5590,44 @@ textarea.form-control-lg {
   margin: calc(-0.5 * var(--bs-modal-header-padding-y)) calc(-0.5 * var(--bs-modal-header-padding-x)) calc(-0.5 * var(--bs-modal-header-padding-y)) auto;
 }
 
+.modal-header .btn-close {
+  color: #ff0000; 
+  background-color: #fff;
+  font-size: 20px ;
+  height: 23px;
+  width: 23px; 
+  opacity: 1;
+  border-radius: 50%;
+  box-shadow: 0 0 3px #555; 
+  position: absolute;
+  left: auto;
+  right: -2px;
+  top: -2px;
+  z-index: 1;
+  transition: all 0.3s;
+  border: none;
+  text-align: center;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+}
+
+.modal-header .btn-close:hover {
+  color: var(--bs-white);
+  background-color: #d50909; 
+}
+
+.modal-header .btn-close::before {
+  content: '×'; 
+  display: block;
+  font-size: 1.5em; 
+  line-height: 1; 
+  margin-top: -8px;
+}
+
 .modal-title {
   margin-bottom: 0;
+  color: #17177C;
   line-height: var(--bs-modal-title-line-height);
 }
 

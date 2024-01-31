@@ -57,8 +57,8 @@ function obtenerDatosUsuario() {
 
 function insertarUsuario(idusuario = null) {
     var datosUsuario = obtenerDatosUsuario();
-    if ((idusuario == null && isnEmpty(datosUsuario.nombre, "nombre") && isnEmpty(datosUsuario.apellidopaterno, "apellido-paterno") && isnEmpty(datosUsuario.apellidomaterno, "apellido-materno") && isnEmpty(datosUsuario.usuario, "usuario") && isnEmpty(datosUsuario.password, "contrasena") && isEmail(datosUsuario.correo, "correo") && isPhoneNumber(datosUsuario.telefono, "telefono") && isnEmpty(datosUsuario.tipo, "tipo-usuario")) 
-    || (idusuario != null && isnEmpty(datosUsuario.nombre, "nombre") && isnEmpty(datosUsuario.apellidopaterno, "apellido-paterno") && isnEmpty(datosUsuario.apellidomaterno, "apellido-materno") &&  isnEmpty(datosUsuario.usuario, "usuario") && isEmail(datosUsuario.correo, "correo") && isPhoneNumber(datosUsuario.telefono, "telefono") && isnEmpty(datosUsuario.tipo, "tipo-usuario"))){
+    if ((idusuario == null && isnEmpty(datosUsuario.nombre, "nombre") && isnEmpty(datosUsuario.apellidopaterno, "apellido-paterno") && isnEmpty(datosUsuario.apellidomaterno, "apellido-materno") && isnEmpty(datosUsuario.usuario, "usuario") && isnEmpty(datosUsuario.password, "contrasena") && isEmail(datosUsuario.correo, "correo") && isPhoneNumber(datosUsuario.telefono, "telefono") && isnEmpty(datosUsuario.tipo, "tipo-usuario"))
+        || (idusuario != null && isnEmpty(datosUsuario.nombre, "nombre") && isnEmpty(datosUsuario.apellidopaterno, "apellido-paterno") && isnEmpty(datosUsuario.apellidomaterno, "apellido-materno") && isnEmpty(datosUsuario.usuario, "usuario") && isEmail(datosUsuario.correo, "correo") && isPhoneNumber(datosUsuario.telefono, "telefono") && isnEmpty(datosUsuario.tipo, "tipo-usuario"))) {
         var transaccion = (idusuario == null) ? "insertarusuario" : "actualizarusuario";
         $.ajax({
             url: "com.sine.enlace/enlaceusuario.php",
@@ -90,7 +90,7 @@ function insertarUsuario(idusuario = null) {
                     alertify.error(res);
                 } else {
                     alertify.success('Se guardaron los datos correctamente ');
-                    if (datosUsuario.img != "" && idusuario != null) {
+                    if (datosUsuario.img != "" && idusuario == uid) {
                         location.href = 'home.php';
                     } else {
                         loadView('listasuarioaltas');
@@ -274,7 +274,7 @@ function checkUsuario() {
     $.ajax({
         url: "com.sine.enlace/enlaceusuario.php",
         type: "POST",
-        data: {transaccion: "gettipousuario"},
+        data: { transaccion: "gettipousuario" },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -297,7 +297,7 @@ function asignarPermisos(idusuario) {
     $.ajax({
         url: "com.sine.enlace/enlaceusuario.php",
         type: "POST",
-        data: {transaccion: "asignarpermiso", idusuario: idusuario},
+        data: { transaccion: "asignarpermiso", idusuario: idusuario },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -330,7 +330,7 @@ function checkAll() {
 function setValoresAsignarPermisos(datos) {
     var array = datos.split("</tr>");
     var permisos = [
-        "idusuario", "nombre", 
+        "idusuario", "nombre",
         "facturas", "crearfactura", "editarfactura", "eliminarfactura", "listafactura",
         "pago", "crearpago", "editarpago", "eliminarpago", "listapago",
         "nomina", "listaempleado", "crearempleado", "editarempleado", "eliminarempleado", "listanomina", "crearnomina", "editarnomina", "eliminarnomina",
@@ -355,11 +355,9 @@ function setValoresAsignarPermisos(datos) {
         permisosMapa[permisos[i]] = array[i];
     }
 
-    changeText("#titulo-asignar", "Asignando permisos a: " + permisosMapa.nombre);
-
-    var tienePermisos = false; 
+    var tienePermisos = false;
     for (var permiso in permisosMapa) {
-        if (permisosMapa[permiso] == '1') {
+        if (permisosMapa[permiso] == '1' && permiso !== 'idusuario' && permiso !== 'accion' && permiso !== 'idlogin') {
             $("#" + permiso).attr('checked', true);
             tienePermisos = true;
         }
@@ -372,6 +370,7 @@ function setValoresAsignarPermisos(datos) {
         $(".collapse-permission").removeClass('show').addClass('hidden');
         changeText("#btn-all-permisos", "Asignar todos los permisos <span class='fas fa-check'></span></a>");
     }
+
 
     $("#form-permisos").append("<input type='hidden' id='idlogin' value='" + permisosMapa.idlogin + "'/>");
     $("#form-permisos").append("<input type='hidden' id='accion' value='" + permisosMapa.accion + "'/>");
@@ -387,7 +386,7 @@ function actualizarPermisos(idusuario) {
         pago: ["crearpago", "editarpago", "eliminarpago", "listapago"],
         nomina: ["listaempleado", "crearempleado", "editarempleado", "eliminarempleado", "listanomina", "crearnomina", "editarnomina", "eliminarnomina"],
         cartaporte: ["listaubicacion", "crearubicacion", "editarubicacion", "eliminarubicacion", "listatransporte", "creartransporte", "editartransporte", "eliminartransporte", "listaremolque", "crearremolque", "editarremolque", "eliminarremolque", "listaoperador", "crearoperador", "editaroperador", "eliminaroperador", "listacarta", "crearcarta", "editarcarta", "eliminarcarta"],
-        cotizacion: ["crearcotizacion", "editarcotizacion", "eliminarcotizacion", "listacotizacion", "anticipo"], 
+        cotizacion: ["crearcotizacion", "editarcotizacion", "eliminarcotizacion", "listacotizacion", "anticipo"],
         cliente: ["crearcliente", "editarcliente", "eliminarcliente", "listacliente"],
         comunicado: ["crearcomunicado", "editarcomunicado", "eliminarcomunicado", "listacomunicado"],
         producto: ["crearproducto", "editarproducto", "eliminarproducto", "listaproducto"],
@@ -408,22 +407,22 @@ function actualizarPermisos(idusuario) {
 
     for (var categoria in categorias) {
         datos[categoria] = 0;
-    
+
         for (var i = 0; i < categorias[categoria].length; i++) {
             var permiso = categorias[categoria][i];
             var valorCheckbox = $("#" + permiso).prop('checked') ? 1 : 0;
             datos[permiso] = valorCheckbox;
-    
+
             if (valorCheckbox == 1) {
                 datos[categoria] = 1;
             }
         }
-    }    
+    }
     $.ajax({
         url: "com.sine.enlace/enlaceusuario.php",
         type: "POST",
         data: datos,
-        success: function(datos) {
+        success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
             var res = texto.substring(1, 1000);

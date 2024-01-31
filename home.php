@@ -59,6 +59,9 @@ require_once 'Enrutador.php';
         $Mactive = "notification-marker-active";
     }
     $mod = explode("-", $modulos);
+    echo "<script>var uid = '" . $uid . "';</script>";
+    echo "<script>var nombreusuario = '" . $nombreusuario . "';</script>";
+
     ?>
 </head>
 
@@ -102,7 +105,7 @@ require_once 'Enrutador.php';
                         </button>
                         <ul class="dropdown-menu user-option" id="list-notificaciones">
                             <li class="py-1">
-                                <a class="notification-link" onclick="loadImgPerfil(<?php echo $uid; ?>)"  data-bs-toggle="modal" data-bs-target="#exampleModal" title="Cambiar imagen de perfil">
+                                <a class="notification-link" onclick="loadImgPerfil(<?php echo $uid; ?>)"  data-bs-toggle="modal" data-bs-target="#modal-profile-img" title="Cambiar imagen de perfil">
                                     <span class="fas fa-user"></span> Cambiar imagen de perfil
                                 </a>
                             </li>
@@ -357,7 +360,7 @@ require_once 'Enrutador.php';
                             }
                         }
                         ?>
-                        <li data-bs-toggle='modal' data-target='#modal-contacto' class='list-element mt-1 ps-5' onclick='getNombreUsuario();'>
+                        <li data-bs-toggle='modal' data-bs-target='#modal-contacto' class='list-element mt-1 ps-5' onclick='getNombreUsuario();'>
                             <div class='marker'></div>
                             <div class='pad'></div><label> Soporte Técnico</label>
                         </li>
