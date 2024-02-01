@@ -67,18 +67,26 @@ function isEmail(val, id) {
 }
 
 function isNumber(val, id) {
-    if (!isNaN(val)) {
-        if (val > 0) {
-            $("#" + id + "-errors").text("");
-            $("#" + id).css("border-color", "green");
-            return true;
-        } else {
-            $("#" + id).css("border-color", "red");
-            $("#" + id + "-errors").text("El número debe ser mayor a 0.");
-            $("#" + id + "-errors").css("color", "red");
-            $("#" + id).focus();
-            return false;
+    if (val != "") {
+        if (!isNaN(val)) {
+            if (val > 0) {
+                $("#" + id + "-errors").text("");
+                $("#" + id).css("border-color", "green");
+                return true;
+            } else {
+                $("#" + id).css("border-color", "red");
+                $("#" + id + "-errors").text("El número debe ser mayor a 0.");
+                $("#" + id + "-errors").css("color", "red");
+                $("#" + id).focus();
+                return false;
+            }
         }
+    } else {
+        $("#" + id).css("border-color", "red");
+        $("#" + id + "-errors").text("Este campo no puede estar vacío.");
+        $("#" + id + "-errors").css("color", "red");
+        $("#" + id).focus();
+        return false;
     }
 }
 
@@ -260,11 +268,12 @@ function loadView(vista) {
         'listaoperador': ["loadBtnCrear('operador')", 300, "filtrarOperador()", 320],
         'carta': ["truncateTmpCarta()", 300, "truncateTmpIMG()", 320, "loadOpcionesFolios('4')", 350, "loadFecha()", 370, "loadOpcionesEstado()", 400, "filtrarProducto()", 420, "loadOpcionesFormaPago()", 450, "loadOpcionesMetodoPago()", 470, "loadOpcionesMoneda()", 500, "loadOpcionesUsoCFDI()", 520, "loadOpcionesComprobante()", 550, "loadOpcionesFacturacion()", 570, "loadOpcionesProveedor()", 600, "opcionesPeriodoGlobal()", 620, "opcionesMeses()", 650, "opcionesAnoGlobal()", 670],
         'listacarta': ["truncateTmpCarta()", 300, "truncateTmpIMG()", 300, "loadBtnCrear('carta')", 300, "filtrarCarta()", 320, "opcionesMotivoCancelar()", 350],
+        'puntosdeventa': [],
     };
 
     if (actions[vista]) {
-        const timeouts = actions[vista]; //Acciones a realizar, los array de cada clave
-        for (let i = 0; i < timeouts.length; i += 2) { //Se recorre esos array (incremento en 2), cada accion tiene tiempo
+        const timeouts = actions[vista]; 
+        for (let i = 0; i < timeouts.length; i += 2) { 
             window.setTimeout(timeouts[i], timeouts[i + 1]);
         }
     }
@@ -454,4 +463,67 @@ function editarPerfil(idusuario) {
             }
         }
     });
+}
+
+function getNombreUsuario() {
+    $("#nombre-soporte").val('');
+    $("#telefono-soporte").val('');
+    $("#check-soporte").removeAttr('checked');
+    $("#correo-soporte").val('');
+    $("#mensaje-soporte").val('');
+
+    $.ajax({
+        url: 'com.sine.enlace/enlaceinicio.php',
+        type: 'POST',
+        data: {transaccion: 'getnombre'},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 5000);
+            if (bandera == 0) {
+                alertify.error(res);
+            } else {
+                var array = datos.split("</tr>");
+                var nombre = array[0];
+                var telefono = array[1];
+                var mail = array[2];
+
+                $("#nombre-soporte").val(nombre);
+                $("#telefono-soporte").val(telefono);
+                $("#correo-soporte").val(mail);
+            }
+        }
+    })
+}
+
+function enviarSoporte() {
+    var nombre = $("#nombre-soporte").val();
+    var telefono = $("#telefono-soporte").val();
+    var correo = $("#correo-soporte").val();
+    var msg = $("#mensaje-soporte").val();
+    var txtbd = msg.replace(new RegExp("\n", 'g'), '<ntr>');
+    var chwhats = 0;
+    if ($("#check-soporte").prop('checked')) {
+        chwhats = 1;
+    }
+    if (isnEmpty(nombre, "nombre-soporte") && isnEmpty(telefono, "telefono-soporte") && isnEmpty(correo, "correo-soporte") && isnEmpty(msg, "mensaje-soporte")) {
+        cargandoHide();
+        cargandoShow();
+        $.ajax({
+            url: 'com.sine.enlace/enlaceinicio.php',
+            type: 'POST',
+            data: {transaccion: 'sendsoporte', nombre: nombre, telefono: telefono, chwhats: chwhats, correo: correo, msg: txtbd},
+            success: function (datos) {
+                var texto = datos.toString();
+                var bandera = texto.substring(0, 1);
+                var res = texto.substring(1, 5000);
+                if (bandera == '0') {
+                    alertify.error(res);
+                } else {
+                    alertify.success(res);
+                }
+                cargandoHide();
+            }
+        })
+    }
 }

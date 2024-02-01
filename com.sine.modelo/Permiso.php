@@ -105,6 +105,10 @@ class Permiso {
     private $confcorreo;
     private $accion;
     private $importar;
+    private $ventas;
+    private $crearventa;
+    private $cancelarventa;
+    private $exportarventa;
 
     function __construct() {
         
@@ -934,4 +938,35 @@ class Permiso {
         $this->importar = $importar;
     }
 
+    function getVentas() {
+        return $this->ventas;
+    }
+
+    function setVentas($ventas) {
+        $this->ventas = $ventas;
+    }
+
+    function getCrearVenta() {
+        return $this->crearventa;
+    }
+
+    function setCrearVenta($crearventa) {
+        $this->crearventa = $crearventa;
+    }
+
+    function getCancelarVenta() {
+        return $this->cancelarventa;
+    }
+
+    function setCancelarVenta($cancelarventa) {
+        $this->cancelarventa = $cancelarventa;
+    }
+
+    function getExportarVenta() {
+        return $this->exportarventa;
+    }
+
+    function setExportarVenta($exportarventa) {
+        $this->exportarventa = $exportarventa;
+    }
 }

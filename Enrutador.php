@@ -1,4 +1,5 @@
 <?php
+
 require_once 'com.sine.modelo/Session.php';
 
 class Enrutador {
@@ -9,6 +10,12 @@ class Enrutador {
             switch ($vista) {
                 case "paginicio":
                     include_once "../com.sine.vista/Inicio/inicio.php";
+                    break;
+                case "notificacion":
+                    include_once "../com.sine.vista/Inicio/listanotificaciones.php";
+                    break;
+                case "comprar":
+                    include_once "../com.sine.vista/Inicio/comprar.php";
                     break;
                 case "iniciosession":
                     include_once "login/formlogin.html";
@@ -208,6 +215,9 @@ class Enrutador {
                 case 'listacarta':
                     include_once '../com.sine.vista/CartaPorte/listacarta.php';
                     break;
+                case 'puntosdeventa':
+                        include_once '../com.sine.vista/ventas/puntosdeventas.html';
+                        break;
                 default:
                     echo "El recurso solicitado no esta disponible<br/>Error 404: $vista Not Found";
                     break;

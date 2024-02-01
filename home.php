@@ -46,9 +46,10 @@ require_once 'Enrutador.php';
     $datosiva = $div[28];
     $reporteventa = $div[29];
     $configuracion = $div[30];
-    $acceso = $div[31];
-    $imgperfil = $div[32];
-    $modulos = $div[33];
+    $ventas = $div[31];
+    $acceso = $div[32];
+    $imgperfil = $div[33];
+    $modulos = $div[34];
 
     $notificaciones = $cp->getNotificacion();
     $divN = explode("<corte>", $notificaciones);
@@ -61,6 +62,7 @@ require_once 'Enrutador.php';
     $mod = explode("-", $modulos);
     echo "<script>var uid = '" . $uid . "';</script>";
     echo "<script>var nombreusuario = '" . $nombreusuario . "';</script>";
+    echo "<script>var imagenperfil = '" . $imgperfil . "';</script>";
 
     ?>
 </head>
@@ -72,7 +74,6 @@ require_once 'Enrutador.php';
             <div class="mdh-square position-absolute"></div>
             <span id="menu-icon" class="lnr lnr-menu show-menu position-fixed p-2 mt-4"></span>
 
-            <!--Parte de nombre de usuario, foto de perfil-->
             <div id="head-info">
                 <div class="logo-color position-absolute"></div>
                 <div class="position-fixed user-info mx-3">
@@ -105,7 +106,7 @@ require_once 'Enrutador.php';
                         </button>
                         <ul class="dropdown-menu user-option" id="list-notificaciones">
                             <li class="py-1">
-                                <a class="notification-link" onclick="loadImgPerfil(<?php echo $uid; ?>)"  data-bs-toggle="modal" data-bs-target="#modal-profile-img" title="Cambiar imagen de perfil">
+                                <a class="notification-link" onclick="loadImgPerfil(<?php echo $uid; ?>)" data-bs-toggle="modal" data-bs-target="#modal-profile-img" title="Cambiar imagen de perfil">
                                     <span class="fas fa-user"></span> Cambiar imagen de perfil
                                 </a>
                             </li>
@@ -132,7 +133,7 @@ require_once 'Enrutador.php';
                     <div class="item-direction pt-1">
                         <li class="list-element mt-1 list-menu ps-5 menu-active" data-submenu='paginicio'>
                             <div class="marker marker-active"></div>
-                            <div class="pad"></div><label> Inicio</label>
+                            <div class="pad"></div><label> Inicio </label>
                         </li>
                         <?php
                         foreach ($mod as $modactual) {
@@ -354,7 +355,17 @@ require_once 'Enrutador.php';
                                                 ?>
                                             </ul>
                                         </div>
-                        <?php
+                                    <?php
+                                    }
+                                    break;
+                                case '14':
+                                    if ($ventas == '1') {
+                                    ?>
+                                        <li class="list-element mt-1 list-menu ps-5" data-submenu='puntosdeventa'>
+                                            <div class="marker"></div>
+                                            <div class="pad"></div><label> Puntos de ventas</label>
+                                        </li>
+                                    <?php
                                     }
                                     break;
                             }

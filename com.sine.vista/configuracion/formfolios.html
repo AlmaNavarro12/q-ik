@@ -19,19 +19,19 @@
         </div>
 
         <div class="col-md-4">
-            <label class="label-form" for="folio-letra">Letra folio</label>  <label class="fw-bold text-white"> </label>
+            <label class="label-form" for="folio-letra">Letra folio</label> <label class="fw-bold text-white"> </label>
             <div class="form-group">
                 <input class="form-control text-center input-form" id="folio-letra" name="folio-letra"
                     placeholder="Letra de inicio de folio (Ej. F0001 máx 4 caracteres)"
-                    title="Letra de inicio de folio (Ej. F0001 máx 4 caracteres)" type="text" maxlength="4" oninput="validarLet(this)" />
+                    title="Letra de inicio de folio (Ej. F0001 máx 4 caracteres)" type="text" maxlength="4"
+                    oninput="validarLet(this)" />
                 <div id="folio-letra-errors">
                 </div>
             </div>
         </div>
 
         <div class="col-md-4">
-            <label class="label-form" for="folio-inicio">N° Inicio</label> <label
-                class="fw-bold text-danger">*</label>
+            <label class="label-form" for="folio-inicio">N° Inicio</label> <label class="fw-bold text-danger">*</label>
             <div class="form-group">
                 <input class="form-control text-center input-form" id="folio-inicio" name="folio-inicio"
                     placeholder="N° de inicio de folios" type="text" oninput="validarNum(this)" />
@@ -43,7 +43,7 @@
     <div class="row mt-4">
         <div class="col-md-6">
             <label class="label-form text-right" for="btn-uso">Usar en:</label> <label
-            class="fw-bold text-danger">*</label>
+                class="fw-bold text-danger">*</label>
             <div class="form-group">
                 <div class='input-group'>
                     <div class="dropdown btn-group dropend">
@@ -85,16 +85,18 @@
                         </ul>
                     </div>
                 </div>
+                <div id="btn-uso-errors">
+                </div>
             </div>
         </div>
-        <div class="row col-md-6 d-flex justify-content-end mt-4 px-0">
+        <div class="row col-md-6 mt-4 px-0">
+            <div class="d-flex align-items-center justify-content-end">
             <button class="button-form btn btn-danger col-auto me-2" onclick="loadViewConfig('listafolio')">Cancelar
                 <span class="fas fa-times"></span></button>
-            <button class="button-form btn btn-primary col-auto" onclick="insertarFolio()"
-                id="btn-form-folio">Guardar <span class="fas fa-save"></span></button>
+            <button class="button-form btn btn-primary col-auto" onclick="insertarFolio()" id="btn-form-folio">Guardar
+                <span class="fas fa-save"></span></button>
+            </div>
         </div>
-    </div>
-    <div id="btn-uso-errors">
     </div>
     </div>
 </form>

@@ -178,6 +178,10 @@ function obtenerDatosPermisos()
     $p->setEncabezados($_POST['encabezados']);
     $p->setConfcorreo($_POST['confcorreo']);
     $p->setImportar($_POST['importar']);
+    $p->setVentas($_POST['ventas']);
+    $p->setCrearVenta($_POST['crearventa']);
+    $p->setCancelarVenta($_POST['cancelarventa']);
+    $p->setExportarVenta($_POST['exportarventa']);
     return $p;
 }
 

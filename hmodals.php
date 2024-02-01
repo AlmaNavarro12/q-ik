@@ -34,7 +34,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div class="row">
+                <div class="row mx-2">
                     <div class="col-md-6">
                         <label class="label-form text-right" for="nombre-soporte">Nombre</label>
                         <div class="form-group">
@@ -58,7 +58,7 @@
                     </div>
                 </div>
 
-                <div class="row mt-3">
+                <div class="row mx-2 mt-3">
                     <div class="col-md-6">
                         <label class="label-form text-right" for="correo-soporte">Correo</label>
                         <div class="form-group">
@@ -83,15 +83,16 @@
     </div>
 </div>
 
-
-<div class="modal fade" id="modal-notification" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-    <div class="modal-dialog" role="document">
+<div class="modal fade shadow-lg rounded rounded-5" id="modal-notification" tabindex="-1" aria-labelledby="exampleModalLabel" data-bs-backdrop="static" aria-hidden="true">
+    <div class="modal-dialog">
         <div class="modal-content">
-            <button type="button" class="close-modal" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <div class="modal-body">
+            <div class="modal-header">
                 <div class="alert-text text-left" id="notification-date">
                     05/Jul/2021
                 </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
                 <div class="alert-text text-justify" id="notification-body">
                     Si
                 </div>

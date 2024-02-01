@@ -233,6 +233,19 @@ header {
     color: #28436f;
 }
 
+.not-unread{
+    background: transparent;
+}
+
+.alert-marker-active {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    background: #FF0000;
+    transition: all 400ms;
+    border-radius: 50%;
+}
+
 .dropdown .logout-link {
     color: #EB4335;
     cursor: pointer;

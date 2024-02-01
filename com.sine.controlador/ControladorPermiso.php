@@ -77,6 +77,7 @@ class ControladorPermiso {
             $datosiva = $usuarioactual['datosiva'];
             $reporteventa = $usuarioactual['reporteventa'];
             $configuracion = $usuarioactual['configuracion'];
+            $ventas = $usuarioactual['ventas'];
             $acceso = $usuarioactual['acceso'];
             $paquete = $usuarioactual['paquete'];
             $imgperfil = $usuarioactual['imgperfil'];
@@ -87,7 +88,7 @@ class ControladorPermiso {
             $replace = array('&aacute;', '&eacute;', '&iacute;', '&oacute;', '&uacute;', '&ntilde;', '&Aacute;', '&Eacute;', '&Iacute;', '&Oacute;', '&Uacute;', '&Ntilde;');
             $nombreusuario = str_replace($search, $replace, $nombreusuario);
 
-            $datos .= "$uid</tr>$nombreusuario</tr>$facturas</tr>$pago</tr>$nomina</tr>$listaempleado</tr>$listanomina</tr>$cartaporte</tr>$listaubicacion</tr>$listatransporte</tr>$listaremolque</tr>$listaoperador</tr>$listacarta</tr>$cotizacion</tr>$cliente</tr>$listacliente</tr>$comunicado</tr>$producto</tr>$proveedor</tr>$impuesto</tr>$datosfacturacion</tr>$contrato</tr>$listausuario</tr>$reporte</tr>$reportefactura</tr>$reportepago</tr>$reportegrafica</tr>$reporteiva</tr>$datosiva</tr>$reporteventa</tr>$configuracion</tr>$acceso</tr>$imgperfil</tr>$modulos";
+            $datos .= "$uid</tr>$nombreusuario</tr>$facturas</tr>$pago</tr>$nomina</tr>$listaempleado</tr>$listanomina</tr>$cartaporte</tr>$listaubicacion</tr>$listatransporte</tr>$listaremolque</tr>$listaoperador</tr>$listacarta</tr>$cotizacion</tr>$cliente</tr>$listacliente</tr>$comunicado</tr>$producto</tr>$proveedor</tr>$impuesto</tr>$datosfacturacion</tr>$contrato</tr>$listausuario</tr>$reporte</tr>$reportefactura</tr>$reportepago</tr>$reportegrafica</tr>$reporteiva</tr>$datosiva</tr>$reporteventa</tr>$configuracion</tr>$ventas</tr>$acceso</tr>$imgperfil</tr>$modulos";
         }
         return $datos;
     }
@@ -141,11 +142,11 @@ class ControladorPermiso {
             $notificacion = substr($notificacion, 0, 40);
             $msg = "$date $hora<br/> $notificacion...";
 
-            $datos .= "<li class='py-1'><a data-toggle='modal' data-target='#modal-notification' onclick='getNotification($id)' class='notification-link $unread'><div $marker></div> $msg </a></li>";
+            $datos .= "<li><a data-bs-toggle='modal' data-bs-target='#modal-notification' onclick='getNotification($id)' class='notification-link $unread'><div $marker></div> $msg </a></li>";
             $count++;
         }
         if ($count == 0) {
-            $datos .= "<li class='py-1'><a class='notification-link list-conf'>No hay notificaciones</a></li>";
+            $datos .= "<li><a class='notification-link '>No hay notificaciones </a></li>";
         }
         $datos .= "<corte>$num";
         return $datos;

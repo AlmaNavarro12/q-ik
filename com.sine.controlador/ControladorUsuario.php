@@ -22,6 +22,7 @@ class ControladorUsuario
         "usuario", "crearusuario", "listausuario", "eliminarusuario", "asignarpermiso",
         "reporte", "reportefactura", "reportepago", "reportegrafica", "reporteiva", "datosiva", "reporteventa",
         "configuracion", "addfolio", "listafolio", "editarfolio", "eliminarfolio", "addcomision", "encabezados", "confcorreo", "importar",
+        "ventas", "crearventa", "cancelarventa", "exportarventa"
     ];
 
     function __construct()
@@ -240,7 +241,7 @@ class ControladorUsuario
                     rename('../temporal/tmp/' . $img, '../img/usuarios/' . $img);
                     unlink("../img/usuarios/" . $u->getImgactualizar());
                 }
-            }            
+            }
 
             $acceso = $u->getIdUsuario() != 0 ? '' : $this->getTAcceso();
             $div = explode("</tr>", $acceso);
@@ -291,12 +292,13 @@ class ControladorUsuario
         return $guardado;
     }
 
-    private function crearImg($nombre) {
+    private function crearImg($nombre)
+    {
         $sn = substr($nombre, 0, 1);
         $hoy = date('Ymd\TH.i.s');
-        
+
         header("Content-Type: image/png");
-        $im = @imagecreate(20, 20)or die("Cannot Initialize new GD image stream");
+        $im = @imagecreate(20, 20) or die("Cannot Initialize new GD image stream");
         $color_fondo = imagecolorallocate($im, 9, 9, 107);
         $color_texto = imagecolorallocate($im, 255, 255, 255);
         imagestring($im, 5, 6, 2.8, "$sn", $color_texto);
@@ -305,24 +307,24 @@ class ControladorUsuario
         imagedestroy($im);
         return $imgname;
     }
-    
-    
+
+
     private function insertarPermisos($idusuario)
     {
         $actualizado = false;
-    
+
         $valores = ["id" => null, "idusuario" => $idusuario];
-    
+
         foreach ($this->permisos as $permiso) {
             $valores[$permiso] = '0';
         }
-    
+
         $consulta = "INSERT INTO `usuariopermiso` VALUES (:id, :idusuario,";
         $consulta .= implode(", :", $this->permisos) . ");";
         $actualizado = $this->consultas->execute($consulta, $valores);
         return $actualizado;
     }
-    
+
     public function validarExistenciaUsuario($nombrecompleto, $correo, $usuario, $idusuario)
     {
         $existe = false;
@@ -439,8 +441,25 @@ class ControladorUsuario
 
     public function quitarUsuario($idusuario)
     {
-        $eliminado = $this->eliminarUsuario($idusuario);
-        return $eliminado;
+        $usuarioArray = $this->getUsuarioById($idusuario);
+
+        if ($usuarioArray) {
+            $usuario = $usuarioArray[0];
+            $imgperfil = $usuario['imgperfil'];
+
+            $eliminado = $this->eliminarUsuario($idusuario);
+
+            if ($eliminado) {
+                $rutaArchivo = '../img/usuarios/';
+                $rutaCompleta = $rutaArchivo . $imgperfil;
+
+                if (file_exists($rutaCompleta)) {
+                    unlink($rutaCompleta);
+                }
+            } else {
+                return $eliminado;
+            }
+        }
     }
 
     private function eliminarUsuario($idusuario)
@@ -589,7 +608,7 @@ class ControladorUsuario
             $idusuario = $usuarioactual['idusuario'];
             $nombreusuario = $usuarioactual['nombre'] . ' ' . $usuarioactual['apellido_paterno'] . ' ' . $usuarioactual['apellido_materno'];
 
-            $datos = "$idusuario</tr>$nombreusuario</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>1</tr>$usuariologin";
+            $datos = "$idusuario</tr>$nombreusuario</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>1</tr>$usuariologin";
             break;
         }
         return $datos;
@@ -607,28 +626,8 @@ class ControladorUsuario
             $idusuario = $usuarioactual['permiso_idusuario'];
             $nombreusuario = $usuarioactual['nombre'] . ' ' . $usuarioactual['apellido_paterno'] . ' ' . $usuarioactual['apellido_materno'];
 
-            $permisosLista = array(
-                "facturas", "crearfactura", "editarfactura", "eliminarfactura", "listafactura",
-                "pago", "crearpago", "editarpago", "eliminarpago", "listapago",
-                "nomina", "listaempleado", "crearempleado", "editarempleado", "eliminarempleado", "listanomina", "crearnomina", "editarnomina", "eliminarnomina",
-                "cartaporte", "listaubicacion", "crearubicacion", "editarubicacion", "eliminarubicacion", "listatransporte", "creartransporte", "editartransporte", "eliminartransporte", "listaremolque", "crearremolque", "editarremolque", "eliminarremolque", "listaoperador", "crearoperador", "editaroperador", "eliminaroperador", "listacarta", "crearcarta", "editarcarta", "eliminarcarta",
-                "cotizacion", "crearcotizacion", "editarcotizacion", "eliminarcotizacion", "listacotizacion",
-                "anticipo", "cliente", "crearcliente", "editarcliente", "eliminarcliente", "listacliente",
-                "comunicado", "crearcomunicado", "editarcomunicado", "eliminarcomunicado", "listacomunicado",
-                "producto", "crearproducto", "editarproducto", "eliminarproducto", "listaproducto",
-                "proveedor", "crearproveedor", "editarproveedor", "eliminarproveedor", "listaproveedor",
-                "impuesto", "crearimpuesto", "editarimpuesto", "eliminarimpuesto", "listaimpuesto",
-                "datosfacturacion", "creardatos", "editardatos", "listadatos",
-                "contrato", "crearcontrato", "editarcontrato", "eliminarcontrato", "listacontrato",
-                "usuarios", "crearusuario", "listausuario", "eliminarusuario", "asignarpermiso",
-                "reporte", "reportefactura", "reportepago", "reportegrafica", "reporteiva", "datosiva", "reporteventa",
-                "configuracion", "addfolio", "listafolio", "editarfolio", "eliminarfolio", "addcomision", "encabezados", "confcorreo",
-                "importar"
-            );
-
             $datos = "$idusuario</tr>$nombreusuario";
-
-            foreach ($permisosLista as $permiso) {
+            foreach ($this->permisos as $permiso) {
                 $valorPermiso = isset($usuarioactual[$permiso]) ? $usuarioactual[$permiso] : '';
                 $datos .= "</tr>$valorPermiso";
             }

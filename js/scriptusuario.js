@@ -90,7 +90,8 @@ function insertarUsuario(idusuario = null) {
                     alertify.error(res);
                 } else {
                     alertify.success('Se guardaron los datos correctamente ');
-                    if (datosUsuario.img != "" && idusuario == uid) {
+                    var nombre = datosUsuario.nombre + ' ' + datosUsuario.apellidopaterno;
+                    if ((datosUsuario.img != imagenperfil || nombre != nombreusuario) && idusuario == uid) {
                         location.href = 'home.php';
                     } else {
                         loadView('listasuarioaltas');
@@ -161,12 +162,12 @@ function setValoresEditarUsuario(datos) {
         $("#tipo-usuario").attr('disabled', true);
     }
     if (idusuario == idlogin || tipologin == '1') {
-        $("#div-user").addClass('col-md-11');
-        $("#span-user").addClass('col-md-1 ps-0 py-2');
+        $("#div-user").addClass('col-11');
+        $("#span-user").addClass('col-1 ps-0 py-2');
         $("#span-user").append("<input class='input-check' type='checkbox' id='chuser' onclick='checkUser()' title='Cambiar nombre de usuario'/>");
 
-        $("#div-pass").addClass('col-md-11');
-        $("#span-pass").addClass('col-md-1 ps-0 py-2');
+        $("#div-pass").addClass('col-11');
+        $("#span-pass").addClass('col-1 ps-0 py-2');
         $("#span-pass").append("<input class='input-check' type='checkbox' id='chpass' onclick='checkContrasena()' title='Cambiar contraseña'/>");
     }
     $("#contrasena").val("");
@@ -346,7 +347,7 @@ function setValoresAsignarPermisos(datos) {
         "usuarios", "crearusuario", "listausuario", "eliminarusuario", "asignarpermiso",
         "reporte", "reportefactura", "reportepago", "reportegrafica", "reporteiva", "datosiva", "reporteventas",
         "configuracion", "addfolio", "listafolio", "editarfolio", "eliminarfolio", "addcomision", "encabezados", "confcorreo",
-        "importar", "accion", "idlogin"
+        "importar", "ventas", "crearventa", "cancelarventa", "exportarventa", "accion", "idlogin"
     ];
 
     var permisosMapa = {};
@@ -354,6 +355,7 @@ function setValoresAsignarPermisos(datos) {
     for (var i = 0; i < permisos.length; i++) {
         permisosMapa[permisos[i]] = array[i];
     }
+    changeText("#titulo-asignar", "Asignando permisos a: " + permisosMapa.nombre);
 
     var tienePermisos = false;
     for (var permiso in permisosMapa) {
@@ -396,7 +398,9 @@ function actualizarPermisos(idusuario) {
         contrato: ["crearcontrato", "editarcontrato", "eliminarcontrato", "listacontrato"],
         usuarios: ["crearusuario", "listausuario", "eliminarusuario", "asignarpermiso"],
         reporte: ["reportefactura", "reportepago", "reportegrafica", "reporteiva", "datosiva", "reporteventas"],
-        configuracion: ["addfolio", "listafolio", "editarfolio", "eliminarfolio", "addcomision", "encabezados", "confcorreo", "importar"]
+        configuracion: ["addfolio", "listafolio", "editarfolio", "eliminarfolio", "addcomision", "encabezados", "confcorreo", "importar"],
+        ventas: ["crearventa", "cancelarventa", "exportarventa"],
+
     };
 
     var datos = {
