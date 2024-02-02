@@ -8,8 +8,12 @@ require_once '../vendor/autoload.php';
 
 class ControladorRegistro {
 
+    private $consultas;
+
     function __construct() {
+        $this->consultas = new Consultas();
     }
+
 
     public function getDatosCuenta($val) {
         $datos = false;
@@ -24,19 +28,18 @@ class ControladorRegistro {
 
     private function getRFCUserAux($uid) {
         $datos = false;
-        $con = new Consultas();
         $consulta = "SELECT * FROM usuarios WHERE (rfc LIKE '%$uid%') OR (mailcontacto LIKE '%$uid%');";
-        $datos = $con->getResults($consulta, null);
+        $datos = $this->consultas->getResults($consulta, null);
         return $datos;
     }
 
     private function buscarCuentaAux($rfc) {
         $opt = "";
         $servidor = "localhost";
-        $basedatos = strtolower($rfc);
+        $basedatos = "naga021226fj0";
         $puerto = "3306";
-        $mysql_user = "u" . strtolower($rfc);
-        $mysql_password = strtolower($rfc) . 'QvikXJWc';
+        $mysql_user = "root" ;
+        $mysql_password = "";
 
         try {
             $db = new PDO("mysql:host=$servidor;port=$puerto;dbname=$basedatos", $mysql_user, $mysql_password);

@@ -1,14 +1,25 @@
 <div class="pt-4 mx-auto" id="contenedor-formulario-login">
-    <img src="img/LogoQik.png" class="img-rounded mt-5 mx-auto d-block" style="max-height: 158px;" id="logo-login" />
-    <br /><br />
+    <img src="img/LogoQik.png" class="img-rounded mt-3 mx-auto d-block" style="max-height: 158px;" id="logo-login" />
     <div>
-        <form action="#" method="post" id="formulario-login" onsubmit="return false;" name="formulario">
+        <form action="#" method="post" class="mt-1" id="formulario-login" onsubmit="return false;" name="formulario">
+            <div class="row">
+                <div class="input-block">
+                    <label class="label-login pull-login" for="rfc">RFC </label>
+                    <div class="input-icons">
+                        <i class="lnr lnr-user icon-login"></i>
+                        <input class="input-login" type="text" id="rfc" name="rfc" placeholder="RFC registrado">
+                        <div id="rfc-errors">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="row">
                 <div class="input-block">
                     <label class="label-login pull-login" for="usuario">Usuario</label>
                     <div class="input-icons">
-                        <i class="lnr lnr-user icon-login"></i>
-                        <input class="input-login" type="text" id="usuario" name="usuario" placeholder="Usuario">
+                        <i class="lnr lnr-envelope icon-login"></i>
+                        <input class="input-login" type="text" id="usuario" name="usuario" placeholder="Nombre de usuario">
                         <div id="usuario-errors">
                         </div>
                     </div>
@@ -24,7 +35,7 @@
                     <div class="input-icons">
                         <i class="lnr lnr-lock icon-login"></i>
                         <input class="input-login" type="password" id="contrasena" name="contrasena"
-                            placeholder="Password">
+                            placeholder="Contraseña">
                         <div id="contrasena-errors">
                         </div>
                     </div>
