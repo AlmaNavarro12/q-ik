@@ -1,8 +1,10 @@
 <?php
-class Usuario {
 
-    //Todos los astributos de la tabla Usuario (Métodos Getter y Setter)
+class Registro {
+
     private $idUsuario;
+    private $rfc;
+    private $razonsocial;
     private $nombre;
     private $apellidoPaterno;
     private $apellidoMaterno;
@@ -18,16 +20,24 @@ class Usuario {
     private $idestado;
     private $idmunicipio;
     private $tipo;
-    private $chpass;
-    private $img;
-    private $imgactualizar;
-    private $nameimg;
+    private $numint;
+    private $codp;
+	private $paquete;
 
     function __construct() {
+        
     }
-    
+
     function getIdUsuario() {
         return $this->idUsuario;
+    }
+
+    function getRfc() {
+        return $this->rfc;
+    }
+
+    function getRazonsocial() {
+        return $this->razonsocial;
     }
 
     function getNombre() {
@@ -42,15 +52,6 @@ class Usuario {
         return $this->apellidoMaterno;
     }
 
-
-    function getTelefono() {
-        return $this->telefono;
-    }
-
-    function getCorreo() {
-        return $this->correo;
-    }
-
     function getUsuario() {
         return $this->usuario;
     }
@@ -59,55 +60,22 @@ class Usuario {
         return $this->contrasena;
     }
 
-    function getEstatus() {
-        return $this->estatus;
+    function getCorreo() {
+        return $this->correo;
     }
 
-    function setIdUsuario($idUsuario) {
-        $this->idUsuario = $idUsuario;
-    }
-
-    function setNombre($nombre) {
-        $this->nombre = $nombre;
-    }
-
-    function setApellidoPaterno($apellidoPaterno) {
-        $this->apellidoPaterno = $apellidoPaterno;
-    }
-
-    function setApellidoMaterno($apellidoMaterno) {
-        $this->apellidoMaterno = $apellidoMaterno;
-    }
-
-    function setTelefono($telefono) {
-        $this->telefono = $telefono;
-    }
-
-    function setCorreo($correo) {
-        $this->correo = $correo;
-    }
-
-    function setUsuario($usuario) {
-        $this->usuario = $usuario;
-    }
-
-    function setContrasena($contrasena) {
-        $this->contrasena = $contrasena;
-    }
-    
     function getCelular() {
         return $this->celular;
     }
 
-    function setCelular($celular) {
-        $this->celular = $celular;
+    function getTelefono() {
+        return $this->telefono;
     }
 
-    
-    function setEstatus($estatus) {
-        $this->estatus = $estatus;
+    function getEstatus() {
+        return $this->estatus;
     }
-    
+
     function getCalle() {
         return $this->calle;
     }
@@ -126,6 +94,58 @@ class Usuario {
 
     function getIdmunicipio() {
         return $this->idmunicipio;
+    }
+
+    function getTipo() {
+        return $this->tipo;
+    }
+
+    function setIdUsuario($idUsuario) {
+        $this->idUsuario = $idUsuario;
+    }
+
+    function setRfc($rfc) {
+        $this->rfc = $rfc;
+    }
+
+    function setRazonsocial($razonsocial) {
+        $this->razonsocial = $razonsocial;
+    }
+
+    function setNombre($nombre) {
+        $this->nombre = $nombre;
+    }
+
+    function setApellidoPaterno($apellidoPaterno) {
+        $this->apellidoPaterno = $apellidoPaterno;
+    }
+
+    function setApellidoMaterno($apellidoMaterno) {
+        $this->apellidoMaterno = $apellidoMaterno;
+    }
+
+    function setUsuario($usuario) {
+        $this->usuario = $usuario;
+    }
+
+    function setContrasena($contrasena) {
+        $this->contrasena = $contrasena;
+    }
+
+    function setCorreo($correo) {
+        $this->correo = $correo;
+    }
+
+    function setCelular($celular) {
+        $this->celular = $celular;
+    }
+
+    function setTelefono($telefono) {
+        $this->telefono = $telefono;
+    }
+
+    function setEstatus($estatus) {
+        $this->estatus = $estatus;
     }
 
     function setCalle($calle) {
@@ -147,44 +167,33 @@ class Usuario {
     function setIdmunicipio($idmunicipio) {
         $this->idmunicipio = $idmunicipio;
     }
-    
-    function getTipo() {
-        return $this->tipo;
-    }
 
     function setTipo($tipo) {
         $this->tipo = $tipo;
     }
     
-    function getChpass() {
-        return $this->chpass;
+    function getNumint() {
+        return $this->numint;
     }
 
-    function setChpass($chpass) {
-        $this->chpass = $chpass;
-    }
-    
-    function getImg() {
-        return $this->img;
+    function getCodp() {
+        return $this->codp;
     }
 
-    function getImgactualizar() {
-        return $this->imgactualizar;
+    function setNumint($numint) {
+        $this->numint = $numint;
     }
 
-    function setImg($img) {
-        $this->img = $img;
+    function setCodp($codp) {
+        $this->codp = $codp;
     }
 
-    function setImgactualizar($imgactualizar) {
-        $this->imgactualizar = $imgactualizar;
+	function getPaquete() {
+        return $this->paquete;
     }
 
-    function getNameImg() {
-        return $this->nameimg;
+    function setPaquete($paquete) {
+        $this->paquete = $paquete;
     }
-    
-    function setNameImg($nameimg) {
-        $this->nameimg = $nameimg;
-    }
+
 }

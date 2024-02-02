@@ -19,6 +19,16 @@ body {
     float: right;
 }
 
+.click-row{
+    color: #28436f;
+    font-size: 10px;
+    text-transform: uppercase;
+    font-family: sans-serif;
+    font-weight: bolder;
+    letter-spacing: 0.5px;
+
+}
+
 .sm-square {
     position: absolute;
     width: 39.1px;
@@ -36,10 +46,53 @@ body {
     height: 72.65px;
     right: 15%;
     top: 7%;
-
     background: #17177C;
     border-radius: 10px;
     transform: rotate(30deg);
+}
+
+.smr-square {
+    position: absolute;
+    width: 39.1px;
+    height: 39.1px;
+    left: 10%;
+    top: 15%;
+    background: #DFDFF0;
+    border-radius: 10px;
+    transform: rotate(30deg);
+}
+
+.mdr-square {
+    position: absolute;
+    width: 72.65px;
+    height: 72.65px;
+    right: 15%;
+    top: 7%;
+    background: #DFDFF0;
+    border-radius: 10px;
+    transform: rotate(30deg);
+}
+
+.lg-square {
+    position: absolute;
+    width: 52.65px;
+    height: 52.65px;
+    left: 85%;
+    top: 85%;
+    background: #DFDFF0;
+    border-radius: 10px;
+    transform: rotate(-30deg);
+}
+
+.xl-square {
+    position: absolute;
+    width: 29.1px;
+    height: 29.1px;
+    left: 10%;
+    top: 85%;
+    background: #DFDFF0;
+    border-radius: 10px;
+    transform: rotate(-30deg);
 }
 
 .elipse-login {
@@ -49,7 +102,6 @@ body {
     height: 291px;
     bottom: 0px;
     right: 0px;
-
     background: #17177C;
 }
 
@@ -231,10 +283,6 @@ header {
 
 .dropdown .notification-link:hover {
     color: #28436f;
-}
-
-.not-unread{
-    background: transparent;
 }
 
 .alert-marker-active {
@@ -610,6 +658,17 @@ article {
     cursor: pointer;
 }
 
+.button-file:disabled {
+    color: #17177ca7;
+    cursor: not-allowed;
+    transition:  border-color 0.3s ease, color 0.3s ease;
+
+}
+
+.button-file:hover {
+    color: #17177c;
+    border: 2px solid #A3A3A3;
+}
 
 .button-submit {
     outline: none !important;

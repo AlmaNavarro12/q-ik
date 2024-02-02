@@ -513,7 +513,7 @@ class ControladorInicio {
         $notificacion = $this->getNotificacionAux("limit 5");
         foreach ($notificacion as $actual){
             $id = $actual['idnotificacion'];
-            $fecha = $actual['fechanot'];
+            $fecha = $this->formatFecha($actual['fechanot']);
             $hora = $actual['horanot'];
             $notificacion = $actual['notificacion'];
             $read = $actual['readed'];
@@ -523,13 +523,10 @@ class ControladorInicio {
                 $unread = "not-unread";
                 $marker = "class='alert-marker-active'";
             }
-            $div = explode("-", $fecha);
-            $mes = $this->translateMonth($div[1]);
-            $date = $div[2]."/".$mes."/".$div[0];
             $notificacion = substr($notificacion, 0, 40);
-            $msg = "$date $hora<br/> $notificacion...";
-            
-            $datos .= "<li><a data-toggle='modal' data-target='#modal-notification' onclick='getNotification($id)' class='notification-link $unread'><div $marker></div> $msg </a></li>";
+
+            $msg = "<span class='mt-0 mx-0 px-0'>$fecha $hora <br> $notificacion... </span>";
+            $datos .= "<li class='px-2'><a data-bs-toggle='modal' data-bs-target='#modal-notification' onclick='getNotification($id)' class='notification-link px-0 $unread'> <div $marker></div> $msg </a></li>";
             $count++;
         }
         if($count == 0){
@@ -539,49 +536,17 @@ class ControladorInicio {
         return $datos;
     }
     
-    private function translateMonth($m) {
-        switch ($m) {
-            case '01':
-                $mes = 'Ene';
-                break;
-            case '02':
-                $mes = 'Feb';
-                break;
-            case '03':
-                $mes = "Mar";
-                break;
-            case '04':
-                $mes = 'Abr';
-                break;
-            case '05':
-                $mes = 'May';
-                break;
-            case '06':
-                $mes = 'Jun';
-                break;
-            case '07':
-                $mes = 'Jul';
-                break;
-            case '08':
-                $mes = 'Ago';
-                break;
-            case '09':
-                $mes = 'Sep';
-                break;
-            case '10':
-                $mes = 'Oct';
-                break;
-            case '11':
-                $mes = 'Nov';
-                break;
-            case '12':
-                $mes = 'Dic';
-                break;
-            default :
-                $mes = "";
-                break;
-        }
-        return $mes;
+    private function formatFecha($fecha) {
+        $div = explode("-", $fecha);
+        $mes = $this->translateMonth($div[1]);
+        return $div[2] . "/" . $mes . "/" . $div[0];
+    }
+
+    private function translateMonth($m)
+    {
+        $months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+        $m = intval($m);
+        return (array_key_exists($m - 1, $months)) ? $months[$m - 1] : "";
     }
     
     private function getNumrowsAux() {

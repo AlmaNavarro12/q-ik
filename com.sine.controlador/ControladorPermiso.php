@@ -123,78 +123,39 @@ class ControladorPermiso {
         $count = 0;
         $num = $this->countNotificacion();
         $datos = "";
-        $notificacion = $this->getNotificacionAux();
-        foreach ($notificacion as $actual) {
+        $notificaciones = $this->getNotificacionAux();
+    
+        foreach ($notificaciones as $actual) {
             $id = $actual['idnotificacion'];
-            $fecha = $actual['fechanot'];
+            $fecha = $this->formatFecha($actual['fechanot']);
             $hora = $actual['horanot'];
-            $notificacion = $actual['notificacion'];
+            $notificacion = substr($actual['notificacion'], 0, 40);
             $read = $actual['readed'];
-            $unread = "";
-            $marker = "";
-            if ($read == '0') {
-                $unread = "not-unread";
-                $marker = "class='alert-marker-active'";
-            }
-            $div = explode("-", $fecha);
-            $mes = $this->translateMonth($div[1]);
-            $date = $div[2] . "/" . $mes . "/" . $div[0];
-            $notificacion = substr($notificacion, 0, 40);
-            $msg = "$date $hora<br/> $notificacion...";
-
-            $datos .= "<li><a data-bs-toggle='modal' data-bs-target='#modal-notification' onclick='getNotification($id)' class='notification-link $unread'><div $marker></div> $msg </a></li>";
+            $unread = ($read == '0') ? "not-unread" : "";
+            $marker = ($unread) ? "class='alert-marker-active'" : "";
+            
+            $msg = "<span class='mt-0 mx-0 px-0'>$fecha $hora <br> $notificacion... </span>";
+            $datos .= "<li class='px-2'><a data-bs-toggle='modal' data-bs-target='#modal-notification' onclick='getNotification($id)' class='notification-link px-0 $unread'> <div $marker></div> $msg </a></li>";
             $count++;
         }
-        if ($count == 0) {
-            $datos .= "<li><a class='notification-link '>No hay notificaciones </a></li>";
-        }
+    
+        $datos .= ($count == 0) ? "<li><a class='notification-link'>No hay notificaciones</a></li>" : "";
         $datos .= "<corte>$num";
+    
         return $datos;
     }
-
-    public function translateMonth($m) {
-        switch ($m) {
-            case '01':
-                $mes = 'Ene';
-                break;
-            case '02':
-                $mes = 'Feb';
-                break;
-            case '03':
-                $mes = "Mar";
-                break;
-            case '04':
-                $mes = 'Abr';
-                break;
-            case '05':
-                $mes = 'May';
-                break;
-            case '06':
-                $mes = 'Jun';
-                break;
-            case '07':
-                $mes = 'Jul';
-                break;
-            case '08':
-                $mes = 'Ago';
-                break;
-            case '09':
-                $mes = 'Sep';
-                break;
-            case '10':
-                $mes = 'Oct';
-                break;
-            case '11':
-                $mes = 'Nov';
-                break;
-            case '12':
-                $mes = 'Dic';
-                break;
-            default :
-                $mes = "";
-                break;
-        }
-        return $mes;
+    
+    private function formatFecha($fecha) {
+        $div = explode("-", $fecha);
+        $mes = $this->translateMonth($div[1]);
+        return $div[2] . "/" . $mes . "/" . $div[0];
     }
 
+    private function translateMonth($m)
+    {
+        $months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+        $m = intval($m);
+        return (array_key_exists($m - 1, $months)) ? $months[$m - 1] : "";
+    }
+    
 }

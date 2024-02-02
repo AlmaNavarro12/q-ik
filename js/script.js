@@ -527,3 +527,94 @@ function enviarSoporte() {
         })
     }
 }
+
+function disabledButton() {
+    var fileInput = document.getElementById('imgprof');
+    var saveButton = document.getElementById('btn-form-profile');
+    var closeButton = document.getElementById('btn-close-modal');
+
+    fileInput.addEventListener('change', function() {
+        if (fileInput.files.length > 0) {
+            saveButton.removeAttribute('disabled');
+        } else {
+            saveButton.setAttribute('disabled', 'true');
+        }
+    });
+
+    closeButton.addEventListener('click', function() {
+        fileInput.value = '';
+        if (fileInput.files.length > 0) {
+            saveButton.removeAttribute('disabled');
+        } else {
+            saveButton.setAttribute('disabled', 'true');
+        }
+    });
+}
+
+function getNotification(id) {
+    $.ajax({
+        url: 'com.sine.enlace/enlaceinicio.php',
+        type: 'POST',
+        data: {transaccion: 'getnotification', id: id},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 5000);
+            if (bandera == 0) {
+                alertify.error("Error al cargar la notificación.")
+            } else {
+                setValoresNotification(datos);
+            }
+        }
+    });
+}
+
+function setValoresNotification(datos) {
+    var array = datos.split("</tr>");
+    var [idnot, fecha, hora, notification, readed] = array;
+    const meses = {
+        "01": "Ene", "02": "Feb", "03": "Mar",
+        "04": "Abr", "05": "May", "06": "Jun",
+        "07": "Jul", "08": "Ago", "09": "Sep",
+        "10": "Oct", "11": "Nov", "12": "Dic"
+    };
+
+    function formatFecha(fecha) {
+        var [year, month, day] = fecha.split("-");
+        return `${day}/${meses[month]}/${year}`;
+    }
+
+    var fechanot = formatFecha(fecha);
+    $("#notification-date").html(`${fechanot} ${hora}`);
+    $("#notification-body").html(notification);
+
+    if (readed === '0') {
+        updateNotificacion(idnot);
+    }
+}
+
+function updateNotificacion(id) {
+    $.ajax({
+        url: 'com.sine.enlace/enlaceinicio.php',
+        type: 'POST',
+        data: {transaccion: 'updatenotification', id: id},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 5000);
+            if (bandera == 0) {
+                alertify.error("Error al cargar la notificación.")
+            } else {
+                var array = datos.split("<corte>");
+                var list = array[1];
+                var count = array[2];
+                $("#list-notificaciones").html(list);
+                if (count > 0) {
+                    $("#notification-alert").addClass("notification-marker-active");
+                } else {
+                    $("#notification-alert").removeClass("notification-marker-active");
+                }
+            }
+        }
+    });
+}

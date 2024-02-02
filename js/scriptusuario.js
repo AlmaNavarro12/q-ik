@@ -51,7 +51,8 @@ function obtenerDatosUsuario() {
         tipo: $("#tipo-usuario").val(),
         img: $("#filename").val(),
         chpass: ($("#chpass").prop('checked')) ? 1 : 0,
-        imgactualizar: $("#imgactualizar").val()
+        imgactualizar: $("#imgactualizar").val(),
+        nameimg: $("#nameimg").val()
     };
 }
 
@@ -79,7 +80,8 @@ function insertarUsuario(idusuario = null) {
                 tipo: datosUsuario.tipo,
                 img: datosUsuario.img,
                 chpass: datosUsuario.chpass,
-                imgactualizar: datosUsuario.imgactualizar
+                imgactualizar: datosUsuario.imgactualizar,
+                nameimg: datosUsuario.nameimg
             },
             success: function (datos) {
                 var texto = datos.toString();
@@ -92,7 +94,7 @@ function insertarUsuario(idusuario = null) {
                     alertify.success('Se guardaron los datos correctamente ');
                     var nombre = datosUsuario.nombre + ' ' + datosUsuario.apellidopaterno;
                     if ((datosUsuario.img != imagenperfil || nombre != nombreusuario) && idusuario == uid) {
-                        location.href = 'home.php';
+                        location.href='home.php';
                     } else {
                         loadView('listasuarioaltas');
                     }
@@ -171,6 +173,7 @@ function setValoresEditarUsuario(datos) {
         $("#span-pass").append("<input class='input-check' type='checkbox' id='chpass' onclick='checkContrasena()' title='Cambiar contraseña'/>");
     }
     $("#contrasena").val("");
+    $("#form-usuario").append("<input type='hidden' id='nameimg' name='nameimg' value='" + imgnm + "'/>")
     $("#form-usuario").append("<input type='hidden' id='id-usuario' name='id-usuario' value='" + idusuario + "'/><input type='hidden' id='imgactualizar' name='imgactualizar' value='" + img + "'/>")
     $("#btn-form-usuario").attr("onclick", "insertarUsuario(" + idusuario + ");");
 }
@@ -457,3 +460,4 @@ function resposiveButton() {
         $("#bdos > div").removeClass('col-12 mb-3').addClass('col-md-6 mb-3');
     }
 }
+

@@ -1,9 +1,10 @@
+<!--IMAGEN DE PERFIL-->
 <div class="modal fade shadow-lg rounded rounded-5" id="modal-profile-img" tabindex="-1" aria-labelledby="exampleModalLabel" data-bs-backdrop="static" aria-hidden="true">
     <div class="modal-dialog modal-sm">
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title fs-5" id="exampleModalLabel">Imagen de Perfil</h4>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" id="btn-close-modal" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form action="com.sine.enlace/enlaceusuario.php" onsubmit="return false;" id="form-profile">
@@ -12,12 +13,12 @@
                     <div class="col-12 mt-3">
                         <label class="button-file col-12" for="imgprof"><span class="fas fa-camera"></span> Seleccionar Imagen</label>
                         <input class="form-control text-center upload" id="imgprof" name="imgprof" type="file" accept=".png, .jpeg, .jpg, .gif" onchange="cargarImgPerfil();" hidden />
-                        <input id="fileuser" name="fileuser" type="hidden" />
+                        <input id="fileuser" name="fileuser" type="hidden"/>
                         <div id="imgprof-errors">
                         </div>
                         <div class="row d-flex justify-content-evenly mt-2">
                             <button id="btn-edit-profile" type="button" class="button-file col-6">Editar Perfil <span class="fas fa-edit"></span></button>
-                            <button id="btn-form-profile" type="button" class="button-file col-5">Guardar <span class="fas fa-save"></span></button>
+                            <button id="btn-form-profile" type="button" class="button-file col-5" disabled>Guardar <span class="fas fa-save"></span></button>
                         </div>
                     </div>
                 </form>
@@ -26,6 +27,12 @@
     </div>
 </div>
 
+<script>
+    disabledButton();
+    window.addEventListener('resize', disabledButton);
+</script>
+
+<!--SOPORTE TÉCNICO-->
 <div class="modal fade" id="modal-contacto" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -83,17 +90,18 @@
     </div>
 </div>
 
-<div class="modal fade shadow-lg rounded rounded-5" id="modal-notification" tabindex="-1" aria-labelledby="exampleModalLabel" data-bs-backdrop="static" aria-hidden="true">
-    <div class="modal-dialog">
+<!--NOTIFICACIONES-->
+<div class="modal fade" id="modal-notification" tabindex="-1" aria-labelledby="exampleModalLabel" data-bs-backdrop="static" aria-hidden="true">
+    <div class="modal-dialog shadow-lg rounded rounded-5">
         <div class="modal-content">
-            <div class="modal-header">
-                <div class="alert-text text-left" id="notification-date">
+            <div class="modal-header py-0">
+                <div class="label-sub fs-5 py-0" id="notification-date">
                     05/Jul/2021
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div class="alert-text text-justify" id="notification-body">
+                <div class="label-sub fs-6 fw-bold text-justify" id="notification-body">
                     Si
                 </div>
             </div>

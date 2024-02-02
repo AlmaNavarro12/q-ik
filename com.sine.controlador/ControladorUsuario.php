@@ -229,6 +229,7 @@ class ControladorUsuario
             }
 
             $img = $u->getImg();
+
             if ($u->getIdUsuario() == 0) {
                 $img = ($img == '') ? $this->crearImg($u->getNombre()) : $img;
                 if ($img != '') {
@@ -237,11 +238,18 @@ class ControladorUsuario
             } else {
                 if ($img == '') {
                     $img = $u->getImgactualizar();
-                } else if ($img != $u->getImgactualizar()) {
-                    rename('../temporal/tmp/' . $img, '../img/usuarios/' . $img);
-                    unlink("../img/usuarios/" . $u->getImgactualizar());
+                } else if ($img != $u->getNameImg()) {
+                    $nuevaRuta = '../img/usuarios/' . $img;
+                    $viejaRuta = '../img/usuarios/' . $u->getNameImg();
+                    rename('../temporal/tmp/' . $img, $nuevaRuta);
+
+                    if (file_exists($viejaRuta)) {
+                        unlink($viejaRuta);
+                        echo 'imagen actualizada';
+                    }
                 }
             }
+
 
             $acceso = $u->getIdUsuario() != 0 ? '' : $this->getTAcceso();
             $div = explode("</tr>", $acceso);

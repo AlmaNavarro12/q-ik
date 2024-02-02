@@ -20,6 +20,7 @@ if (isset($_POST['transaccion'])) {
             $u = obtenerDatosUsuario();
             $u->setIdUsuario($_POST['idusuario']);
             $u->setImgactualizar($_POST['imgactualizar']);
+            $u->setNameImg($_POST['nameimg']);
             $insertado = $cu->nuevoUsuario($u);
             break;
         case 'eliminarusuario':
