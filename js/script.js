@@ -425,7 +425,7 @@ function cargarImgPerfil() {
     var img = $("#imgprof").val();
     if (isnEmpty(img, 'imgprof')) {
         $.ajax({
-            url: 'com.sine.enlace/cargarimguser.php',
+            url: 'com.sine.enlace/cargarimg.php',
             type: "POST",
             data: formData,
             contentType: false,

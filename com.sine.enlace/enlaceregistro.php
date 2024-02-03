@@ -5,7 +5,7 @@ require_once '../com.sine.modelo/Registro.php';
 
 if (isset($_POST['transaccion'])) {
     $transaccion = $_POST['transaccion'];
-    
+
     $r = new Registro();
     $cr = new ControladorRegistro();
 
@@ -14,6 +14,10 @@ if (isset($_POST['transaccion'])) {
             $rfc = strtoupper(trim($_POST['rfc']));
             echo ($datos = $cr->getDatosCuenta($rfc)) ? $datos : "0No se han encontrado datos de este RFC en el sistema.";
             break;
-        
+        case 'sendrecover':
+            $rfc = $_POST['rfc'];
+            $iduser = $_POST['iduser'];
+            echo ($cr->sendRecoverEmail($rfc, $iduser)) ?: '0No';
+            break;
     }
 }

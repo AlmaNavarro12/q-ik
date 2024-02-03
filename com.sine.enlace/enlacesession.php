@@ -7,7 +7,6 @@ if (!isset($_POST['transaccion'])) {
     exit();
 }
 
-//Enlace a controladorsession
 $transaccion = $_POST['transaccion'];
 $cs = new ControladorSession();
 

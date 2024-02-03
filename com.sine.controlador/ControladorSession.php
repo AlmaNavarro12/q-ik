@@ -2,17 +2,19 @@
 require_once '../com.sine.modelo/Session.php';
 require_once '../com.sine.dao/Consultas.php';
 
-//Relacion a enlacesession.php
 class ControladorSession {
 
-    function __construct() {}
+    private $consultas;
+
+    function __construct() {
+        $this->consultas = new Consultas();
+    }
 
     private function autenticarUsuario($u) {
         $consultado = false;
         $consulta = "SELECT * FROM usuario WHERE usuario=:usuario and password=:contrasena LIMIT 1;";
         $valores = array("usuario" => $u->getUsuario(), "contrasena" => $u->getContrasena());
-        $c = new Consultas();
-        $consultado = $c->getResults($consulta, $valores);
+        $consultado = $this->consultas->getResults($consulta, $valores);
         return $consultado;
     }
 
@@ -34,7 +36,6 @@ class ControladorSession {
     public function sessionIsActive() {
         $activa = false;
         Session::start();
-        $existe = true;
         if (isset($_SESSION[sha1("usuario")])) {
             $activa = true;
         }

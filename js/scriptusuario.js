@@ -216,7 +216,7 @@ function cargarImgUsuario() {
     var img = $("#imagen").val();
     if (isnEmpty(img, 'imagen')) {
         $.ajax({
-            url: 'com.sine.enlace/cargarimguser.php',
+            url: 'com.sine.enlace/cargarimg.php',
             type: "POST",
             data: formData,
             contentType: false,
