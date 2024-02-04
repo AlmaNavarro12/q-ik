@@ -24,7 +24,6 @@ function loadBtnConfig(view) {
         data: { transaccion: "loadbtn", view: view },
         success: function (datos) {
             var array = datos.split("</tr>");
-            alert(datos);
 
             var elements = [
                 { key: 'folio', divId: 'div-folio-conf', btnId: 'btn-folio-conf', view: 'listafolio' },

@@ -4,6 +4,12 @@ require_once '../com.sine.dao/Consultas.php';
 
 class ControladorImgs {
 
+    private $consultas;
+
+    function __construct() {
+        $this->consultas = new Consultas();
+    }
+
     public function insertarImg($nombre, $img, $ext, $sid) {
         $insertado = false;
         $consulta = "INSERT INTO `tmpimg` VALUES (:id, :tmpname, :imgtmp, :ext, :descripcion, :sid);";
@@ -13,17 +19,15 @@ class ControladorImgs {
             "ext" => $ext,
             "descripcion" => '',
             "sid" => $sid);
-        $con = new Consultas();
-        $insertado = $con->execute($consulta, $valores);
+        $insertado = $this->consultas->execute($consulta, $valores);
         return $insertado;
     }
 
     private function getTmpImg($sid) {
         $consultado = false;
         $consulta = "SELECT * FROM tmpimg where sessionid=:sid;";
-        $consultas = new Consultas();
         $val = array("sid" => $sid);
-        $consultado = $consultas->getResults($consulta, $val);
+        $consultado = $this->consultas->getResults($consulta, $val);
         return $consultado;
     }
 
@@ -52,9 +56,8 @@ class ControladorImgs {
     private function getIMGDataAux($id) {
         $consultado = false;
         $consulta = "SELECT * FROM tmpimg WHERE idtmpimg=:id;";
-        $consultas = new Consultas();
         $valores = array("id" => $id);
-        $consultado = $consultas->getResults($consulta, $valores);
+        $consultado = $this->consultas->getResults($consulta, $valores);
         return $consultado;
     }
 
@@ -83,9 +86,8 @@ class ControladorImgs {
         $img = $this->getNameImg($id);
         $consultado = false;
         $consulta = "DELETE FROM tmpimg where idtmpimg=:id;";
-        $consultas = new Consultas();
         $val = array("id" => $id);
-        $consultado = $consultas->execute($consulta, $val);
+        $consultado = $this->consultas->execute($consulta, $val);
         unlink("../temporal/tmp/$img");
         return $consultado;
     }
@@ -93,9 +95,8 @@ class ControladorImgs {
     private function getIMGComunicadoAux($id) {
         $consultado = false;
         $consulta = "SELECT * FROM doccomunicado WHERE iddoccomunicado=:id;";
-        $consultas = new Consultas();
         $valores = array("id" => $id);
-        $consultado = $consultas->getResults($consulta, $valores);
+        $consultado = $this->consultas->getResults($consulta, $valores);
         return $consultado;
     }
 
@@ -119,18 +120,16 @@ class ControladorImgs {
         }
         $consultado = false;
         $consulta = "DELETE FROM tmpimg where sessionid=:sid;";
-        $consultas = new Consultas();
         $val = array("sid" => $sid);
-        $consultado = $consultas->execute($consulta, $val);
+        $consultado = $this->consultas->execute($consulta, $val);
         return $consultado;
     }
     
     private function getIMGAnticipoAux($id) {
         $consultado = false;
         $consulta = "SELECT imganticipo FROM anticipo WHERE idanticipo=:id;";
-        $consultas = new Consultas();
         $valores = array("id" => $id);
-        $consultado = $consultas->getResults($consulta, $valores);
+        $consultado = $this->consultas->getResults($consulta, $valores);
         return $consultado;
     }
 
@@ -150,17 +149,15 @@ class ControladorImgs {
         $valores = array("id" => null,
             "descripcion" => $descripcion,
             "id" => $id);
-        $con = new Consultas();
-        $insertado = $con->execute($consulta, $valores);
+        $insertado = $this->consultas->execute($consulta, $valores);
         return $insertado;
     }
     
     private function getIMGCartaPorteAux($id) {
         $consultado = false;
         $consulta = "SELECT * FROM detalledoccarta WHERE iddetalledoccarta=:id;";
-        $consultas = new Consultas();
         $valores = array("id" => $id);
-        $consultado = $consultas->getResults($consulta, $valores);
+        $consultado = $this->consultas->getResults($consulta, $valores);
         return $consultado;
     }
 
@@ -175,13 +172,11 @@ class ControladorImgs {
         }
         return $datos;
     }
-    
     private function getDatosFacturacionAux($id) {
         $consultado = false;
         $consulta = "SELECT * FROM datos_facturacion WHERE id_datos=:id;";
-        $consultas = new Consultas();
         $valores = array("id" => $id);
-        $consultado = $consultas->getResults($consulta, $valores);
+        $consultado = $this->consultas->getResults($consulta, $valores);
         return $consultado;
     }
 
@@ -193,5 +188,4 @@ class ControladorImgs {
         }
         return $rfc;
     }
-
 }

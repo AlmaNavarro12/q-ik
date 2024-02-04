@@ -79,7 +79,7 @@ require_once 'Enrutador.php';
                 <div class="position-fixed user-info mx-3">
                     <div class="dropdown">
                         <button class="btn button-home dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <span id="user-name"> <?php echo utf8_decode($nombreusuario); ?> </span> <span class="caret"></span>
+                            <span id="user-name"> <?php echo iconv('UTF-8', 'windows-1252', $nombreusuario); ?> </span> <span class="caret"></span>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end ">
                             <?php

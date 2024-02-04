@@ -316,7 +316,6 @@ class ControladorUsuario
         return $imgname;
     }
 
-
     private function insertarPermisos($idusuario)
     {
         $actualizado = false;

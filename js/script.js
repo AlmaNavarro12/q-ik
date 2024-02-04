@@ -588,7 +588,7 @@ function setValoresNotification(datos) {
     $("#notification-date").html(`${fechanot} ${hora}`);
     $("#notification-body").html(notification);
 
-    if (readed === '0') {
+    if (readed == '0') {
         updateNotificacion(idnot);
     }
 }

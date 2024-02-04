@@ -91,12 +91,13 @@ function insertarUsuario(idusuario = null) {
                 if (bandera == '0') {
                     alertify.error(res);
                 } else {
-                    alertify.success('Se guardaron los datos correctamente ');
                     var nombre = datosUsuario.nombre + ' ' + datosUsuario.apellidopaterno;
                     if ((datosUsuario.img != imagenperfil || nombre != nombreusuario) && idusuario == uid) {
                         location.href='home.php';
+                        alertify.success('Se guardaron los datos correctamente ');
                     } else {
                         loadView('listasuarioaltas');
+                        alertify.success('Se guardaron los datos correctamente ');
                     }
                 }
             }
@@ -254,24 +255,6 @@ function eliminarUsuario(idusuario) {
             }
         });
     }).set({ title: "Q-ik" });
-}
-
-function crearIMG() {
-    $.ajax({
-        url: "com.sine.enlace/enlaceusuario.php",
-        type: "POST",
-        data: { transaccion: "crearimg" },
-        success: function (datos) {
-            var texto = datos.toString();
-            var bandera = texto.substring(0, 1);
-            var res = texto.substring(1, 1000);
-            if (bandera == '0') {
-                alertify.error(res);
-            } else {
-                alert(datos);
-            }
-        }
-    });
 }
 
 function checkUsuario() {

@@ -91,6 +91,10 @@ body {
     background: #17177C;
 }
 
+.not-unread{
+    background: #F2F2F2;
+}
+
 /*----------------------------FORMULARIO DE LOGIN----------------------------*/
 .input-block {
     max-width: 366px;
@@ -275,7 +279,7 @@ header {
     display: inline-block;
     width: 10px;
     height: 10px;
-    background: #FF0000;
+    background: #ebb105;
     transition: all 400ms;
     border-radius: 50%;
 }

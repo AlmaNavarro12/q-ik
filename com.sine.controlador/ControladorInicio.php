@@ -3,14 +3,18 @@
 require_once '../com.sine.dao/Consultas.php';
 require_once '../com.sine.modelo/Session.php';
 require_once '../vendor/autoload.php';
+
 date_default_timezone_set("America/Mexico_City");
 
-use SWServices\AccountBalance\AccountBalanceService as AccountBalanceService;
+use PHPMailer\PHPMailer\PHPMailer;
 use Twilio\Rest\Client;
 
 class ControladorInicio {
 
+    private $consultas;
+
     function __construct() {
+        $this->consultas = new Consultas();
     }
     
     public function sendMSG() {
@@ -44,6 +48,7 @@ class ControladorInicio {
         closedir($dir);
     }
 
+    //Declarada pero no usada
     public function iniFile() {
         $sampleData = array(
             'database' => array(
@@ -101,133 +106,11 @@ class ControladorInicio {
         return $success;
     }
 
-    public function loadSQL() {
-        /* $consulta = "Create database qikbd;";
-          $con = new Consultas();
-          $insertado = $con->execute($consulta, null); */
-
-        $servidor = "localhost";
-        $basedatos = "qikbd";
-        $puerto = "3306";
-        $mysql_user = "root";
-        $mysql_password = "";
-
-        $db = new PDO("mysql:host=$servidor;port=$puerto;dbname=$basedatos", $mysql_user, $mysql_password);
-
-        /* $tablequery = file_get_contents("../../queries/qikTables.sql");
-
-          $stmttable = $db->prepare($tablequery);
-
-          if ($stmttable->execute()) {
-          echo "Success";
-          } else {
-          echo "Fail";
-          } */
-
-        $pass = sha1('holamundo');
-
-        $userquery = "INSERT INTO `usuario` VALUES (:id, :nombre, :apaterno, :amaterno, :user, :pass, :mail, :phone, :phone2, :status, :tipo, :accesso, :date, :img); INSERT INTO `usuariopermiso` VALUES (null, '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1');";
-
-        $stmttable = $db->prepare($userquery, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
-
-        if ($stmttable->execute(array(':id' => null,
-                    ':nombre' => "Si",
-                    ':apaterno' => 'red',
-                    ':amaterno' => 'blue',
-                    ':user' => 'user',
-                    ':pass' => $pass,
-                    ':mail' => 'ejemplo@ejemplo.com',
-                    ':phone' => '4271221859',
-                    ':phone2' => '4271221859',
-                    ':status' => 'activo',
-                    ':tipo' => '1',
-                    ':accesso' => '1',
-                    ':date' => '2021-03-31',
-                    ':img' => 'img.jpg'))) {
-            echo "Success";
-        } else {
-            echo "Fail";
-        }
-
-        //$loadprod = $this->loadProdServicios($servidor, $puerto, $basedatos, $mysql_user, $mysql_password);
-    }
-
-    private function loadProdServicios($servidor, $puerto, $basedatos, $mysql_user, $mysql_password) {
-        $db = new PDO("mysql:host=$servidor;port=$puerto;dbname=$basedatos", $mysql_user, $mysql_password);
-
-        $query1 = file_get_contents("../../queries/prodserv1.sql");
-        $stmt = $db->prepare($query1);
-
-        if ($stmt->execute()) {
-            echo "Success";
-        } else {
-            echo "Fail";
-        }
-
-        $query2 = file_get_contents("../../queries/prodserv2.sql");
-        $stmt = $db->prepare($query2);
-
-        if ($stmt->execute()) {
-            echo "Success";
-        } else {
-            echo "Fail";
-        }
-
-        $query3 = file_get_contents("../../queries/prodserv3.sql");
-
-        $stmt = $db->prepare($query3);
-
-        if ($stmt->execute()) {
-            echo "Success";
-        } else {
-            echo "Fail";
-        }
-
-        $query4 = file_get_contents("../../queries/prodserv4.sql");
-
-        $stmt = $db->prepare($query4);
-
-        if ($stmt->execute()) {
-            echo "Success";
-        } else {
-            echo "Fail";
-        }
-
-        $query5 = file_get_contents("../../queries/prodserv5.sql");
-
-        $stmt = $db->prepare($query5);
-
-        if ($stmt->execute()) {
-            echo "Success";
-        } else {
-            echo "Fail";
-        }
-    }
-
     private function getSaldoAux() {
         $consultado = false;
         $consulta = "SELECT * FROM contador_timbres WHERE idtimbres=:id;";
-        $consultas = new Consultas();
         $valores = array("id" => '1');
-        $consultado = $consultas->getResults($consulta, $valores);
-        return $consultado;
-    }
-    
-    private function getTAcceso($uid){
-        $tacceso = "";
-        $datos = $this->getTAccesoAux($uid);
-        foreach ($datos as $actual){
-            $tacceso = $actual['acceso'];
-        }
-        return $tacceso;
-    }
-    
-    private function getTAccesoAux($uid){
-        $consultado = false;
-        $consulta = "SELECT acceso FROM usuario WHERE idusuario=:uid;";
-        $consultas = new Consultas();
-        $val = array("uid" => $uid);
-        $consultado = $consultas->getResults($consulta, $val);
+        $consultado = $this->consultas->getResults($consulta, $valores);
         return $consultado;
     }
 
@@ -237,11 +120,7 @@ class ControladorInicio {
         foreach ($saldo as $actual) {
             Session::start();
             $acceso = $this->getNombrePaquete($_SESSION[sha1("paquete")]);
-            $comprados = $actual['timbresComprados'];
-            $usados = $actual['timbresUtilizados'];
-            $restantes = $actual['timbresRestantes'];
-            
-            $datos = "$acceso</tr>$comprados</tr>$usados</tr>$restantes";
+            $datos = "$acceso</tr>{$actual['timbresComprados']}</tr>{$actual['timbresUtilizados']}</tr>{$actual['timbresRestantes']}";
         }
         return $datos;
     }
@@ -273,79 +152,58 @@ class ControladorInicio {
 
     public function opcionesAno() {
         $anio_de_inicio = 2018;
-        $fecha = getdate();
-        $y = $fecha['year'];
-        $r = "";
+        $y = date('Y');
+        $options = "";
+    
         foreach (range($anio_de_inicio, $y) as $x) {
-            $r = $r . "<option id='ano" . $x . "' value='" . $x . "'>" . $x . "  " . "</option>";
+            $options .= "<option id='ano{$x}' value='{$x}'>{$x} </option>";
         }
-        return $r;
+        return $options;
     }
-
+    
     public function getDatos($y) {
         $datos = "";
         $totales = "";
         $cancelados = "";
         $sintimbre = "";
-        $contador = 0;
+    
         for ($i = 1; $i <= 12; $i++) {
-            $m = $i;
-            if ($m < 10) {
-                $m = "0$m";
-            }
+            $m = str_pad($i, 2, '0', STR_PAD_LEFT);
+            
             $con = "and status_pago!='3' and uuid!=''";
             $datosemitidos = $this->getDatosAux($y, $m, $con);
             $dato = "";
             foreach ($datosemitidos as $emi) {
                 $dato = $emi['emitidas'];
             }
-            if ($contador >= 1) {
-                $datos .= "</tr>$dato";
-            } else {
-                $datos .= "$dato";
-            }
-
-            $total = $this->getTotales($y, $m);
-            if ($contador >= 1) {
-                $totales .= "</tr>" . bcdiv($total, '1', 2);
-            } else {
-                $totales .= bcdiv($total, '1', 2);
-            }
-
+            $datos .= $datos ? "</tr>$dato" : $dato;
+    
+            $total = bcdiv($this->getTotales($y, $m), '1', 2);
+            $totales .= $totales ? "</tr>$total" : $total;
+    
             $con2 = "and status_pago = '3'";
             $datosCancelados = $this->getDatosAux($y, $m, $con2);
             $cancelado = "";
             foreach ($datosCancelados as $can) {
                 $cancelado = $can['emitidas'];
             }
-            if ($contador >= 1) {
-                $cancelados .= "</tr>$cancelado";
-            } else {
-                $cancelados .= "$cancelado";
-            }
-
+            $cancelados .= $cancelados ? "</tr>$cancelado" : $cancelado;
+    
             $con3 = "and uuid is null";
             $datosNtimbre = $this->getDatosAux($y, $m, $con3);
             $notimbre = "";
             foreach ($datosNtimbre as $st) {
                 $notimbre = $st['emitidas'];
             }
-            if ($contador >= 1) {
-                $sintimbre .= "</tr>$notimbre";
-            } else {
-                $sintimbre .= "$notimbre";
-            }
-
-            $contador++;
+            $sintimbre .= $sintimbre ? "</tr>$notimbre" : $notimbre;
         }
         return $datos . "<dataset>" . $totales . "<dataset>" . $cancelados . "<dataset>" . $sintimbre;
     }
-
+    
     private function getDatosAux($y, $m, $con) {
         $consultado = false;
         $consulta = "select count(*) emitidas from datos_factura where fecha_creacion like '$y-$m%' $con;";
-        $consultas = new Consultas();
-        $consultado = $consultas->getResults($consulta, null);
+        $consultado = $this->consultas->getResults($consulta, null);
         return $consultado;
     }
 
@@ -353,7 +211,7 @@ class ControladorInicio {
         $total = 0;
         $gettotales = $this->getTotalesAux($y, $m);
         foreach ($gettotales as $actual) {
-            $total += $this->totalDivisa($actual['total'], $actual['tcambio'], 1, $actual['id_moneda']);
+            //$total += $this->totalDivisa($actual['total'], $actual['tcambio'], 1, $actual['id_moneda']);
         }
         return $total;
     }
@@ -361,12 +219,11 @@ class ControladorInicio {
     private function getTotalesAux($y, $m) {
         $consultado = false;
         $consulta = "select totalfactura total, tcambio, id_moneda from datos_factura where fecha_creacion like '$y-$m%';";
-        $consultas = new Consultas();
-        $consultado = $consultas->getResults($consulta, null);
+        $consultado = $this->consultas->getResults($consulta, null);
         return $consultado;
     }
 
-    private function totalDivisa($total, $tcambio, $monedaP, $monedaF) {
+    /*private function totalDivisa($total, $tcambio, $monedaP, $monedaF) {
         if ($monedaP == $monedaF) {
             $OP = bcdiv($total, '1', 2);
         } else {
@@ -386,14 +243,13 @@ class ControladorInicio {
             }
         }
         return $OP;
-    }
+    } */
 
     private function getUsuarioAux($idusuario) {
         $consultado = false;
         $consulta = "select * from usuario where idusuario=:id;";
         $val = array("id" => $idusuario);
-        $consultas = new Consultas();
-        $consultado = $consultas->getResults($consulta, $val);
+        $consultado = $this->consultas->getResults($consulta, $val);
         return $consultado;
     }
 
@@ -433,8 +289,7 @@ class ControladorInicio {
         $valores = array("id" => '1',
             "comprados" => '0',
             "restantes" => '0');
-        $con = new Consultas();
-        $insertado = $con->execute($consulta, $valores);
+        $insertado = $this->consultas->execute($consulta, $valores);
         return $insertado;
     }
     
@@ -442,21 +297,16 @@ class ControladorInicio {
         $consultado = false;
         $consulta = "SELECT * FROM notificacion where idnotificacion=:id;";
         $val = array("id" => $id);
-        $c = new Consultas();
-        $consultado = $c->getResults($consulta, $val);
+        $consultado = $this->consultas->getResults($consulta, $val);
         return $consultado;
     }
     
     public function getNotification($id){
         $datos = "";
         $not = $this->getNotificacionbyID($id);
+    
         foreach($not as $actual){
-            $idnot = $actual['idnotificacion'];
-            $fecha = $actual['fechanot'];
-            $hora = $actual['horanot'];
-            $notificacion = $actual['notificacion'];
-            $readed = $actual['readed'];
-            $datos .= "$idnot</tr>$fecha</tr>$hora</tr>$notificacion</tr>$readed";
+            $datos .= implode('</tr>', $actual) . '</tr>';
         }
         return $datos;
     }
@@ -465,42 +315,20 @@ class ControladorInicio {
         $consulta = "UPDATE `notificacion` SET readed=:readed where idnotificacion=:id;";
         $valores = array("id" => $id,
             "readed" => '1');
-        $con = new Consultas();
-        $insertado = $con->execute($consulta, $valores);
+        $insertado = $this->consultas->execute($consulta, $valores);
         return $insertado;
     }
     
     public function listNotificacion($id){
         $update = $this->updateNotification($id);
-        
         $list = $this->getListNotificacion();
-        
         return $list;
-    }
-    
-    private function countNotificacionAux() {
-        $consultado = false;
-        $consulta = "SELECT * FROM notificacion where readed=:readed;";
-        $c = new Consultas();
-        $val = array("readed" => '0');
-        $consultado = $c->getResults($consulta, $val);
-        return $consultado;
-    }
-    
-    private function countNotificacion() {
-        $count = 0;
-        $notification = $this->countNotificacionAux();
-        foreach ($notification as $actual){
-            $count++;
-        }
-        return $count;
     }
     
     private function getNotificacionAux($con="") {
         $consultado = false;
         $consulta = "SELECT * FROM notificacion order by idnotificacion desc $con;";
-        $c = new Consultas();
-        $consultado = $c->getResults($consulta, null);
+        $consultado = $this->consultas->getResults($consulta, null);
         return $consultado;
     }
     
@@ -508,31 +336,26 @@ class ControladorInicio {
         session_start();
         $idusuario = $_SESSION[sha1("idusuario")];
         $datos = "<corte><li><a class='notification-link' onclick='loadImgPerfil($idusuario)' data-toggle='modal' data-target='#modal-profile-img' title='Cambiar imagen de perfil'><span class='glyphicon glyphicon-user'></span> Cambiar imagen de perfil </a></li>";
-        $count = 0;
-        $num = $this->countNotificacion();
-        $notificacion = $this->getNotificacionAux("limit 5");
-        foreach ($notificacion as $actual){
+    
+        $notificaciones = $this->getNotificacionAux("limit 5");
+        $count = count($notificaciones);
+        
+        foreach ($notificaciones as $actual){
             $id = $actual['idnotificacion'];
             $fecha = $this->formatFecha($actual['fechanot']);
             $hora = $actual['horanot'];
-            $notificacion = $actual['notificacion'];
-            $read = $actual['readed'];
-            $unread = "";
-            $marker = "";
-            if($read == '0'){
-                $unread = "not-unread";
-                $marker = "class='alert-marker-active'";
-            }
-            $notificacion = substr($notificacion, 0, 40);
-
+            $notificacion = substr($actual['notificacion'], 0, 40);
+    
+            $unread = ($actual['readed'] == '0') ? "not-unread" : "";
+            $marker = ($unread) ? "class='alert-marker-active'" : "";
+    
             $msg = "<span class='mt-0 mx-0 px-0'>$fecha $hora <br> $notificacion... </span>";
-            $datos .= "<li class='px-2'><a data-bs-toggle='modal' data-bs-target='#modal-notification' onclick='getNotification($id)' class='notification-link px-0 $unread'> <div $marker></div> $msg </a></li>";
-            $count++;
+            $datos .= "<li class='p-2 $unread'><a data-bs-toggle='modal' data-bs-target='#modal-notification' onclick='getNotification($id)' class='notification-link px-0'> <div $marker></div> $msg </a></li>";
         }
-        if($count == 0){
-            $datos .= "<li><a class='notification-link'>No hay notificaciones </a></li>";
-        }
-        $datos .= "<li><a class='notification-link'>Ver todas las notificaciones </a></li><corte>$num";
+    
+        $datos .= ($count == 0) ? "<li><a class='notification-link'>No hay notificaciones </a></li>" : "";
+        $datos .= "<li><a class='notification-link'>Ver todas las notificaciones </a></li><corte>$count";
+        
         return $datos;
     }
     
@@ -548,12 +371,11 @@ class ControladorInicio {
         $m = intval($m);
         return (array_key_exists($m - 1, $months)) ? $months[$m - 1] : "";
     }
-    
+
     private function getNumrowsAux() {
         $consultado = false;
         $consulta = "select count(idnotificacion) numrows FROM notificacion order by idnotificacion desc;";
-        $consultas = new Consultas();
-        $consultado = $consultas->getResults($consulta, null);
+        $consultado = $this->consultas->getResults($consulta, null);
         return $consultado;
     }
 
@@ -570,7 +392,9 @@ class ControladorInicio {
         require_once '../com.sine.common/pagination.php';
         $datos = "<thead class='sin-paddding'>
             <tr>
-                <th colspan='3'></th>
+                <th class='ps-4'>FECHA</th>
+                <th>HORA</th>
+                <th>NOTIFICACIÓN</th>
             </tr>
         </thead>
         <tbody>";
@@ -589,20 +413,13 @@ class ControladorInicio {
             $fecha = $actual['fechanot'];
             $hora = $actual['horanot'];
             $notificacion = $actual['notificacion'];
-            $read = $actual['readed'];
-            $unread = "";
-            $marker = "";
-            if($read == '0'){
-                $unread = "not-unread";
-                $marker = "class='alert-marker-active'";
-            }
             $div = explode("-", $fecha);
             $mes = $this->translateMonth($div[1]);
             $date = $div[2]."/".$mes."/".$div[0];
             
             $datos .= "
                     <tr class='table-row'>
-                        <td>$date</td>
+                        <td class='ps-4'>$date</td>
                         <td>$hora</td>
                         <td>$notificacion</td>
                     </tr>
@@ -622,10 +439,9 @@ class ControladorInicio {
 	private function getUsuarioLoginAux() {
         Session::start();
         $consultado = false;
-        $con = new Consultas();
         $consulta = 'SELECT * FROM usuario WHERE idusuario=:uid;';
         $val = array("uid" => $_SESSION[sha1('idusuario')]);
-        $consultado = $con->getResults($consulta, $val);
+        $consultado = $this->consultas->getResults($consulta, $val);
         return $consultado;
     }
 
@@ -643,10 +459,9 @@ class ControladorInicio {
 
     private function getConfigMailAux() {
         $consultado = false;
-        $consultas = new Consultas();
         $consulta = "SELECT * FROM correoenvio WHERE chuso1=:id;";
         $valores = array("id" => '1');
-        $consultado = $consultas->getResults($consulta, $valores);
+        $consultado = $this->consultas->getResults($consulta, $valores);
         return $consultado;
     }
 
@@ -695,19 +510,19 @@ class ControladorInicio {
             $mail->From = $correoremitente;
             $mail->FromName = $remitente;
 
-            $mail->Subject = utf8_decode('Soporte Tecnico Q-ik');
+            $mail->Subject = iconv('UTF-8', 'windows-1252', 'Soporte Técnico Q-ik'); 
             $mail->isHTML(true);
             $mail->Body = $this->bodyMail($nombre, $telefono, $chwhats, $correo, $msg);
             $mail->addAddress('dsedge23@gmail.com');
 
             if (!$mail->send()) {
-                echo '0No se envio el mensaje';
+                echo '0No se envio el mensaje.';
                 echo '0Mailer Error: ' . $mail->ErrorInfo;
             } else {
-                return '1Se ha enviado la factura';
+                return '1Se ha enviado la factura.';
             }
         } else {
-            return "0No se ha configurado un correo de envio para esta area";
+            return "0No se ha configurado un correo de envío para esta área.";
         }
     }
 
@@ -725,41 +540,41 @@ class ControladorInicio {
             $whats = "(cuenta con Whatsapp)";
         }
         $message = "<html>
-    <body>
-        <table width='100%' bgcolor='#e0e0e0' cellpadding='0' cellspacing='0' border='0' style='border-radius: 25px;'>
-            <tr>
-                <td>
-                    <table align='center' width='100%' border='0' cellpadding='0' cellspacing='0' style='max-width:650px; border-radius: 20px; background-color:#fff; font-family:sans-serif;'>
-                        <thead>
-                            <tr height='80'>
-                                <th align='left' colspan='4' style='padding: 6px; background-color:#f5f5f5; border-radius: 20px; border-bottom:solid 1px #bdbdbd;' ><img src='https://q-ik.mx/Registro/img/LogoQik.png' height='100px'/></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr align='center' height='10' style='font-family:sans-serif; '>
-                                <td style='background-color:#09096B; text-align:center; border-radius: 5px;'></td>
-                            </tr>
-                            <tr>
-                                <td colspan='4' style='padding:15px;'>
-                                    <h1>Solicitud de soporte tecnico</h1>
-                                    <hr/>
-                                    <p style='font-size:15px; text-align: justify;'><b>RFC registrado:</b> $rfcuser</p>
-                                    <p style='font-size:15px; text-align: justify;'><b>Nombre del solicitante:</b> " . utf8_decode($nombre) . "</p>
-                                    <p style='font-size:15px; text-align: justify;'><b>Correo de contacto:</b> " . utf8_decode($correo) . "</p>
-                                    <p style='font-size:15px; text-align: justify;'><b>Telefono de contacto:</b> $telefono $whats</p>
-                                    <p style='font-size:15px; text-align: justify;'><b>Solicitud:</b> </p>
-                                    <p style='font-size:15px; text-align: justify;'>
-                                        " . utf8_decode($msg) . "
-                                    </p>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </td>
-            </tr>
-        </table>
-    </body>
-</html>";
+            <body>
+                <table width='100%' bgcolor='#e0e0e0' cellpadding='0' cellspacing='0' border='0' style='border-radius: 25px;'>
+                    <tr>
+                        <td>
+                            <table align='center' width='100%' border='0' cellpadding='0' cellspacing='0' style='max-width:650px; border-radius: 20px; background-color:#fff; font-family:sans-serif;'>
+                                <thead>
+                                    <tr height='80'>
+                                        <th align='left' colspan='4' style='padding: 6px; background-color:#f5f5f5; border-radius: 20px; border-bottom:solid 1px #bdbdbd;' ><img src='https://q-ik.mx/Registro/img/LogoQik.png' height='100px'/></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr align='center' height='10' style='font-family:sans-serif; '>
+                                        <td style='background-color:#09096B; text-align:center; border-radius: 5px;'></td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan='4' style='padding:15px;'>
+                                            <h1>Solicitud de soporte técnico</h1>
+                                            <hr/>
+                                            <p style='font-size:15px; text-align: justify;'><b>RFC registrado:</b> $rfcuser</p>
+                                            <p style='font-size:15px; text-align: justify;'><b>Nombre del solicitante:</b> " . iconv('UTF-8', 'windows-1252', $nombre) . "</p>
+                                            <p style='font-size:15px; text-align: justify;'><b>Correo de contacto:</b> " . iconv('UTF-8', 'windows-1252', $correo) . "</p>
+                                            <p style='font-size:15px; text-align: justify;'><b>Teléfono de contacto:</b> $telefono $whats</p>
+                                            <p style='font-size:15px; text-align: justify;'><b>Solicitud:</b> </p>
+                                            <p style='font-size:15px; text-align: justify;'>
+                                                " .  iconv('UTF-8', 'windows-1252', $msg)  . "
+                                            </p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </body>
+        </html>";
         return $message;
     }
 
@@ -783,22 +598,19 @@ class ControladorInicio {
     }
 
     private function getuserFTAux($uid) {
-        $con = new Consultas();
         $consultado = false;
         $consulta = "SELECT * FROM usuario WHERE idusuario=:uid;";
         $val = array("uid" => $uid);
-        $consultado = $con->getResults($consulta, $val);
+        $consultado = $this->consultas->getResults($consulta, $val);
         return $consultado;
     }
     
     private function updateUserFtsession($uid){
         $actualizado = false;
-        $con = new Consultas();
         $consulta = "UPDATE `usuario` SET firstsession=:ft WHERE idusuario=:uid;";
         $val = array("uid" => $uid,
             "ft" => "1");
-        $actualizado = $con->execute($consulta, $val);
+        $actualizado = $this->consultas->execute($consulta, $val);
         return $actualizado;
     }
-
 }
