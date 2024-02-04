@@ -168,7 +168,7 @@ function setValoresEditarUsuario(datos) {
         $("#div-user").addClass('col-11');
         $("#span-user").addClass('col-1 ps-0 py-2');
         $("#span-user").append("<input class='input-check' type='checkbox' id='chuser' onclick='checkUser()' title='Cambiar nombre de usuario'/>");
-
+        
         $("#div-pass").addClass('col-11');
         $("#span-pass").addClass('col-1 ps-0 py-2');
         $("#span-pass").append("<input class='input-check' type='checkbox' id='chpass' onclick='checkContrasena()' title='Cambiar contraseña'/>");
