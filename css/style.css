@@ -241,6 +241,9 @@ header {
     transform: rotate(30deg);
 }
 
+.ex-profile img{
+    border-radius: 50%;
+}
 
 .dropdown .option-link {
     color: #4285F4;

@@ -8,7 +8,7 @@
             </div>
             <div class="modal-body">
                 <form action="com.sine.enlace/enlaceusuario.php" onsubmit="return false;" id="form-profile">
-                    <div class="ex-profile text-center" id="profimg">
+                    <div class="ex-profile text-center" width='200px' id="profimg">
                     </div>
                     <div class="col-12 mt-3">
                         <label class="button-file col-12" for="imgprof"><span class="fas fa-camera"></span> Seleccionar Imagen</label>
