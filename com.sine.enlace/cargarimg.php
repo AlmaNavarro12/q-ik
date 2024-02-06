@@ -6,39 +6,44 @@ require_once '../com.sine.controlador/ControladorImgs.php';
 Session::start();
 date_default_timezone_set("America/Mexico_City");
 
-$maxsz = isset($_POST['imgsz']) ? $_POST['imgsz'] : 200;
 $carpeta = "../temporal/tmp/";
 
+// Si se ha enviado un archivo de imagen
 if (isset($_FILES["imgprof"]) || isset($_FILES["imagen"])) {
     $imgtmp = isset($_FILES["imgprof"]) ? $_FILES["imgprof"] : $_FILES["imagen"];
     $file = $imgtmp;
     $tipo = $file["type"];
 
+    // Si el archivo es una imagen válida (jpg, jpeg, png, gif)
     if (!in_array($tipo, ['image/jpg', 'image/jpeg', 'image/png', 'image/gif'])) {
         echo "Error, el archivo no es una imagen<corte>";
     } else {
         $sessionid = session_id();
         $idusuario = $_SESSION[sha1("idusuario")];
 
+        // Generar nombre unico
         $fecha = date('YmdHis');
         $ranstr = substr(str_shuffle("0123456789011121314151617181920"), 0, 5);
-
         $prevfile = isset($_POST['fileuser']) ? $_POST['fileuser'] : (isset($_POST['filename']) ? $_POST['filename'] : '');
 
+        // Ruta provisional y nombre del archivo
         $ruta_provisional = $file["tmp_name"];
         $nombre = $file["name"];
         $size = $file["size"];
 
+        // Eliminar el archivo anterior si existe
         if ($prevfile && file_exists($carpeta . $prevfile)) {
             unlink($carpeta . $prevfile);
         }
 
+        // Obtener dimensiones y tipo de la imagen
         $dimensiones = getimagesize($ruta_provisional);
         $width = $dimensiones[0];
         $height = $dimensiones[1];
         $extension = pathinfo($nombre, PATHINFO_EXTENSION);
         $nombre = $fecha . $ranstr . '_' . $idusuario . $sessionid . '.' . $extension;
 
+        // Variables para redimensionar la imagen
         $max_width = 500;
         $max_height = 500;
         $mime = $dimensiones['mime'];
@@ -67,12 +72,15 @@ if (isset($_FILES["imgprof"]) || isset($_FILES["imagen"])) {
                 return;
         }
 
+        // Crear las img
         $dst_img = imagecreatetruecolor($max_width, $max_height);
         $src_img = $image_create($ruta_provisional);
 
+        // Nuevas dimensiones manteniendo la proporción
         $width_new = $height * $max_width / $max_height;
         $height_new = $width * $max_height / $max_width;
 
+        // Redimensiona la imagen y guardar en tmp
         if ($width_new > $width) {
             $h_point = (($height - $height_new) / 2);
             imagecopyresampled($dst_img, $src_img, 0, 0, 0, $h_point, $max_width, $max_height, $width, $height_new);
@@ -81,11 +89,13 @@ if (isset($_FILES["imgprof"]) || isset($_FILES["imagen"])) {
             imagecopyresampled($dst_img, $src_img, 0, 0, $w_point, 0, $max_width, $max_height, $width_new, $height);
         }
 
+        // Guardar la imagen redimensionada
         $image($dst_img, $carpeta . $nombre);
 
         if ($dst_img) imagedestroy($dst_img);
         if ($src_img) imagedestroy($src_img);
 
+        // Convierte la imagen a base64 para mostrarla
         $type = pathinfo($carpeta . $nombre, PATHINFO_EXTENSION);
         $data = file_get_contents($carpeta . $nombre);
         $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
