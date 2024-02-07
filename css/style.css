@@ -21,7 +21,7 @@ body {
 
 .click-row{
     color: #444444c3;
-    font-size: 10px;
+    font-size: 14px;
     text-transform: uppercase;
     font-family: sans-serif;
     font-weight: bolder;
@@ -30,7 +30,7 @@ body {
 
 .click-row:hover{
     color: #09096B;
-    font-size: 10px;
+    font-size: 14px;
     text-transform: uppercase;
     font-family: sans-serif;
     font-weight: bolder;
@@ -272,6 +272,7 @@ header {
     line-height: 14px;
     padding: 10px;
     text-decoration: none;
+
 }
 
 .dropdown .notification-link:hover {
@@ -649,8 +650,17 @@ article {
     text-align: center;
     color: #17177C;
     cursor: pointer;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
+.text-secondary-emphasis{
+    
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
 .button-file:disabled {
     color: #17177ca7;
     cursor: not-allowed;
@@ -923,6 +933,9 @@ table.table-row tr td {
     font-size: 17px;
     line-height: 250.7%;
     text-align: center;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 /*---------------------IMPORTAR TABlAS - CONFIGURACION PHP----------------------------*/

@@ -98,7 +98,7 @@ class ControladorUsuario
                 }
 
                 if ($permisos[1] == '1') {
-                    $datos .= "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' onclick='asignarPermisos($id_usuario)'>Asignar permisos <span class='text-muted fas fa-sign-in-alt small'></span></a></li>";
+                    $datos .= "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis text-nowrap' style='overflow: hidden; text-overflow: ellipsis;' onclick='asignarPermisos($id_usuario)'>Asignar permisos <span class='text-muted fas fa-sign-in-alt small'></span></a></li>";
                 }
                 $datos .= "</ul>
                     </div>

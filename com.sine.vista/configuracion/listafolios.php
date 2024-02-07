@@ -14,7 +14,8 @@
                 <option value="100">100</option>
             </select>
         </div>
-        <div class="col-sm-4 py-1 d-flex justify-content-end px-0" id="btn-crear-folio">
+        
+        <div class="col-sm-4 py-1 d-flex justify-content-end" id="btn-crear-folio">
         </div>
     </div>
 </form>

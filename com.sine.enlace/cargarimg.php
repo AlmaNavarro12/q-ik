@@ -71,11 +71,9 @@ if (isset($_FILES["imgprof"]) || isset($_FILES["imagen"]) || isset($_FILES["img-
         $dst_img = imagecreatetruecolor($max_width, $max_height);
         $src_img = $image_create($ruta_provisional);
 
-        // Nuevas dimensiones manteniendo la proporción
         $width_new = $height * $max_width / $max_height;
         $height_new = $width * $max_height / $max_width;
 
-        // Redimensiona la imagen y guardar en tmp
         if ($width_new > $width) {
             $h_point = (($height - $height_new) / 2);
             imagecopyresampled($dst_img, $src_img, 0, 0, 0, $h_point, $max_width, $max_height, $width, $height_new);
@@ -84,7 +82,6 @@ if (isset($_FILES["imgprof"]) || isset($_FILES["imagen"]) || isset($_FILES["img-
             imagecopyresampled($dst_img, $src_img, 0, 0, $w_point, 0, $max_width, $max_height, $width_new, $height);
         }
 
-        // Guardar la imagen redimensionada
         $image($dst_img, $carpeta . $nombre);
 
         if ($dst_img) imagedestroy($dst_img);
@@ -95,7 +92,7 @@ if (isset($_FILES["imgprof"]) || isset($_FILES["imagen"]) || isset($_FILES["img-
         $data = file_get_contents($carpeta . $nombre);
         $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
 
-        echo "<img src='$base64' width='200' id='img'><corte>$nombre";
+        echo "<img src='$base64' width='200'  id='img'><corte>$nombre";
     } 
     else if (in_array($tipo, ['application/pdf', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/msword'])) {
         $extension = pathinfo($nombre, PATHINFO_EXTENSION);

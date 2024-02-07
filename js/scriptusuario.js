@@ -131,7 +131,7 @@ function setValoresEditarUsuario(datos) {
     $("#usuario").attr('disabled', true);
     $("#contrasena").attr('disabled', true);
     changeText("#contenedor-titulo-form-usuario", "Editar usuario");
-    changeText("#btn-form-usuario", "Guardar cambios <span class='fas fa-save'></span></a>");
+    changeText("#btn-form-usuario", "Actualizar <span class='fas fa-save'></span></a>");
     var array = datos.split("</tr>");
     var idusuario = array[0];
     var nombre = array[1];

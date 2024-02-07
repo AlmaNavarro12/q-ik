@@ -71,10 +71,19 @@ class ControladorButton{
                 }
                 $btn = $configBotones;            
             } else {
-                foreach ($permisos as $usuarioactual) {
-                    if ($usuarioactual[$permiso] == '1') {
-                        $btn = "<button class='button-create' onclick=\"loadView('$accion');\">$texto <span class='lnr lnr-plus-circle icon-size'></span></button>";
-                        break;
+                if ($accion == 'folio') {
+                    foreach ($permisos as $usuarioactual) {
+                        if ($usuarioactual[$permiso] == '1') {
+                            $btn = "<button class='button-create' onclick=\"loadViewConfig('$accion');\">$texto <span class='lnr lnr-plus-circle icon-size'></span></button>";
+                            break;
+                        }
+                    }
+                } else {
+                    foreach ($permisos as $usuarioactual) {
+                        if ($usuarioactual[$permiso] == '1') {
+                            $btn = "<button class='button-create' onclick=\"loadView('$accion');\">$texto <span class='lnr lnr-plus-circle icon-size'></span></button>";
+                            break;
+                        }
                     }
                 }
             }

@@ -19,6 +19,10 @@ function validarLet(input) {
     input.value = input.value.replace(/[^A-Za-z. ]/g, '');
 }
 
+function validarFol(input) {
+    input.value = input.value.replace(/[^A-Za-z]/g, '');
+}
+
 //Validacion de campos vacios
 function isnEmpty(val, id) {
     if (val == "") {
