@@ -214,8 +214,12 @@ function checkContrasena() {
 
 function cargarImgUsuario() {
     var formData = new FormData(document.getElementById("form-usuario"));
-    var img = $("#imagen").val();
-    if (isnEmpty(img, 'imagen')) {
+    
+    alert(formData);
+    var img = $("#imagenperfil").val();
+    
+    alert(img);
+    if (isnEmpty(img, 'imagenperfil')) {
         $.ajax({
             url: 'com.sine.enlace/cargarimg.php',
             type: "POST",
@@ -228,7 +232,7 @@ function cargarImgUsuario() {
                 var fn = array[1];
                 $("#muestraimagen").html(view);
                 $("#filename").val(fn);
-                $("#imagen").val('');
+                $("#imagenperfil").val('');
             }
         });
     }

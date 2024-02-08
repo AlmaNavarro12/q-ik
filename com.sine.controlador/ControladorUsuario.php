@@ -245,7 +245,6 @@ class ControladorUsuario
 
                     if (file_exists($viejaRuta)) {
                         unlink($viejaRuta);
-                        echo 'imagen actualizada';
                     }
                 }
             }

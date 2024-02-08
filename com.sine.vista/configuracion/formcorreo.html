@@ -1,0 +1,303 @@
+<form action="#" onsubmit="return false;" id="form-correo">
+    <div class="row">
+        <div class="col-md-6 my-1">
+            <div class="label-sub" id="contenedor-titulo-form-correo">Configuración correo </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 d-flex justify-content-end mb-2">
+            <label class="fw-bold text-danger small">* Campo obligatorio</label>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 mt-2">
+            <label class="label-form text-right mb-2" for="id-correo">Editar Correo</label>
+            <div class="form-group">
+                <select class="input-form form-select w-100 p-2 text-center" id="id-correo" name="id-correo"
+                    onchange="loadMailConfig();">
+                    <option value="" id="option-default-usuario">- - - -</option>
+                    <optgroup id="correos" class="contenedor-correos text-left"> </optgroup>
+                </select>
+                <div id="id-correo-errors"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 my-1 mt-2">
+            <label class="label-sub">Nuevo Correo</label>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 my-1">
+            <label class="label-form text-right mb-2" for="correo-uso">Correo de envio</label>
+            <label class="mark-required text-danger fw-bold">*</label>
+            <div class="form-group">
+                <input class="form-control text-center input-form" id="correo-uso" name="correo-uso"
+                    placeholder="Correo para envios" type="text" onkeyup="actualizarRemitente()" />
+                <div id="correo-uso-errors">
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 my-1">
+            <label class="label-form text-right mb-2" for="pass">Contraseña</label>
+            <label class="mark-required text-danger fw-bold">*</label>
+            <div class="form-group">
+                <input class="form-control text-center input-form" id="pass" name="pass" placeholder="Contraseña correo"
+                    type="password" autocomplete="new-password" />
+                <div id="pass-errors">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 my-1">
+            <label class="label-form text-right mb-2" for="remitente">Remitente</label>
+            <label class="mark-required text-danger fw-bold">*</label>
+            <div class="form-group">
+                <input class="form-control text-center input-form" id="remitente" name="remitente"
+                    placeholder="Nombre remitente" type="text" />
+                <div id="remitente-errors">
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 my-1">
+            <label class="label-form text-right mb-2" for="correo-remitente">Correo remitente</label>
+            <div class="form-group">
+                <input class="form-control text-center input-form" id="correo-remitente" name="correo-remitente"
+                    placeholder="Correo del remitente" type="text" readonly />
+                <div id="correo-remitente-errors">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 my-1">
+            <label class="label-form text-right mb-2" for="host-correo">Host servidor</label>
+            <label class="mark-required text-danger fw-bold">*</label>
+            <div class="form-group">
+                <input title="Ejemplo: ssl://smtp.gmail.com dependiendo del servidor de correo"
+                    class="form-control text-center input-form" id="host-correo" name="host-correo"
+                    placeholder="Ej: ssl://smtp.gmail.com" type="text" />
+                <div id="host-correo-errors">
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 my-1">
+            <label class="label-form text-right mb-2" for="puerto-acceso">Puerto de acceso</label>
+            <label class="mark-required text-danger fw-bold">*</label>
+            <div class="form-group">
+                <input title="Ejemplo: 25, 465 o 587 dependiendo del servidor de correo y el tipo de seguridad"
+                    class="form-control text-center input-form" id="puerto-acceso" name="puerto-acceso"
+                    placeholder="Ej: 25, 465 o 587" type="text" />
+                <div id="puerto-acceso-errors">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 my-1">
+            <label class="label-form text-right mb-2" for="seguridad">Tipo seguridad</label>
+            <label class="mark-required text-danger fw-bold">*</label>
+            <div class="form-group">
+                <select class="form-select w-100 p-2 input-form text-center" id="seguridad" name="seguridad">
+                    <option value="" id="option-default-seguridad">- - - -</option>
+                    <optgroup id="opseg" class="contenedor-seguridad text-left">
+                        <option value="ssl">SSL</option>
+                        <option value="tls">TLS</option>
+                        <option value="STARTTLS">STARTTLS</option>
+                    </optgroup>
+                </select>
+                <div id="seguridad-errors">
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-2 my-1 ">
+            <label class="label-form text-right mb-2" for="btn-uso">Usar en:</label>
+            <div class="form-group">
+                <div class='input-group'>
+                    <div class='dropdown'>
+                        <button type="button" class="button-check dropdown-toggle" data-bs-toggle="dropdown"
+                            data-bs-auto-close="outside" id="btn-uso">
+                            Usar en: <span class='caret'></span>
+                        </button>
+                        <ul class='dropdown-menu'>
+                            <li class="px-2"><label class='dropdown-menu-item checkbox'><input type='checkbox' value='1'
+                                        name='chusocorreo' id='chuso1' style="display: none;" /><span id='chspan1'
+                                        class='far fa-square'></span> Facturas</label></li>
+                            <li class="px-2"><label class='dropdown-menu-item checkbox'><input type='checkbox' value='2'
+                                        name='chusocorreo' id='chuso2' style="display: none;" /><span id='chspan2'
+                                        class='far fa-square'></span> Pagos</label></li>
+                            <li class="px-2"><label class='dropdown-menu-item checkbox'><input type='checkbox' value='3'
+                                        name='chusocorreo' id='chuso3' style="display: none;" /><span id='chspan3'
+                                        class='far fa-square'></span> Cotizaciones</label></li>
+                            <li class="px-2"><label class='dropdown-menu-item checkbox'><input type='checkbox' value='4'
+                                        name='chusocorreo' id='chuso4' style="display: none;" /><span id='chspan4'
+                                        class='far fa-square'></span> Comunicados</label></li>
+                            <li class="px-2"><label class='dropdown-menu-item checkbox'><input type='checkbox' value='5'
+                                        name='chusocorreo' id='chuso5' style="display: none;" /><span id='chspan5'
+                                        class='far fa-square'></span> Contratos</label></li>
+
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <label class="label-form text-right mb-2" for="">&nbsp;</label>
+            <div class="form-group d-flex justify-content-end">
+                <button title="Enviar correo de prueba para verificar la configuracion" class="button-modal"
+                    onclick="testCorreo()" id="btn-pago">Probar conexion al correo <span
+                        class="fas fa-envelope"></span></button>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+
+    </div>
+    <div class="d-flex justify-content-end mt-3">
+        <button class="button-form col-auto btn btn-danger me-2" onclick="loadView('config');">Cancelar <span
+                class="fas fa-times"></span></button>
+        <button class="button-form col-auto btn btn-primary" onclick="insertarCorreo();" id="btn-form-correo">Guardar <span
+                class="fas fa-save"></span></button>
+    </div>
+
+    <div class="col-md-12 text-center mt-3">
+        <label class="label-sub-tit fs-2">Cuerpo Correo</label>
+        <label class="label-sub">Personaliza el asunto y el mensaje para los correos electrónicos de facturas, cotizaciones y pagos en esta
+        sección. </label>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 my-1">
+            <label class="label-form text-right mb-2" for="id-body">Editar</label>
+            <div class="form-group">
+                <select class="form-select w-100 p-2 text-center input-form" id="id-body" name="id-body" onchange="getMailBody();">
+                    <option value="" id="option-default-seguridad">- - - -</option>
+                    <optgroup id="opbody" class="contenedor-body text-left">
+                        <option value="1">Mensaje facturas</option>
+                        <option value="2">Mensaje pagos</option>
+                        <option value="3">Mensaje cotizaciones</option>
+                        <option value="4">Mensaje carta porte</option>
+                    </optgroup>
+                </select>
+                <div id="id-body-errors"></div>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <label class="label-form text-right mb-2" for="">&nbsp;</label>
+            <div class="form-group">
+                <label class="button-file text-center col-12" for="imagen"><span class="far fa-image"></span> Logotipo</label>
+                <input class="form-control text-center upload" hidden id="imagen" name="imagen" type="file"
+                    onchange="cargarLogoMail();" />
+                <input id="filename" name="filename" type="hidden" />
+                <input id="imgsz" name="imgsz" type="hidden" value="100" />
+                <input id="imgactualizar" name="imgactualizar" type="hidden" />
+                <div id="imagen-errors">
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-md-3 mt-3">
+            <label class="label-form text-left mb-2" for="chlogo">¿Usar logo en todos los correos?</label>
+            <div class="new-tooltip icon tip d-flex align-items-center">
+                <input class="input-check mr-2" id="chlogo" name="chlogo" type="checkbox" />
+                <label class="ms-2" for="chlogo">
+                    <i class="fas fa-question-circle"></i>
+                </label>
+                <span class="tiptext ml-2">Seleccionando esta opción se usará el logo actual en todos los mensajes.</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 my-1">
+            <label class="label-form text-right mb-2" for="asunto">Asunto</label>
+            <div class="form-group">
+                <input class="form-control text-center input-form" id="asunto" name="asunto" placeholder="Asunto correo"
+                    type="text" oninput="typeText()" />
+                <div id="asunto-errors">
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 my-1">
+            <label class="label-form text-right mb-2" for="saludo">Saludo</label>
+            <div class="form-group">
+                <input class="form-control text-center input-form" id="saludo" name="saludo" placeholder="Saludo correo"
+                    type="text" oninput="typeText()" />
+                <div id="saludo-errors">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 my-1">
+            <label class="label-form text-right mb-2" for="texto-correo">Texto</label>
+            <div class="form-group">
+                <textarea rows="8" cols="40" id="texto-correo" class="form-control input-form" style="height: 200px;"
+                    placeholder="Texto a implementar" oninput="typeText()"></textarea>
+                <div id="texto-correo-errors"></div>
+            </div>
+        </div>
+
+        <div class="col-md-6 my-1">
+            <label class="label-form text-right mb-2" for="exmensaje">Ejemplo Mensaje: </label>
+            <div class="form-group">
+                <table width='100%' bgcolor='#e0e0e0' cellpadding='0' cellspacing='0' border='0'
+                    style='border-radius: 25px;'>
+                    <tr>
+                        <td>
+                            <table align='center' width='100%' border='0' cellpadding='0' cellspacing='0'
+                                style='max-width:650px; border-radius: 20px; background-color:#fff; font-family:sans-serif;'>
+                                <thead>
+                                    <tr height='80'>
+                                        <th align='left' colspan='4'
+                                            style='padding: 6px; background-color:#f5f5f5; border-radius: 20px; border-bottom:solid 1px #bdbdbd;'
+                                            id="muestraimagen"><img src='https://q-ik.mx/Registro/img/LogoQik.png'
+                                                height='100px' /></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr align='center' height='10' style='font-family:sans-serif; '>
+                                        <td style='background-color:#09096B; text-align:center; border-radius: 5px;'>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan='4' style='padding:15px;'>
+                                            <h1 id="asunto-lab">Asunto</h1>
+                                            <p style='font-size:20px;' id="saludo-lab">Hola (Raz&oacute;n social del cliente)
+                                            </p>
+                                            <hr />
+                                            <p style='font-size:18px; text-align: justify;' id="txt-lab">Mensaje</p>
+                                        </td>
+                                    </tr>
+
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="d-flex justify-content-end mt-3">
+        <button class="button-form btn btn-danger me-2" onclick="loadView('config');">Cancelar <span
+                class="fas fa-times"></span></button>
+        <button class="button-form btn btn-primary" onclick="actualizarBody();" id="btn-form-body">Guardar <span
+                class="fas fa-save"></span></button>
+    </div>
+</form>
+<br /><br />
+<script src="js/scriptconfig.js"></script>

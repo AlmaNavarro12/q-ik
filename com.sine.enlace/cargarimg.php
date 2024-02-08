@@ -1,44 +1,46 @@
 <?php
+
 require_once '../com.sine.modelo/Session.php';
 require_once '../com.sine.controlador/ControladorImgs.php';
 
 Session::start();
 date_default_timezone_set("America/Mexico_City");
-$ci = new ControladorImgs();
+
+$maxsz = isset($_POST['imgsz']) ? $_POST['imgsz'] : 200;
 $carpeta = "../temporal/tmp/";
 
-// Si se ha enviado un archivo de imagen
-if (isset($_FILES["imgprof"]) || isset($_FILES["imagen"]) || isset($_FILES["img-evidencia"])) {
-    $imgtmp = isset($_FILES["imgprof"]) ? $_FILES["imgprof"] : (isset($_FILES["imagen"]) ? $_FILES["imagen"] : $_FILES["img-evidencia"]);
+$sessionid = session_id();
+$idusuario = $_SESSION[sha1("idusuario")];
+
+if (isset($_FILES["imagenusuario"]) || isset($_FILES["imagenperfil"])) {
+    if (isset($_FILES["imagenusuario"])) {
+        $imgtmp = $_FILES["imagenusuario"];
+    } else {
+        $imgtmp = $_FILES["imagenperfil"];
+    }
     $file = $imgtmp;
     $tipo = $file["type"];
 
-    $sessionid = session_id();
-    $idusuario = $_SESSION[sha1("idusuario")];
 
-    // Ruta provisional y nombre del archivo
-    $ruta_provisional = $file["tmp_name"];
-    $nombre = $file["name"];
-    $size = $file["size"];
-    $fecha = date('YmdHis');
-    $ranstr = substr(str_shuffle("0123456789011121314151617181920"), 0, 5);
-    $prevfile = isset($_POST['fileuser']) ? $_POST['fileuser'] : (isset($_POST['filename']) ? $_POST['filename'] : '');
+        $fecha = date('YmdHis');
+        $ranstr = substr(str_shuffle("0123456789011121314151617181920"), 0, 5);
 
-    // Obtener dimensiones y tipo de la imagen
-    $dimensiones = getimagesize($ruta_provisional);
-    $width = $dimensiones[0];
-    $height = $dimensiones[1];
-    $extension = pathinfo($nombre, PATHINFO_EXTENSION);
-    $nombre = $fecha . $ranstr . '_' . $idusuario . $sessionid . '.' . $extension;
+        $prevfile = isset($_POST['fileuser']) ? $_POST['fileuser'] : (isset($_POST['filename']) ? $_POST['filename'] : '');
 
-    // Si el archivo es una imagen válida (jpg, jpeg, png, gif)
-    if (in_array($tipo, ['image/jpg', 'image/jpeg', 'image/png', 'image/gif'])) {
-        // Eliminar el archivo anterior si existe
+        $ruta_provisional = $file["tmp_name"];
+        $nombre = $file["name"];
+        $size = $file["size"];
+
         if ($prevfile && file_exists($carpeta . $prevfile)) {
             unlink($carpeta . $prevfile);
         }
 
-        // Variables para redimensionar la imagen
+        $dimensiones = getimagesize($ruta_provisional);
+        $width = $dimensiones[0];
+        $height = $dimensiones[1];
+        $extension = pathinfo($nombre, PATHINFO_EXTENSION);
+        $nombre = $fecha . $ranstr . '_' . $idusuario . $sessionid . '.' . $extension;
+
         $max_width = 500;
         $max_height = 500;
         $mime = $dimensiones['mime'];
@@ -67,7 +69,6 @@ if (isset($_FILES["imgprof"]) || isset($_FILES["imagen"]) || isset($_FILES["img-
                 return;
         }
 
-        // Crear las img
         $dst_img = imagecreatetruecolor($max_width, $max_height);
         $src_img = $image_create($ruta_provisional);
 
@@ -87,49 +88,117 @@ if (isset($_FILES["imgprof"]) || isset($_FILES["imagen"]) || isset($_FILES["img-
         if ($dst_img) imagedestroy($dst_img);
         if ($src_img) imagedestroy($src_img);
 
-        // Convierte la imagen a base64 para mostrarla
         $type = pathinfo($carpeta . $nombre, PATHINFO_EXTENSION);
         $data = file_get_contents($carpeta . $nombre);
         $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
 
-        echo "<img src='$base64' width='200'  id='img'><corte>$nombre";
-    } 
-    else if (in_array($tipo, ['application/pdf', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/msword'])) {
-        $extension = pathinfo($nombre, PATHINFO_EXTENSION);
-        $nombre = $fecha . $ranstr . '_' . $idusuario . $sessionid . '.' . $extension;
-        $src = $carpeta . $nombre;
+        echo "<img src='$base64' width='200' class='rounded-circle border border-secondary shadow-sm' id='img'><corte>$nombre";
+} else if (isset($_FILES["imagen"])) {
+    $file = $_FILES["imagen"];
+    $nombre = $file["name"];
+    $tipo = $file["type"];
+    $ruta_provisional = $file["tmp_name"];
+    $size = $file["size"];
 
-        move_uploaded_file($ruta_provisional, $src);
-        $insertar = $ci->insertarImg($nombre, $nombre, $extension, $sessionid);
-        //echo "<a href='#' onclick='displayDocAnticipo();' class='btn btn-sm button-modal' title='Ver archivo' ><span class='glyphicon glyphicon-file'></span></a><corte>$nombre";
-    } 
-    else if (in_array($tipo, ['application/x-zip-compressed', 'application/octet-stream', 'application/zip', 'application/x-rar-compressed', 'multipart/x-zip'])) {
-        // Obtiener los primeros bytes del archivo
-        $bytes = file_get_contents($ruta_provisional, FALSE, NULL, 0, 7);
-        // Verificar la extensión del archivo
-        $sub = substr($nombre, -4);
-        if ($sub == '.zip') {
-            $sign = substr($bytes, 0, 2);
-            if ($sign == 'PK') {
-                $insertar = $ci->insertarImg($nombre, $tmpnombre, $extension, $sessionid);
-                move_uploaded_file($ruta_provisional, $src);
-                echo "$nombre";
-            } else {
-                echo 'Archivo no permitido<corte>';
+        $dimensiones = getimagesize($ruta_provisional);
+        $width = $dimensiones[0];
+        $height = $dimensiones[1];
+
+        $carpeta = "../temporal/tmp/";
+
+        if ($size > 900 * 900) {
+            // Redimensionar la imagen si el tamaño es mayor que 900x900
+            $newwidth = $width * 0.5;
+            $newheight = $height * 0.5;
+            switch ($tipo) {
+                case 'image/jpeg':
+                    $image_create_func = 'imagecreatefromjpeg';
+                    $image_save_func = 'imagejpeg';
+                    break;
+                case 'image/png':
+                    $image_create_func = 'imagecreatefrompng';
+                    $image_save_func = 'imagepng';
+                    break;
+                case 'image/gif':
+                    $image_create_func = 'imagecreatefromgif';
+                    $image_save_func = 'imagegif';
+                    break;
+                default:
+                    throw new Exception('Unknown image type.');
             }
-        } else if ($sub == '.rar') {
-            $sign = bin2hex($bytes);
-            if ($sign == '526172211a0701' || $sign == '526172211a0700') {
-                $insertar = $ci->insertarImg($nombre, $tmpnombre, $extension, $sessionid);
-                move_uploaded_file($ruta_provisional, $src);
-                echo "$nombre";
+            $imagen = $image_create_func($ruta_provisional);
+            $imagen_p = imagecreatetruecolor($newwidth, $newheight);
+            $white = imagecolorallocate($imagen_p, 255, 255, 255);
+            imagefilledrectangle($imagen_p, 0, 0, $width, $height, $white);
+            imagecopyresampled($imagen_p, $imagen, 0, 0, 0, 0, $newwidth, $newheight, $width, $height);
+            $img = $image_save_func($imagen_p, $carpeta . $nombre);
+            imageDestroy($imagen_p);
+        } else if ($width > 2000 || $height > 2000) {
+            // Redimensionar la imagen si el ancho o la altura son mayores que 2000
+            $newwidth = $width * 0.5;
+            $newheight = $height * 0.5;
+            switch ($tipo) {
+                case 'image/jpeg':
+                    $image_create_func = 'imagecreatefromjpeg';
+                    $image_save_func = 'imagejpeg';
+                    break;
+                case 'image/png':
+                    $image_create_func = 'imagecreatefrompng';
+                    $image_save_func = 'imagepng';
+                    break;
+                case 'image/gif':
+                    $image_create_func = 'imagecreatefromgif';
+                    $image_save_func = 'imagegif';
+                    break;
+                default:
+                    throw new Exception('Unknown image type.');
+            }
+            $imagen = $image_create_func($ruta_provisional);
+            $imagen_p = imagecreatetruecolor($newwidth, $newheight);
+            $white = imagecolorallocate($imagen_p, 255, 255, 255);
+            imagefilledrectangle($imagen_p, 0, 0, $width, $height, $white);
+            imagecopyresampled($imagen_p, $imagen, 0, 0, 0, 0, $newwidth, $newheight, $width, $height);
+            $img = $image_save_func($imagen_p, $carpeta . $nombre);
+            imageDestroy($imagen_p);
+        } else if ($width < 60 || $height < 60) {
+            // Mostrar error si el ancho o la altura son menores que 60px
+            echo "Error: La anchura y la altura mínima permitida es 60px<corte>";
+        } else if ($tipo == 'image/png') {
+            // Procesar la imagen PNG
+            $newwidth = $width * 1;
+            $newheight = $height * 1;
+            $imagen = imagecreatefrompng($ruta_provisional);
+            $imagen_p = imagecreatetruecolor($newwidth, $newheight);
+            $white = imagecolorallocate($imagen_p, 255, 255, 255);
+            imagefilledrectangle($imagen_p, 0, 0, $width, $height, $white);
+            imagecopyresampled($imagen_p, $imagen, 0, 0, 0, 0, $newwidth, $newheight, $width, $height);
+            $img = imagepng($imagen_p, $carpeta . $nombre);
+            imageDestroy($imagen_p);
+        } else {
+            // Mover el archivo a la carpeta temporal si no cumple con ninguna condición anterior
+            $rawBaseName = pathinfo($nombre, PATHINFO_FILENAME);
+            $extension = pathinfo($nombre, PATHINFO_EXTENSION);
+
+            $src = $carpeta . $nombre;
+            move_uploaded_file($ruta_provisional, $src);
+        }
+
+        // Mostrar la imagen con altura responsiva
+        $vista = "temporal/tmp/" . $nombre;
+        $type = pathinfo("../" . $vista, PATHINFO_EXTENSION);
+        $data = file_get_contents("../" . $vista);
+        $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+        if ($tipo != 'application/pdf') {
+            if ($width >= $height) {
+                $height = ($height * $maxsz) / $width;
+                $padding = $maxsz - $height;
+                echo "<img style='margin-top:$padding.;' src='$base64' width='" . $maxsz . "px' height='$height" . "px' id='img'><corte>$nombre";
             } else {
-                echo 'Archivo no permitido<corte>';
+                $width = ($width * $maxsz) / $height;
+                echo "<img src='$base64' width='$width.px' height='" . $maxsz . "px' id='img'><corte>$nombre";
             }
         } else {
-            echo 'Archivo no permitido<corte>';
+            echo "Vista previa no disponible";
         }
-    }
-} else {
-    echo "Error, no se recibió ningún archivo<corte>";
 }
+

@@ -841,6 +841,29 @@ article {
     padding-bottom: 10px;
 }
 
+.label-sub-tit{
+    height: 60px;
+    font-family: sans-serif;
+    font-style: normal;
+    font-weight: 300;
+    font-size: 45px;
+    color: #17177C;
+}
+
+
+.label-radio{
+    font-family: sans-serif;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 15px;
+    line-height: 14px;
+    color: #444444;
+    padding-top: 8px;
+    padding: 6px;
+    height: 30px;
+    vertical-align: middle;
+}
+
 /*----------------------------------TABLAS GENERALES----------------------------------*/
 table.thead-mod thead tr th {
     height: 50px;
@@ -921,6 +944,7 @@ table.table-row tr td {
     border-bottom: 1px solid #FFFFFF;
 }
 
+
 .button-form {
     outline: none !important;
     border: 2px solid #CECEE2;
@@ -936,6 +960,30 @@ table.table-row tr td {
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+}
+
+
+.button-modal{
+    outline:none !important;
+    background: none;
+    padding: 10px;
+    border: 2px solid #CECEE2;
+    box-sizing: border-box;
+    border-radius: 5px;
+    font-family: sans-serif;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 17px;
+    text-align: center;
+    color: #17177C;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.button-modal:hover{
+    background: #EDEDF4;
+    color: #17177C;
 }
 
 /*---------------------IMPORTAR TABlAS - CONFIGURACION PHP----------------------------*/

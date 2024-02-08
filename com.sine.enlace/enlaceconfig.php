@@ -6,11 +6,10 @@ require_once '../com.sine.controlador/ControladorConfiguracion.php';
 
 if (isset($_POST['transaccion'])) {
     $transaccion = $_POST['transaccion'];
-    $c = new Configuracion();
     $cc = new ControladorConfiguracion();
-    
+
     switch ($transaccion) {
-        //------------------------------------ FOLIO
+            //------------------------------------ FOLIO
         case 'insertarfolio':
             $insertado = $cc->valFolio(obtenerDatosFolio());
             break;
@@ -29,7 +28,43 @@ if (isset($_POST['transaccion'])) {
         case 'eliminarfolio':
             $insertado = $cc->eliminarFolio($_POST['idfolio']);
             break;
-            //--------------------------------TABLAS
+            //------------------------------------COMISION
+        case 'datosusuario':
+            $datos = $cc->datosUsuario($_POST['idusuario']);
+            echo $datos != "" ? $datos : "0No hay clientes registrados.";
+            break;
+        case 'insertarcomision':
+            $insertado = $cc->insertarComision(obtenerDatosComision());
+            break;
+        case 'actualizarcomision':
+            $c = obtenerDatosComision();
+            $c->setIdcomision($_POST['idcomision']);
+            $insertado = $cc->actualizarComision($c);
+            break;
+        case 'quitarcomision':
+            $insertado = $cc->quitarComision($_POST['idcomision']);
+            break;
+            //------------------------------------CORREO
+        case 'loadmail':
+            $datos = $cc->getMail($_POST['idcorreo']);
+            echo $datos != "" ? $datos : "0No se han encontrado datos.";
+            break;
+        case 'insertarcorreo':
+            $insertado = $cc->nuevoCorreo(obtenerDatosCorreo());
+            break;
+        case 'actualizarcorreo':
+            $c = obtenerDatosCorreo();
+            $c->setIdCorreo($_POST['idcorreo']);
+            $insertado = $cc->modificarCorreo($c);
+            break;
+        case 'editarbody':
+            $datos = $cf->getMailBody($_POST['idbody']);
+            echo $datos != "" ? $datos : "0Botón activo.";
+            break;
+        case 'actualizarbody':
+            $insertado = $cc->actualizarBodyMail(obtenerDatosBodyCorreo());
+            break;
+            //------------------------------------TABLAS
         case 'loadexcel':
             $fnm = $_POST['fnm'];
             $tabla = $_POST['tabla'];
@@ -38,15 +73,57 @@ if (isset($_POST['transaccion'])) {
     }
 
     if (isset($insertado)) {
-        echo $insertado ? $insertado : "0Error: No se pudo realizar la operación";
+        echo $insertado ? $insertado : "0Error: No se pudo realizar la operación.";
     }
 }
 
-function obtenerDatosFolio(){
+function obtenerDatosFolio()
+{
     $f = new Folio();
     $f->setSerie($_POST['serie']);
     $f->setLetra($_POST['letra']);
     $f->setNuminicio($_POST['folio']);
     $f->setUsofolio($_POST['usofolio']);
     return $f;
+}
+
+function obtenerDatosComision()
+{
+    $c = new Configuracion();
+    $c->setIdUsuario($_POST['idusuario']);
+    $c->setPorcentaje($_POST['porcentaje']);
+    $c->setChCalculo($_POST['chcalculo']);
+    $c->setChCom($_POST['chcom']);
+    return $c;
+}
+
+function obtenerDatosCorreo()
+{
+    $c = new Configuracion();
+    $c->setCorreoEnvio($_POST['correo']);
+    $c->setPassCorreo($_POST['pass']);
+    $c->setRemitente($_POST['remitente']);
+    $c->setMailRemitente($_POST['mailremitente']);
+    $c->setHostCorreo($_POST['host']);
+    $c->setPuertoCorreo($_POST['puerto']);
+    $c->setSeguridadCorreo($_POST['seguridad']);
+    $c->setChUsoCorreo1($_POST['chuso1']);
+    $c->setChUsoCorreo2($_POST['chuso2']);
+    $c->setChUsoCorreo3($_POST['chuso3']);
+    $c->setChUsoCorreo4($_POST['chuso4']);
+    $c->setChUsoCorreo5($_POST['chuso5']);
+    return $c;
+}
+
+function obtenerDatosBodyCorreo()
+{
+    $c = new Configuracion();
+    $c->setIdBodyMail($_POST['idbody']);
+    $c->setAsuntoBody($_POST['asunto']);
+    $c->setSaludoBody($_POST['saludo']);
+    $c->setTxtBody($_POST['txtbd']);
+    $c->setImgLogo($_POST['filenm']);
+    $c->setImgActualizar($_POST['imgactualizar']);
+    $c->setChLogo($_POST['chlogo']);
+    return $c;
 }

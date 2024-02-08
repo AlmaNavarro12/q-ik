@@ -52,7 +52,7 @@ function loadViewConfig(vista) {
         'folio': 300,
         'listafolio': 400,
         'comision': 400,
-        'tablas': 0  
+        'tablas': 0
     };
 
     const funciones = {
@@ -60,7 +60,7 @@ function loadViewConfig(vista) {
         'folio': 'loadopcionesFolioDatos()',
         'listafolio': 'loadListaFolio(); loadBtnCrearConfig("folio")',
         'comision': 'loadOpcionesUsuario()',
-        'tablas': ''  
+        'tablas': ''
     };
 
     const configuracion = config[vista] || 0;
@@ -75,7 +75,7 @@ function getViewConfig(view) {
     $.ajax({
         url: 'com.sine.enlace/enlaceenrutador.php',
         type: 'POST',
-        data: {transaccion: "hola", view: view},
+        data: { transaccion: "hola", view: view },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -95,7 +95,7 @@ function loadListaFolio(pag = "") {
     $.ajax({
         url: "com.sine.enlace/enlaceconfig.php",
         type: "POST",
-        data: {transaccion: "listafolios", pag: pag, REF: $("#buscar-folio").val(), numreg: $("#num-reg").val()},
+        data: { transaccion: "listafolios", pag: pag, REF: $("#buscar-folio").val(), numreg: $("#num-reg").val() },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -114,7 +114,7 @@ function loadBtnCrearConfig(view) {
     $.ajax({
         url: "com.sine.enlace/enlacepermiso.php",
         type: "POST",
-        data: {transaccion: "loadbtn", view: view},
+        data: { transaccion: "loadbtn", view: view },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -132,13 +132,13 @@ function obtenerDatosFolio() {
     var usofolio = $("input[name='chusofolio']:checked").map(function () { //obtener un array de valores
         return $(this).val();
     }).get().join("-"); // unir valores con un guion ("-").
-    return {serie, letra, folio, usofolio};
+    return { serie, letra, folio, usofolio };
 }
 
 function insertarFolio(idfolio = null) {
     var datosFolio = obtenerDatosFolio();
     if (isnEmpty(datosFolio.serie, "serie") && isNumber(datosFolio.folio, "folio-inicio") && isnEmpty(datosFolio.usofolio, "btn-uso")) {
-    cargandoHide();
+        cargandoHide();
         cargandoShow();
         var transaccion = (idfolio == null) ? "insertarfolio" : "actualizarfolio";
         $.ajax({
@@ -180,7 +180,7 @@ function editarFolio(idfolio) {
     $.ajax({
         url: "com.sine.enlace/enlaceconfig.php",
         type: "POST",
-        data: {transaccion: "editarfolio", idfolio: idfolio},
+        data: { transaccion: "editarfolio", idfolio: idfolio },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -230,7 +230,7 @@ function eliminarFolio(idfolio) {
         $.ajax({
             url: "com.sine.enlace/enlaceconfig.php",
             type: "POST",
-            data: {transaccion: "eliminarfolio", idfolio: idfolio},
+            data: { transaccion: "eliminarfolio", idfolio: idfolio },
             success: function (datos) {
                 var texto = datos.toString();
                 var bandera = texto.substring(0, 1);
@@ -244,9 +244,392 @@ function eliminarFolio(idfolio) {
                 cargandoHide();
             }
         });
+    }).set({ title: "Q-ik" });
+}
+
+//--------------------------------COMISION
+function loaddatosUsuario() {
+    var idusuario = $("#id-usuario").val();
+    $.ajax({
+        url: 'com.sine.enlace/enlaceconfig.php',
+        type: 'POST',
+        data: { transaccion: 'datosusuario', idusuario: idusuario },
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 5000);
+            if (bandera == 0) {
+                alertify.error(res);
+            } else {
+                setValoresUsuarioComision(datos);
+            }
+        }
+    });
+}
+function setValoresUsuarioComision(datos) {
+    var array = datos.split("</tr>");
+    var tipo = array[0];
+    var t = (tipo == '1') ? "Administrador" : "Vendedor";
+    $("#tipo-usuario").val(t);
+
+    var check = array[1];
+    if (check != '0') {
+        var [idcomision, idusu, porcentaje, calculo] = array.slice(2);
+        $("#btn-form-quicom").html("Eliminar comisión <span class='fas fa-times'></span>").attr('onclick', `quitarComision(${idcomision})`).removeClass('visually-hidden');
+        $("#porcentaje-comision").val(porcentaje);
+        $(`#calculo${calculo}`).prop('checked', true);
+        $("#btn-form-comision").html("Actualizar comisión <span class='fas fa-save'></span>").attr('onclick', `insertarComision(${idcomision})`);
+    } else {
+        $("#btn-form-quicom").addClass('visually-hidden'); // Oculta el botón de eliminar comisión
+        $("#porcentaje-comision").val('');
+        $("#calculo1").prop('checked', true);
+        $("#btn-form-comision").html("Guardar <span class='fas fa-save'></span>").attr('onclick', 'insertarComision()');
+    }
+}
+
+function insertarComision(idcomision = null) {
+    var idusuario = $("#id-usuario").val();
+    var porcentaje = $("#porcentaje-comision").val();
+    var chcalculo = $("input[name=calculo]:checked").val();
+    var chcom = ($("#chcom").prop('checked')) ? 1 : 0;
+
+    if (isnEmpty(idusuario, "id-usuario") && isPorcentaje(porcentaje, "porcentaje-comision")) {
+        cargandoHide();
+        cargandoShow();
+        var transaccion = (idcomision == null) ? "insertarcomision" : "actualizarcomision";
+        $.ajax({
+            url: "com.sine.enlace/enlaceconfig.php",
+            type: "POST",
+            data: {
+                transaccion: transaccion,
+                idcomision: idcomision,
+                idusuario: idusuario,
+                porcentaje: porcentaje,
+                chcalculo: chcalculo,
+                chcom: chcom
+            },
+            success: function(datos) {
+                var texto = datos.toString();
+                var bandera = texto.substring(0, 1);
+                var res = texto.substring(1, 1000);
+                if (bandera == '0') {
+                    cargandoHide();
+                    alertify.error(res);
+                } else {
+                    cargandoHide();
+                    var mensaje = (transaccion == "insertarcomision") ? 'registrada.' : 'actualizada.';
+                    alertify.success('Comisión ' + mensaje);
+                    loadViewConfig('comision');
+                }
+            }
+        });
+    }
+}
+
+function quitarComision(idcomision){
+    alertify.confirm("¿Estás seguro que quieres eliminar la comisión de este usuario?", function () {
+        cargandoHide();
+        cargandoShow();
+        $.ajax({
+            url: "com.sine.enlace/enlaceconfig.php",
+            type: "POST",
+            data: {transaccion: "quitarcomision", idcomision: idcomision},
+            success: function (datos) {
+                var texto = datos.toString();
+                var bandera = texto.substring(0, 1);
+                var res = texto.substring(1, 1000);
+                if (bandera == '0') {
+                    alertify.error(res);
+                }
+                else {
+                    cargandoHide();
+                    alertify.success("Comisión eliminada.");
+                    loadViewConfig('comision');
+                }
+            }
+        });
     }).set({title: "Q-ik"});
 }
 
+//--------------------------------CORREO
+function loadMailConfig() {
+    cargandoHide();
+    cargandoShow();
+    $.ajax({
+        url: "com.sine.enlace/enlaceconfig.php",
+        type: "POST",
+        data: {transaccion: "loadmail", idcorreo: $("#id-correo").val()},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 1000);
+            if (bandera == '0') {
+                alertify.error(res);
+                changeText("#btn-form-correo", "Guardar <span class='fas fa-save'></span>");
+                $("#btn-form-correo").attr('onclick', 'insertarCorreo()');
+                cargandoHide();
+            } else {
+                setValoresCorreo(datos);
+                cargandoHide();
+            }
+        }
+    });
+}
+
+function setValoresCorreo(datos) {
+    changeText("#btn-form-correo", "Guardar cambios <span class='fas fa-save'></span>");
+    var array = datos.split("</tr>");
+
+    $("#correo-uso").val(array[0]);
+    $("#pass").val(array[1]);
+    $("#remitente").val(array[2]);
+    $("#correo-remitente").val(array[0]);
+    $("#host-correo").val(array[4]);
+    $("#puerto-acceso").val(array[5]);
+    $("#seguridad").val(array[6]);
+
+    for (var i = 7; i <= 12; i++) {
+        var checkboxId = "#chuso" + (i - 6);
+        $(checkboxId).prop('checked', array[i] == 1);
+    }
+
+    $("#btn-form-correo").attr('onclick', 'actualizarCorreo()');
+}
+
+function insertarCorreo() {
+    var correo = $("#correo-uso").val();
+    var pass = $("#pass").val();
+    var remitente = $("#remitente").val();
+    var mailremitente = $("#correo-remitente").val();
+    var host = $("#host-correo").val();
+    var puerto = $("#puerto-acceso").val();
+    var seguridad = $("#seguridad").val();
+
+    var chusos = [1, 2, 3, 4, 5].map(function(index) {
+        return $("#chuso" + index).prop('checked') ? 1 : 0;
+    });
+
+    if (isEmail(correo, "correo-uso") && isnEmpty(pass, "pass") && isnEmpty(remitente, "remitente") && isnEmpty(host, "host-correo") && isnEmpty(puerto, "puerto-acceso") && isnEmpty(seguridad, "seguridad")) {
+        cargandoHide();
+        cargandoShow();
+        $.ajax({
+            url: "com.sine.enlace/enlaceconfig.php",
+            type: "POST",
+            data: {
+                transaccion: "insertarcorreo",
+                correo: correo,
+                pass: pass,
+                remitente: remitente,
+                mailremitente: mailremitente,
+                host: host,
+                puerto: puerto,
+                seguridad: seguridad,
+                chusos: chusos
+            },
+            success: function(datos) {
+                var texto = datos.toString();
+                var bandera = texto.substring(0, 1);
+                var res = texto.substring(1, 1000);
+                if (bandera == '0') {
+                    alertify.error(res);
+                } else {
+                    alertify.success('Correo registrado');
+                    loadViewConfig('correo');
+                }
+                cargandoHide();
+            }
+        });
+    }
+}
+
+function actualizarCorreo() {
+    var idcorreo = $("#id-correo").val();
+    var correo = $("#correo-uso").val();
+    var pass = $("#pass").val();
+    var remitente = $("#remitente").val();
+    var mailremitente = $("#correo-remitente").val();
+    var host = $("#host-correo").val();
+    var puerto = $("#puerto-acceso").val();
+    var seguridad = $("#seguridad").val();
+    
+    var checkboxes = ['#chuso1', '#chuso2', '#chuso3', '#chuso4', '#chuso5'];
+    var chusos = checkboxes.map(function(checkbox) {
+        return $(checkbox).prop('checked') ? 1 : 0;
+    });
+
+    if (isnEmpty(idcorreo, "id-correo") && isEmail(correo, "correo-uso") && isnEmpty(pass, "pass") && isnEmpty(remitente, "remitente") && isnEmpty(host, "host-correo") && isnEmpty(puerto, "puerto-acceso") && isnEmpty(seguridad, "seguridad")) {
+        cargandoHide();
+        cargandoShow();
+        $.ajax({
+            url: "com.sine.enlace/enlaceconfig.php",
+            type: "POST",
+            data: {
+                transaccion: "actualizarcorreo",
+                idcorreo: idcorreo,
+                correo: correo,
+                pass: pass,
+                remitente: remitente,
+                mailremitente: mailremitente,
+                host: host,
+                puerto: puerto,
+                seguridad: seguridad,
+                chuso1: chusos[0],
+                chuso2: chusos[1],
+                chuso3: chusos[2],
+                chuso4: chusos[3],
+                chuso5: chusos[4]
+            },
+            success: function(datos) {
+                var texto = datos.toString();
+                var bandera = texto.substring(0, 1);
+                var res = texto.substring(1, 1000);
+                if (bandera == '0') {
+                    alertify.error(res);
+                } else {
+                    alertify.success('Datos Guardados');
+                    loadViewConfig('correo');
+                }
+                cargandoHide();
+            }
+        });
+    }
+}
+
+function actualizarRemitente() {
+    var correoUso = $("#correo-uso").val();
+    $("#correo-remitente").val(correoUso);
+}
+
+$("#correo-uso").on("keyup", function () {
+    actualizarRemitente();
+});
+
+function cargarLogoMail() {
+    var formData = new FormData(document.getElementById("form-correo"));
+    var idbody = $("#id-body").val();
+    var img = $("#imagen").val();
+    if (isnEmpty(idbody, "id-body") && isnEmpty(img, "imagen")) {
+        cargandoHide();
+        cargandoShow();
+        $.ajax({
+            url: 'com.sine.enlace/cargarimg.php',
+            type: "POST",
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function (datos) {
+                var array = datos.split("<corte>");
+                $("#muestraimagen").html(array[0]);
+                $("#filename").val(array[1]);
+                $("#imagen").val('');
+                cargandoHide();
+            }
+        });
+    }
+}
+
+function getMailBody() {
+    var body = $("#id-body").val();
+    if (isnEmpty(body, "id-body")) {
+        cargandoHide();
+        cargandoShow();
+        $.ajax({
+            url: "com.sine.enlace/enlaceconfig.php",
+            type: "POST",
+            data: {transaccion: "editarbody", idbody:  $("#id-body").val()},
+            success: function (datos) {
+                var texto = datos.toString();
+                var bandera = texto.substring(0, 1);
+                var res = texto.substring(1, 1000);
+                if (bandera == '0') {
+                    alertify.error(res);
+                    cargandoHide();
+                } else {
+                    setValoresEditarBody(datos);
+                    cargandoHide();
+
+                }
+            }
+        });
+    }
+}
+
+function setValoresEditarBody(datos) {
+    var array = datos.split("</tr>");
+    var mensaje = array[3];
+    var filenm = array[4];
+    var txt = mensaje.replace(new RegExp("<corte>", 'g'), '\n');
+
+    $("#asunto").val(array[1]);
+    $("#saludo").val(array[2]);
+    $("#texto-correo").val(txt);
+    $("#muestraimagen").html(array[5]);
+    $("#filename").val(filenm);
+    $("#imgactualizar").val(filenm);
+
+    typeText();
+}
+
+function actualizarBody() {
+    var idbody = $("#id-body").val();
+    var asunto = $("#asunto").val();
+    var saludo = $("#saludo").val();
+    var mensaje = $("#texto-correo").val();
+    var filenm = $("#filename").val();
+    var imgactualizar = $("#imgactualizar").val();
+    var chlogo = $("#chlogo").prop('checked') ? 1 : 0;
+    var txtbd = mensaje.replace(/\n/g, '<corte>');
+
+    if (isnEmpty(idbody, "id-body") && isnEmpty(asunto, "asunto") && isnEmpty(mensaje, "mensaje")) {
+        cargandoHide();
+        cargandoShow();
+        $.ajax({
+            url: "com.sine.enlace/enlaceconfig.php",
+            type: "POST",
+            data: {
+                transaccion: "actualizarbody",
+                idbody: idbody,
+                asunto: asunto,
+                saludo: saludo,
+                txtbd: txtbd,
+                filenm: filenm,
+                imgactualizar: imgactualizar,
+                chlogo: chlogo
+            },
+            success: function(datos) {
+                var texto = datos.toString();
+                var bandera = texto.substring(0, 1);
+                var res = texto.substring(1, 1000);
+                cargandoHide();
+                if (bandera == '0') {
+                    alertify.error(res);
+                } else {
+                    alertify.success("Datos actualizados");
+                    loadViewConfig('correo');
+                }
+            }
+        });
+    }
+}
+
+function opcionesCorreo() {
+    $.ajax({
+        url: 'com.sine.enlace/enlaceconfig.php',
+        type: 'POST',
+        data: {transaccion: 'opcionescorreo'},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 5000);
+            if (bandera == 0) {
+                alertify.error(res);
+            } else {
+                $(".contenedor-correos").html(datos);
+            }
+            //cargandoHide();
+        }
+    });
+}
 //--------------------------------TABLAS
 function loadFormato() {
     var tabla = $("#datos").val();
@@ -341,15 +724,14 @@ function cargarArchivoTabla() {
     cargandoHide();
     cargandoShow();
     $.ajax({
-        url: 'com.sine.enlace/cargarimg.php',
+        url: 'com.sine.enlace/cargaroffice.php',
         type: "POST",
         data: formData,
         contentType: false,
         processData: false,
         success: function (datos) {
             var array = datos.split("<corte>");
-            $("#muestraimagen").html(array[0]);
-            $("#filename").val(array[1]);
+            $("#filename").val(array[0]);
             $("#imagen").val('');
             cargandoHide();
         }
@@ -360,13 +742,13 @@ function loadArchivo() {
     var fnm = $("#filename").val();
     var tabla = $("#datos").val();
 
-    if (isnEmpty(tabla,"datos") && isnEmpty(fnm, "imagen")) {
+    if (isnEmpty(tabla, "datos") && isnEmpty(fnm, "imagen")) {
         cargandoHide();
         cargandoShow();
         $.ajax({
             url: "com.sine.enlace/enlaceconfig.php",
             type: "POST",
-            data: {transaccion: "loadexcel", fnm: fnm, tabla: tabla},
+            data: { transaccion: "loadexcel", fnm: fnm, tabla: tabla },
             success: function (datos) {
                 var texto = datos.toString();
                 var bandera = texto.substring(0, 1);

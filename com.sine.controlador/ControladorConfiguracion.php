@@ -63,8 +63,7 @@ class ControladorConfiguracion
     {
         $consultado = false;
         $consulta = "SELECT * FROM folio $con;";
-        $consultas = new Consultas();
-        $consultado = $consultas->getResults($consulta, NULL);
+        $consultado = $this->consultas->getResults($consulta, NULL);
         return $consultado;
     }
 
@@ -94,9 +93,8 @@ class ControladorConfiguracion
     {
         $consultado = false;
         $consulta = "SELECT * FROM folio WHERE idfolio=:id;";
-        $consultas = new Consultas();
         $valores = array("id" => $id);
-        $consultado = $consultas->getResults($consulta, $valores);
+        $consultado = $this->consultas->getResults($consulta, $valores);
         return $consultado;
     }
 
@@ -233,7 +231,7 @@ class ControladorConfiguracion
     public function importTable($fn, $tabla)
     {
         $targetPath = '../temporal/tmp/' . $fn;
-        $ext = pathinfo($targetPath, PATHINFO_EXTENSION); //obtener la extensión del archivo
+        $ext = pathinfo($targetPath, PATHINFO_EXTENSION);
         if (!in_array($ext, ['xls', 'xlsx'])) {
             return "0Error: Tipo de archivo no válido, solo archivos excel (.xls, .xlsx).";
         }
@@ -364,5 +362,125 @@ class ControladorConfiguracion
     {
         $datos = $this->getMunicipioAux($municipio, $idestado);
         return $datos ? $datos[0]['id_municipio'] : "0";
+    }
+
+    private function getUsuariosAux($con = "") {
+        $consultado = false;
+        $consulta = "select * from usuario $con order by nombre;";
+        $consultado = $this->consultas->getResults($consulta, null);
+        return $consultado;
+    }
+
+    private function checkComisionUsuarioAux($idusuario) {
+        $consultado = false;
+        $consulta = "select * from comisionusuario where comision_idusuario=:id;";
+        $val = array("id" => $idusuario);
+        $consultado = $this->consultas->getResults($consulta, $val);
+        return $consultado;
+    }
+
+    private function checkComisionUsuario($idusuario) {
+        $datos = "";
+        $get = $this->checkComisionUsuarioAux($idusuario);
+        foreach ($get as $actual) {
+            $idcomisionusuario = $actual['idcomisionusuario'];
+            $idusu = $actual['comision_idusuario'];
+            $porcentaje = $actual['comisionporcentaje'];
+            $calculo = $actual['calculo'];
+            $datos = "$idcomisionusuario</tr>$idusu</tr>$porcentaje</tr>$calculo";
+        }
+        return $datos;
+    }
+
+    public function datosUsuario($idusuario) {
+        $get = $this->getUsuariosAux("where idusuario='$idusuario'");
+        $datos = "";
+        $check = '0';
+        foreach ($get as $actual) {
+            $tipo = $actual['tipo'];
+            $datcom = $this->checkComisionUsuario($idusuario);
+            if ($datcom != "") {
+                $check = '1';
+            }
+            $datos .= "$tipo</tr>$check</tr>$datcom";
+        }
+        return $datos;
+    }
+
+    public function insertarComision($f) {
+        $insertado = false;
+        $consulta = "INSERT INTO `comisionusuario` VALUES (:id, :idusuario, :porcentaje, :calculo);";
+        $valores = array("id" => null,
+            "idusuario" => $f->getIdusuario(),
+            "porcentaje" => $f->getPorcentaje(),
+            "calculo" => $f->getChcalculo());
+        $insertado = $this->consultas->execute($consulta, $valores);
+        $insertado = true;
+
+        if ($f->getChcom() == '1') {
+            $auto = $this->checkComision($f);
+        }
+        return $insertado;
+    }
+
+    public function actualizarComision($f) {
+        $insertado = false;
+        $consulta = "UPDATE `comisionusuario` SET comisionporcentaje=:porcentaje, calculo=:calculo where idcomisionusuario=:id;";
+        $valores = array("id" => $f->getIdcomision(),
+            "porcentaje" => $f->getPorcentaje(),
+            "calculo" => $f->getChcalculo());
+        $insertado = $this->consultas->execute($consulta, $valores);
+        if ($f->getChcom() == '1') {
+            $auto = $this->checkComision($f);
+        }
+        return $insertado;
+    }
+      public function quitarComision($idcomision) {
+        $eliminado = false;
+        $consulta = "DELETE FROM `comisionusuario` WHERE idcomisionusuario=:id;";
+        $valores = array("id" => $idcomision);
+        $eliminado = $this->consultas->execute($consulta, $valores);
+        return $eliminado;
+    }
+
+    private function checkComision($f) {
+        $comision = "";
+        $getusu = $this->getUsuariosAux();
+        foreach ($getusu as $actual) {
+            $check = false;
+            $idusuario = $actual['idusuario'];
+            $com = $this->checkComisionUsuarioAux($idusuario);
+            foreach ($com as $comactual) {
+                $idcom = $comactual['idcomisionusuario'];
+                $check = true;
+            }
+            if ($check) {
+                $comision = $this->actualizarComision2($f, $idcom);
+            } else {
+                $comision = $this->insertarComision2($f, $idusuario);
+            }
+        }
+        return $comision;
+    }
+
+    private function insertarComision2($f, $idusuario) {
+        $insertado = false;
+        $consulta = "INSERT INTO `comisionusuario` VALUES (:id, :idusuario, :porcentaje, :calculo);";
+        $valores = array("id" => null,
+            "idusuario" => $idusuario,
+            "porcentaje" => $f->getPorcentaje(),
+            "calculo" => $f->getChcalculo());
+        $insertado = $this->consultas->execute($consulta, $valores);
+        return $insertado;
+    }
+
+    private function actualizarComision2($f, $idcom) {
+        $insertado = false;
+        $consulta = "UPDATE `comisionusuario` SET comisionporcentaje=:porcentaje, calculo=:calculo where idcomisionusuario=:id;";
+        $valores = array("id" => $idcom,
+            "porcentaje" => $f->getPorcentaje(),
+            "calculo" => $f->getChcalculo());
+        $insertado=$this->consultas->execute($consulta, $valores);
+        return $insertado;
     }
 }

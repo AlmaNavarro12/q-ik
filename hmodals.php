@@ -8,13 +8,13 @@
             </div>
             <div class="modal-body">
                 <form action="com.sine.enlace/enlaceusuario.php" onsubmit="return false;" id="form-profile">
-                    <div class="ex-profile text-center" width='200px' id="profimg">
+                    <div class="ex-profile text-center" id="profimg">
                     </div>
                     <div class="col-12 mt-3">
-                        <label class="button-file col-12" for="imgprof"><span class="fas fa-camera"></span> Seleccionar Imagen</label>
-                        <input class="form-control text-center upload" id="imgprof" name="imgprof" type="file" accept=".png, .jpeg, .jpg, .gif" onchange="cargarImgPerfil();" hidden />
+                        <label class="button-file col-12" for="imagenusuario"><span class="fas fa-camera"></span> Seleccionar Imagen</label>
+                        <input class="form-control text-center upload" id="imagenusuario" name="imagenusuario" type="file" accept=".png, .jpeg, .jpg, .gif" onchange="cargarImgPerfil();" hidden />
                         <input id="fileuser" name="fileuser" type="hidden"/>
-                        <div id="imgprof-errors">
+                        <div id="imagenusuario-errors">
                         </div>
                         <div class="row d-flex justify-content-evenly mt-2">
                             <button id="btn-edit-profile" type="button" class="button-file col-6">Editar Perfil <span class="fas fa-edit"></span></button>

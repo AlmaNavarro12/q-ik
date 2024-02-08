@@ -94,6 +94,37 @@ function isNumber(val, id) {
     }
 }
 
+function isPorcentaje(val, id) {
+    if (val.trim() == "") {
+        $("#" + id).css("border-color", "red");
+        $("#" + id + "-errors").text("Este campo no puede estar vacío.");
+        $("#" + id + "-errors").css("color", "red");
+        $("#" + id).focus();
+        return false;
+    }
+
+    var parsedValue = parseFloat(val);
+    if (isNaN(parsedValue)) {
+        $("#" + id).css("border-color", "red");
+        $("#" + id + "-errors").text("Porcentaje inválido. Ingrese un número.");
+        $("#" + id + "-errors").css("color", "red");
+        $("#" + id).focus();
+        return false;
+    }
+
+    if (parsedValue < 0 || parsedValue > 100) {
+        $("#" + id).css("border-color", "red");
+        $("#" + id + "-errors").text("Porcentaje inválido. Debe estar entre 0 y 100.");
+        $("#" + id + "-errors").css("color", "red");
+        $("#" + id).focus();
+        return false;
+    }
+
+    $("#" + id + "-errors").text("");
+    $("#" + id).css("border-color", "green");
+    return true;
+}
+
 //Función para ocultar el menu responsivo
 function resetMenu() {
     if (window.innerWidth >= 700) {
@@ -250,7 +281,7 @@ function loadView(vista) {
         'reporteventas': ["truncateTmp()", 400, "truncateTmpCot()", 450, "loadOpcionesCliente()", 500, "loadOpcionesFacturacion()", 500, "loadOpcionesVendedor()", 500],
         'config': ["loadBtnConfig('config')", 350],
         'encabezado': [],
-        'correo': ["opcionesCorreo()", 300],
+        'correo': [/*"opcionesCorreo()", 300*/],
         'folio': [],
         'listafolio': ["loadListaFolio()", 400],
         'comision': ["loadOpcionesUsuario()", 400],
@@ -426,8 +457,8 @@ function actualizarImgPerfil(idusuario) {
 
 function cargarImgPerfil() {
     var formData = new FormData(document.getElementById("form-profile"));
-    var img = $("#imgprof").val();
-    if (isnEmpty(img, 'imgprof')) {
+    var img = $("#imagenusuario").val();
+    if (isnEmpty(img, 'imagenusuario')) {
         $.ajax({
             url: 'com.sine.enlace/cargarimg.php',
             type: "POST",
@@ -440,7 +471,7 @@ function cargarImgPerfil() {
                 var fn = array[1];
                 $("#profimg").html(view);
                 $("#fileuser").val(fn);
-                $("#imgprof").val('');
+                $("#imagenusuario").val('');
             }
         });
     }
@@ -619,6 +650,43 @@ function updateNotificacion(id) {
                     $("#notification-alert").removeClass("notification-marker-active");
                 }
             }
+        }
+    });
+}
+
+function opcionesCorreoList() {
+    $.ajax({
+        url: 'com.sine.enlace/enlaceopcion.php',
+        type: 'POST',
+        data: {transaccion: 'correolist'},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 5000);
+            if (bandera == 0) {
+                alertify.error(res);
+            } else {
+                $(".contenedor-correos").html(datos);
+            }
+        }
+    });
+}
+
+function loadOpcionesUsuario() {
+    $.ajax({
+        url: 'com.sine.enlace/enlaceopcion.php',
+        type: 'POST',
+        data: {transaccion: 'opcionesusuario'},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 5000);
+            if (bandera == 0) {
+                alertify.error(res);
+            } else {
+                $(".contenedor-usuarios").html(datos);
+            }
+            //cargandoHide();
         }
     });
 }
