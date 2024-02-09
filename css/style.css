@@ -283,7 +283,7 @@ header {
     display: inline-block;
     width: 10px;
     height: 10px;
-    background: #ebb105;
+    background: #EB4335;
     transition: all 400ms;
     border-radius: 50%;
 }
@@ -961,7 +961,6 @@ table.table-row tr td {
     white-space: nowrap;
     text-overflow: ellipsis;
 }
-
 
 .button-modal{
     outline:none !important;

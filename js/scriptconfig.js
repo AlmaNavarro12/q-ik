@@ -266,6 +266,7 @@ function loaddatosUsuario() {
         }
     });
 }
+
 function setValoresUsuarioComision(datos) {
     var array = datos.split("</tr>");
     var tipo = array[0];
@@ -380,18 +381,26 @@ function setValoresCorreo(datos) {
     changeText("#btn-form-correo", "Guardar cambios <span class='fas fa-save'></span>");
     var array = datos.split("</tr>");
 
-    $("#correo-uso").val(array[0]);
-    $("#pass").val(array[1]);
-    $("#remitente").val(array[2]);
-    $("#correo-remitente").val(array[0]);
-    $("#host-correo").val(array[4]);
-    $("#puerto-acceso").val(array[5]);
-    $("#seguridad").val(array[6]);
+    var fields = ["#correo-uso", "#pass", "#remitente", "#correo-remitente", "#host-correo", "#puerto-acceso", "#seguridad"];
+    var chusos = [array[7], array[8], array[9], array[10], array[11], array[12]];
 
-    for (var i = 7; i <= 12; i++) {
-        var checkboxId = "#chuso" + (i - 6);
-        $(checkboxId).prop('checked', array[i] == 1);
-    }
+    fields.forEach(function(field, index) {
+        $(field).val(array[index]);
+    });
+
+    chusos.forEach(function(valor, index) {
+        $("#chuso" + (index + 1)).prop('checked', valor == 1);
+        
+        var checkboxId = "#chuso" + (index + 1);
+        var checkboxSpanId = "#chspan" + (index + 1);
+        if (valor == 1) {
+            $(checkboxId).prop('checked', true);
+            $(checkboxSpanId).removeClass('far fa-square').addClass('far fa-check-square');
+        } else {
+            $(checkboxId).prop('checked', false);
+            $(checkboxSpanId).removeClass('far fa-check-square').addClass('far fa-square');
+        }
+    });
 
     $("#btn-form-correo").attr('onclick', 'actualizarCorreo()');
 }
@@ -400,14 +409,40 @@ function insertarCorreo() {
     var correo = $("#correo-uso").val();
     var pass = $("#pass").val();
     var remitente = $("#remitente").val();
-    var mailremitente = $("#correo-remitente").val();
+    var mailremitente = $("#correo-remitente").val();  // Agregado
     var host = $("#host-correo").val();
     var puerto = $("#puerto-acceso").val();
     var seguridad = $("#seguridad").val();
+    var chuso1 = 0;
+    var chuso2 = 0;
+    var chuso3 = 0;
+    var chuso4 = 0;
+    var chuso5 = 0;
+    var chuso6 = 0;
 
-    var chusos = [1, 2, 3, 4, 5].map(function(index) {
-        return $("#chuso" + index).prop('checked') ? 1 : 0;
-    });
+    if ($("#chuso1").prop('checked')) {
+        chuso1 = 1;
+    }
+
+    if ($("#chuso2").prop('checked')) {
+        chuso2 = 1;
+    }
+
+    if ($("#chuso3").prop('checked')) {
+        chuso3 = 1;
+    }
+
+    if ($("#chuso4").prop('checked')) {
+        chuso4 = 1;
+    }
+
+    if ($("#chuso5").prop('checked')) {
+        chuso5 = 1;
+    }
+    
+    if ($("#chuso6").prop('checked')) {
+        chuso6 = 1;
+    }
 
     if (isEmail(correo, "correo-uso") && isnEmpty(pass, "pass") && isnEmpty(remitente, "remitente") && isnEmpty(host, "host-correo") && isnEmpty(puerto, "puerto-acceso") && isnEmpty(seguridad, "seguridad")) {
         cargandoHide();
@@ -415,28 +450,20 @@ function insertarCorreo() {
         $.ajax({
             url: "com.sine.enlace/enlaceconfig.php",
             type: "POST",
-            data: {
-                transaccion: "insertarcorreo",
-                correo: correo,
-                pass: pass,
-                remitente: remitente,
-                mailremitente: mailremitente,
-                host: host,
-                puerto: puerto,
-                seguridad: seguridad,
-                chusos: chusos
-            },
-            success: function(datos) {
+            data: {transaccion: "insertarcorreo", correo: correo, pass: pass, remitente: remitente, mailremitente: mailremitente, host: host, puerto: puerto, seguridad: seguridad, chuso1: chuso1, chuso2: chuso2, chuso3: chuso3, chuso4: chuso4, chuso5: chuso5, chuso6:chuso6},
+            success: function (datos) {
                 var texto = datos.toString();
                 var bandera = texto.substring(0, 1);
                 var res = texto.substring(1, 1000);
                 if (bandera == '0') {
+                    cargandoHide();
                     alertify.error(res);
                 } else {
-                    alertify.success('Correo registrado');
+                    cargandoHide();
+                    //alert(datos);
+                    alertify.success('correo insertado');
                     loadViewConfig('correo');
                 }
-                cargandoHide();
             }
         });
     }
@@ -451,11 +478,31 @@ function actualizarCorreo() {
     var host = $("#host-correo").val();
     var puerto = $("#puerto-acceso").val();
     var seguridad = $("#seguridad").val();
-    
-    var checkboxes = ['#chuso1', '#chuso2', '#chuso3', '#chuso4', '#chuso5'];
-    var chusos = checkboxes.map(function(checkbox) {
-        return $(checkbox).prop('checked') ? 1 : 0;
-    });
+    var chuso1 = 0;
+    var chuso2 = 0;
+    var chuso3 = 0;
+    var chuso4 = 0;
+    var chuso5 = 0;
+
+    if ($("#chuso1").prop('checked')) {
+        chuso1 = 1;
+    }
+
+    if ($("#chuso2").prop('checked')) {
+        chuso2 = 1;
+    }
+
+    if ($("#chuso3").prop('checked')) {
+        chuso3 = 1;
+    }
+
+    if ($("#chuso4").prop('checked')) {
+        chuso4 = 1;
+    }
+
+    if ($("#chuso5").prop('checked')) {
+        chuso5 = 1;
+    }
 
     if (isnEmpty(idcorreo, "id-correo") && isEmail(correo, "correo-uso") && isnEmpty(pass, "pass") && isnEmpty(remitente, "remitente") && isnEmpty(host, "host-correo") && isnEmpty(puerto, "puerto-acceso") && isnEmpty(seguridad, "seguridad")) {
         cargandoHide();
@@ -463,23 +510,8 @@ function actualizarCorreo() {
         $.ajax({
             url: "com.sine.enlace/enlaceconfig.php",
             type: "POST",
-            data: {
-                transaccion: "actualizarcorreo",
-                idcorreo: idcorreo,
-                correo: correo,
-                pass: pass,
-                remitente: remitente,
-                mailremitente: mailremitente,
-                host: host,
-                puerto: puerto,
-                seguridad: seguridad,
-                chuso1: chusos[0],
-                chuso2: chusos[1],
-                chuso3: chusos[2],
-                chuso4: chusos[3],
-                chuso5: chusos[4]
-            },
-            success: function(datos) {
+            data: {transaccion: "actualizarcorreo", idcorreo: idcorreo, correo: correo, pass: pass, remitente: remitente, mailremitente: mailremitente, host: host, puerto: puerto, seguridad: seguridad, chuso1: chuso1, chuso2: chuso2, chuso3: chuso3, chuso4: chuso4, chuso5: chuso5},
+            success: function (datos) {
                 var texto = datos.toString();
                 var bandera = texto.substring(0, 1);
                 var res = texto.substring(1, 1000);
@@ -612,6 +644,18 @@ function actualizarBody() {
     }
 }
 
+function typeText() {
+    var asunto = $("#asunto").val();
+    var saludo = $("#saludo").val();
+    var nombre = "(Razon Social del cliente)";
+    var mensaje = $("#texto-correo").val();
+    var txtformat = mensaje.replace(new RegExp("\n", 'g'), "</p> <p style='font-size:18px; text-align: justify;'>");
+
+    $("#asunto-lab").html(asunto);
+    $("#saludo-lab").html(saludo + "" + nombre);
+    $("#txt-lab").html(txtformat);
+}
+
 function opcionesCorreo() {
     $.ajax({
         url: 'com.sine.enlace/enlaceconfig.php',
@@ -626,9 +670,39 @@ function opcionesCorreo() {
             } else {
                 $(".contenedor-correos").html(datos);
             }
-            //cargandoHide();
         }
     });
+}
+
+function testCorreo() {
+    var correo = $("#correo-uso").val();
+    var pass = $("#pass").val();
+    var remitente = $("#remitente").val();
+    var mailremitente = $("#correo-remitente").val();
+    var host = $("#host-correo").val();
+    var puerto = $("#puerto-acceso").val();
+    var seguridad = $("#seguridad").val();
+
+    if (isEmail(correo, "correo-uso") && isnEmpty(pass, "pass") && isnEmpty(remitente, "remitente") && isnEmpty(host, "host-correo") && isnEmpty(puerto, "puerto-acceso") && isnEmpty(seguridad, "seguridad")) {
+        cargandoHide();
+        cargandoShow();
+        $.ajax({
+            url: "com.sine.enlace/enlaceconfig.php",
+            type: "POST",
+            data: {transaccion: "testcorreo", correo: correo, pass: pass, remitente: remitente, mailremitente: mailremitente, host: host, puerto: puerto, seguridad: seguridad},
+            success: function (datos) {
+                var texto = datos.toString();
+                var bandera = texto.substring(0, 1);
+                var res = texto.substring(1, 1000);
+                if (bandera == '0') {
+                    alertify.error(res);
+                } else {
+                    alertify.success(res);
+                }
+                cargandoHide();
+            }
+        });
+    }
 }
 //--------------------------------TABLAS
 function loadFormato() {

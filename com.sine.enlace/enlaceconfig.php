@@ -58,11 +58,15 @@ if (isset($_POST['transaccion'])) {
             $insertado = $cc->modificarCorreo($c);
             break;
         case 'editarbody':
-            $datos = $cf->getMailBody($_POST['idbody']);
+            $datos = $cc->getMailBody($_POST['idbody']);
             echo $datos != "" ? $datos : "0Botón activo.";
             break;
         case 'actualizarbody':
             $insertado = $cc->actualizarBodyMail(obtenerDatosBodyCorreo());
+            break;
+        case 'testcorreo':
+            $datos = $cc->mailPrueba(obtenerDatosTesteo());
+            echo $datos != "" ? $datos : "0No hay clientes registrados.";
             break;
             //------------------------------------TABLAS
         case 'loadexcel':
@@ -112,6 +116,18 @@ function obtenerDatosCorreo()
     $c->setChUsoCorreo3($_POST['chuso3']);
     $c->setChUsoCorreo4($_POST['chuso4']);
     $c->setChUsoCorreo5($_POST['chuso5']);
+    return $c;
+}
+
+function obtenerDatosTesteo() {
+    $c = new Configuracion();
+    $c->setCorreoEnvio($_POST['correo']);
+    $c->setPassCorreo($_POST['pass']);
+    $c->setRemitente($_POST['remitente']);
+    $c->setMailRemitente($_POST['mailremitente']);
+    $c->setHostCorreo($_POST['host']);
+    $c->setPuertoCorreo($_POST['puerto']);
+    $c->setSeguridadCorreo($_POST['seguridad']);
     return $c;
 }
 

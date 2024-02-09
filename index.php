@@ -26,6 +26,5 @@ if (isset($_POST['usuario'], $_POST['contrasena'])) {
         </div>
         <script src="js/scriptlogin.js"></script>
     </body>
-
     </html>
 <?php } ?>

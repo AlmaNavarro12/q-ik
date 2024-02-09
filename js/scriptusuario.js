@@ -214,11 +214,7 @@ function checkContrasena() {
 
 function cargarImgUsuario() {
     var formData = new FormData(document.getElementById("form-usuario"));
-    
-    alert(formData);
     var img = $("#imagenperfil").val();
-    
-    alert(img);
     if (isnEmpty(img, 'imagenperfil')) {
         $.ajax({
             url: 'com.sine.enlace/cargarimg.php',
@@ -447,4 +443,3 @@ function resposiveButton() {
         $("#bdos > div").removeClass('col-12 mb-3').addClass('col-md-6 mb-3');
     }
 }
-

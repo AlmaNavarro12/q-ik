@@ -7,6 +7,7 @@ require_once '../vendor/autoload.php'; //Carga automatica
 
 use PhpOffice\PhpSpreadsheet\Reader\Xlsx; //Biblioteca Xlsx 
 date_default_timezone_set("America/Mexico_City");
+use PHPMailer\PHPMailer\PHPMailer;
 
 class ControladorConfiguracion
 {
@@ -18,6 +19,45 @@ class ControladorConfiguracion
         $this->consultas = new Consultas();
     }
 
+    //---------------------------------------------------GENERAL
+    
+    private function getBancoAux($banco){
+        $consulta = "SELECT idcatalogo_banco FROM catalogo_banco WHERE nombre_banco LIKE '%$banco%' OR descripcion_banco LIKE '%$banco%';";
+        return $this->consultas->getResults($consulta, null);
+    }
+
+    private function getBanco($banco)
+    {
+        $datos = $this->getBancoAux($banco);
+        return $datos ? $datos[0]['idcatalogo_banco'] : "0";
+    }
+
+    private function getEstadoAux($estado)
+    {
+        $consulta = "SELECT id_estado FROM estado WHERE estado LIKE '%$estado%';";
+        return $this->consultas->getResults($consulta, null);
+    }
+
+    private function getEstado($estado)
+    {
+        $datos = $this->getEstadoAux($estado);
+        return $datos ? $datos[0]['id_estado'] : "0";
+    }
+
+    private function getMunicipioAux($municipio, $idestado)
+    {
+        $consulta = "SELECT id_municipio FROM municipio WHERE municipio LIKE '%$municipio%' AND id_estado=:idestado;";
+        $val = array("municipio" => $municipio, "idestado" => $idestado);
+        return $this->consultas->getResults($consulta, $val);
+    }
+
+    private function getMunicipio($municipio, $idestado)
+    {
+        $datos = $this->getMunicipioAux($municipio, $idestado);
+        return $datos ? $datos[0]['id_municipio'] : "0";
+    }
+
+    //----------------------------------------------------FOLIO
     public function valFolio($f)
     {
         $insertar = "";
@@ -70,10 +110,9 @@ class ControladorConfiguracion
     private function getPermisoById($idusuario)
     {
         $consultado = false;
-        $c = new Consultas();
         $consulta = "SELECT p.editarfolio, p.eliminarfolio FROM usuariopermiso p WHERE permiso_idusuario=:idusuario;";
         $valores = array("idusuario" => $idusuario);
-        $consultado = $c->getResults($consulta, $valores);
+        $consultado = $this->consultas->getResults($consulta, $valores);
         return $consultado;
     }
 
@@ -228,6 +267,7 @@ class ControladorConfiguracion
         return $usofolio;
     }
 
+    //------------------------------------------IMPORTAR TABLAS
     public function importTable($fn, $tabla)
     {
         $targetPath = '../temporal/tmp/' . $fn;
@@ -290,6 +330,9 @@ class ControladorConfiguracion
                 $insert = $this->consultas->execute($consulta, $valores);
             }
         }
+        if ($insert) {
+            unlink($targetPath);
+        }
         return $insert;
     }
 
@@ -325,45 +368,13 @@ class ControladorConfiguracion
                 $insert = $this->consultas->execute($consulta, $valores);
             }
         }
+        if ($insert) {
+            unlink($targetPath);
+        }
         return $insert;
     }
 
-    private function getBancoAux($banco){
-        $consulta = "SELECT idcatalogo_banco FROM catalogo_banco WHERE nombre_banco LIKE '%$banco%' OR descripcion_banco LIKE '%$banco%';";
-        return $this->consultas->getResults($consulta, null);
-    }
-
-    private function getBanco($banco)
-    {
-        $datos = $this->getBancoAux($banco);
-        return $datos ? $datos[0]['idcatalogo_banco'] : "0";
-    }
-
-    private function getEstadoAux($estado)
-    {
-        $consulta = "SELECT id_estado FROM estado WHERE estado LIKE '%$estado%';";
-        return $this->consultas->getResults($consulta, null);
-    }
-
-    private function getEstado($estado)
-    {
-        $datos = $this->getEstadoAux($estado);
-        return $datos ? $datos[0]['id_estado'] : "0";
-    }
-
-    private function getMunicipioAux($municipio, $idestado)
-    {
-        $consulta = "SELECT id_municipio FROM municipio WHERE municipio LIKE '%$municipio%' AND id_estado=:idestado;";
-        $val = array("municipio" => $municipio, "idestado" => $idestado);
-        return $this->consultas->getResults($consulta, $val);
-    }
-
-    private function getMunicipio($municipio, $idestado)
-    {
-        $datos = $this->getMunicipioAux($municipio, $idestado);
-        return $datos ? $datos[0]['id_municipio'] : "0";
-    }
-
+    //-----------------------------------------COMISIONES
     private function getUsuariosAux($con = "") {
         $consultado = false;
         $consulta = "select * from usuario $con order by nombre;";
@@ -435,7 +446,8 @@ class ControladorConfiguracion
         }
         return $insertado;
     }
-      public function quitarComision($idcomision) {
+    
+    public function quitarComision($idcomision) {
         $eliminado = false;
         $consulta = "DELETE FROM `comisionusuario` WHERE idcomisionusuario=:id;";
         $valores = array("id" => $idcomision);
@@ -482,5 +494,346 @@ class ControladorConfiguracion
             "calculo" => $f->getChcalculo());
         $insertado=$this->consultas->execute($consulta, $valores);
         return $insertado;
+    }
+
+    //---------------------------------CORREO
+    public function getMail($idcorreo) {
+        $datos = "";
+        $get = $this->getMailAux($idcorreo);
+        foreach ($get as $actual) {
+            $correo = $actual['correo'];
+            $pass = $actual['password'];
+            $remitente = $actual['remitente'];
+            $correoremitente = $actual['correoremitente'];
+            $host = $actual['host'];
+            $puerto = $actual['puerto'];
+            $seguridad = $actual['seguridad'];
+            $chuso1 = $actual['chuso1'];
+            $chuso2 = $actual['chuso2'];
+            $chuso3 = $actual['chuso3'];
+            $chuso4 = $actual['chuso4'];
+            $chuso5 = $actual['chuso5'];
+            $datos = "$correo</tr>$pass</tr>$remitente</tr>$correoremitente</tr>$host</tr>$puerto</tr>$seguridad</tr>$chuso1</tr>$chuso2</tr>$chuso3</tr>$chuso4</tr>$chuso5";
+        }
+        return $datos;
+    }
+
+    private function getMailAux($idcorreo) {
+        $consultado = false;
+        $consulta = "SELECT * FROM correoenvio WHERE idcorreoenvio=:id;";
+        $valores = array("id" => $idcorreo);
+        $consultado = $this->consultas->getResults($consulta, $valores);
+        return $consultado;
+    }
+
+    public function nuevoCorreo($c) {
+        $insertar = "";
+        $check = $this-> verificarCorreo($c);
+       
+        if (!$check) {
+            $insertar = $this->insertarCorreoEnvio($c);
+        }
+        return $insertar;
+    }
+    
+    private function insertarCorreoEnvio($c) {
+        $actualizado = false;
+        $consulta = "INSERT INTO `correoenvio` VALUES (:id, :correo, :password, :remitente, :correoremitente, :host, :puerto, :seguridad, :chuso1, :chuso2, :chuso3, :chuso4, :chuso5);";
+        $valores = array("id" => null,
+            "correo" => $c->getCorreoenvio(),
+            "password" => $c->getPasscorreo(),
+            "remitente" => $c->getRemitente(),
+            "correoremitente" => $c->getMailremitente(),
+            "host" => $c->getHostcorreo(),
+            "puerto" => $c->getPuertocorreo(),
+            "seguridad" => $c->getSeguridadcorreo(),
+            "chuso1" => $c->getChusocorreo1(),
+            "chuso2" => $c->getChusocorreo2(),
+            "chuso3" => $c->getChusocorreo3(),
+            "chuso4" => $c->getChusocorreo4(),
+            "chuso5" => $c->getChusocorreo5());
+        $actualizado = $this->consultas->execute($consulta, $valores);
+        return $actualizado;
+    }
+
+    private function getMailval($correo) {
+        $consulta = "SELECT COUNT(*) AS total FROM correoenvio WHERE correo = :correo OR correoremitente = :correo";
+        $valores = array("correo" => $correo);
+        $resultado = $this->consultas->getResults($consulta, $valores);
+        if (!empty($resultado)) {
+            $totalCorreos = $resultado[0]['total'];
+            return $totalCorreos;
+        } else {
+            return 0;
+        }
+    }
+    
+    private function getMailbyUsoAux($uso) {
+        $consultado = false;
+        $consulta = "SELECT * FROM correoenvio WHERE chuso$uso=:chuso;";
+        $valores = array("chuso" => '1');
+        $consultado = $this->consultas->getResults($consulta, $valores);
+        return $consultado;
+    }
+
+    private function verificarCorreo($c) {
+        $existe = false;
+
+        if($this->getMailval($c->getCorreoenvio()) > 0){
+            echo "0Ya existe un correo registrado.";
+            $existe = true;
+        } else {
+            if ($c->getChusocorreo1() == '1') {
+                $correos = $this->getMailbyUsoAux('1');
+                foreach ($correos as $actual) {
+                    echo "0Ya existe un correo asignado a Facturas.";
+                    $existe = true;
+                    break;
+                }
+            }
+            if (!$existe) {
+                if ($c->getChusocorreo2() == '1') {
+                    $correos = $this->getMailbyUsoAux('2');
+                    foreach ($correos as $actual) {
+                        echo "0Ya existe un correo asignado a Pagos.";
+                        $existe = true;
+                        break;
+                    }
+                }
+            }
+            if (!$existe) {
+                if ($c->getChusocorreo3() == '1') {
+                    $correos = $this->getMailbyUsoAux('3');
+                    foreach ($correos as $actual) {
+                        echo "0Ya existe un correo asignado a Cotizaciones.";
+                        $existe = true;
+                        break;
+                    }
+                }
+            }
+            if (!$existe) {
+                if ($c->getChusocorreo4() == '1') {
+                    $correos = $this->getMailbyUsoAux('4');
+                    foreach ($correos as $actual) {
+                        echo "0Ya existe un correo asignado a Comunicados.";
+                        $existe = true;
+                        break;
+                    }
+                }
+            }
+            if (!$existe) {
+                if ($c->getChusocorreo5() == '1') {
+                    $correos = $this->getMailbyUsoAux('5');
+                    foreach ($correos as $actual) {
+                        echo "0Ya existe un correo asignado a Contratos.";
+                        $existe = true;
+                        break;
+                    }
+                }
+            }
+        }
+        return $existe;
+    }
+
+    public function modificarCorreo($c) {
+        $insertar = "";
+        $check = $this->verificarActualizarCorreo($c);
+        if (!$check) {
+            $insertar = $this->actualizarCorreoEnvio($c);
+        }
+        return $insertar;
+    }
+
+    private function getMailbyUsoAux2($uso, $id) {
+        $consultado = false;
+        $consulta = "SELECT * FROM correoenvio WHERE chuso$uso=:chuso and idcorreoenvio!=:id;";
+        $valores = array("chuso" => '1',
+            "id" => $id);
+        $consultado = $this->consultas->getResults($consulta, $valores);
+        return $consultado;
+    }
+
+    private function verificarActualizarCorreo($c) {
+        $existe = false;
+        if ($c->getChusocorreo1() == '1') {
+            $correos = $this->getMailbyUsoAux2('1', $c->getIdcorreo());
+            foreach ($correos as $actual) {
+                echo "0Ya existe un correo asignado a Facturas.";
+                $existe = true;
+                break;
+            }
+        }
+        if (!$existe) {
+            if ($c->getChusocorreo2() == '1') {
+                $correos = $this->getMailbyUsoAux2('2', $c->getIdcorreo());
+                foreach ($correos as $actual) {
+                    echo "0Ya existe un correo asignado a Pagos.";
+                    $existe = true;
+                    break;
+                }
+            }
+        }
+        if (!$existe) {
+            if ($c->getChusocorreo3() == '1') {
+                $correos = $this->getMailbyUsoAux2('3', $c->getIdcorreo());
+                foreach ($correos as $actual) {
+                    echo "0Ya existe un correo asignado a Cotizaciones.";
+                    $existe = true;
+                    break;
+                }
+            }
+        }
+        if (!$existe) {
+            if ($c->getChusocorreo4() == '1') {
+                $correos = $this->getMailbyUsoAux2('4', $c->getIdcorreo());
+                foreach ($correos as $actual) {
+                    echo "0Ya existe un correo asignado a Comunicados.";
+                    $existe = true;
+                    break;
+                }
+            }
+        }
+        if (!$existe) {
+            if ($c->getChusocorreo5() == '1') {
+                $correos = $this->getMailbyUsoAux2('5', $c->getIdcorreo());
+                foreach ($correos as $actual) {
+                    echo "0Ya existe un correo asignado a Contratos.";
+                    $existe = true;
+                    break;
+                }
+            }
+        }
+        return $existe;
+    }
+
+    private function actualizarCorreoEnvio($c) {  
+        $actualizado = false;
+        $consulta = "UPDATE `correoenvio` set correo=:correo, password=:password, remitente=:remitente, correoremitente=:correoremitente, host=:host, puerto=:puerto, seguridad=:seguridad, chuso1=:chuso1, chuso2=:chuso2, chuso3=:chuso3, chuso4=:chuso4, chuso5=:chuso5 WHERE idcorreoenvio=:id;";
+        $valores = array("id" => $c->getIdcorreo(),
+            "correo" => $c->getCorreoenvio(),
+            "password" => $c->getPasscorreo(),
+            "remitente" => $c->getRemitente(),
+            "correoremitente" => $c->getMailremitente(),
+            "host" => $c->getHostcorreo(),
+            "puerto" => $c->getPuertocorreo(),
+            "seguridad" => $c->getSeguridadcorreo(),
+            "chuso1" => $c->getChusocorreo1(),
+            "chuso2" => $c->getChusocorreo2(),
+            "chuso3" => $c->getChusocorreo3(),
+            "chuso4" => $c->getChusocorreo4(),
+            "chuso5" => $c->getChusocorreo5());
+        $actualizado = $this->consultas->execute($consulta, $valores);
+        return $actualizado;
+    }
+
+    public function actualizarBodyMail($c) {
+        $actualizado = false;
+        $img = $c->getImglogo();
+        if ($img == '') {
+            $img = $c->getImgactualizar();
+        }
+        $consulta = "UPDATE `mailbody` SET asunto=:asunto, saludo=:saludo, mensaje=:mensaje, logomsg=:img WHERE idmailbody=:id;";
+        $valores = array("id" => $c->getIdbodymail(),
+            "asunto" => $c->getAsuntobody(),
+            "saludo" => $c->getSaludobody(),
+            "mensaje" => $c->getTxtbody(),
+            "img" => $img);
+        rename("../temporal/tmp/" . $img, "../img/" . $img);
+        $actualizado = $this->consultas->execute($consulta, $valores);
+        if ($c->getChlogo()) {
+            $this->updateLogoBody($c->getIdbodymail(), $img);
+        }
+        return $actualizado;
+    }
+
+    private function updateLogoBody($id, $img) {
+        $actualizado = FALSE;
+        $consulta = $consulta = "UPDATE `mailbody` SET logomsg=:img WHERE idmailbody!=:id;";
+        $val = array("img" => $img,
+            "id" => $id);
+        $actualizado = $this->consultas->execute($consulta, $val);
+        return $actualizado;
+    }
+
+    public function getMailBody($id) {
+        $datos = "";
+        $get = $this->getMailBodyAux($id);
+        foreach ($get as $actual) {
+            $idmailbody = $actual['idmailbody'];
+            $asunto = $actual['asunto'];
+            $saludo = $actual['saludo'];
+            $mensaje = $actual['mensaje'];
+            $imagen = $actual['logomsg'];
+            $img = "";
+            if ($imagen != "") {
+                $imgfile = "../img/" . $imagen;
+                $type = pathinfo($imgfile, PATHINFO_EXTENSION);
+                $data = file_get_contents($imgfile);
+                $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+                $img = "<div class=\"col-4\"><img src=\"$base64\" style=\"max-width:100%; height:auto;\" class=\"img-fluid\"></div>";
+            }
+            $datos = "$idmailbody</tr>$asunto</tr>$saludo</tr>$mensaje</tr>$imagen</tr>$img";
+        }
+        return $datos;
+    }
+
+    public function mailPrueba($sm) {
+        $mail = new PHPMailer;
+        $mail->Mailer = 'smtp';
+        $mail->SMTPAuth = true;
+        $mail->Host = $sm->getHostcorreo();
+        $mail->Port = $sm->getPuertocorreo();
+        $mail->SMTPSecure = $sm->getSeguridadcorreo();
+        $mail->Username = $sm->getCorreoenvio();
+        $mail->Password = $sm->getPasscorreo();
+        $mail->From = $sm->getMailremitente();
+        $mail->FromName = $sm->getRemitente();
+        $mail->Subject = iconv("utf-8","windows-1252","Prueba de conexión de correo");
+
+        $mail->isHTML(true);
+        $mail->Body = "<html>
+        <body>
+            <table width='100%' bgcolor='#e0e0e0' cellpadding='0' cellspacing='0' border='0' style='border-radius: 25px;'>
+                <tr><td>
+                        <table align='center' width='100%' border='0' cellpadding='0' cellspacing='0' style='max-width:650px; border-radius: 20px; background-color:#fff; font-family:sans-serif;'>
+                            <thead>
+                                <tr height='80'>
+                                    <th align='left' colspan='4' style='padding: 6px; background-color:#f5f5f5; border-radius: 20px; border-bottom:solid 1px #bdbdbd;' ><img src='https://q-ik.mx/Demo/img/LogoQik.png' height='100px'/></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr align='center' height='10' style='font-family:sans-serif; '>
+                                    <td style='background-color:#09096B; text-align:center; border-radius: 5px;'></td>
+                                </tr>
+                                <tr>
+                                    <td colspan='4' style='padding:15px;'>
+                                        <h1>Prueba de conexion</h1>
+                                        <p style='font-size:20px;'>Hola soy un correo de prueba</p>
+                                        <hr/>
+                                        <p style='font-size:18px; text-align: justify;'>Si recibiste este mensaje, significa que la configuracion del correo que ingresaste para el envio de tus facturas se hizo correctamente.</p>
+                                        <p style='font-size:18px; text-align: justify;'>Tu sistema ahora esta listo para enviar correos, recuerda que los correos se envian desde esta cuenta por lo que las posibles respuestas de tus clientes o avisos de errores de envio por direcciones incorrectas o inexistentes llegaran aqui.</p>
+                                        <p style='font-size:18px; text-align: justify;'>Gracias y un saludo por parte del equipo de <span style='font-family:sans-serif; color: #17177c; font-weight: bolder;'>Q-ik</span>.</p>
+                                    </td>
+                                </tr>
+
+                            </tbody>
+                        </table>
+                    </td></tr>
+            </table>
+        </body>
+    </html>";
+        $mail->addAddress($sm->getCorreoenvio());
+        if (!$mail->send()) {
+            echo '0No se envió el mensaje' . $mail->ErrorInfo;
+        } else {
+            return '1Se ha enviado el correo.';
+        }
+    }
+    private function getMailBodyAux($id) {
+        $consultado = false;
+        $consulta = "SELECT * FROM mailbody WHERE idmailbody=:id;";
+        $valores = array("id" => $id);
+        $consultado = $this->consultas->getResults($consulta, $valores);
+        return $consultado;
     }
 }

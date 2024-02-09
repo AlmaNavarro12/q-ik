@@ -102,7 +102,7 @@ class ControladorPermiso {
             $marker = $unread ? "class='alert-marker-active'" : "";
             
             $msg = "<span class='mt-0 mx-0 px-0'>$fecha $hora <br> $notificacion... </span>";
-            $datos .= "<li class='px-2 py-1 $unread'><a data-bs-toggle='modal' data-bs-target='#modal-notification' onclick='getNotification($id)' class='notification-link px-0'> <div $marker></div> $msg </a></li>";
+            $datos .= "<li class='px-2 py-2 $unread'><a data-bs-toggle='modal' data-bs-target='#modal-notification' onclick='getNotification($id)' class='notification-link px-0'> <div $marker></div> $msg </a></li>";
             $count++;
         }
     

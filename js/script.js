@@ -1,3 +1,7 @@
+$(document).ready(function () {
+    loadView('paginicio');
+});
+
 //Mostrar el spinner loading...
 function cargandoShow() {
     $("body").append("<div id='contenedor-loader'></div>");
@@ -281,7 +285,7 @@ function loadView(vista) {
         'reporteventas': ["truncateTmp()", 400, "truncateTmpCot()", 450, "loadOpcionesCliente()", 500, "loadOpcionesFacturacion()", 500, "loadOpcionesVendedor()", 500],
         'config': ["loadBtnConfig('config')", 350],
         'encabezado': [],
-        'correo': [/*"opcionesCorreo()", 300*/],
+        'correo': ["opcionesCorreo()", 300],
         'folio': [],
         'listafolio': ["loadListaFolio()", 400],
         'comision': ["loadOpcionesUsuario()", 400],
@@ -564,7 +568,7 @@ function enviarSoporte() {
 }
 
 function disabledButton() {
-    var fileInput = document.getElementById('imgprof');
+    var fileInput = document.getElementById('imagenusuario');
     var saveButton = document.getElementById('btn-form-profile');
     var closeButton = document.getElementById('btn-close-modal');
 
@@ -664,7 +668,7 @@ function opcionesCorreoList() {
             var bandera = texto.substring(0, 1);
             var res = texto.substring(1, 5000);
             if (bandera == 0) {
-                alertify.error(res);
+                //alertify.error(res);
             } else {
                 $(".contenedor-correos").html(datos);
             }
