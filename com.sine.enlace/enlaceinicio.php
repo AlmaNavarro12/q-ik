@@ -19,16 +19,16 @@ if (isset($_POST['transaccion'])) {
             break;
         case 'datosgrafica':
             $y = getdate()['year'];
-            echo ($ci->getDatos($y)) ? $insertado : "0Error: no inserto el registro.";
+            echo ($insertado = $ci->getDatos($y)) ? $insertado : "0Error: no inserto el registro.";
             break;
         case 'opcionesano':
-            echo ($datos = $cf->opcionesAno()) ? $datos : "0No hay cartas porte asignadas a este permisionario.";
+            echo ($datos = $ci->opcionesAno()) ? $datos : "0No hay cartas porte asignadas a este permisionario.";
             break;
         case 'buscargrafica':
-            echo ($datos = $cf->getDatos($_POST['ano'])) ? $datos : "0No hay cartas porte asignadas a este permisionario.";
+            echo ($datos = $ci->getDatos($_POST['ano'])) ? $datos : "0No hay cartas porte asignadas a este permisionario.";
             break;
         case 'valperiodo':
-            echo (!$cf->checkAcceso()) ? "1Si" : "0Su periodo de prueba de 15 días ha concluido. Si deseas seguir usando Q-ik, te invitamos a adquirir el paquete de timbres que más se ajuste a tus necesidades para continuar con el servicio";
+            echo (!$ci->checkAcceso()) ? "1Si" : "0Su periodo de prueba de 15 días ha concluido. Si deseas seguir usando Q-ik, te invitamos a adquirir el paquete de timbres que más se ajuste a tus necesidades para continuar con el servicio";
             break;
         case 'sendmsg':
             echo ($insertado = $ci->sendMSG()) ? $insertado : "0Error: no inserto el registro.";

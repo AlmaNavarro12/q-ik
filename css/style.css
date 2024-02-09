@@ -349,6 +349,56 @@ header {
     color: #17177C;
 }
 
+.button-inicio {
+    outline: none !important;
+    min-width: 130px;
+    width: auto;
+    height: 50px;
+    padding: 10px;
+    border-color: #17177C;
+    border-radius: 50px;
+    font-family: sans-serif;
+    font-style: normal;
+    font-weight: 300;
+    font-size: 18px;
+    color: #17177C;
+}
+
+.button-inicio:hover{
+    transition: all 300ms;
+    background: #17177C;
+    color: #FFFFFF;
+}
+
+.boton-largo {
+    position: relative;
+    display: inline-block;
+    overflow: hidden;
+    background-color: #FFFFFF;
+    border-radius: 50px;
+    display: inline-block;
+    margin: 10px 0px;
+}
+
+.label-index{
+    font-family: sans-serif;
+    font-style: normal;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+.boton-azul {
+    background-color: #17177C;
+    border-radius: 50px;
+    padding: 10px 20px; /* Ajusta el relleno según sea necesario */
+    color: #FFFFFF;
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 80px;
+    height: 100%;
+}
+
 .user-option {
     padding: 10px 5px;
     border: 2px solid #D6D6DF;
@@ -565,7 +615,6 @@ article {
 
 /*----------------------CONFIGURACION PHP---------------------*/
 .titulo-lista {
-    min-height: 100px;
     font-family: sans-serif;
     font-style: normal;
     font-weight: 300;

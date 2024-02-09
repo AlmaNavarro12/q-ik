@@ -24,12 +24,14 @@
     <link rel="stylesheet" href="https://cdn.linearicons.com/free/1.0.0/icon-font.min.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
 
+    <!--Graficas-->
+    <script src="chart/Chart.min.js"></script>
+    <script src="chart/Chart.bundle.min.js"></script>
+    <script src="chart/chartjs-plugin-labels.js"></script>
+
     <!-- Scripts adicionales -->
     <script src="js/jquery-ui.min.js"></script>
     <script src="js/alertify.min.js"></script>
     <script type="text/javascript" src="js/validator.min.js" charset="UTF-8"></script>
     <script src="js/script.js"></script>
-    <script src="chart/Chart.min.js"></script>
-    <script src="chart/Chart.bundle.min.js"></script>
-    <script src="chart/chartjs-plugin-labels.js"></script>
 </head>

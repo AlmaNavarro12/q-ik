@@ -42,4 +42,15 @@ class ControladorOpcion {
         }
         return $op;
     }
+
+    public function opcionesAno() {
+        $anio_de_inicio = 2020;
+        $fecha = getdate();
+        $y = $fecha['year'];
+        $r = "";
+        foreach (range($anio_de_inicio, $y) as $x) {
+            $r = $r . "<option id='ano" . $x . "' value='" . $x . "'>" . $x . "  " . "</option>";
+        }
+        return $r;
+    }
 }

@@ -162,44 +162,135 @@ class ControladorInicio {
     }
     
     public function getDatos($y) {
+        $facturas = $this->getDatosFacturas($y);
+        $cartas = $this->getDatosCartas($y);
+        return "$facturas<datacfdi>$cartas";
+    }
+
+    private function getDatosCartas($y) {
         $datos = "";
         $totales = "";
         $cancelados = "";
         $sintimbre = "";
-    
+        $contador = 0;
         for ($i = 1; $i <= 12; $i++) {
-            $m = str_pad($i, 2, '0', STR_PAD_LEFT);
-            
+            $m = $i;
+            if ($m < 10) {
+                $m = "0$m";
+            }
+            $con = "AND status_pago!='3' AND uuid!=''";
+            $datosemitidos = $this->getDatosCartaAux($y, $m, $con);
+            $dato = "";
+            foreach ($datosemitidos as $emi) {
+                $dato = $emi['emitidas'];
+            }
+            if ($contador >= 1) {
+                $datos .= "</tr>$dato";
+            } else {
+                $datos .= "$dato";
+            }
+
+            $total = $this->getTotalesCarta($y, $m);
+            if ($contador >= 1) {
+                $totales .= "</tr>" . bcdiv($total, '1', 2);
+            } else {
+                $totales .= bcdiv($total, '1', 2);
+            }
+
+            $con2 = "AND status_pago = '3'";
+            $datosCancelados = $this->getDatosCartaAux($y, $m, $con2);
+            $cancelado = "";
+            foreach ($datosCancelados as $can) {
+                $cancelado = $can['emitidas'];
+            }
+            if ($contador >= 1) {
+                $cancelados .= "</tr>$cancelado";
+            } else {
+                $cancelados .= "$cancelado";
+            }
+
+            $con3 = "AND uuid IS NULL";
+            $datosNtimbre = $this->getDatosCartaAux($y, $m, $con3);
+            $notimbre = "";
+            foreach ($datosNtimbre as $st) {
+                $notimbre = $st['emitidas'];
+            }
+            if ($contador >= 1) {
+                $sintimbre .= "</tr>$notimbre";
+            } else {
+                $sintimbre .= "$notimbre";
+            }
+
+            $contador++;
+        }
+        return $datos . "<dataset>" . $totales . "<dataset>" . $cancelados . "<dataset>" . $sintimbre;
+    }
+
+    private function getDatosCartaAux($y, $m, $con) {
+        $consultado = false;
+        $consulta = "SELECT count(*) emitidas FROM factura_carta WHERE fecha_creacion LIKE '$y-$m%' $con;";
+        $consultado = $this->consultas->getResults($consulta, null);
+        return $consultado;
+    }
+    
+    private function getDatosFacturas($y) {
+        $datos = "";
+        $totales = "";
+        $cancelados = "";
+        $sintimbre = "";
+        $contador = 0;
+        for ($i = 1; $i <= 12; $i++) {
+            $m = $i;
+            if ($m < 10) {
+                $m = "0$m";
+            }
             $con = "and status_pago!='3' and uuid!=''";
             $datosemitidos = $this->getDatosAux($y, $m, $con);
             $dato = "";
             foreach ($datosemitidos as $emi) {
                 $dato = $emi['emitidas'];
             }
-            $datos .= $datos ? "</tr>$dato" : $dato;
-    
-            $total = bcdiv($this->getTotales($y, $m), '1', 2);
-            $totales .= $totales ? "</tr>$total" : $total;
-    
+            if ($contador >= 1) {
+                $datos .= "</tr>$dato";
+            } else {
+                $datos .= "$dato";
+            }
+
+            $total = $this->getTotales($y, $m);
+            if ($contador >= 1) {
+                $totales .= "</tr>" . bcdiv($total, '1', 2);
+            } else {
+                $totales .= bcdiv($total, '1', 2);
+            }
+
             $con2 = "and status_pago = '3'";
             $datosCancelados = $this->getDatosAux($y, $m, $con2);
             $cancelado = "";
             foreach ($datosCancelados as $can) {
                 $cancelado = $can['emitidas'];
             }
-            $cancelados .= $cancelados ? "</tr>$cancelado" : $cancelado;
-    
+            if ($contador >= 1) {
+                $cancelados .= "</tr>$cancelado";
+            } else {
+                $cancelados .= "$cancelado";
+            }
+
             $con3 = "and uuid is null";
             $datosNtimbre = $this->getDatosAux($y, $m, $con3);
             $notimbre = "";
             foreach ($datosNtimbre as $st) {
                 $notimbre = $st['emitidas'];
             }
-            $sintimbre .= $sintimbre ? "</tr>$notimbre" : $notimbre;
+            if ($contador >= 1) {
+                $sintimbre .= "</tr>$notimbre";
+            } else {
+                $sintimbre .= "$notimbre";
+            }
+
+            $contador++;
         }
         return $datos . "<dataset>" . $totales . "<dataset>" . $cancelados . "<dataset>" . $sintimbre;
     }
-    
     private function getDatosAux($y, $m, $con) {
         $consultado = false;
         $consulta = "select count(*) emitidas from datos_factura where fecha_creacion like '$y-$m%' $con;";
@@ -223,7 +314,23 @@ class ControladorInicio {
         return $consultado;
     }
 
-    /*private function totalDivisa($total, $tcambio, $monedaP, $monedaF) {
+    private function getTotalesCarta($y, $m) {
+        $total = 0;
+        $gettotales = $this->getTotalesCartaAux($y, $m);
+        foreach ($gettotales as $actual) {
+            $total += $this->totalDivisa($actual['total'], $actual['tcambio'], 1, $actual['id_moneda']);
+        }
+        return $total;
+    }
+
+    private function getTotalesCartaAux($y, $m) {
+        $consultado = false;
+        $consulta = "SELECT totalfactura total, tcambio, id_moneda FROM factura_carta WHERE fecha_creacion LIKE '$y-$m%';";
+        $consultado = $this->consultas->getResults($consulta, null);
+        return $consultado;
+    }
+
+    private function totalDivisa($total, $tcambio, $monedaP, $monedaF) {
         if ($monedaP == $monedaF) {
             $OP = bcdiv($total, '1', 2);
         } else {
@@ -232,18 +339,18 @@ class ControladorInicio {
                 $OP = bcdiv($total, '1', 2) / bcdiv($tcambio, '1', 6);
             } else if ($monedaP == '2') {
                 if ($monedaF == '4') {
-                    $tcambio = $this->getTipoCambio($monedaF, $monedaP);
+                    //$tcambio = $this->getTipoCambio($monedaF, $monedaP);
                 }
                 $OP = bcdiv($total, '1', 2) * bcdiv($tcambio, '1', 6);
             } else if ($monedaP == '4') {
                 if ($monedaF == '2') {
-                    $tcambio = $this->getTipoCambio($monedaF, $monedaP);
+                    //$tcambio = $this->getTipoCambio($monedaF, $monedaP);
                 }
                 $OP = bcdiv($total, '1', 2) * bcdiv($tcambio, '1', 6);
             }
         }
         return $OP;
-    } */
+    }
 
     private function getUsuarioAux($idusuario) {
         $consultado = false;

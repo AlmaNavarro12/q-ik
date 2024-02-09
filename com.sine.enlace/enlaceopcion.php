@@ -75,10 +75,10 @@ if (isset($_POST['transaccion'])) {
         case 'opcionesvendedor':
             $datos = $co->opcionesVendedor();
             break;
-        case 'opcionesano':
+        */case 'opcionesano':
             $datos = $co->opcionesAno();
             break;
-        */case 'opcionesusuario':
+        case 'opcionesusuario':
             $datos = $co->opcionesUsuario();
             break;/*
         case 'opcionesfolio':

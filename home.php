@@ -77,7 +77,7 @@ require_once 'Enrutador.php';
             <div id="head-info">
                 <div class="logo-color position-absolute"></div>
                 <div class="position-fixed user-info mx-3">
-                    <div class="dropdown">
+                    <div class="dropdown zn-1">
                         <button class="btn button-home dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <span id="user-name"> <?php echo iconv('UTF-8', 'windows-1252', $nombreusuario); ?> </span> <span class="caret"></span>
                         </button>
