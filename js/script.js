@@ -1,5 +1,9 @@
 $(document).ready(function () {
     loadView('paginicio');
+
+    if($('#main-menu').length > 0){
+        FInicia();
+    }
 });
 
 function getUserFirstSession() {
@@ -20,6 +24,92 @@ function getUserFirstSession() {
     });
 }
 
+
+//-------------------------CIERRE DE SESION AUTOMATICA
+var min = 0;
+var seg = 0;
+var count_back = 6;
+
+function FReset(){
+	min = 0;
+	seg = 0;
+	count_back = 6;
+}
+
+function FInicia(){
+    document.onmousemove = function(){ FReset(); }
+    document.onkeyup = function(){ FReset(); }
+
+    setInterval(()=>{
+        seg++;
+        if(seg == 60)
+        {
+            min++;
+            seg = 0;
+        }
+        if(min == 14 && seg == 55){
+            alertify.alert().setting({
+                'closable': false,
+                'title': 'ATENCIÓN',
+                'label':'CANCELAR',
+                'message': 'Tu sesión se cerrará por inactividad en <span id="timer"></span> segundos.' ,
+                'onok': function(){ FReset(); }
+            }).show();
+            
+            setTimeout(function() {
+                $('.ajs-button.ajs-ok').css({
+                    'color': 'red',
+                    'border':'none !important',
+                    'border': '1px solid red',
+                    'border-radius': '5px',
+                    'cursor': 'pointer',
+                    'font-weight': 'bold',
+                    'padding': '8px 15px',
+                    'margin': '5px',
+                    'text-decoration': 'none',
+                    'display': 'inline-block',
+                });
+            }, 100);
+        }
+        
+        if(min == 14 && seg >= 55){
+            count_back--;
+            $('#timer').html(count_back);
+        }
+        if(count_back == 1){
+            logout(987);
+        }
+    },1000);
+}
+
+function logout(p = 0) {
+    cargandoShow();
+    $.ajax({
+        url: 'com.sine.enlace/enlacesession.php',
+        type: 'POST',
+        data: {transaccion: 'logout'},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 5000);
+            if (bandera == 0) {
+                alertify.error(res);
+            } else {
+                if (datos == 'salir') {
+                    if(p == 0) {
+                        location.href = 'index.php';
+                    }else{
+                        location.href = 'timeout.php';
+                    }
+                    
+                } else {
+                    alertify.error(res);
+                }
+            }
+            cargandoHide();
+        }
+    });
+}
 
 
 //Mostrar el spinner loading...
@@ -348,30 +438,6 @@ function loadBtnCrear(view) {
             var bandera = texto.substring(0, 1);
             var res = texto.substring(1, 1000);
             $("#btn-crear").html(datos);
-            cargandoHide();
-        }
-    });
-}
-
-function logout() {
-    cargandoShow();
-    $.ajax({
-        url: 'com.sine.enlace/enlacesession.php',
-        type: 'POST',
-        data: {transaccion: 'logout'},
-        success: function (datos) {
-            var texto = datos.toString();
-            var bandera = texto.substring(0, 1);
-            var res = texto.substring(1, 5000);
-            if (bandera == 0) {
-                alertify.error(res);
-            } else {
-                if (datos == 'salir') {
-                    location.href = 'index.php';
-                } else {
-                    alertify.error(res);
-                }
-            }
             cargandoHide();
         }
     });

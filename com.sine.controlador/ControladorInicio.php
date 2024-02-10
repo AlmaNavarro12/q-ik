@@ -48,7 +48,6 @@ class ControladorInicio {
         closedir($dir);
     }
 
-    //Declarada pero no usada
     public function iniFile() {
         $sampleData = array(
             'database' => array(

@@ -125,26 +125,19 @@ function grafica(datos) {
             datasets: [{
                 label: 'Totales Facturas',
                 data: f2,
-                backgroundColor: colorF,
-                borderColor: colorF,
+                backgroundColor: [colorF, colorF, colorF, colorF, colorF, colorF, colorF, colorF, colorF, colorF, colorF, colorF],
+                borderColor: [colorF, colorF, colorF, colorF, colorF, colorF, colorF, colorF, colorF, colorF, colorF, colorF],
                 borderWidth: 2
             }, {
                 label: 'Totales Cartas',
                 data: c2,
-                backgroundColor: colorC,
-                borderColor: colorC,
+                backgroundColor: [colorC, colorC, colorC, colorC, colorC, colorC, colorC, colorC, colorC, colorC, colorC, colorC],
+                borderColor: [colorC, colorC, colorC, colorC, colorC, colorC, colorC, colorC, colorC, colorC, colorC, colorC],
                 borderWidth: 2
             }]
         },
         options: {
             plugins: {
-                legend: {
-                    labels: {
-                        font: {
-                            size: 16
-                        }
-                    }
-                },
                 datalabels: {
                     align: 'top',
                     backgroundColor: 'rgba(0, 0, 0, 0.4)',
@@ -156,11 +149,33 @@ function grafica(datos) {
                         return '$' + value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                     }
                 }
+            },
+            legend: {
+                labels: {
+                    font: {
+                        size: 16
+                    }
+                }
+            },
+            tooltip: {
+                callbacks: {
+                    label: function (context) {
+                        return context.dataset.label + ': $' + context.dataset.data[context.dataIndex].toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    }
+                }
+            },
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero:true
+                    }
+                }]
             }
-        }
+        },
     });
     cargandoHide();
 }
+
 
 
 function buscarGrafica() {

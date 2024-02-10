@@ -390,13 +390,16 @@ header {
 .boton-azul {
     background-color: #17177C;
     border-radius: 50px;
-    padding: 10px 20px; /* Ajusta el relleno según sea necesario */
+    padding: 10px 20px; 
     color: #FFFFFF;
     position: absolute;
     top: 0;
     right: 0;
     min-width: 80px;
     height: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .user-option {
@@ -1139,4 +1142,34 @@ table.table-row tr td {
 
 .new-tooltip.tip .tiptext {
     color: #4183d7;
+}
+
+.fijo {
+    background-color: #EDEDF4;
+    position: sticky; 
+    top: 90; 
+    z-index: 100;
+}
+
+.line {
+    height: 100px; 
+    width: 2px; 
+    background-color: #09096B; 
+    margin: 0 20px; 
+}
+
+.boton-cancelar {
+    color: red;
+    border: 1px solid red;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    padding: 8px 15px;
+    margin: 5px;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.ajs-button.ajs-ok:focus {
+    outline: none; 
 }

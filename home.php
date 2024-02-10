@@ -69,7 +69,7 @@ require_once 'Enrutador.php';
 
 <body style="position: fixed; width: 100%;">
     <div style="overflow-y: scroll; height: 100%;" id="">
-        <header class="w-100 position-fixed">
+        <header class="w-100 position-fixed mb-0 pb-0">
             <div class="smh-square position-absolute"></div>
             <div class="mdh-square position-absolute"></div>
             <span id="menu-icon" class="lnr lnr-menu show-menu position-fixed p-2 mt-4"></span>
