@@ -290,6 +290,7 @@ class ControladorInicio {
         }
         return $datos . "<dataset>" . $totales . "<dataset>" . $cancelados . "<dataset>" . $sintimbre;
     }
+    
     private function getDatosAux($y, $m, $con) {
         $consultado = false;
         $consulta = "select count(*) emitidas from datos_factura where fecha_creacion like '$y-$m%' $con;";

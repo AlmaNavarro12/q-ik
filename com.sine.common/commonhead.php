@@ -25,9 +25,9 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
 
     <!--Graficas-->
-    <script src="chart/Chart.min.js"></script>
-    <script src="chart/Chart.bundle.min.js"></script>
-    <script src="chart/chartjs-plugin-labels.js"></script>
+    <script src="chart/chart.min.js"></script>
+    <script src="chart/chart-plugin-datalabels.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
 
     <!-- Scripts adicionales -->
     <script src="js/jquery-ui.min.js"></script>

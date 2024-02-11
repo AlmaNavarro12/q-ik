@@ -1,5 +1,5 @@
 <div class=" p-0 m-0">
-    <div class="p-0 m-0 fijo">
+    <div class="p-0 m-0 fijo z-1">
         <div class="row pt-0 mt-0">
             <div class="col-md-6">
                 <div class="titulo-lista">Inicio</div>

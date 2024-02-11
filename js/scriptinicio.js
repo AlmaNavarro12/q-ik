@@ -102,6 +102,7 @@ function poolColors(a) {
 }
 
 function grafica(datos) {
+    Chart.register(ChartDataLabels);
     var arrcfdi = datos.split("<datacfdi>");
     var array = arrcfdi[0].split("<dataset>");
     var f1 = array[0].split("</tr>");
@@ -117,7 +118,7 @@ function grafica(datos) {
     var c4 = array2[3].split("</tr>");
     var colorC = poolColors(1).toString();
 
-    var popCanvas = $("#chart1");
+    var popCanvas = document.getElementById("chart1");
     var barChart = new Chart(popCanvas, {
         type: 'bar',
         data: {
@@ -136,47 +137,44 @@ function grafica(datos) {
                 borderWidth: 2
             }]
         },
+        plugins: [ChartDataLabels],
         options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            },
             plugins: {
                 datalabels: {
                     align: 'top',
-                    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
                     borderRadius: 20,
                     color: 'white',
-                    rotation: 90,
+                    rotation: 270,
                     padding: 5,
                     formatter: function (value, context) {
                         return '$' + value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                     }
-                }
-            },
-            legend: {
-                labels: {
-                    font: {
-                        size: 16
+                },
+                legend: {
+                    labels: {
+                        font: {
+                            size: 15
+                        }
                     }
-                }
-            },
-            tooltip: {
-                callbacks: {
-                    label: function (context) {
-                        return context.dataset.label + ': $' + context.dataset.data[context.dataIndex].toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function (context) {
+                            return context.dataset.label + ': $' + context.dataset.data[context.dataIndex].toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        }
                     }
-                }
+                },
             },
-            scales: {
-                yAxes: [{
-                    ticks: {
-                        beginAtZero:true
-                    }
-                }]
-            }
-        },
+        }
     });
     cargandoHide();
 }
-
-
 
 function buscarGrafica() {
     var d = new Date();
