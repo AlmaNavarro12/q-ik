@@ -63,7 +63,7 @@ require_once 'Enrutador.php';
     echo "<script>var uid = '" . $uid . "';</script>";
     echo "<script>var nombreusuario = '" . $nombreusuario . "';</script>";
     echo "<script>var imagenperfil = '" . $imgperfil . "';</script>";
-
+    echo "<script>var cartaportepermiso = '" . $cartaporte . "';</script>";
     ?>
 </head>
 

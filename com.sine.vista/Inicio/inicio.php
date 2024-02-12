@@ -1,27 +1,34 @@
+<?php
+if (isset($_SESSION[sha1('paquete')])) {
+    echo "<script>var paquete = '" . $_SESSION[sha1('paquete')] . "';</script>";
+} else {
+    echo "<script>var paquete = '1';</script>";
+}?>
+
 <div class=" p-0 m-0">
     <div class="p-0 m-0 fijo z-1">
         <div class="row pt-0 mt-0">
             <div class="col-md-6">
                 <div class="titulo-lista">Inicio</div>
             </div>
-            <div class="col-md-6 text-end">
+            <div class="col-md-6 text-end pe-4">
                 <a class="btn button-inicio" href="../Registro/comprar.php">Comprar Timbres <span class="fas fa-credit-card"></span></a>
             </div>
         </div>
     </div>
     <div class="container-fluid">
-        <div class="row py-1 px-3 d-flex justify-content-between flex-wrap">
-            <div class="col-md-4 py-1 boton-largo row">
-                <label class="label-index text-start ps-2 col-9 fw-semibold text-muted py-2">Timbres Disponibles:</label>
-                <label class="boton-azul text-center pt-2 col-3" id="contenedor-timbres">0</label>
+        <div class="row py-1 d-flex justify-content-between flex-wrap g-1">
+            <div class="col-md-3 py-1 boton-largo row">
+                <label class="label-index text-start col-10 text-muted py-1">Timbres Disponibles:</label>
+                <label class="boton-azul text-center col-3 pb-3" id="contenedor-timbres">0</label>
             </div>
             <div class="col-md-3 py-1 boton-largo row">
-                <label class="label-index text-start ps-2 col-9 fw-semibold text-muted py-2">Timbres Utilizados:</label>
-                <label class="boton-azul text-center pt-2 col-3" id="contenedor-usados">0</label>
+                <label class="label-index text-start col-9 text-muted py-1">Timbres Utilizados:</label>
+                <label class="boton-azul text-center col-3 pb-3" id="contenedor-usados">0</label>
             </div>
-            <div class="col-md-4 py-1 boton-largo row">
-                <label class="label-index text-start ps-2 col-7 fw-semibold text-muted py-2">Plan de Facturación:</label>
-                <label class="boton-azul text-center pt-2 col-5" id="contenedor-plan">Paquete Básico</label>
+            <div class="col-md-5 py-1 boton-largo row">
+                <label class="label-index text-start col-7 text-muted py-1">Plan de Facturación:</label>
+                <label class="boton-azul text-center col-5" id="contenedor-plan">Paquete Básico</label>
             </div>
         </div>
         <div class="div-form px-5 py-4 mt-2">

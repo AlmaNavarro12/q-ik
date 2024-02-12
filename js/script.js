@@ -111,7 +111,6 @@ function logout(p = 0) {
     });
 }
 
-
 //Mostrar el spinner loading...
 function cargandoShow() {
     $("body").append("<div id='contenedor-loader'></div>");

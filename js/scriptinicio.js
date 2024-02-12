@@ -119,23 +119,29 @@ function grafica(datos) {
     var colorC = poolColors(1).toString();
 
     var popCanvas = document.getElementById("chart1");
+    var datasets = [{
+        label: 'Totales Facturas',
+        data: f2,
+        backgroundColor: [colorF, colorF, colorF, colorF, colorF, colorF, colorF, colorF, colorF, colorF, colorF, colorF],
+        borderColor: [colorF, colorF, colorF, colorF, colorF, colorF, colorF, colorF, colorF, colorF, colorF, colorF],
+        borderWidth: 2
+    }];
+
+    if (cartaportepermiso == 1 && paquete != 1) {
+        datasets.push({
+            label: 'Totales Cartas',
+            data: c2,
+            backgroundColor: [colorC, colorC, colorC, colorC, colorC, colorC, colorC, colorC, colorC, colorC, colorC, colorC],
+            borderColor: [colorC, colorC, colorC, colorC, colorC, colorC, colorC, colorC, colorC, colorC, colorC, colorC],
+            borderWidth: 2
+        });
+    }
+
     var barChart = new Chart(popCanvas, {
         type: 'bar',
         data: {
             labels: ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
-            datasets: [{
-                label: 'Totales Facturas',
-                data: f2,
-                backgroundColor: [colorF, colorF, colorF, colorF, colorF, colorF, colorF, colorF, colorF, colorF, colorF, colorF],
-                borderColor: [colorF, colorF, colorF, colorF, colorF, colorF, colorF, colorF, colorF, colorF, colorF, colorF],
-                borderWidth: 2
-            }, {
-                label: 'Totales Cartas',
-                data: c2,
-                backgroundColor: [colorC, colorC, colorC, colorC, colorC, colorC, colorC, colorC, colorC, colorC, colorC, colorC],
-                borderColor: [colorC, colorC, colorC, colorC, colorC, colorC, colorC, colorC, colorC, colorC, colorC, colorC],
-                borderWidth: 2
-            }]
+            datasets: datasets
         },
         plugins: [ChartDataLabels],
         options: {

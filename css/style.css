@@ -383,19 +383,20 @@ header {
 .label-index{
     font-family: sans-serif;
     font-style: normal;
+    font-weight: 600;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
 }
+
 .boton-azul {
     background-color: #17177C;
     border-radius: 50px;
-    padding: 10px 20px; 
+    padding: 7px 20px; 
     color: #FFFFFF;
     position: absolute;
     top: 0;
     right: 0;
-    min-width: 80px;
     height: 100%;
     overflow: hidden;
     white-space: nowrap;
@@ -767,21 +768,23 @@ article {
 }
 
 
-.input-form {
+.input-form, .input-form:focus, .input-form:active{
     min-width: 120px;
     width: 100%;
     height: 45px;
-    border: 2px solid #D6D6DF;
+    border: 2px solid #D6D6DF !important;
     box-sizing: border-box;
     border-radius: 5px;
     font-family: sans-serif;
     font-style: normal;
     font-weight: normal;
     font-size: 15px;
+    outline: none;
 }
 
 .input-form option {
     width: 100px;
+    outline: none;
 }
 
 .button-check {
