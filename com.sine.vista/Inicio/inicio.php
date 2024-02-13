@@ -18,16 +18,16 @@ if (isset($_SESSION[sha1('paquete')])) {
     </div>
     <div class="container-fluid">
         <div class="row py-1 d-flex justify-content-between flex-wrap g-1">
-            <div class="col-md-3 py-1 boton-largo row">
-                <label class="label-index text-start col-10 text-muted py-1">Timbres Disponibles:</label>
-                <label class="boton-azul text-center col-3 pb-3" id="contenedor-timbres">0</label>
+            <div class="col-md-3 py-1 boton-largo row ps-0">
+                <label class="label-index text-start col-11 py-1">Timbres Disponibles:</label>
+                <label class="boton-azul text-center col-4 pb-3" id="contenedor-timbres"></label>
             </div>
-            <div class="col-md-3 py-1 boton-largo row">
-                <label class="label-index text-start col-9 text-muted py-1">Timbres Utilizados:</label>
-                <label class="boton-azul text-center col-3 pb-3" id="contenedor-usados">0</label>
+            <div class="col-md-3 py-1 boton-largo row ps-0">
+                <label class="label-index text-start col-9 py-1">Timbres Utilizados:</label>
+                <label class="boton-azul text-center col-4 pb-3" id="contenedor-usados"></label>
             </div>
-            <div class="col-md-5 py-1 boton-largo row">
-                <label class="label-index text-start col-7 text-muted py-1">Plan de Facturación:</label>
+            <div class="col-md-5 py-1 boton-largo row ps-0">
+                <label class="label-index text-start col-7 py-1">Plan de Facturación:</label>
                 <label class="boton-azul text-center col-5" id="contenedor-plan">Paquete Básico</label>
             </div>
         </div>

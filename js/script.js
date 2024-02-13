@@ -1,29 +1,11 @@
 $(document).ready(function () {
     loadView('paginicio');
+    valPeriodoPrueba();
 
     if($('#main-menu').length > 0){
         FInicia();
     }
 });
-
-function getUserFirstSession() {
-    $.ajax({
-        url: "com.sine.enlace/enlaceinicio.php",
-        type: "POST",
-        data: {transaccion: "firstsession"},
-        success: function (datos) {
-            var texto = datos.toString();
-            var bandera = texto.substring(0, 1);
-            var res = texto.substring(1, 1000);
-
-            if (datos == '0') {
-                $("#modal-alert").modal('show');
-                $("#alert-body").html("<div class='text-justify'><p class='alert-title text-center'>Bienvenido a Q-ik</p> <p class='alert-title text-center'>Tu sistema de facturaci&oacute;n en la nube.</p> <p class='alert-text'>Para dar tus primeros pasos en el sistema recuerda dar de alta la siguiente informaci&oacute;n: </p> <ul class='alert-text' style='padding-left:50px;'><li>Datos de facturaci&oacute;n</li> <li>Datos de impuestos</li> <li>Folios de facturaci&oacute;n</li></ul> <p class='alert-text'>Si deseas saber como realizar estos pasos te invitamos a visitar nuestro canal de Youtube, donde encontraras tutoriales para los distintos m&oacute;dulos del sistema <a href='https://www.youtube.com/playlist?list=PL3Iwrxm9g7E0cq3fhRdshFEUcpwx44u1d' target='_blank'>Iniciar en Q-ik</a></p> <p class='alert-text'>Para recibir soporte t&eacute;cnico o resolver dudas puedes usar el m&oacute;dulo de soporte t&eacute;cnico en el men&uacute; del sistema.</p> <p class='alert-title text-center'>Gracias por tu preferencia</p></div>");
-            }
-        }
-    });
-}
-
 
 //-------------------------CIERRE DE SESION AUTOMATICA
 var min = 0;
@@ -107,6 +89,45 @@ function logout(p = 0) {
                 }
             }
             cargandoHide();
+        }
+    });
+}
+
+//-------------------------MODO PRUEBA
+function valPeriodoPrueba() {
+    $.ajax({
+        url: 'com.sine.enlace/enlaceinicio.php',
+        type: 'POST',
+        data: {transaccion: 'valperiodo'},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 5000);
+            if (bandera == 0) {
+                $("#modal-alert").modal('show');
+                $("#titulo-alerta").html("Modo de prueba expirado");
+                $("#alert-body").html(res);
+            } else {
+            }
+        }
+    });
+}
+
+function getUserFirstSession() {
+    $.ajax({
+        url: "com.sine.enlace/enlaceinicio.php",
+        type: "POST",
+        data: {transaccion: "firstsession"},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 1000);
+
+            if (datos == '0') {
+                $("#modal-alert").modal('show');
+                $("#titulo-alerta").html("Bienvenido a Q-ik.");
+                $("#alert-body").html("<div class='text-justify'>Tu sistema de facturaci&oacute;n en la nube.</p> <p class='alert-text'>Para dar tus primeros pasos en el sistema recuerda dar de alta la siguiente informaci&oacute;n: </p> <ul class='alert-text' style='padding-left:50px;'><li>Datos de facturaci&oacute;n</li> <li>Datos de impuestos</li> <li>Folios de facturaci&oacute;n</li></ul> <p class='alert-text'>Si deseas saber como realizar estos pasos te invitamos a visitar nuestro canal de Youtube, donde encontraras tutoriales para los distintos m&oacute;dulos del sistema <a href='https://www.youtube.com/playlist?list=PL3Iwrxm9g7E0cq3fhRdshFEUcpwx44u1d' target='_blank'>Iniciar en Q-ik</a></p> <p class='alert-text'>Para recibir soporte t&eacute;cnico o resolver dudas puedes usar el m&oacute;dulo de soporte t&eacute;cnico en el men&uacute; del sistema.</p> <p class='alert-title text-center'>Gracias por tu preferencia</p></div>");
+            }
         }
     });
 }

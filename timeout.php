@@ -1,8 +1,16 @@
+<?php
+session_start();
+if (isset($_SESSION[sha1('usuario')]) || !isset($_SESSION[sha1('usuario')])) {
+    header("Location: home.php");
+    exit();
+}
+require_once 'Enrutador.php';
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <!--Cabecera comun de hojas de estilos y scripts-->
     <?php include 'com.sine.common/commonhead.php'; ?>
 </head>
 

@@ -382,9 +382,10 @@ header {
 
 .label-index{
     font-family: sans-serif;
-    font-style: normal;
-    font-weight: 600;
     overflow: hidden;
+    font-weight: 600;
+    font-size: 15px;
+    color: #09096B;
     white-space: nowrap;
     text-overflow: ellipsis;
 }
@@ -1175,4 +1176,17 @@ table.table-row tr td {
 
 .ajs-button.ajs-ok:focus {
     outline: none; 
+}
+
+/*--------------------------------ALERTAS*/
+.alert-text{
+    padding-top: 10px;
+    font-family: sans-serif;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 18px;
+    line-height: 180%;
+    text-transform: uppercase;
+    color: #17177C;
+    padding-bottom: 10px;
 }

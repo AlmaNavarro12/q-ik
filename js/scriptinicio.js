@@ -127,7 +127,7 @@ function grafica(datos) {
         borderWidth: 2
     }];
 
-    if (cartaportepermiso == 1 && paquete != 1) {
+    if (paquete != 1) {
         datasets.push({
             label: 'Totales Cartas',
             data: c2,
@@ -141,7 +141,7 @@ function grafica(datos) {
         type: 'bar',
         data: {
             labels: ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
-            datasets: datasets
+            datasets: datasets,
         },
         plugins: [ChartDataLabels],
         options: {

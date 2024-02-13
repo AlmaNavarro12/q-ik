@@ -124,7 +124,7 @@ class ControladorInicio {
         return $datos;
     }
     
-    private function getNombrePaquete($aid) {
+    private function  getNombrePaquete($aid) {
         $paquete = "Prueba";
         $servidor = "localhost";
         $basedatos = "sineacceso";

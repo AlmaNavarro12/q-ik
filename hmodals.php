@@ -108,3 +108,23 @@
         </div>
     </div>
 </div>
+
+<!--ALERTAS-->
+<div class="modal fade" id="modal-alert" tabindex="-1" aria-labelledby="exampleModalLabel" data-bs-backdrop="static" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+        <div class="modal-header py-0">
+                <div class="label-sub fs-5 py-0" id="titulo-alerta">
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert-text fs-6" style="text-align: justify;" id="alert-body">
+                </div>
+                <div class="text-end mt-3">
+                    <a href="http://localhost/Registro/comprar.php"><button id="btn-alert" type="button" class="button-file fs-6 fw-bold">Comprar Timbres <span class="fas fa-credit-card"></span></button></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

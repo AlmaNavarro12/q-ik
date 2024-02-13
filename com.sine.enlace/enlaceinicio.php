@@ -28,7 +28,7 @@ if (isset($_POST['transaccion'])) {
             echo ($datos = $ci->getDatos($_POST['ano'])) ? $datos : "0No hay cartas porte asignadas a este permisionario.";
             break;
         case 'valperiodo':
-            echo (!$ci->checkAcceso()) ? "1Si" : "0Su periodo de prueba de 15 días ha concluido. Si deseas seguir usando Q-ik, te invitamos a adquirir el paquete de timbres que más se ajuste a tus necesidades para continuar con el servicio";
+            echo (!$ci->checkAcceso()) ? "1Si" : "0Tu modo prueba de 15 días ha concluido. Si deseas seguir usando Q-ik, te invitamos a adquirir el paquete de timbres que más se ajuste a tus necesidades para continuar con el servicio.";
             break;
         case 'sendmsg':
             echo ($insertado = $ci->sendMSG()) ? $insertado : "0Error: no inserto el registro.";
