@@ -20,7 +20,6 @@ class ControladorConfiguracion
     }
 
     //---------------------------------------------------GENERAL
-    
     private function getBancoAux($banco){
         $consulta = "SELECT idcatalogo_banco FROM catalogo_banco WHERE nombre_banco LIKE '%$banco%' OR descripcion_banco LIKE '%$banco%';";
         return $this->consultas->getResults($consulta, null);

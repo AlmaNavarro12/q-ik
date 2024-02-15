@@ -53,4 +53,35 @@ class ControladorOpcion {
         }
         return $r;
     }
+
+    public function opcionesFolios($id, $serie, $folio) {
+        $datos = $this->getFoliosAux();
+        $op = "";
+        $check = false;
+    
+        foreach ($datos as $actual) {
+            $consecutivo = str_pad($actual['consecutivo'], 4, '0', STR_PAD_LEFT);
+    
+            $selected = ($id == $actual['usofolio'] || in_array($id, explode("-", $actual['usofolio']))) ? "selected" : "";
+    
+            $op .= "<option class='option-folio text-start ps-5' id='folio{$actual['idfolio']}' value='{$actual['idfolio']}' $selected> Serie {$actual['serie']}-{$actual['letra']}$consecutivo</option>";
+    
+            if ($selected) {
+                $check = true;
+            }
+        }
+    
+        if ($id == "0" && !$check) {
+            $op .= "<option selected id='folio{$id}' value='{$id}'> Serie {$serie}-{$folio}</option>";
+        }
+    
+        return $op;
+    }
+
+    private function getFoliosAux() {
+        $consultado = false;
+        $consulta = "SELECT * FROM folio ORDER BY serie;";
+        $consultado = $this->consultas->getResults($consulta, null);
+        return $consultado;
+    }
 }

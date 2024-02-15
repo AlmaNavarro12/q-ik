@@ -6,15 +6,18 @@
 
     <!-- Bootstrap 5.3 CSS -->
     <link rel="stylesheet" href="css/bootstrap/bootstrap.css">
+    
+    <!-- Otros estilos-->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/jquery-ui.css">
+    <link rel="stylesheet" href="css/jquery-ui.themes.css">
 
     <!-- jQuery 3.7.1 -->
     <script src="js/jquery-3.7.1.min.js"></script>
+    <script src="js/jquery-ui.min.js"></script>
 
     <!-- Bootstrap 5.3 JS -->
     <script src="css/js/bootstrap.bundle.min.js"></script>
-
-    <!-- Otros estilos-->
-    <link rel="stylesheet" href="css/style.css">
 
     <!--Alertas-->
     <link rel="stylesheet" href="css/bootstrap/alertify.min.css" />
@@ -30,7 +33,6 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
 
     <!-- Scripts adicionales -->
-    <script src="js/jquery-ui.min.js"></script>
     <script src="js/alertify.min.js"></script>
     <script type="text/javascript" src="js/validator.min.js" charset="UTF-8"></script>
     <script src="js/script.js"></script>

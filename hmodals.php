@@ -119,7 +119,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div class="alert-text fs-6" style="text-align: justify;" id="alert-body">
+                <div class="alert-text fs-6 fw-bold" style="text-align: justify;" id="alert-body">
                 </div>
                 <div class="text-end mt-3">
                     <a href="http://localhost/Registro/comprar.php"><button id="btn-alert" type="button" class="button-file fs-6 fw-bold">Comprar Timbres <span class="fas fa-credit-card"></span></button></a>

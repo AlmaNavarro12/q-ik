@@ -818,3 +818,21 @@ function loadopcionesAno() {
         }
     });
 }
+
+function loadOpcionesFolios(id = "" , serie = "", folio = "") {
+    $.ajax({
+        url: 'com.sine.enlace/enlaceopcion.php',
+        type: 'POST',
+        data: {transaccion: 'opcionesfolio', id:id, serie:serie, folio:folio},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 5000);
+            if (bandera == 0) {
+                alertify.error(res);
+            } else {
+                $(".contenedor-folios").html(datos);
+            }
+        }
+    });
+}
