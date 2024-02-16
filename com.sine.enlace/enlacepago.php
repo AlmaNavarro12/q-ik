@@ -7,6 +7,8 @@ require_once '../com.sine.modelo/Session.php';
 require_once '../com.sine.modelo/Pago.php';
 
 $cp = new ControladorPago();
+$t = new TMPPago();
+
 
 if (isset($_POST['transaccion'])) {
     $transaccion = $_POST['transaccion'];
@@ -16,11 +18,20 @@ if (isset($_POST['transaccion'])) {
             $datos = $cp->listaServiciosHistorial($_POST['REF'], $_POST['pag'], $_POST['numreg']);
             echo $datos != "" ? $datos : "0Ha ocurrido un error.";
             break;
-            case 'emisor':
-                $folio = $cp->getDatosEmisor($_POST['iddatos']);
-                echo $folio ?: "0No se han encontrado datos.";
-                break;
-        
+        case 'emisor':
+            $folio = $cp->getDatosEmisor($_POST['iddatos']);
+            echo $folio ? $folio : "0No se han encontrado datos.";
+            break;
+        case 'gettipocambio':
+            $datos = $cp->getTipoCambio($_POST['idmoneda']);
+            echo $datos != "" ? $datos : "0Error al obtener los datos.";
+            break;
+        case 'loadtabla':
+            $insertado = $cp->getTabla($sid, $_POST['tag'], $$_POST['idmoneda'], $_POST['tcambio'], session_id());
+            echo $insertado ? $insertado : "0Error: No se insertó el registro.";
+            break;
+        case 'nuevocomplemento':
+            echo $datos = $cp->nuevoComplemento($_POST['comp']);
     }
 }
 
@@ -39,8 +50,7 @@ $cpp = new ControladorPagoPermi();
 if (isset($_POST['transaccion'])) {
     $transaccion = $_POST['transaccion'];
     switch ($transaccion) {
-        case 'nuevocomplemento':
-            echo $datos = $cp->nuevoComplemento($_POST['comp']);
+        
         case 'listapagoaltas':
             $datos = "";
             $datos = $cp->listaServiciosHistorial($_POST['REF'], $_POST['pag'], $_POST['numreg']);
@@ -62,10 +72,7 @@ if (isset($_POST['transaccion'])) {
             $datos = $cp->updateTipoCambio();
             echo $datos != "" ? $datos : "0Error al obtener los datos.";
             break;
-        case 'gettipocambio':
-            $datos = $cp->getTipoCambio($_POST['idmoneda']);
-            echo $datos != "" ? $datos : "0Error al obtener los datos.";
-            break;
+        
         case 'mail':
             $idfactura =
                 $datos = $cf->mail($_POST['idfactura']);

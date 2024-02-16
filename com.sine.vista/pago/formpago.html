@@ -11,6 +11,13 @@
             </div>
         </div>
         <div class="row" id="not-timbre">
+            <div class="row">
+                <div class="col-md-12">
+                    <button id="btn-nuevo-producto" type="button" class="button-modal" onclick="agregarComplemento()">
+                        <span class="glyphicon glyphicon-plus"></span> Agregar nuevo complemento
+                    </button>
+                </div>
+            </div>
         </div>
         <div class="row">
             <div class="col-md-8">
@@ -35,9 +42,9 @@
                 <label class="label-form text-right" for="folio-pago">Folio de pago</label> <label
                     class="mark-required text-danger fw-bold">*</label>
                 <div class="form-group">
-                    <select class="select-control text-center input-form" id="folio-pago" name="folio-pago">
+                    <select class="select-control text-center px-2 input-form" id="folio-pago" name="folio-pago">
                         <option value="" id="option-default-folio">- - - -</option>
-                        <optgroup id="foliopagos" class="contenedor-folios text-left"> </optgroup>
+                        <optgroup id="foliopagos" class="contenedor-folios text-start ps-4"> </optgroup>
                     </select>
                     <div id="folio-pago-errors"></div>
                 </div>
@@ -46,10 +53,10 @@
                 <label class="label-form text-right" for="datos-facturacion">Datos de facturaci&oacute;n</label> <label
                     class="mark-required text-danger fw-bold">*</label>
                 <div class="form-group">
-                    <select class="select-control text-center input-form" id="datos-facturacion"
+                    <select class="select-control text-center px-2 input-form" id="datos-facturacion"
                         name="datos-facturacion" onchange="loadFolioPago();">
                         <option value="" id="option-default-datos">- - - -</option>
-                        <optgroup id="datosfacturar" class="contenedor-datos text-start"> </optgroup>
+                        <optgroup id="contenedor-datos" class="contenedor-datos text-start"> </optgroup>
                     </select>
                     <div id="datos-facturacion-errors"></div>
                 </div>
@@ -167,39 +174,38 @@
                 <label class="label-sub">Datos de Pago</label>
             </div>
         </div>
-
         <div class="row">
             <div class="col-md-4 py-2">
-                <label class="label-form text-right" for="id-forma-pago">Forma de pago</label> <label
+                <label class="label-form text-right" for="id-forma-pago">Forma de pagos</label> <label
                     class="mark-required text-danger fw-bold">*</label>
                 <div class="form-group">
                     <div>
-                        <select class="select-control text-center input-form" id="id-forma-pago" name="id-forma-pago"
-                            onchange="disableCuenta();">
-                            <option value="" id="option-default-forma-pago">- - - -</option>
-                            <optgroup id="forma-pago" class="contenedor-forma-pago text-left"> </optgroup>
+                        <select class="select-control text-center px-2 input-form" id="id-forma-pago" name="id-forma-pago"
+                            onchange="disableCuenta();"> 
+                            <option value="" class="" id="option-default-forma-pago">- - - -</option>
+                            <optgroup id="forma-pago" class="contenedor-forma-pago"> </optgroup>
                         </select>
                     </div>
                     <div id="id-forma-pago-errors"></div>
                 </div>
             </div>
 
-            <div class="col-md-2">
+            <div class="col-md-2 py-2">
                 <label class="label-form text-right" for="id-moneda-pago">Moneda de pago</label> <label
                     class="mark-required text-danger fw-bold">*</label>
                 <div class="form-group">
                     <div>
-                        <select class="select-control text-center input-form" id="id-moneda-pago" name="id-moneda-pago"
+                        <select class="select-control text-center px-2 input-form" id="id-moneda-pago" name="id-moneda-pago"
                             onchange="getTipoCambio(); loadTablaCFDI();">
                             <option value="" id="option-default-moneda-pago">- - - -</option>
-                            <optgroup id="moneda-pago" class="contenedor-moneda text-left"> </optgroup>
+                            <optgroup id="moneda-pago" class="contenedor-moneda text-start"> </optgroup>
                         </select>
                     </div>
                     <div id="id-moneda-pago-errors"></div>
                 </div>
             </div>
 
-            <div class="col-md-2">
+            <div class="col-md-2 py-2">
                 <label class="label-form text-right" for="tipo-cambio">Tipo de cambio</label>
                 <label class="mark-required text-danger fw-bold"></label>
                 <div class="form-group">
@@ -233,10 +239,10 @@
                 <label class="label-form text-right" for="id-bancocuenta">Cuenta ordenante (Cliente)</label>
                 <label class="mark-required text-danger fw-bold"></label>
                 <div class="form-group">
-                    <select class="select-control text-center input-form" id="id-bancocuenta" name="id-bancocuenta"
+                    <select class="select-control text-center px-2 input-form" id="id-bancocuenta" name="id-bancocuenta"
                         disabled>
                         <option value="" id="option-default-id-bancocuenta">- - - -</option>
-                        <optgroup id="ordenante" class="contenedor-id-bancocuenta text-left"> </optgroup>
+                        <optgroup id="ordenante" class="contenedor-id-bancocuenta text-start"> </optgroup>
                     </select>
                     <div id="id-bancocuenta-errors"></div>
                 </div>
@@ -250,7 +256,7 @@
                     <select class="select-control text-center input-form" id="id-bancobeneficiario"
                         name="id-bancobeneficiario" disabled>
                         <option value="" id="option-default-id-bancobeneficiario">- - - -</option>
-                        <optgroup id="beneficiario" class="contenedor-id-bancobeneficiario text-left"> </optgroup>
+                        <optgroup id="beneficiario" class="contenedor-id-bancobeneficiario text-start"> </optgroup>
                     </select>
                     <div id="id-bancobeneficiario-errors"></div>
                 </div>
@@ -288,6 +294,8 @@
                 </div>
             </div>
         </div>
+
+        
 
         <div class="row scrollX">
             <div class="col-md-12">

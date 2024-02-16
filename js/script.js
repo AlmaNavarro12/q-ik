@@ -774,7 +774,6 @@ function opcionesCorreoList() {
             var bandera = texto.substring(0, 1);
             var res = texto.substring(1, 5000);
             if (bandera == 0) {
-                //alertify.error(res);
             } else {
                 $(".contenedor-correos").html(datos);
             }
@@ -796,7 +795,6 @@ function loadOpcionesUsuario() {
             } else {
                 $(".contenedor-usuarios").html(datos);
             }
-            //cargandoHide();
         }
     });
 }
@@ -832,6 +830,52 @@ function loadOpcionesFolios(id = "" , serie = "", folio = "") {
                 alertify.error(res);
             } else {
                 $(".contenedor-folios").html(datos);
+            }
+        }
+    });
+}
+
+function loadOpcionesMoneda(idmoneda = "") {
+    $.ajax({
+        data : {transaccion: 'getOptions'},
+        url  : '../../CATSAT/CATSAT/com.sine.enlace/enlaceMonedas.php',
+        type : 'POST',
+        dataType : 'JSON',
+        success  : function(res){
+            if(res.status > 0){
+                $('#moneda-pago').html(res.datos);
+            }
+        }
+    });
+}
+
+function loadOpcionesFormaPago2() {
+    $.ajax({
+        data : {transaccion: 'getOptions'},
+        url  : '../../CATSAT/CATSAT/com.sine.enlace/enlaceFormaPago.php',
+        type : 'POST',
+        dataType : 'JSON',
+        success  : function(res){
+            if(res.status > 0){
+                $('#forma-pago').html(res.datos);
+            }
+        }
+    });
+}
+
+function loadOpcionesFacturacion(id = "") {
+    $.ajax({
+        url: 'com.sine.enlace/enlaceopcion.php',
+        type: 'POST',
+        data: {transaccion: 'opcionesfacturacion', id:id},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 5000);
+            if (bandera == 0) {
+                alertify.error(res);
+            } else {
+                $(".contenedor-datos").html(datos);
             }
         }
     });

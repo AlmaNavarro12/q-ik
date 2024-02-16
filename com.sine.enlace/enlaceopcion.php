@@ -8,19 +8,19 @@ if (isset($_POST['transaccion'])) {
     $datos = '';
 
     switch ($transaccion) {
-        /*case 'opcionesbancocliente':
+        case 'opcionesbancocliente':
             $datos = $co->opcionesBancobyCliente($_POST['idcliente']);
             break;
         case 'opcionesbeneficiario':
             $datos = $co->opcionesBeneficiario($_POST['iddatos']);
             break;
-        case 'opcionescliente':
+        /*case 'opcionescliente':
             $datos = $co->opcionesCliente();
-            break;
+            break;*/
         case 'opcionesfacturacion':
             $datos = $co->opcionesDatFacturacion($_POST['id']);
             break;
-        case 'opcionesmpago':
+        /*case 'opcionesmpago':
             $datos = $co->opcionesMetodoPago($_POST['selected']);
             break;
         case 'opcionesformapago':

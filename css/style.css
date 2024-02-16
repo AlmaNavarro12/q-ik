@@ -1212,3 +1212,8 @@ table.table-row tr td {
 .button-add-prod:hover{
     background: #EDEDF4;
 }
+
+.sub-tab-active{
+    border-color: #1DB4BF;
+    background: #EDEDF4;
+}
