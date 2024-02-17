@@ -22,12 +22,8 @@ if (isset($_POST['transaccion'])) {
             $folio = $cp->getDatosEmisor($_POST['iddatos']);
             echo $folio ? $folio : "0No se han encontrado datos.";
             break;
-        case 'gettipocambio':
-            $datos = $cp->getTipoCambio($_POST['idmoneda']);
-            echo $datos != "" ? $datos : "0Error al obtener los datos.";
-            break;
         case 'loadtabla':
-            $insertado = $cp->getTabla($sid, $_POST['tag'], $$_POST['idmoneda'], $_POST['tcambio'], session_id());
+            $insertado = $cp->getTabla($sid, $_POST['tag'], $_POST['idmoneda'], $_POST['tcambio'], session_id());
             echo $insertado ? $insertado : "0Error: No se insertó el registro.";
             break;
         case 'nuevocomplemento':

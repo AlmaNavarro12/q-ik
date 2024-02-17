@@ -13,7 +13,6 @@ $(function () {
     });
 });
 
-
 var comp = 1;
 function agregarComplemento() {
     $.ajax({
@@ -31,7 +30,6 @@ function agregarComplemento() {
                 $("#tabs").append(array[0]);
                 $("#complementos").append(array[1]);
                 var tag = array[2];
-
                 $(".sub-div").hide();
                 $(".tab-pago").removeClass("sub-tab-active");
 
@@ -44,6 +42,64 @@ function agregarComplemento() {
         }
     });
 }
+
+function loadFormaPago(tag="") {
+    $.ajax({
+        data : {transaccion: 'getOptions'},
+        url  : '../../CATSAT/CATSAT/com.sine.enlace/enlaceFormaPago.php',
+        type : 'POST',
+        dataType : 'JSON',
+        success  : function(res){
+            if(res.status > 0){
+                $(".cont-fpago-" + tag).html(res.datos);
+            }
+        }
+    });
+}
+
+function loadMonedaComplemento(tag = "") {
+    $.ajax({
+        data : {transaccion: 'getOptions'},
+        url  : '../../CATSAT/CATSAT/com.sine.enlace/enlaceMonedas.php',
+        type : 'POST',
+        dataType : 'JSON',
+        success  : function(res){
+            if(res.status > 0){
+                $(".contmoneda-" + tag).html(res.datos);
+            }
+        }
+    });
+}
+
+function cerrarComplemento(tab = "") {
+    alertify.confirm("Esta seguro que desea eliminar este complemento? (Toda la informacion ingresada se perdera)", function () {
+        if (tab == '') {
+            tab = $("#tabs").find('.sub-tab-active').attr("data-tab");
+        }
+        $.ajax({
+            url: 'com.sine.enlace/enlacepago.php',
+            type: 'POST',
+            data: {transaccion: 'borrarcomplemento', tab: tab},
+            success: function (datos) {
+                var texto = datos.toString();
+                var bandera = texto.substring(0, 1);
+                var res = texto.substring(1, 5000);
+                if (bandera == '0') {
+                    alertify.error(res);
+                } else {
+                    $("#tab-" + tab).remove();
+                    $("#complemento-" + tab).remove();
+                    var first = $("#tabs").find('.tab-pago:first').attr("data-tab");
+                    if (first) {
+                        $("#complemento-" + first).show();
+                        $("#tab-" + first).addClass("sub-tab-active");
+                    }
+                }
+            }
+        });
+    }).set({title: "Q-ik"});
+}
+
 
 function buscarPago(pag = "") {
     $.ajax({
@@ -146,36 +202,14 @@ function autocompletarCliente() {
     });
 }
 
-$(document).ready(function() {
-    $("#id-forma-pago").change(function() {
-        var formapago = $(this).val();
-        if (formapago == '2' || formapago == '3' || formapago == '4' || formapago == '5' || formapago == '6' || formapago == '18' || formapago == '19') {
-            $('#id-bancocuenta').removeAttr('disabled');
-            $("#id-bancobeneficiario").removeAttr('disabled');
-            $("#num-transaccion").removeAttr('disabled');
-            loadBancoCliente(formapago);
-            loadBancoBeneficiario(formapago);
-        } else {
-            $('#id-bancocuenta').attr('disabled', true);
-            $('#id-bancocuenta').val('');
-            $("#id-bancobeneficiario").attr('disabled', true);
-            $("#id-bancobeneficiario").val('');
-            $("#num-transaccion").attr('disabled', true);
-        }
-    });
-});
-
-/*
 function disableCuenta() {
     var tag = $("#tabs").find('.sub-tab-active').attr("data-tab");
-    alert(tag)
     var formapago = $("#forma-" + tag).val();
-    if (formapago == '2' || formapago == '3' || formapago == '4' || formapago == '5' || formapago == '7' || formapago == '8' || formapago == '20') {
+    if (formapago == '2' || formapago == '3' || formapago == '4' || formapago == '5' || formapago == '6' || formapago == '18' || formapago == '19') {
         $("#cuenta-" + tag).removeAttr('disabled');
         $("#benef-" + tag).removeAttr('disabled');
         $("#transaccion-" + tag).removeAttr('disabled');
         loadBancoCliente(tag);
-        
         loadBancoBeneficiario(tag);
     } else {
         $("#cuenta-" + tag).attr('disabled', true);
@@ -185,7 +219,7 @@ function disableCuenta() {
         $("#transaccion-" + tag).attr('disabled', true);
     }
 }
-*/
+
 
 function loadBancoCliente(tag) {
     $.ajax({
@@ -193,14 +227,13 @@ function loadBancoCliente(tag) {
         type: 'POST',
         data: { transaccion: 'opcionesbancocliente', idcliente: $("#id-cliente").val() },
         success: function (datos) {
-            alert(datos);
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
             var res = texto.substring(1, 5000);
             if (bandera == 0) {
-                alertify.error(res);
+                //alertify.error('Debe llenar datos del receptor.');
             } else {
-                $("#id-bancocuenta").html(datos);
+                $(".contenedor-cuenta-" + tag).html(datos);
             }
         }
     });
@@ -217,7 +250,7 @@ function loadBancoBeneficiario(tag) {
             var bandera = texto.substring(0, 1);
             var res = texto.substring(1, 5000);
             if (bandera == 0) {
-                alertify.error(res);
+                //alertify.error(res);
             } else {
                 $(".contenedor-beneficiario-" + tag).html(datos);
             }
@@ -231,7 +264,7 @@ function getTipoCambio() {
     cargandoShow();
     var idmoneda = $("#moneda-" + tag).val();
     $.ajax({
-        url: 'com.sine.enlace/enlacepago.php',
+        url: '../../CATSAT/CATSAT/com.sine.enlace/enlaceMonedas.php',
         type: 'POST',
         data: { transaccion: 'gettipocambio', idmoneda: idmoneda },
         success: function (datos) {
@@ -362,4 +395,19 @@ function loadTablaCFDI(uuid = "") {
         }
     }
 
+}
+
+function aucompletarFactura() {
+    var tag = $("#tabs").find('.sub-tab-active').attr("data-tab");
+    var idcliente = $("#id-cliente").val() || '0';
+    $('#factura-' + tag).autocomplete({
+        source: "com.sine.enlace/enlaceautocompletar.php?transaccion=facturas&&iddatos=" + idcliente,
+        select: function (event, ui) {
+            var a = ui.item.value;
+            var id = ui.item.id;
+            var type = ui.item.type;
+
+            loadFactura(id, type, tag);
+        }
+    });
 }

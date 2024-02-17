@@ -86,39 +86,24 @@ class ControladorOpcion {
     public function opcionesBancobyCliente($idcliente) {
         $cliente = $this->getClienteID($idcliente);
         $r = "";
+    
         foreach ($cliente as $clienteactual) {
-            $idbanco = $clienteactual['idbanco'];
-            $cuenta = $clienteactual['cuenta'];
-            $idbanco1 = $clienteactual['idbanco1'];
-            $cuenta1 = $clienteactual['cuenta1'];
-            $idbanco2 = $clienteactual['idbanco2'];
-            $cuenta2 = $clienteactual['cuenta2'];
-            $idbanco3 = $clienteactual['idbanco3'];
-            $cuenta3 = $clienteactual['cuenta3'];
+            $bancoCuentaPairs = [];
+            for ($i = 0; $i < 4; $i++) {
+                $idbanco = $clienteactual["idbanco" . ($i == 0 ? '' : $i)];
+                $cuenta = $clienteactual["cuenta" . ($i == 0 ? '' : $i)];
+    
+                if ($idbanco != '0') {
+                    $banco = $this->getNomBanco($idbanco);
+                    $bancoCuentaPairs[] = "$banco - Cuenta: $cuenta";
+                }
+            }
+            $r .= "<option value='" . ($i + 1) . "'>" . implode("</option><option value='" . ($i + 1) . "'>", $bancoCuentaPairs) . "</option>";
         }
-        $banco = $this->getNomBanco($idbanco);
-        if ($idbanco != '0') {
-            $banco = $this->getNomBanco($idbanco);
-            $r .= "<option value='1'>" . $banco . " - Cuenta:" . $cuenta . "</option>";
-        }
-
-        if ($idbanco1 != '0') {
-            $banco1 = $this->getNomBanco($idbanco1);
-            $r .= "<option value='2'>" . $banco1 . " - Cuenta:" . $cuenta1 . "</option>";
-        }
-
-        if ($idbanco2 != '0') {
-            $banco2 = $this->getNomBanco($idbanco2);
-            $r .= "<option value='3'>" . $banco2 . " - Cuenta:" . $cuenta2 . "</option>";
-        }
-
-        if ($idbanco3 != '0') {
-            $banco3 = $this->getNomBanco($idbanco3);
-            $r .= "<option value='4'>" . $banco3 . " - Cuenta:" . $cuenta3 . "</option>";
-        }
-
+    
         return $r;
     }
+    
 
     private function getClienteID($idcliente) {
         $consultado = false;
@@ -148,37 +133,24 @@ class ControladorOpcion {
     public function opcionesBeneficiario($iddatos) {
         $datos = $this->getDatosFacturacionbyID($iddatos);
         $r = "";
+        
         foreach ($datos as $actual) {
-            $idbanco = $actual['idbanco'];
-            $cuenta = $actual['cuenta'];
-            $idbanco1 = $actual['idbanco1'];
-            $cuenta1 = $actual['cuenta1'];
-            $idbanco2 = $actual['idbanco2'];
-            $cuenta2 = $actual['cuenta2'];
-            $idbanco3 = $actual['idbanco3'];
-            $cuenta3 = $actual['cuenta3'];
+            $bancoCuentaPairs = [];
+            for ($i = 0; $i < 4; $i++) {
+                $idbanco = $actual["idbanco" . ($i == 0 ? '' : $i)];
+                $cuenta = $actual["cuenta" . ($i == 0 ? '' : $i)];
+                
+                if ($idbanco != '0') {
+                    $banco = $this->getNomBanco($idbanco);
+                    $bancoCuentaPairs[] = "$banco - Cuenta: $cuenta";
+                }
+            }
+            $r .= "<option value='" . ($i + 1) . "'>" . implode("</option><option value='" . ($i + 1) . "'>", $bancoCuentaPairs) . "</option>";
         }
-        $banco = $this->getNomBanco($idbanco);
-        if ($idbanco != '0') {
-            $banco = $this->getNomBanco($idbanco);
-            $r .= "<option value='1'>" . $banco . " - Cuenta:" . $cuenta . "</option>";
-        }
-        if ($idbanco1 != '0') {
-            $banco1 = $this->getNomBanco($idbanco1);
-            $r .= "<option value='2'>" . $banco1 . " - Cuenta:" . $cuenta1 . "</option>";
-        }
-        if ($idbanco2 != '0') {
-            $banco2 = $this->getNomBanco($idbanco2);
-            $r .= "<option value='3'>" . $banco2 . " - Cuenta:" . $cuenta2 . "</option>";
-        }
-        if ($idbanco3 != '0') {
-            $banco3 = $this->getNomBanco($idbanco3);
-            $r .= "<option value='4'>" . $banco3 . " - Cuenta:" . $cuenta3 . "</option>";
-        }
-
+    
         return $r;
     }
-
+    
     private function getDatosFacturacionbyID($id) {
         $consultado = false;
         $consulta = "select * from datos_facturacion where id_datos=:id";
@@ -205,5 +177,23 @@ class ControladorOpcion {
             $r .= "<option $selected value='" . $clienteactual['id_datos'] . "'>" . $clienteactual['nombre_contribuyente'] . "</option>";
         }
         return $r;
+    }
+
+    private function getMotivosAux() {
+        $consultado = false;
+        $consulta = "SELECT * FROM catalogo_motivo order by clvmotivo;";
+        $consultado = $this->consultas->getResults($consulta, null);
+        return $consultado;
+    }
+
+    public function opcionesMotivo() {
+        $get = $this->getMotivosAux();
+        $op = "";
+        foreach ($get as $actual) {
+            $clv = $actual['clvmotivo'];
+            $descripcion = $actual['descripcionmotivo'];
+            $op .= "<option id='motivo" . $clv . "' value='" . $clv . "'>" . $clv . " " . $descripcion . "</option>";
+        }
+        return $op;
     }
 }

@@ -1,13 +1,18 @@
 <?php
 
 require_once '../com.sine.dao/Consultas.php';
+require_once '../vendor/autoload.php';
+require_once  '../../CATSAT/CATSAT/com.sine.controlador/controladorMunicipio.php';
+
 
 class ControladorAuto {
 
     private $consultas;
+    private $controladorMunicipio;
 
     function __construct() {
-        $this->consultas = new consultas();
+        $this->consultas = new consultas(); 
+        $this->controladorMunicipio = new ControladorMunicipio();
     }
 
     public function getCoincidenciasBusquedaCliente($referencia) {
@@ -17,7 +22,7 @@ class ControladorAuto {
         $contador = 0;
         foreach ($resultados as $resultado) {
             $estado = $this->getEstadoAux($resultado['idestado']);
-            $municipio = $this->getMunicipioAux($resultado['idmunicipio']);
+            $municipio = $this->controladorMunicipio->getMunicipioAux($resultado['idmunicipio']);
             $int = "";
             if($resultado['numero_interior'] != ""){
                 $int = " Int. ".$resultado['numero_interior'];
@@ -57,20 +62,39 @@ class ControladorAuto {
         return $consultado;
     }
 
-    private function getMunicipioAux($idmun) {
-        $municipio = "";
-        $mun = $this->getMunicipioById($idmun);
-        foreach ($mun as $actual) {
-            $municipio = $actual['municipio'];
+    public function getCoincidenciasFacturas($referencia, $iddatos) {
+        $datos = [];
+        $c = new Consultas();
+    
+        $consultaFactura = "SELECT * FROM datos_factura WHERE (concat(letra, folio_interno_fac) LIKE '%$referencia%') AND idcliente = '$iddatos' AND status_pago != '3' ORDER BY folio_interno_fac DESC LIMIT 15;";
+        $resultadosFactura = $c->getResults($consultaFactura, null);
+    
+        foreach ($resultadosFactura as $resultado) {
+            $datos[] = [
+                "value" => "Factura-" . $resultado['letra'] . $resultado['folio_interno_fac'],
+                "id" => $resultado["iddatos_factura"],
+                "type" => 'f'
+            ];
         }
-        return $municipio;
-    }
-
-    private function getMunicipioById($idmun) {
-        $consultado = false;
-        $consulta = "SELECT * FROM municipio WHERE id_municipio=:id;";
-        $valores = array("id" => $idmun);
-        $consultado = $this->consultas->getResults($consulta, $valores);
-        return $consultado;
+    
+        $consultaCarta = "SELECT * FROM factura_carta WHERE (concat(letra, foliocarta) LIKE '%$referencia%') AND idcliente = '$iddatos' AND status_pago != '3' ORDER BY foliocarta DESC LIMIT 15;";
+        $resultadosCarta = $c->getResults($consultaCarta, null);
+    
+        foreach ($resultadosCarta as $resultado) {
+            $datos[] = [
+                "value" => "Carta Porte-" . $resultado['letra'] . $resultado['foliocarta'],
+                "id" => $resultado["idfactura_carta"],
+                "type" => 'c'
+            ];
+        }
+    
+        if (empty($datos)) {
+            $datos[] = [
+                "value" => "No se encontraron registros",
+                "id" => "Ninguno"
+            ];
+        }
+    
+        return $datos;
     }
 }

@@ -10,7 +10,7 @@
     <!-- Otros estilos-->
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/jquery-ui.css">
-    <link rel="stylesheet" href="css/jquery-ui.themes.css">
+    <!--<link rel="stylesheet" href="css/jquery-ui.themes.css">-->
 
     <!-- jQuery 3.7.1 -->
     <script src="js/jquery-3.7.1.min.js"></script>
@@ -29,7 +29,7 @@
 
     <!--Graficas-->
     <script src="chart/chart.min.js"></script>
-    <script src="chart/chart-plugin-datalabels.min.js"></script>
+    <!--<script src="chart/chart-plugin-datalabels.min.js"></script>-->
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
 
     <!-- Scripts adicionales -->

@@ -1214,6 +1214,60 @@ table.table-row tr td {
 }
 
 .sub-tab-active{
-    border-color: #1DB4BF;
+    border-color: #1DB4BF !important;
+    background: #EDEDF4 !important;
+}
+
+.tab-pago{
+    outline:none !important;
+    position: relative;
+    min-width: 100px;
+    max-width: 170px;
+    width: auto;
+    height: 40px;
+    background: #ffffff;
+    padding: 4px 7px;
+    border: 2px solid #CECEE2;
+    border-bottom: none;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    font-family: sans-serif;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 17px;
+    text-align: center;
+    color: #17177C;
+}
+
+.tab-pago:hover{
     background: #EDEDF4;
+}
+
+.close-button{
+    color: #e74c3c;
+    background-color: #fff;
+    font-weight: bolder;
+    font-size: 19px;
+    text-shadow: none;
+    height: 23px;
+    width: 23px;
+    opacity: 1;
+    border-radius: 50%;
+    box-shadow: 0 0 5px #555;
+    position: absolute;
+    top: -6px;
+    right: -9px;
+    z-index: 1;
+    transition: all 0.3s;
+    border: none;
+}
+
+.close-button span{
+    margin: -2px 0 0 0;
+    display: block;
+}
+
+.close-button:hover{
+    color: #fff;
+    background-color: #e74c3c;
 }

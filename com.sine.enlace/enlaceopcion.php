@@ -86,11 +86,11 @@ if (isset($_POST['transaccion'])) {
             break;
         /*case 'correolist':
             $datos = $co->opcionesCorreoList();
-            break;
+            break;*/
         case 'opcionesmotivo':
             $datos = $co->opcionesMotivo();
             break;
-        case 'opcionesimpuestos':
+        /*case 'opcionesimpuestos':
             $datos = $co->opcionesImpuestos($_POST['t']);
             break;
         case 'opcionesrelacion':

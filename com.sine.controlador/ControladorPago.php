@@ -1,16 +1,20 @@
 <?php
 
 require_once '../com.sine.dao/Consultas.php';
+require_once '../../CATSAT/CATSAT/com.sine.controlador/controladorMonedas.php';
 require_once '../vendor/autoload.php';
+
 date_default_timezone_set("America/Mexico_City");
 session_start();
 
 class ControladorPago {
 
     private $consultas;
+    private $controladorMoneda;
 
     function __construct() {
         $this->consultas = new consultas();
+        $this->controladorMoneda = new ControladorMonedas();
     }
 
     public function listaServiciosHistorial($REF, $pag, $numreg) {
@@ -225,82 +229,6 @@ class ControladorPago {
         return $datos;
     }
 
-    
-    private function getTipoCambioAux($idmoneda) {
-        $consultado = false;
-        $consulta = "SELECT * FROM catalogo_moneda WHERE idcatalogo_moneda=:id;";
-        $val = array("id" => $idmoneda);
-        $consultado = $this->consultas->getResults($consulta, $val);
-        return $consultado;
-    }
-
-    public function getTipoCambio($idmoneda, $idmonedaF = '0', $tcambioF = '0', $tcambioP = '0') {
-        $moneda = $this->getTipoCambioAux($idmoneda);
-        foreach ($moneda as $actual) {
-            $tcambio = $actual['tipo_cambio'];
-        }
-        if ($idmoneda == '1') {
-            if ($idmonedaF == '1') {
-                if ($tcambioF != "0") {
-                    $tcambio = $tcambioF;
-                } else {
-                    foreach ($moneda as $actual) {
-                        $tcambio = $actual['tipo_cambio'];
-                    }
-                }
-            } else if ($idmonedaF == '2') {
-                if ($tcambioF != "0") {
-                    $tcambio = bcdiv(1, $tcambioF, 6);
-                } else {
-                    foreach ($moneda as $actual) {
-                        $tcambio = $actual['cambioDolar'];
-                    }
-                }
-            } else if ($idmonedaF == '4') {
-                if ($tcambioF != "0") {
-                    $tcambio = bcdiv(1, $tcambioF, 6);
-                } else {
-                    foreach ($moneda as $actual) {
-                        $tcambio = $actual['cambioEuro'];
-                    }
-                }
-            }
-        } else if ($idmoneda == '2') {
-            if ($idmonedaF == '1') {
-                if ($tcambioP != '0') {
-                    $tcambio = $tcambioP;
-                } else {
-                    foreach ($moneda as $actual) {
-                        $tcambio = $actual['tipo_cambio'];
-                    }
-                }
-            } else if ($idmonedaF == '2') {
-                foreach ($moneda as $actual) {
-                    $tcambio = $actual['cambioDolar'];
-                }
-            } else if ($idmonedaF == '4') {
-                foreach ($moneda as $actual) {
-                    $tcambio = $actual['cambioEuro'];
-                }
-            }
-        } else if ($idmoneda == '4') {
-            if ($idmonedaF == '1') {
-                foreach ($moneda as $actual) {
-                    $tcambio = $actual['tipo_cambio'];
-                }
-            } else if ($idmonedaF == '2') {
-                foreach ($moneda as $actual) {
-                    $tcambio = $actual['cambioDolar'];
-                }
-            } else if ($idmonedaF == '4') {
-                foreach ($moneda as $actual) {
-                    $tcambio = $actual['cambioEuro'];
-                }
-            }
-        }
-        return $tcambio;
-    }
-
     public function getTabla($sessionid, $tag, $idmoneda, $tcambio, $uuid) {
         $tabla = $this->tablaPago($sessionid, $tag, $tcambio, $idmoneda, $uuid);
         return $tabla;
@@ -318,56 +246,58 @@ class ControladorPago {
                 <th class='text-center'>RESTANTE</th>
                 <th class='text-center'>OPCIONES</th>
                 </thead><tbody>";
+    
         $totalpagados = 0;
-        $disuuid = "";
-        if ($uuid != "") {
-            $disuuid = "disabled";
-        }
+        $disuuid = ($uuid != "") ? "disabled" : "";
+    
         $productos = $this->getPagosTMP($sessionid, $tag);
+    
         foreach ($productos as $pagoactual) {
-            $idtmp = $pagoactual['idtmppago'];
-            $idfactura = $pagoactual['idfacturatmp'];
             $folio = $pagoactual['foliofacturatmp'];
-            $idmonedaF = $pagoactual['idmonedatmp'];
-            $tcambioF = $pagoactual['tcambiotmp'];
             $noparcialidad = $pagoactual['noparcialidadtmp'];
             $monto = $pagoactual['montotmp'];
             $montoanterior = $pagoactual['montoanteriortmp'];
             $montoinsoluto = $pagoactual['montoinsolutotmp'];
             $totalfactura = $pagoactual['totalfacturatmp'];
-            $type = $pagoactual['type'];
-
-            $totalpagados += $this->totalDivisa($monto, $idmoneda, $idmonedaF, $tcambioF, $tcambio);
+            $idtmp = $pagoactual['idtmppago'];
+    
+            $totalpagados += $this->totalDivisa($monto, $idmoneda, $pagoactual['idmonedatmp'], $pagoactual['tcambiotmp'], $tcambio);
+    
             $table .= "
-                     <tr>
-                        <td>$folio</td>
-                        <td>$noparcialidad</td>
-                        <td>$ " . number_format(bcdiv($totalfactura, '1', 2), 2, '.', ',') . "</td>
-                        <td>$ " . number_format(bcdiv($montoanterior, '1', 2), 2, '.', ',') . "</td>
-                        <td>$ " . number_format(bcdiv($monto, '1', 2), 2, '.', ',') . "</td>
-                        <td>$ " . number_format(bcdiv($montoinsoluto, '1', 2), 2, '.', ',') . "</td>
-                        <td><a $disuuid class='btn button-list' title='Eliminar' onclick='eliminarcfdi($idtmp);'><span class='glyphicon glyphicon-remove'></span></a></td>
-                    </tr>";
+                <tr>
+                    <td>$folio</td>
+                    <td>$noparcialidad</td>
+                    <td>$ " . number_format($totalfactura, 2, '.', ',') . "</td>
+                    <td>$ " . number_format($montoanterior, 2, '.', ',') . "</td>
+                    <td>$ " . number_format($monto, 2, '.', ',') . "</td>
+                    <td>$ " . number_format($montoinsoluto, 2, '.', ',') . "</td>
+                    <td><a $disuuid class='btn button-list' title='Eliminar' onclick='eliminarcfdi($idtmp);'><span class='glyphicon glyphicon-remove'></span></a></td>
+                </tr>";
         }
+    
         $monedapago = ($idmoneda == 1) ? "MXN" : (($idmoneda == 2) ? "USD" : (($idmoneda == 3) ? "EUR" : "Desconocida"));
+    
         $table .= "
             </tbody>
             <tfoot>
-            <tr>
-            <th colspan='3' align='right'></th>
-            <th align='right'><b>TOTAL PAGADO:</b></th>
-            <th>$ " . number_format(bcdiv($totalpagados, '1', 2), 2, '.', ',') . " $monedapago</th>
-            <th></th>
-            </tr>
-        </tfoot>";
+                <tr>
+                    <th colspan='3' align='right'></th>
+                    <th align='right'><b>TOTAL PAGADO:</b></th>
+                    <th>$ " . number_format($totalpagados, 2, '.', ',') . " $monedapago</th>
+                    <th></th>
+                </tr>
+            </tfoot>
+        </table>";
+    
         return $table;
     }
+    
 
     private function totalDivisa($total, $monedaP, $monedaF, $tcambioF = '0', $tcambioP = '0') {
         if ($monedaP == $monedaF) {
             $OP = bcdiv($total, '1', 2);
         } else {
-            $tcambio = $this->getTipoCambio($monedaP, $monedaF, $tcambioF, $tcambioP);
+            $tcambio = $this->controladorMoneda->getTipoCambio($monedaP, $monedaF, $tcambioF, $tcambioP);
             $OP = bcdiv($total, '1', 2) / bcdiv($tcambio, '1', 6);
         }
         return $OP;
@@ -392,165 +322,174 @@ class ControladorPago {
     
     public function nuevoComplemento($comp) {
         $tag = $this->genTag();
-        $datos = "<button id='tab-$tag' class='tab-pago sub-tab-active' data-tab='$tag' data-ord='$comp' name='tab-complemento' >Complemento $comp &nbsp; <span data-tab='$tag' type='button' class='close-button' aria-label='Close'><span aria-hidden='true'>&times;</span></span></button>
+        $datos = "<button id='tab-$tag' class='tab-pago sub-tab-active' data-tab='$tag' data-ord='$comp' name='tab-complemento'>Complemento $comp &nbsp; <span data-tab='$tag' type='button' class='close-button' aria-label='Close'><span aria-hidden='true'>&times;</span></span></button>
                 <cut>
                 <div id='complemento-$tag' class='sub-div'>
                 <div class='row'>
-            <div class='col-md-4'>
-                <label class='label-form text-right' for='forma-$tag'>Forma de Pago</label> <label class='mark-required text-right'>*</label>
-                <div class='form-group'>
-                        <select class='form-control text-center input-form' id='forma-$tag' name='forma-$tag' onchange='disableCuenta();'>
-                            <option value='' id='default-fpago-$tag'>- - - -</option>
-                            <optgroup id='forma-pago-$tag' class='cont-fpago-$tag text-left'> </optgroup>
+                <div class='col-md-4 py-2'>
+                    <label class='label-form text-right' for='forma-$tag'>Forma de pago</label> <label
+                        class='mark-required text-danger fw-bold'>*</label>
+                    <div class='form-group'>
+                            <select class='form-select text-center input-form' id='forma-$tag' name='forma-$tag' onchange='disableCuenta();'>
+                                <option value='' id='default-fpago-$tag'>- - - -</option>
+                                <optgroup id='forma-pago-$tag' class='cont-fpago-$tag text-left'> </optgroup>
+                            </select>
+                        <div id='forma-$tag-errors'></div>
+                    </div>
+                </div>
+
+                <div class='col-md-2 py-2'>
+                    <label class='label-form text-right' for='moneda-$tag'>Moneda de pago</label> <label
+                        class='mark-required text-danger fw-bold'>*</label>
+                    <div class='form-group'>
+                        <select class='form-select text-center input-form' id='moneda-$tag' name='moneda-$tag' onchange='getTipoCambio(); loadTablaCFDI();'>
+                            <option value='' id='default-moneda-$tag'>- - - -</option>
+                            <optgroup id='mpago-$tag' class='contmoneda-$tag text-left'> </optgroup>
                         </select>
-                    <div id='forma-$tag-errors'></div>
+                        <div id='moneda-$tag-errors'></div>
+                    </div>
                 </div>
-            </div>
 
-            <div class='col-md-2'>
-                <label class='label-form text-right' for='moneda-$tag'>Moneda de Pago</label> <label class='mark-required text-right'>*</label>
-                <div class='form-group'>
-                    <select class='form-control text-center input-form' id='moneda-$tag' name='moneda-$tag' onchange='getTipoCambio(); loadTablaCFDI();'>
-                        <option value='' id='default-moneda-$tag'>- - - -</option>
-                        <optgroup id='mpago-$tag' class='contmoneda-$tag text-left'> </optgroup>
-                    </select>
-                    <div id='moneda-$tag-errors'></div>
+                <div class='col-md-2 py-2'>
+                    <label class='label-form text-right' for='cambio-$tag'>Tipo de cambio</label>
+                    <label class='mark-required text-danger fw-bold'></label>
+                    <div class='form-group'>
+                        <input type='text' class='form-control input-form' id='cambio-$tag' placeholder='Tipo de cambio de moneda' disabled=''>
+                        <div id='cambio-$tag-errors'></div>
+                    </div>
                 </div>
-            </div>
 
-            <div class='col-md-2'>
-                <label class='label-form text-right' for='cambio-$tag'>Tipo de Cambio</label>
-                <div class='form-group'>
-                    <input type='text' class='form-control input-form' id='cambio-$tag' placeholder='Tipo de cambio de Moneda' disabled=''>
-                    <div id='cambio-$tag-errors'></div>
-                </div>
-            </div>
-
-            <div class='col-md-4'>
-                <label class='label-form text-right' for='fecha-$tag'>Fecha de Pago</label> <label class='mark-required text-right'>*</label>
-                <div class='form-group'>
-                    <input class='form-control text-center input-form' id='fecha-$tag' name='fecha-$tag' type='date'/>
-                    <div id='fecha-$tag-errors'></div>
-                </div>
-            </div>
-        </div>
-
-        <div class='row'>
-            <div class='col-md-4'>
-                <label class='label-form text-right' for='hora-$tag'>Hora de Pago</label> <label class='mark-required text-right'>*</label>
-                <div class='form-group'>
-                    <input class='form-control text-center input-form' id='hora-$tag' name='hora-$tag' type='time' />
-                    <div id='hora-$tag-errors'></div>
-                </div>
-            </div>
-
-            <div class='col-md-4'>
-                <label class='label-form text-right' for='uenta-$tag'>Cuenta Ordenante (Cliente)</label>
-                <div class='form-group'>
-                    <select class='form-control text-center input-form' id='cuenta-$tag' name='cuenta-$tag' disabled>
-                        <option value='' id='default-cuenta-$tag'>- - - -</option>
-                        <optgroup id='ordenante-$tag' class='contenedor-cuenta-$tag text-left'> </optgroup>
-                    </select>
-                    <div id='cuenta-$tag-errors'></div>
-                </div>
-            </div>
-
-            <div class='col-md-4'>
-                <label class='label-form text-right' for='benef-$tag'>Cuenta Beneficiario (Mis Cuentas)</label>
-                <div class='form-group'>
-                    <select class='form-control text-center input-form' id='benef-$tag' name='benef-$tag' disabled>
-                        <option value='' id='default-benef-$tag'>- - - -</option>
-                        <optgroup id='beneficiario-$tag' class='contenedor-beneficiario-$tag text-left'> </optgroup>
-                    </select>
-                    <div id='benef-$tag-errors'></div>
-                </div>
-            </div>
-        </div>
-
-        <div class='row'>
-            <div class='col-md-4'>
-                <label class='label-form text-right' for='transaccion-$tag'>N° de Transaccion</label>
-                <div class='form-group'>
-                    <input class='form-control text-center input-form' id='transaccion-$tag' name='transaccion-$tag' placeholder='N° de Transaccion' type='number' disabled/>
-                    <div id='transaccion-$tag-errors'>
+                <div class='col-md-4 py-2'>
+                    <label class='label-form text-right' for='fecha-$tag'>Fecha de pago</label> <label
+                        class='mark-required text-danger fw-bold'>*</label>
+                    <div class='form-group'>
+                        <input class='form-control text-center input-form' id='fecha-$tag' name='fecha-$tag' type='date'/>
+                        <div id='fecha-$tag-errors'></div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class='row'>
-            <div class='col-md-12'>
-                <div class='new-tooltip icon tip'> 
-                    <label class='label-sub' for='fecha-creacion'>CFDIS RELACIONADOS </label> <span class='glyphicon glyphicon-question-sign'></span>
-                    <span class='tiptext'>Para agregar una factura realice la b&uacute;squeda por Folio de la factura y se cargaran los datos, la b&uacute;squeda se limita a las facturas asignadas al cliente seleccionado en el campo Cliente.</span>
+            <div class='row'>
+                <div class='col-md-4 py-2'>
+                    <label class='label-form text-right' for='hora-$tag'>Hora de pago</label> <label
+                        class='mark-required text-danger fw-bold'>*</label>
+                    <div class='form-group'>
+                        <input class='form-control text-center input-form' id='hora-$tag' name='hora-$tag' type='time' />
+                        <div id='hora-$tag-errors'></div>
+                    </div>
+                </div>
+
+                <div class='col-md-4 py-2'>
+                    <label class='label-form text-right' for='uenta-$tag'>Cuenta ordenante (Cliente)</label>
+                    <label class='mark-required text-danger fw-bold'></label>
+                    <div class='form-group'>
+                        <select class='form-select text-center input-form' id='cuenta-$tag' name='cuenta-$tag' disabled>
+                            <option value='' id='default-cuenta-$tag'>- - - -</option>
+                            <optgroup id='ordenante-$tag' class='contenedor-cuenta-$tag text-start ps-2'> </optgroup>
+                        </select>
+                        <div id='cuenta-$tag-errors'></div>
+                    </div>
+                </div>
+
+                <div class='col-md-4 py-2'>
+                    <label class='label-form text-right' for='benef-$tag'>Cuenta beneficiario (Mis cuentas)</label>
+                    <label class='mark-required text-danger fw-bold'></label>
+                    <div class='form-group'>
+                        <select class='form-select text-center input-form' id='benef-$tag' name='benef-$tag' disabled>
+                            <option value='' id='default-benef-$tag'>- - - -</option>
+                            <optgroup id='beneficiario-$tag' class='contenedor-beneficiario-$tag text-start ps-2'> </optgroup>
+                        </select>
+                        <div id='benef-$tag-errors'></div>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class='row scrollX'>
-            <div class='col-md-12'>
-                <table class='table tab-hover table-condensed table-responsive table-row thead-form'>
-                    <tbody >
-                        <tr>
-                            <td colspan='2'>
-                                <label class='label-form text-right' for='factura-$tag'>Folio Factura</label>
-                                <input id='id-factura-$tag' type='hidden' /><input class='form-control text-center input-form' id='factura-$tag' name='factura-$tag' placeholder='Factura' type='text' oninput='aucompletarFactura();'/>
-                            </td>
-                            <td colspan='2'>
-                                <label class='label-form text-right' for='uuid-$tag'>UUID Factura</label>
-                                <input class='form-control cfdi text-center input-form' id='uuid-$tag' name='uuid-$tag' placeholder='UUID del cfdi' type='text'/>
-                            </td>
-                            <td>
-                                <label class='label-form text-right' for='type-$tag'>Tipo Factura</label>
-                                <select class='form-control text-center input-form' id='type-$tag' name='type-$tag'>
-                                    <option value='' id='default-tipo-$tag'>- - - -</option>
-                                    <option value='f' id='tipo-f-$tag'>Factura</option>
-                                    <option value='c' id='tipo-c-$tag'>Carta Porte</option>
-                                </select>
-                            </td>
-                            <td>
-                                <label class='label-form text-right' for='monedarel-$tag'>Moneda Factura</label>
-                                <input id='cambiocfdi-$tag' type='hidden' />
-                                <input id='metcfdi-$tag' type='hidden' />
-                                <select class='form-control text-center input-form' id='monedarel-$tag' name='monedarel-$tag'>
-                                    <option value='' id='default-moneda-$tag'>- - - -</option>
-                                    <optgroup id='moncfdi-$tag' class='contenedor-moneda-$tag text-left'> </optgroup>
-                                </select>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <label class='label-form text-right' for='parcialidad-$tag'>N° Parcialidad</label>
-                                <input class='form-control text-center input-form' id='parcialidad-$tag' name='parcialidad-$tag' placeholder='No Parcialidad' type='text'/>
-                            </td>
-                            <td>
-                                <label class='label-form text-right' for='total-$tag'>Total Factura</label>
-                                <input class='form-control text-center input-form' id='total-$tag' name='total-$tag' placeholder='Total de Factura' type='number' step='any'/>
-                            </td>
-                            <td>
-                                <label class='label-form text-right' for='anterior-$tag'>Monto Anterior</label>
-                                <input class='form-control text-center input-form' id='anterior-$tag' name='anterior-$tag' placeholder='Monto Anterior' type='number' step='any'/>
-                            </td>
-                            <td>
-                                <label class='label-form text-right' for='monto-$tag'>Monto a Pagar</label>
-                                <input class='form-control text-center input-form' id='monto-$tag' name='monto-$tag' placeholder='Monto Pagado' type='number' step='any' oninput='calcularRestante()'/>
-                            </td>
-                            <td>
-                                <label class='label-form text-right' for='restante-$tag'>Monto Restante</label>
-                                <input class='form-control text-center input-form' id='restante-$tag' name='cantidad' placeholder='Monto Restante' type='number' step='any'/>
-                            </td>
-                            <td>
-                                <label class='label-space' for='btn-agregar-cfdi'></label>
-                                <button id='btn-agregar-cfdi' class='button-modal' onclick='agregarCFDI();'><span class='glyphicon glyphicon-plus'></span> Agregar</button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-                <table class='table tab-hover table-condensed table-responsive table-row table-head' id='lista-cfdi-$tag'>
-
-                </table>
+            <div class='row'>
+                <div class='col-md-4 py-2'>
+                    <label class='label-form text-right' for='transaccion-$tag'>No. de transaccion</label>
+                    <label class='mark-required text-danger fw-bold'></label>
+                    <div class='form-group'>
+                        <input class='form-control text-center input-form' id='transaccion-$tag' name='transaccion-$tag' placeholder='N° de Transaccion' type='number' disabled/>
+                        <div id='transaccion-$tag-errors'>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
+
+            <div class='row mt-3'>
+                <div class='col-md-12'>
+                    <div class='new-tooltip icon tip'> 
+                        <label class='label-sub' for='fecha-creacion'>CFDIS RELACIONADOS </label> <span
+                        class='fas fa-question-circle small text-primary-emphasis'></span>
+                        <span class='tiptext'>Para agregar una factura realice la b&uacute;squeda por Folio de la factura y se cargaran los datos, la b&uacute;squeda se limita a las facturas asignadas al cliente seleccionado en el campo Cliente.</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class='row scrollX'>
+                <div class='col-md-12'>
+                    <table class='table tab-hover table-condensed table-responsive table-row thead-form'>
+                        <tbody >
+                            <tr>
+                                <td colspan='2'>
+                                    <label class='label-form mb-1' for='factura-$tag'>Folio factura</label>
+                                    <input id='id-factura-$tag' type='hidden' /><input class='form-control text-center input-form' id='factura-$tag' name='factura-$tag' placeholder='Factura' type='text' oninput='aucompletarFactura();'/>
+                                </td>
+                                <td colspan='2'>
+                                    <label class='label-form mb-1' for='uuid-$tag'>UUID Factura</label>
+                                    <input class='form-control cfdi text-center input-form' id='uuid-$tag' name='uuid-$tag' placeholder='UUID del cfdi' type='text'/>
+                                </td>
+                                <td>
+                                    <label class='label-form mb-1' for='type-$tag'>Tipo factura</label>
+                                    <select class='form-select text-center input-form' id='type-$tag' name='type-$tag'>
+                                        <option value='' id='default-tipo-$tag'>- - - -</option>
+                                        <option value='f' id='tipo-f-$tag'>Factura</option>
+                                        <option value='c' id='tipo-c-$tag'>Carta Porte</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <label class='label-form mb-1' for='monedarel-$tag'>Moneda factura</label>
+                                    <input id='cambiocfdi-$tag' type='hidden' />
+                                    <input id='metcfdi-$tag' type='hidden' />
+                                    <select class='form-select text-center input-form' id='monedarel-$tag' name='monedarel-$tag'>
+                                        <option value='' id='default-moneda-$tag'>- - - -</option>
+                                        <optgroup id='moncfdi-$tag' class='contenedor-moneda-$tag text-left'> </optgroup>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label class='label-form mb-1' for='parcialidad-$tag'>No. Parcialidad</label>
+                                    <input class='form-control text-center input-form' id='parcialidad-$tag' name='parcialidad-$tag' placeholder='No Parcialidad' type='text'/>
+                                </td>
+                                <td>
+                                    <label class='label-form mb-1' for='total-$tag'>Total factura</label>
+                                    <input class='form-control text-center input-form' id='total-$tag' name='total-$tag' placeholder='Total de Factura' type='number' step='any'/>
+                                </td>
+                                <td>
+                                    <label class='label-form mb-1' for='anterior-$tag'>Monto anterior</label>
+                                    <input class='form-control text-center input-form' id='anterior-$tag' name='anterior-$tag' placeholder='Monto Anterior' type='number' step='any'/>
+                                </td>
+                                <td>
+                                    <label class='label-form mb-1' for='monto-$tag'>Monto a pagar</label>
+                                    <input class='form-control text-center input-form' id='monto-$tag' name='monto-$tag' placeholder='Monto Pagado' type='number' step='any' oninput='calcularRestante()'/>
+                                </td>
+                                <td>
+                                    <label class='label-form mb-1' for='restante-$tag'>Monto restante</label>
+                                    <input class='form-control text-center input-form' id='restante-$tag' name='cantidad' placeholder='Monto Restante' type='number' step='any'/>
+                                </td>
+                                <td class='text-center'>
+                                    <label class='label-space text-light' for='btn-agregar-cfdi'>Algo</label>
+                                    <button id='btn-agregar-cfdi' class='button-modal' onclick='agregarCFDI();'><span class='fas fa-plus'></span> Agregar</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table class='table tab-hover table-condensed table-responsive table-row table-head' id='lista-cfdi-$tag'>
+
+                    </table>
+                </div>
+            </div>
         </div><cut>$tag";
         return $datos;
     }

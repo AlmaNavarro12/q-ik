@@ -23,12 +23,12 @@ if (isset($_GET['transaccion'])) {
             break;
         case 'datosfiscales':
             echo json_encode($cp->getCoincidenciasCliente($_GET['term']));
-            break;
+            break;*/
         case 'facturas':
             $iddatos = $_GET['iddatos'];
             echo json_encode($cp->getCoincidenciasFacturas($_GET['term'], $iddatos));
             break;
-        case 'catunidad':
+        /*case 'catunidad':
             echo json_encode($cp->getCoincidenciasCatalogoUnidad($_GET['term']));
             break;
         case 'foliocotizaion':

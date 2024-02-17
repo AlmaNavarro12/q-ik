@@ -11,13 +11,6 @@
             </div>
         </div>
         <div class="row" id="not-timbre">
-            <div class="row">
-                <div class="col-md-12">
-                    <button id="btn-nuevo-producto" type="button" class="button-modal" onclick="agregarComplemento()">
-                        <span class="glyphicon glyphicon-plus"></span> Agregar nuevo complemento
-                    </button>
-                </div>
-            </div>
         </div>
         <div class="row">
             <div class="col-md-8">
@@ -175,174 +168,22 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-md-4 py-2">
-                <label class="label-form text-right" for="id-forma-pago">Forma de pagos</label> <label
-                    class="mark-required text-danger fw-bold">*</label>
-                <div class="form-group">
-                    <div>
-                        <select class="select-control text-center px-2 input-form" id="id-forma-pago" name="id-forma-pago"
-                            onchange="disableCuenta();"> 
-                            <option value="" class="" id="option-default-forma-pago">- - - -</option>
-                            <optgroup id="forma-pago" class="contenedor-forma-pago"> </optgroup>
-                        </select>
-                    </div>
-                    <div id="id-forma-pago-errors"></div>
-                </div>
-            </div>
-
-            <div class="col-md-2 py-2">
-                <label class="label-form text-right" for="id-moneda-pago">Moneda de pago</label> <label
-                    class="mark-required text-danger fw-bold">*</label>
-                <div class="form-group">
-                    <div>
-                        <select class="select-control text-center px-2 input-form" id="id-moneda-pago" name="id-moneda-pago"
-                            onchange="getTipoCambio(); loadTablaCFDI();">
-                            <option value="" id="option-default-moneda-pago">- - - -</option>
-                            <optgroup id="moneda-pago" class="contenedor-moneda text-start"> </optgroup>
-                        </select>
-                    </div>
-                    <div id="id-moneda-pago-errors"></div>
-                </div>
-            </div>
-
-            <div class="col-md-2 py-2">
-                <label class="label-form text-right" for="tipo-cambio">Tipo de cambio</label>
-                <label class="mark-required text-danger fw-bold"></label>
-                <div class="form-group">
-                    <input type="text" class="form-control input-form" id="tipo-cambio"
-                        placeholder="Tipo de cambio de moneda" disabled="">
-                    <div id="tipo-cambio-errors"></div>
-                </div>
-            </div>
-
-            <div class="col-md-4 py-2">
-                <label class="label-form text-right" for="fecha-pago">Fecha de pago</label> <label
-                    class="mark-required text-danger fw-bold">*</label>
-                <div class="form-group">
-                    <input class="form-control text-center input-form" id="fecha-pago" name="fecha-pago" type="date" />
-                    <div id="fecha-pago-errors"></div>
-                </div>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-4 py-2">
-                <label class="label-form text-right" for="hora-pago">Hora de pago</label> <label
-                    class="mark-required text-danger fw-bold">*</label>
-                <div class="form-group">
-                    <input class="form-control text-center input-form" id="hora-pago" name="hora-pago" type="time" />
-                    <div id="hora-pago-errors"></div>
-                </div>
-            </div>
-
-            <div class="col-md-4 py-2">
-                <label class="label-form text-right" for="id-bancocuenta">Cuenta ordenante (Cliente)</label>
-                <label class="mark-required text-danger fw-bold"></label>
-                <div class="form-group">
-                    <select class="select-control text-center px-2 input-form" id="id-bancocuenta" name="id-bancocuenta"
-                        disabled>
-                        <option value="" id="option-default-id-bancocuenta">- - - -</option>
-                        <optgroup id="ordenante" class="contenedor-id-bancocuenta text-start"> </optgroup>
-                    </select>
-                    <div id="id-bancocuenta-errors"></div>
-                </div>
-            </div>
-
-            <div class="col-md-4 py-2">
-                <label class="label-form text-right" for="id-bancobeneficiario">Cuenta beneficiario (Mis
-                    cuentas)</label>
-                <label class="mark-required text-danger fw-bold"></label>
-                <div class="form-group">
-                    <select class="select-control text-center input-form" id="id-bancobeneficiario"
-                        name="id-bancobeneficiario" disabled>
-                        <option value="" id="option-default-id-bancobeneficiario">- - - -</option>
-                        <optgroup id="beneficiario" class="contenedor-id-bancobeneficiario text-start"> </optgroup>
-                    </select>
-                    <div id="id-bancobeneficiario-errors"></div>
-                </div>
-            </div>
-        </div>
-
-        <div class="row d-flex align-items-end">
-            <div class="col-md-4 py-2">
-                <label class="label-form text-right" for="num-transaccion">No. de transacci&oacute;n</label>
-                <label class="mark-required text-danger fw-bold"></label>
-                <div class="form-group">
-                    <input class="form-control text-center input-form" id="num-transaccion" name="num-transaccion"
-                        placeholder="No. de transacci&oacute;n" type="number" disabled />
-                    <div id="num-transaccion-errors">
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4 py-2">
-                <div class="form-group d-flex align-items-start pb-2">
-                    <input class="input-check me-2" id="chfirma" name="chfirma" type="checkbox">
-                    <label class="label-form mb-0 ml-2" for="chfirma">¿Firmar?</label>
-                </div>
-                <div id="chfirma-errors"></div>
-            </div>
-        </div>
-
-        <div class="row mt-4">
             <div class="col-md-12">
-                <div class="new-tooltip icon tip">
-                    <label class="label-sub" for="fecha-creacion">CFDIS RELACIONADOS </label> <span
-                        class="fas fa-question-circle small text-primary-emphasis"></span>
-                    <span class="tiptext">Para agregar una factura realice la b&uacute;squeda por Folio de la factura y
-                        se cargaran los datos, la b&uacute;squeda se limita a las facturas asignadas al cliente
-                        seleccionado en el campo "Cliente".</span>
+                <button id="btn-nuevo-producto" type="button" class="button-modal" onclick="agregarComplemento()">
+                    <span class="fas fa-plus"></span> Agregar nuevo complemento
+                </button>
+            </div>
+        </div>
+        <div style="max-width: 100%;">
+            <div class="col-md-12 mt-3">
+                <div id="tabs" class='tabs-div'>
+
                 </div>
             </div>
-        </div>
+            <div id="complementos" class="mt-2">
 
-        
-
-        <div class="row scrollX">
-            <div class="col-md-12">
-                <table class="table tab-hover table-condensed table-responsive table-row thead-form">
-                    <thead>
-                        <tr>
-                            <th class="col-auto text-center">Folio Factura</th>
-                            <th class="col-auto text-center">Parcialidad</th>
-                            <th class="col-auto text-center">Total Factura</th>
-                            <th class="col-auto text-center">Monto Ant.</th>
-                            <th class="col-auto text-center">Monto Pagado</th>
-                            <th class="col-auto text-center">Restante</th>
-                            <th class="col-auto text-center">Agregar</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-
-                            <td><input id="id-factura" type='hidden' /><input id="type-factura" type='hidden' /><input
-                                    id="uuid-cfdi" type='hidden' /><input id="tcambio-cfdi" type='hidden' /><input
-                                    id="idmoneda-cfdi" type='hidden' /><input id="cmoneda-cfdi" type='hidden' /><input
-                                    id="cmetodo-cfdi" type='hidden' /><input class='form-control text-center input-form'
-                                    id="folio-factura" name='codigo' placeholder='Factura' type='text'
-                                    oninput="aucompletarFactura();" /></td>
-                            <td><input class='form-control text-center input-form' id="parcialidad" disabled
-                                    name='parcialidad' placeholder='No. Parcialidad' type='text' /></td>
-                            <td><input class='form-control text-center input-form' id='total-factura' disabled
-                                    name='total-factura' placeholder='Total de factura' type='number' step="any" /></td>
-                            <td><input class='form-control text-center input-form' id='monto-anterior' disabled
-                                    name='monto-anterior' placeholder='Monto anterior' type='number' step="any" /></td>
-                            <td><input class='form-control text-center input-form' id='monto-pago' name='monto-pago'
-                                    placeholder='Monto pagado' type='number' step="any" oninput="calcularRestante()" />
-                            </td>
-                            <td><input class='form-control text-center input-form' id='monto-restante' disabled
-                                    name='cantidad' placeholder='Monto restante' type='number' step="any" /></td>
-                            <td class="text-center"><button id="btn-agregar-cfdi" class='button-add-prod'
-                                    onclick='agregarCFDI();'><span class='fas fa-plus'></span></button></td>
-                        </tr>
-                    </tbody>
-                </table>
-                <table class="table tab-hover table-condensed table-responsive table-row table-head"
-                    id="body-lista-cfdi">
-
-                </table>
             </div>
         </div>
-        <br />
         <div class="row col-12">
             <div class="col-md-12 d-flex justify-content-end" id="btns">
                 <button class="button-form btn btn-danger me-2" onclick="cancelarPago();">Cancelar <span
