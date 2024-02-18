@@ -418,9 +418,8 @@ class ControladorUsuario
     private function getFechaAccAux()
     {
         $consultado = false;
-        $c = new Consultas();
         $consulta = "SELECT fecharegistro, acceso, paquete FROM usuario ORDER BY idusuario ASC limit 1;";
-        $consultado = $c->getResults($consulta, null);
+        $consultado = $this->consultas->getResults($consulta, null);
         return $consultado;
     }
 
@@ -428,9 +427,8 @@ class ControladorUsuario
     {
         $consultado = false;
         $consulta = "SELECT * FROM usuario where concat(nombre,apellido_paterno,apellido_materno,usuario,email) = :concat;";
-        $c = new Consultas();
         $val = array("concat" => $concat);
-        $consultado = $c->getResults($consulta, $val);
+        $consultado = $this->consultas->getResults($consulta, $val);
         return $consultado;
     }
 

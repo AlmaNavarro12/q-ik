@@ -19,6 +19,8 @@ class TMPPago {
     private $totalfacturatmp;
     private $sessionid;
     private $type;
+    private $tag;
+
     
     function __construct() {
         
@@ -50,6 +52,10 @@ class TMPPago {
 
     function getTcamcfdi() {
         return $this->tcamcfdi;
+    }
+
+    function getTag() {
+        return $this->tag;
     }
 
     function getIdmonedacdfi() {
@@ -102,6 +108,10 @@ class TMPPago {
 
     function setTcambio($tcambio) {
         $this->tcambio = $tcambio;
+    }
+
+    function setTag($tag) {
+        $this->tag = $tag;
     }
 
     function setIdfacturatmp($idfacturatmp) {

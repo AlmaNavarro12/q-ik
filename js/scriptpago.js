@@ -192,7 +192,6 @@ function autocompletarCliente() {
     $('#nombre-cliente').autocomplete({
         source: "com.sine.enlace/enlaceautocompletar.php?transaccion=nombrecliente",
         select: function (event, ui) {
-            console.log(ui.item);
             $("#id-cliente").val(ui.item.id);
             $("#rfc-cliente").val(ui.item.rfc);
             $("#razon-cliente").val(ui.item.razon);
@@ -219,7 +218,6 @@ function disableCuenta() {
         $("#transaccion-" + tag).attr('disabled', true);
     }
 }
-
 
 function loadBancoCliente(tag) {
     $.ajax({
@@ -406,8 +404,123 @@ function aucompletarFactura() {
             var a = ui.item.value;
             var id = ui.item.id;
             var type = ui.item.type;
-
             loadFactura(id, type, tag);
         }
     });
 }
+
+function loadFactura(idfactura, type, tag) {
+    var idpago = 0;
+    if ($("#idpagoactualizar").val()) {
+        idpago = $("#idpagoactualizar").val();
+    }
+    $.ajax({
+        url: "com.sine.enlace/enlacepago.php",
+        type: "POST",
+        data: {transaccion: "loadfactura", idfactura: idfactura, type: type, idpago: idpago},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 1000);
+            if (bandera == '0') {
+                alertify.error(res);
+            } else {
+                $("#type-" + tag).val(type);
+                setvaloresFactura(datos, tag);
+            }
+            cargandoHide();
+        }
+    });
+}
+
+function setvaloresFactura(datos, tag) {
+    var [iddatosfactura, uuid, tcambio, idmoneda, idmetodo, totalfactura, noparcialidad_tmp, montoant_tmp] = datos.split("</tr>").slice(0, 8);
+    $("#id-factura-" + tag).val(iddatosfactura);
+    $("#uuid-" + tag).val(uuid);
+    $("#cambiocfdi-" + tag).val(tcambio);
+    loadMonedaCFDI(tag, idmoneda);
+    $("#metcfdi-" + tag).val(idmetodo);
+    $("#parcialidad-" + tag).val(noparcialidad_tmp);
+    $("#total-" + tag).val(totalfactura);
+    $("#anterior-" + tag).val(montoant_tmp);
+    $("#monto-" + tag).val(montoant_tmp);
+    calcularRestante(tag);
+}
+
+function loadMonedaCFDI(tag = "", idmoneda = "") {
+    $.ajax({
+        url: '../../CATSAT/CATSAT/com.sine.enlace/enlaceMonedas.php',
+        type: 'POST',
+        data: {transaccion: 'opcionesmoneda', idmoneda: idmoneda},
+        success: function (datos) {
+            alert(datos);
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 5000);
+            if (bandera == 0) {
+                alertify.error(res);
+            } else {
+                $("#monedarel-" + tag).html(datos);
+            }
+        }
+    });
+}
+
+function calcularRestante(tag = "") {
+    tag = tag || $("#tabs .sub-tab-active").attr('data-tab');
+    var restante = parseFloat($("#anterior-" + tag).val()) - parseFloat($("#monto-" + tag).val());
+    restante = restante.toFixed(2);
+    $("#restante-" + tag).val(restante);
+}
+
+function agregarCFDI() {
+    var tag = $("#tabs").find('.sub-tab-active').attr("data-tab");
+    var idmoneda = $("#moneda-" + tag).val();
+    var tcambio = $("#cambio-" + tag).val();
+    var idfactura = $("#id-factura-" + tag).val() || '0';
+    var folio = $("#factura-" + tag).val();
+    var uuid = $("#uuid-" + tag).val();
+    var type = $("#type-" + tag).val();
+    var tcamcfdi = $("#cambiocfdi-" + tag).val();
+    var cmetodo = $("#metcfdi-" + tag).val();
+    var idmonedacdfi = $("#monedarel-" + tag).val();
+    var factura = $("#factura-" + tag).val();
+    var parcialidad = $("#parcialidad-" + tag).val();
+    var totalfactura = $("#total-" + tag).val();
+    var montoanterior = $("#anterior-" + tag).val();
+    var montopago = $("#monto-" + tag).val();
+    var montorestante = $("#restante-" + tag).val();
+
+    if (isnEmpty(idmoneda, "moneda-" + tag) && isnEmpty(factura, "factura-" + tag) && isnEmpty(type, "type-" + tag) && isnEmpty(idmonedacdfi, "monedarel-" + tag) && isnEmpty(parcialidad, "parcialidad-" + tag) && isnEmpty(totalfactura, "total-" + tag) && isnZero(montoanterior, "anterior-" + tag) && isPositive(montopago, "monto-" + tag) && isnEmpty(montorestante, "restante-" + tag)) {
+        $.ajax({
+            url: "com.sine.enlace/enlacepago.php",
+            type: "POST",
+            data: {transaccion: "agregarcfdi", tag: tag, idmoneda: idmoneda, tcambio: tcambio, type: type, idfactura: idfactura, folio: folio, uuid: uuid, tcamcfdi: tcamcfdi, idmonedacdfi: idmonedacdfi, cmetodo: cmetodo, factura: factura, parcialidad: parcialidad, totalfactura: totalfactura, montoanterior: montoanterior, montopago: montopago, montorestante: montorestante},
+            success: function (datos) {
+                var texto = datos.toString();
+                var bandera = texto.substring(0, 1);
+                var res = texto.substring(1, 1000);
+                if (bandera == '0') {
+                    alertify.error(res);
+                } else {
+                    $("#id-factura-" + tag).val('');
+                    $("#factura-" + tag).val('');
+                    $("#uuid-" + tag).val('');
+                    $("#type-" + tag).val('');
+                    $("#cambiocfdi-" + tag).val('');
+                    $("#metcfdi-" + tag).val('');
+                    $("#monedarel-" + tag).val('');
+                    $("#factura-" + tag).val('');
+                    $("#parcialidad-" + tag).val('');
+                    $("#total-" + tag).val('');
+                    $("#anterior-" + tag).val('');
+                    $("#monto-" + tag).val('');
+                    $("#restante-" + tag).val('');
+                    loadTablaCFDI();
+                }
+                cargandoHide();
+            }
+        });
+    }
+}
+

@@ -1,8 +1,8 @@
 <?php
 
 require_once '../com.sine.dao/Consultas.php';
-require_once '../../CATSAT/CATSAT/com.sine.controlador/controladorMonedas.php';
 require_once '../vendor/autoload.php';
+require_once '../../CATSAT/CATSAT/com.sine.controlador/controladorMonedas.php';
 
 date_default_timezone_set("America/Mexico_City");
 session_start();
@@ -453,22 +453,22 @@ class ControladorPago {
                                     <input id='metcfdi-$tag' type='hidden' />
                                     <select class='form-select text-center input-form' id='monedarel-$tag' name='monedarel-$tag'>
                                         <option value='' id='default-moneda-$tag'>- - - -</option>
-                                        <optgroup id='moncfdi-$tag' class='contenedor-moneda-$tag text-left'> </optgroup>
+                                        <optgroup id='moncfdi-$tag' class='contenedor-moneda-$tag'> </optgroup>
                                     </select>
                                 </td>
                             </tr>
                             <tr>
                                 <td>
                                     <label class='label-form mb-1' for='parcialidad-$tag'>No. Parcialidad</label>
-                                    <input class='form-control text-center input-form' id='parcialidad-$tag' name='parcialidad-$tag' placeholder='No Parcialidad' type='text'/>
+                                    <input class='form-control text-center input-form' id='parcialidad-$tag' disabled name='parcialidad-$tag' placeholder='No Parcialidad' type='text'/>
                                 </td>
                                 <td>
                                     <label class='label-form mb-1' for='total-$tag'>Total factura</label>
-                                    <input class='form-control text-center input-form' id='total-$tag' name='total-$tag' placeholder='Total de Factura' type='number' step='any'/>
+                                    <input class='form-control text-center input-form' id='total-$tag' disabled name='total-$tag' placeholder='Total de Factura' type='number' step='any'/>
                                 </td>
                                 <td>
                                     <label class='label-form mb-1' for='anterior-$tag'>Monto anterior</label>
-                                    <input class='form-control text-center input-form' id='anterior-$tag' name='anterior-$tag' placeholder='Monto Anterior' type='number' step='any'/>
+                                    <input class='form-control text-center input-form' id='anterior-$tag' disabled name='anterior-$tag' placeholder='Monto Anterior' type='number' step='any'/>
                                 </td>
                                 <td>
                                     <label class='label-form mb-1' for='monto-$tag'>Monto a pagar</label>
@@ -476,7 +476,7 @@ class ControladorPago {
                                 </td>
                                 <td>
                                     <label class='label-form mb-1' for='restante-$tag'>Monto restante</label>
-                                    <input class='form-control text-center input-form' id='restante-$tag' name='cantidad' placeholder='Monto Restante' type='number' step='any'/>
+                                    <input class='form-control text-center input-form' id='restante-$tag' disabled name='cantidad' placeholder='Monto Restante' type='number' step='any'/>
                                 </td>
                                 <td class='text-center'>
                                     <label class='label-space text-light' for='btn-agregar-cfdi'>Algo</label>
@@ -492,5 +492,269 @@ class ControladorPago {
             </div>
         </div><cut>$tag";
         return $datos;
+    }
+
+    public function loadFactura($id, $idpago, $type) {
+        return ($type == 'f') ? $this->dataFactura($id, $idpago) : (($type == 'c') ? $this->dataFacturaCarta($id, $idpago) : false);
+    }
+
+    private function dataFactura($id, $idpago) {
+        $datos = "";
+        $getfactura = $this->getFactura($id);
+        $actual = reset($getfactura); 
+    
+        if ($actual !== false) { 
+            $iddatosfactura = $actual['iddatos_factura'];
+            $tcambio = $actual['tcambio'];
+            $idmoneda = $actual['id_moneda'];
+            $uuid = $actual['uuid'];
+            $cmetodo = $actual['id_metodo_pago'];
+            $totalfactura = $actual['totalfactura'];
+    
+            $parcialidad = $this->getParcialidad($iddatosfactura, $idpago);
+            $noparc = $parcialidad - 1;
+            $montoanterior = ($noparc == '0') ? $actual['totalfactura'] : $this->getMontoAnterior($noparc, $iddatosfactura);
+            $datos = "$iddatosfactura</tr>$uuid</tr>$tcambio</tr>$idmoneda</tr>$cmetodo</tr>$totalfactura</tr>$parcialidad</tr>$montoanterior</tr>$noparc";
+        }
+        return $datos;
+    }
+    
+    private function getFactura($id) {
+        $consultado = false;
+        $consulta = "SELECT f.iddatos_factura, f.letra, f.folio_interno_fac, f.tcambio, f.uuid, f.totalfactura,f.status_pago, f.id_moneda, f.id_metodo_pago FROM datos_factura f WHERE f.iddatos_factura=:id;";
+        $val = array("id" => $id);
+        $consultado = $this->consultas->getResults($consulta, $val);
+        return $consultado;
+    }
+
+    private function getParcialidad($idfactura, $idpago) {
+        $datos = "1";
+        $parcialidad = $this->getParcialidadAux($idfactura, $idpago);
+        foreach ($parcialidad as $p) {
+            $datos = $p['par'];
+        }
+        $datos2 = "";
+        $parcialidad2 = $this->getParcialidadAux2($idfactura);
+        foreach ($parcialidad2 as $p) {
+            $datos2 = $p['par'];
+        }
+        if ($datos2 > $datos) {
+            $datos = $datos2;
+        }
+        return $datos;
+    }
+    
+    private function getParcialidadAux($idfactura, $idpago) {
+        $consultado = false;
+        $consulta = "SELECT (noparcialidad)+1 par FROM detallepago dt INNER JOIN pagos p ON (p.tagpago=dt.detalle_tagencabezado) WHERE pago_idfactura=:id AND cancelado != '1' AND p.tagpago != :idpago AND type=:tipo;";
+        $valores = array("id" => $idfactura,
+            "idpago" => $idpago,
+            "tipo" => 'f');
+        $consultado = $this->consultas->getResults($consulta, $valores);
+        return $consultado;
+    }
+
+    private function getMontoAnteriorAux($noparcialidad, $idfactura_tmp) {
+        $consultado = false;
+        $consulta = "SELECT montoinsoluto FROM detallepago WHERE noparcialidad=:noparcialidad AND pago_idfactura=:idfactura AND type=:tipo;";
+        $val = array("noparcialidad" => $noparcialidad,
+            "idfactura" => $idfactura_tmp,
+            "tipo" => 'f');
+        $consultado = $this->consultas->getResults($consulta, $val);
+        return $consultado;
+    }
+
+    private function getMontoAnterior($noparcialidad_tmp, $idfactura_tmp) {
+        $totalfactura = $this->getMontoAnteriorAux($noparcialidad_tmp, $idfactura_tmp);
+        if (empty($totalfactura)) {
+            $totalfactura = $this->getMontoAnteriorAux2($noparcialidad_tmp, $idfactura_tmp);
+        }
+        return $totalfactura ?? "";
+    }
+    
+    private function getParcialidadAux2($idfactura) {
+        $consulta = "SELECT (noparcialidadtmp)+1 as par FROM tmppago WHERE idfacturatmp=:id and sessionid=:sid AND type=:tipo;";
+        $valores = array(
+            "id" => $idfactura,
+            "sid" => session_id(),
+            "tipo" => 'f'
+        );
+        return $this->consultas->getResults($consulta, $valores) ?: false;
+    }
+
+    private function getMontoAnteriorAux2($noparcialidad_tmp, $idfactura_tmp) {
+        $consulta = "SELECT montoinsolutotmp FROM tmppago WHERE noparcialidadtmp=:noparcialidad AND idfacturatmp=:idfactura AND type=:tipo;";
+        $val = array(
+            "noparcialidad" => $noparcialidad_tmp,
+            "idfactura" => $idfactura_tmp,
+            "tipo" => 'f'
+        );
+        return $this->consultas->getResults($consulta, $val) ?: false;
+    }
+
+    private function getParcialidadCarta($idfactura, $idpago) {
+        $parcialidad = $this->getParcialidadCartaAux($idfactura, $idpago);
+        foreach ($parcialidad as $p) {
+            return $p['par'];
+        }
+        
+        $parcialidad2 = $this->getParcialidadCartaAux2($idfactura);
+        foreach ($parcialidad2 as $p2) {
+            return $p2['par'];
+        }
+        return "1";
+    }
+
+    private function getParcialidadCartaAux($idfactura, $idpago) {
+        $consulta = "SELECT (noparcialidad)+1 par FROM detallepago dt INNER JOIN pagos p ON (p.tagpago=dt.detalle_tagencabezado) WHERE pago_idfactura=:id AND cancelado != '1' AND p.tagpago != :idpago AND type=:tipo;";
+        $valores = array("id" => $idfactura,
+            "idpago" => $idpago,
+            "tipo" => 'c');
+        return $this->consultas->getResults($consulta, $valores) ?: false;
+    }
+
+    private function getParcialidadCartaAux2($idfactura) {
+        $sessionid = session_id();
+        $consulta = "SELECT (noparcialidadtmp)+1 as par FROM tmppago WHERE idfacturatmp=:id and sessionid=:sid AND type=:tipo";
+        $valores = array(
+            "id" => $idfactura,
+            "sid" => $sessionid,
+            "tipo" => 'c'
+        );
+        return $this->consultas->getResults($consulta, $valores) ?: false;
+    }
+    
+    private function getMontoAnteriorCartaAux2($noparcialidad_tmp, $idfactura_tmp) {
+        $consulta = "SELECT montoinsolutotmp FROM tmppago WHERE noparcialidadtmp=:noparcialidad AND idfacturatmp=:idfactura AND type=:tipo;";
+        $val = array(
+            "noparcialidad" => $noparcialidad_tmp,
+            "idfactura" => $idfactura_tmp,
+            "tipo" => 'c'
+        );
+        return $this->consultas->getResults($consulta, $val) ?: false;
+    }
+    
+    private function getMontoAnteriorCartaAux($noparcialidad, $idfactura_tmp) {
+        $consulta = "SELECT montoinsoluto FROM detallepago WHERE noparcialidad=:noparcialidad AND pago_idfactura=:idfactura AND type=:tipo;";
+        $val = array(
+            "noparcialidad" => $noparcialidad,
+            "idfactura" => $idfactura_tmp,
+            "tipo" => 'c'
+        );
+        return $this->consultas->getResults($consulta, $val) ?: false;
+    }
+    
+    private function getMontoAnteriorCarta($noparcialidad_tmp, $idfactura_tmp) {
+        $total = $this->getMontoAnteriorCartaAux($noparcialidad_tmp, $idfactura_tmp);
+        
+        foreach ($total as $actual) {
+            return $actual['montoinsoluto'];
+        }
+        
+        $total2 = $this->getMontoAnteriorCartaAux2($noparcialidad_tmp, $idfactura_tmp);
+        foreach ($total2 as $actual2) {
+            return $actual2['montoinsolutotmp'];
+        }
+        return "";
+    }
+    
+    private function getFacturaCarta($id) {
+        $consultado = false;
+        $consulta = "SELECT f.idfactura_carta, f.letra, f.foliocarta, f.tcambio, f.uuid, f.totalfactura, f.status_pago, f.id_moneda, f.id_metodo_pago FROM factura_carta f WHERE f.idfactura_carta=:id;";
+        $val = array("id" => $id);
+        $consultado = $this->consultas->getResults($consulta, $val);
+        return $consultado;
+    }
+
+    private function dataFacturaCarta($id, $idpago) {
+        $datos = "";
+        $getfactura = $this->getFacturaCarta($id);
+        foreach ($getfactura as $actual) {
+            $iddatosfactura = $actual['idfactura_carta'];
+            $tcambio = $actual['tcambio'];
+            $idmoneda = $actual['id_moneda'];
+            $uuid = $actual['uuid'];
+            $idmetodo = $actual['id_metodo_pago'];
+            $totalfactura = $actual['totalfactura'];
+
+            $parcialidad = $this->getParcialidadCarta($iddatosfactura, $idpago);
+            $noparc = $parcialidad - 1;
+            if ($noparc == '0') {
+                $montoanterior = $actual['totalfactura'];
+            } else {
+                $montoanterior = $this->getMontoAnteriorCarta($noparc, $iddatosfactura);
+            }
+
+            $datos = "$iddatosfactura</tr>$uuid</tr>$tcambio</tr>$idmoneda</tr>$idmetodo</tr>$totalfactura</tr>$parcialidad</tr>$montoanterior</tr>$noparc";
+        }
+        return $datos;
+    }
+
+    private function checkPago($t) {
+        $montoins = $t->getMontoinsolutotmp();
+        if (bccomp($montoins, '0', 2) < 0) {
+            echo "0El monto ingresado supera al total de la factura";
+            return true;
+        }
+    
+        $parcialidad = $t->getParcialidadtmp();
+        $idfactura = $t->getIdfacturatmp();
+        $type = $t->getType();
+    
+        if ($this->checkParcialidadAux($parcialidad, $idfactura, $type) || $this->checkParcialidadTmp($parcialidad, $idfactura, $type)) {
+            echo "0Ya esta registrado este numero de parcialidad";
+            return true;
+        }
+    
+        return false;
+    }
+
+    private function checkParcialidadAux($p, $id, $type) {
+        $datos = false;
+        $consulta = "SELECT * 
+                    FROM detallepago dp INNER JOIN pagos p ON p.tagpago = dp.detalle_tagencabezado WHERE dp.noparcialidad=:p AND dp.pago_idfactura=:id AND dp.type=:type AND p.cancelado = 0";
+        $val = array("p" => $p,
+            "id" => $id,
+            "type" => $type);
+        $datos = $this->consultas->getResults($consulta, $val);
+        return $datos;
+    }
+
+    private function checkParcialidadTmp($p, $id, $type) {
+        $datos = false;
+        $consulta = "SELECT * FROM tmppago WHERE noparcialidadtmp=:p AND idfacturatmp=:id AND type=:type";
+        $val = array("p" => $p,
+            "id" => $id,
+            "type" => $type);
+        $datos = $this->consultas->getResults($consulta, $val);
+        return $datos;
+    }
+    
+    public function agregarPago($t) {
+        if ($this->checkPago($t)) {
+            return false;
+        }
+    
+        $consulta = "INSERT INTO `tmppago` VALUES (:id, :parcialidad, :idfactura, :folio, :uuid, :tcambio, :idmoneda, :cmetodo, :monto, :montoant, :montoins, :total, :type, :tag, :session);";
+        $valores = array(
+            "id" => null,
+            "parcialidad" => $t->getParcialidadtmp(),
+            "idfactura" => $t->getIdfacturatmp(),
+            "folio" => $t->getFoliotmp(),
+            "uuid" => $t->getUuid(),
+            "tcambio" => $t->getTcamcfdi(),
+            "idmoneda" => $t->getIdmonedacdfi(),
+            "cmetodo" => $t->getCmetodo(),
+            "monto" => bcdiv($t->getMontopagotmp(), '1', 2),
+            "montoant" => bcdiv($t->getMontoanteriortmp(), '1', 2),
+            "montoins" => bcdiv($t->getMontoinsolutotmp(), '1', 2),
+            "total" => $t->getTotalfacturatmp(),
+            "type" => $t->getType(),
+            "session" => $t->getSessionid(),
+            "tag" => $t->getTag()
+        );
+    
+        $insertado = $this->consultas->execute($consulta, $valores);
+        return $insertado;
     }
 }

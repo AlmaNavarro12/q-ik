@@ -30,9 +30,7 @@ if (isset($_POST['transaccion'])) {
             $condicion = "where c_pago !='99'";
             $datos = $co->opcionesFormaPago($condicion, $_POST['selected']);
             break;
-        case 'opcionesmoneda':
-            $datos = $co->opcionesMoneda($_POST['idmoneda']);
-            break;
+       
         case 'opcionesusocfdi':
             $datos = $co->opcionesUsoCFDI($_POST['iduso']);
             break;

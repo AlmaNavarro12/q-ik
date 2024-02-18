@@ -28,7 +28,42 @@ if (isset($_POST['transaccion'])) {
             break;
         case 'nuevocomplemento':
             echo $datos = $cp->nuevoComplemento($_POST['comp']);
+            break;
+        case 'loadfactura':
+            $datos = $cp->loadFactura($_POST['idfactura'], $_POST['idpago'], $_POST['type']);
+            echo $datos != "" ? $datos : "0No se encontro la factura.";
+            break;
+        case 'agregarcfdi':
+            $insertado = $cp->agregarPago(crearTMPPagoDesdePOST());
+            echo $insertado ? $insertado : "0Error: No se insertó el registro. ";
+            break;
     }
+}
+
+
+function crearTMPPagoDesdePOST()
+{
+    $t = new TMPPago();
+    $t->setTag($_POST['tag']);
+    $t->setIdmoneda($_POST['idmoneda']);
+    $t->setTcambio($_POST['tcambio']);
+    $t->setType($_POST['type']);
+    $t->setParcialidadtmp($_POST['parcialidad']);
+    $t->setIdfacturatmp($_POST['idfactura']);
+
+    $folio = $_POST['folio'];
+    $t->setFoliotmp(explode("-", $folio)[1] ?? $folio);
+
+    $t->setUuid($_POST['uuid']);
+    $t->setTcamcfdi($_POST['tcamcfdi']);
+    $t->setIdmonedacdfi($_POST['idmonedacdfi']);
+    $t->setCmetodo($_POST['cmetodo']);
+    $t->setMontopagotmp($_POST['montopago']);
+    $t->setMontoanteriortmp($_POST['montoanterior']);
+    $t->setMontoinsolutotmp($_POST['montorestante']);
+    $t->setTotalfacturatmp($_POST['totalfactura']);
+    $t->setSessionid(session_id());
+    return $t;
 }
 
 /**<?php
@@ -47,11 +82,6 @@ if (isset($_POST['transaccion'])) {
     $transaccion = $_POST['transaccion'];
     switch ($transaccion) {
         
-        case 'listapagoaltas':
-            $datos = "";
-            $datos = $cp->listaServiciosHistorial($_POST['REF'], $_POST['pag'], $_POST['numreg']);
-            echo $datos != "" ? $datos : "0Ha ocurrido un error.";
-            break;
         case 'editarpago':
             $datos = $cp->getDatosPago($_POST['idpago']);
             echo $datos != "" ? $datos : "0No se han econtrado datos.";
@@ -119,10 +149,7 @@ if (isset($_POST['transaccion'])) {
             $cadena = $cp->checkCancelados($_POST['idpago']);
             echo $cadena ? $cadena : "0Error.";
             break;
-        case 'agregarcfdi':
-            $insertado = $cp->agregarPago(crearTMPPagoDesdePOST());
-            echo $insertado ? $insertado : "0Error: No se insertó el registro. ";
-            break;
+        
     }
 }
 
@@ -164,28 +191,4 @@ function obtenerDatosComplementoPago()
     return $p;
 }
 
-function crearTMPPagoDesdePOST()
-{
-    $t = new TMPPago();
-    $t->setTag($_POST['tag']);
-    $t->setIdmoneda($_POST['idmoneda']);
-    $t->setTcambio($_POST['tcambio']);
-    $t->setType($_POST['type']);
-    $t->setParcialidadtmp($_POST['parcialidad']);
-    $t->setIdfacturatmp($_POST['idfactura']);
-
-    $folio = $_POST['folio'];
-    $t->setFoliotmp(explode("-", $folio)[1] ?? $folio);
-
-    $t->setUuid($_POST['uuid']);
-    $t->setTcamcfdi($_POST['tcamcfdi']);
-    $t->setIdmonedacdfi($_POST['idmonedacdfi']);
-    $t->setCmetodo($_POST['cmetodo']);
-    $t->setMontopagotmp($_POST['montopago']);
-    $t->setMontoanteriortmp($_POST['montoanterior']);
-    $t->setMontoinsolutotmp($_POST['montorestante']);
-    $t->setTotalfacturatmp($_POST['totalfactura']);
-    $t->setSessionid(session_id());
-    return $t;
-}
  */

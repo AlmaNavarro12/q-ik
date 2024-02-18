@@ -25,8 +25,7 @@ if (isset($_GET['transaccion'])) {
             echo json_encode($cp->getCoincidenciasCliente($_GET['term']));
             break;*/
         case 'facturas':
-            $iddatos = $_GET['iddatos'];
-            echo json_encode($cp->getCoincidenciasFacturas($_GET['term'], $iddatos));
+            echo json_encode($cp->getCoincidenciasFacturas($_GET['term'], $_GET['iddatos']));
             break;
         /*case 'catunidad':
             echo json_encode($cp->getCoincidenciasCatalogoUnidad($_GET['term']));
