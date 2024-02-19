@@ -37,7 +37,6 @@ include("modals.php");
         </thead>
     </table>
 </div>
-<br />
 <script type="text/javascript" src="js/scriptpago.js"></script>
 <script>
     $(document).ready(function() {

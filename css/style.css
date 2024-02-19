@@ -1271,3 +1271,63 @@ table.table-row tr td {
     color: #fff;
     background-color: #e74c3c;
 }
+
+
+.small-tooltip {
+    color: #222;
+    display: inline-block;
+    text-decoration: none;
+    position: relative;
+    margin: 0 2px;
+    -webkit-transition: all .5s;
+    -moz-transition: all .5s;
+    transition: all .5s;
+}
+
+.small-tooltip.icon:before {
+    font-family: "FontAwesome", sans-serif;
+    color: #fff;
+    font-size: 20px;
+}
+
+.small-tooltip .tiptext {
+    background: #fff;
+    color: #222;
+    font-size: 14px;
+    font-weight: bold;
+    position:  absolute;
+    text-align: justify;
+    bottom: 0;
+    left: -25px;
+    right: -25px;
+    padding: 12px;
+    visibility: hidden;
+    opacity: 0;
+    -webkit-transition: all .4s;
+    -moz-transition: all .4s;
+    transition: all .4s;
+    min-width: 160px;
+    border-radius: 15px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+}
+
+.small-tooltip .tiptext:before {
+    content: '';
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid #fff;
+    position: absolute;
+    bottom: -5px;
+    left: 40px;
+    z-index: 800;
+}
+
+.small-tooltip:hover .tiptext {
+    bottom: 50px;
+    visibility: visible;
+    opacity: 1;
+}
+
+.small-tooltip.tip .tiptext {
+    color: #4183d7;
+}

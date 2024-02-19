@@ -26,6 +26,7 @@ class Pago {
     private $actualizarfiscales;
     private $idbancoB;
     private $cuentaB;
+    private $tagPago;
             
     function __construct() {
         
@@ -53,6 +54,10 @@ class Pago {
 
     function getRazoncliente() {
         return $this->razoncliente;
+    }
+
+    function gettagPago() {
+        return $this->tagPago;
     }
 
     function getRegfiscalcliente() {
@@ -145,6 +150,10 @@ class Pago {
 
     function setRazoncliente($razoncliente) {
         $this->razoncliente = $razoncliente;
+    }
+
+    function settagPago($tagPago) {
+        $this->tagPago = $tagPago;
     }
 
     function setRegfiscalcliente($regfiscalcliente) {

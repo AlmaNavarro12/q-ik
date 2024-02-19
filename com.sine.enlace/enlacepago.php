@@ -8,7 +8,7 @@ require_once '../com.sine.modelo/Pago.php';
 
 $cp = new ControladorPago();
 $t = new TMPPago();
-
+Session::start();
 
 if (isset($_POST['transaccion'])) {
     $transaccion = $_POST['transaccion'];
@@ -23,7 +23,7 @@ if (isset($_POST['transaccion'])) {
             echo $folio ? $folio : "0No se han encontrado datos.";
             break;
         case 'loadtabla':
-            $insertado = $cp->getTabla($sid, $_POST['tag'], $_POST['idmoneda'], $_POST['tcambio'], session_id());
+            $insertado = $cp->getTabla(session_id(), $_POST['tag'], $_POST['idmoneda'], $_POST['tcambio'], $_POST['uuid']);
             echo $insertado ? $insertado : "0Error: No se insertó el registro.";
             break;
         case 'nuevocomplemento':
@@ -37,6 +37,35 @@ if (isset($_POST['transaccion'])) {
             $insertado = $cp->agregarPago(crearTMPPagoDesdePOST());
             echo $insertado ? $insertado : "0Error: No se insertó el registro. ";
             break;
+        case 'eliminar':
+            $eliminado = $cp->eliminar($_POST['idtemp'], session_id());
+            echo $eliminado != "" ? $eliminado : "0No se han econtrado datos.";
+            break;
+        case 'borrarcomplemento':
+            $insertado = $cp->cancelar(session_id(), $_POST['tab']);
+            echo $insertado ? $insertado : "0Error al eliminar el complemento.";
+            break;
+        case 'insertarpago':
+            $insertado = $cp->validarPago(obtenerDatosPago(), $_POST['objimpuesto']);
+            echo $insertado ? $insertado : "0Error: no insertó el registro";
+            break;
+        case 'insertarcomplementos':
+            $insertado = $cp->insertarComplemento(obtenerDatosComplementoPago());
+            echo $insertado ? $insertado : "0Error al insertar el complemento.";
+            break;
+        case 'xml':
+            $cadena = $cp->checkCancelados($_POST['idpago']);
+            echo $cadena ? $cadena : "0Error.";
+            break;
+        case 'editarpago':
+            $datos = $cp->getDatosPago($_POST['idpago']);
+            echo $datos != "" ? $datos : "0No se han econtrado datos.";
+            break;
+        case 'complementos':
+            $complementos = $cp->buildComplementos($_POST['tag'], $_POST['idemisor'], session_id(), $_POST['uuid']);
+            echo $complementos ? $complementos : '0Error en la vista de complementos.';
+            break;
+            
     }
 }
 
@@ -66,6 +95,45 @@ function crearTMPPagoDesdePOST()
     return $t;
 }
 
+function obtenerDatosPago()
+{
+    $p = new Pago();
+    $p->setTagpago(isset($_POST['tag']) ? $_POST['tag'] : null);
+    $p->setIdpago(isset($_POST['idpago']) ? $_POST['idpago'] : null);
+    $p->setFoliopago($_POST['folio']);
+    $p->setIdcliente($_POST['idcliente']);
+    $p->setNombrecliente($_POST['cliente']);
+    $p->setRfccliente($_POST['rfccliente']);
+    $p->setRazoncliente($_POST['razoncliente']);
+    $p->setRegfiscalcliente($_POST['regfiscalcliente']);
+
+    $search = "/[^A-Za-z0-9]/";
+    $p->setCodpostal(preg_replace($search, "", $_POST['codpostal']));
+    $p->setPago_idfiscales($_POST['datosfiscales']);
+    $p->setChfirmar($_POST['chfirma']);
+    $p->setSessionid(session_id());
+    return $p;
+}
+
+function obtenerDatosComplementoPago()
+{
+    $p = new Pago();
+    $p->setTagpago($_POST['tag']);
+    $p->setTagcomp($_POST['tagcomp']);
+    $p->setOrden($_POST['orden']);
+    $p->setPagoidformapago($_POST['idformapago']);
+    $p->setPagoidmoneda($_POST['moneda']);
+    $p->setTipocambio($_POST['tcambio']);
+    $p->setFechapago($_POST['fechapago']);
+    $p->setHorapago($_POST['horapago']);
+    $p->setPago_idbanco($_POST['cuenta']);
+    $p->setIdbancoB($_POST['beneficiario']);
+    $p->setNooperacion($_POST['numtransaccion']);
+    $p->setSessionid(session_id());
+    return $p;
+}
+
+
 /**<?php
 
 require_once '../com.sine.modelo/TMPPago.php';
@@ -82,10 +150,7 @@ if (isset($_POST['transaccion'])) {
     $transaccion = $_POST['transaccion'];
     switch ($transaccion) {
         
-        case 'editarpago':
-            $datos = $cp->getDatosPago($_POST['idpago']);
-            echo $datos != "" ? $datos : "0No se han econtrado datos.";
-            break;
+        
         case 'pdf':
             $datos = $cp->mail($$_POST['idpago']);
             echo $datos != "" ? $datos : "0No hay pagos activos.";
@@ -112,10 +177,7 @@ if (isset($_POST['transaccion'])) {
             $eliminado = $cp->cancelarTimbre($_POST['idpago'], $_POST['motivo'],  $_POST['reemplazo']);
             echo $eliminado != "" ? $eliminado : "0No se han econtrado datos.";
             break;
-        case 'eliminar':
-            $eliminado = $cp->eliminar($_POST['idtemp'], session_id());
-            echo $eliminado != "" ? $eliminado : "0No se han econtrado datos.";
-            break;
+        
         case 'cancelar':
             $eliminado = $cp->cancelar(session_id());
             echo $eliminado != "" ? $eliminado : "0No se han econtrado datos.";
@@ -145,50 +207,8 @@ if (isset($_POST['transaccion'])) {
             $datos = $cf->listaServiciosHistorial($_POST['FO']);
             echo $datos != "" ? $datos : "0Ha ocurrido un error.";
             break;
-        case 'xml':
-            $cadena = $cp->checkCancelados($_POST['idpago']);
-            echo $cadena ? $cadena : "0Error.";
-            break;
+        
         
     }
 }
-
-function obtenerDatosPago()
-{
-    $p = new Pago();
-    $p->setTagpago($_POST['tag']);
-    $p->setIdpago($_POST['idpago']);
-    $p->setFoliopago($_POST['foliopago']);
-    $p->setIdcliente($_POST['idcliente']);
-    $p->setNombrecliente($_POST['cliente']);
-    $p->setRfccliente($_POST['rfccliente']);
-    $p->setRazoncliente($_POST['razoncliente']);
-    $p->setRegfiscalcliente($_POST['regfiscalcliente']);
-
-    $search = "/[^A-Za-z0-9]/";
-    $p->setCodpostal(preg_replace($search, "", $_POST['codpostal']));
-    $p->setPago_idfiscales($_POST['pago_idfiscales']);
-    $p->setChfirmar($_POST['chfirmar']);
-    $p->setSessionid(session_id());
-    return $p;
-}
-
-function obtenerDatosComplementoPago()
-{
-    $p = new Pago();
-    $p->setTagpago($_POST['tag']);
-    $p->setTagcomp($_POST['tagcomp']);
-    $p->setOrden($_POST['orden']);
-    $p->setPagoidformapago($_POST['idformapago']);
-    $p->setPagoidmoneda($_POST['moneda']);
-    $p->setTipocambio($_POST['tcambio']);
-    $p->setFechapago($_POST['fechapago']);
-    $p->setHorapago($_POST['horapago']);
-    $p->setPago_idbanco($_POST['cuenta']);
-    $p->setIdbancoB($_POST['beneficiario']);
-    $p->setNooperacion($_POST['numtransaccion']);
-    $p->setSessionid(session_id());
-    return $p;
-}
-
  */

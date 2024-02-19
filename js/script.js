@@ -259,6 +259,66 @@ function isPorcentaje(val, id) {
     return true;
 }
 
+function isnZero(val, id) {
+    if (val != "") {
+        if (!isNaN(val)) {
+            if (val > 0) {
+                $("#" + id + "-errors").text("");
+                $("#" + id).css("border-color", "green");
+                return true;
+            } else {
+                $("#" + id).css("border-color", "red");
+                $("#" + id + "-errors").text("El número debe ser mayor a cero.");
+                $("#" + id + "-errors").css("color", "red");
+                $("#" + id).focus();
+                return false;
+            }
+        } else {
+            $("#" + id).css("border-color", "red");
+            $("#" + id + "-errors").text("Este campo debe contener solo números.");
+            $("#" + id + "-errors").css("color", "red");
+            $("#" + id).focus();
+            return false;
+        }
+    } else {
+        $("#" + id).css("border-color", "red");
+        $("#" + id + "-errors").text("Este campo no puede estar vacío.");
+        $("#" + id + "-errors").css("color", "red");
+        $("#" + id).focus();
+        return false;
+    }
+}
+
+function isPositive(val, id) {
+    if (val != "") {
+        if (!isNaN(val)) {
+            if (val >= 0) {
+                $("#" + id + "-errors").text("");
+                $("#" + id).css("border-color", "green");
+                return true;
+            } else {
+                $("#" + id).css("border-color", "red");
+                $("#" + id + "-errors").text("El número debe ser positivo.");
+                $("#" + id + "-errors").css("color", "red");
+                $("#" + id).focus();
+                return false;
+            }
+        } else {
+            $("#" + id).css("border-color", "red");
+            $("#" + id + "-errors").text("Este campo debe contener solo números.");
+            $("#" + id + "-errors").css("color", "red");
+            $("#" + id).focus();
+            return false;
+        }
+    } else {
+        $("#" + id).css("border-color", "red");
+        $("#" + id + "-errors").text("Este campo no puede estar vacío.");
+        $("#" + id + "-errors").css("color", "red");
+        $("#" + id).focus();
+        return false;
+    }
+}
+
 //Función para ocultar el menu responsivo
 function resetMenu() {
     if (window.innerWidth >= 700) {

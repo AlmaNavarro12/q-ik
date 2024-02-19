@@ -11,6 +11,10 @@ class ComposerStaticInit62e10e6c8df9afc192311b196c75bb33
     );
 
     public static $prefixLengthsPsr4 = array (
+        't' => 
+        array (
+            'tests\\' => 6,
+        ),
         'Z' => 
         array (
             'ZipStream\\' => 10,
@@ -18,6 +22,10 @@ class ComposerStaticInit62e10e6c8df9afc192311b196c75bb33
         'T' => 
         array (
             'Twilio\\' => 7,
+        ),
+        'S' => 
+        array (
+            'SWServices\\' => 11,
         ),
         'P' => 
         array (
@@ -39,6 +47,10 @@ class ComposerStaticInit62e10e6c8df9afc192311b196c75bb33
     );
 
     public static $prefixDirsPsr4 = array (
+        'tests\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/lunasoft/sw-sdk-php/tests',
+        ),
         'ZipStream\\' => 
         array (
             0 => __DIR__ . '/..' . '/maennchen/zipstream-php/src',
@@ -46,6 +58,10 @@ class ComposerStaticInit62e10e6c8df9afc192311b196c75bb33
         'Twilio\\' => 
         array (
             0 => __DIR__ . '/..' . '/twilio/sdk/src/Twilio',
+        ),
+        'SWServices\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/lunasoft/sw-sdk-php/SWServices',
         ),
         'Psr\\SimpleCache\\' => 
         array (

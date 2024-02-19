@@ -1,6 +1,6 @@
 <?php
 session_start();
-if (isset($_SESSION[sha1('usuario')]) || !isset($_SESSION[sha1('usuario')])) {
+if (isset($_SESSION[sha1('usuario')])) {
     header("Location: home.php");
     exit();
 }

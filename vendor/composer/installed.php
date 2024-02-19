@@ -3,7 +3,7 @@
         'name' => '__root__',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => 'd260f240c0e729c29df02fc902222968b21b232f',
+        'reference' => 'e453c8a7672202dfb6efd6c7ba627756b8879c02',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -13,7 +13,7 @@
         '__root__' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => 'd260f240c0e729c29df02fc902222968b21b232f',
+            'reference' => 'e453c8a7672202dfb6efd6c7ba627756b8879c02',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
@@ -26,6 +26,17 @@
             'type' => 'library',
             'install_path' => __DIR__ . '/../ezyang/htmlpurifier',
             'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'lunasoft/sw-sdk-php' => array(
+            'pretty_version' => 'dev-master',
+            'version' => 'dev-master',
+            'reference' => 'fb074227d34bc09fa29f1de9b53f754eed562afa',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../lunasoft/sw-sdk-php',
+            'aliases' => array(
+                0 => '9999999-dev',
+            ),
             'dev_requirement' => false,
         ),
         'maennchen/zipstream-php' => array(
