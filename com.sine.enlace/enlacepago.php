@@ -65,6 +65,11 @@ if (isset($_POST['transaccion'])) {
             $complementos = $cp->buildComplementos($_POST['tag'], $_POST['idemisor'], session_id(), $_POST['uuid']);
             echo $complementos ? $complementos : '0Error en la vista de complementos.';
             break;
+        case 'eliminarpago':
+            $eliminado = $cp->eliminarPago($_POST['idpago']);
+            echo $eliminado ? $eliminado : "0No se han encontrado datos";
+            break;
+            
             
     }
 }
@@ -118,7 +123,7 @@ function obtenerDatosPago()
 function obtenerDatosComplementoPago()
 {
     $p = new Pago();
-    $p->setTagpago($_POST['tag']);
+    $p->setTagpago(isset($_POST['tag']) ? $_POST['tag'] : null);
     $p->setTagcomp($_POST['tagcomp']);
     $p->setOrden($_POST['orden']);
     $p->setPagoidformapago($_POST['idformapago']);

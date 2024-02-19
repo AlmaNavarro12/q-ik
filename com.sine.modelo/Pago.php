@@ -27,6 +27,9 @@ class Pago {
     private $idbancoB;
     private $cuentaB;
     private $tagPago;
+    private $tagcomp;
+    private $orden;
+
             
     function __construct() {
         
@@ -42,6 +45,14 @@ class Pago {
 
     function getFechacreacion() {
         return $this->fechacreacion;
+    }
+
+    function gettagcomp() {
+        return $this->tagcomp;
+    }
+
+    function getorden() {
+        return $this->orden;
     }
 
     function getIdcliente() {
@@ -214,6 +225,14 @@ class Pago {
 
     function setActualizarfiscales($actualizarfiscales) {
         $this->actualizarfiscales = $actualizarfiscales;
+    }
+
+    function settagcomp($tagcomp) {
+        $this->tagcomp = $tagcomp;
+    }
+
+    function setorden($orden) {
+        $this->orden = $orden;
     }
 
     function setIdbancoB($idbancoB) {

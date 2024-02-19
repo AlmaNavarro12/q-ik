@@ -1000,21 +1000,23 @@ class ControladorPago{
         $cfdi = $this->getPagosTMP($idsession, $tagcomp);
         foreach ($cfdi as $actual) {
             $totalpagado += $actual['montotmp'];
-            $this->consultas->execute("INSERT INTO `detallepago` VALUES (null, :noparcialidad, :pagoidfactura, :folio, :uuid, :tcambio, :idmoneda, :cmetodo, :monto, :montoanterior, :montoinsoluto, :totalfactura, :type, :tagpago, :tagcomp);", [
+            $this->consultas->execute("INSERT INTO `detallepago` VALUES (null, :noparcialidad, :pagoidfactura, :folio, :uuid, :tcambio, :idmoneda, :cmetodo, :monto, :montoanterior, :montoinsoluto, :totalfactura, :type, :tagpago, :tagcomp, :detalle_tagencabezado);", [
                 "noparcialidad" => $actual['noparcialidadtmp'],
                 "pagoidfactura" => $actual['idfacturatmp'],
                 "folio" => $actual['foliofacturatmp'],
                 "uuid" => $actual['uuidtmp'],
                 "tcambio" => $actual['tcambiotmp'],
                 "idmoneda" => $actual['idmonedatmp'],
-                "cmetodo" => $actual['idmetodotmp'],
+                "cmetodo" => $actual['cmetodotmp'],
                 "monto" => $actual['montotmp'],
                 "montoanterior" => $actual['montoanteriortmp'],
                 "montoinsoluto" => $actual['montoinsolutotmp'],
                 "totalfactura" => $actual['totalfacturatmp'],
                 "type" => $actual['type'],
                 "tagpago" => $tagpago,
-                "tagcomp" => $tagcomp
+                "tagcomp" => $tagcomp,
+                "detalle_tagencabezado" => $tagcomp
+
             ]);
 
             $estado = ($actual['montoinsolutotmp'] != '0') ? '4' : '1';
@@ -1889,5 +1891,83 @@ class ControladorPago{
         </div><cut>$tagcomp<cut>$orden<comp>";
         }
         return $datos;
+    }
+
+    private function getTagPagoAux($idpago) {
+        $resultados = "";
+        $consulta = "SELECT * FROM pagos WHERE idpago=:id;";
+        $val = array("id" => $idpago);
+        $resultados = $this->consultas->getResults($consulta, $val);
+        return $resultados;
+    }
+
+    private function getTagPago($idpago) {
+        $tag = "";
+        $datos = $this->getTagPagoAux($idpago);
+        foreach ($datos as $actual) {
+            $tag = $actual['tagpago'];
+        }
+        return $tag;
+    }
+
+    public function eliminarPago($idpago) {
+        $tag = $this->getTagPago($idpago);
+        $eliminado = false;
+        $consulta = "DELETE FROM `pagos` WHERE idpago=:id;";
+        $valores = array("id" => $idpago);
+        $eliminado = $this->consultas->execute($consulta, $valores);
+        $detalle = $this->eliminarDetallePago($tag);
+        return $detalle;
+    }
+
+    private function getDetalleEliminar($tag) {
+        $consultado = false;
+        $consulta = "SELECT * FROM detallepago WHERE detalle_tagencabezado=:tag ORDER BY iddetallepago;";
+        $val = array("tag" => $tag);    
+        $consultado = $this->consultas->getResults($consulta, $val);
+        return $consultado;
+    }
+
+    private function getestadoFacturaAux($id, $type) {
+        $consultado = false;
+        if ($type == 'f') {
+            $consulta = "SELECT * FROM datos_factura WHERE iddatos_factura=:id;";
+        } else if ($type == 'c') {
+            $consulta = "SELECT * FROM factura_carta WHERE idfactura_carta=:id;";
+        }
+        $val = array("id" => $id);
+        $consultado = $this->consultas->getResults($consulta, $val);
+        return $consultado;
+    }
+
+    private function getestadoFactura($id, $type) {
+        $status = "";
+        $datos = $this->getestadoFacturaAux($id, $type);
+        foreach ($datos as $actual) {
+            $status = $actual['status_pago'];
+        }
+        return $status;
+    }
+
+    private function eliminarDetallePago($tag) {
+        $getpago = $this->getDetalleEliminar($tag);
+        foreach ($getpago as $actual) {
+            $idfactura = $actual['pago_idfactura'];
+            $type = $actual['type'];
+            $estado = $this->getestadoFactura($idfactura, $type);
+            if ($estado != '3') {
+                $actualizar = $this->estadoFactura($idfactura, '2', $type);
+            }
+        }
+
+        $eliminado = false;
+        $consulta = "DELETE FROM complemento_pago WHERE tagpago=:tag;";
+        $val = array("tag" => $tag);
+        $eliminado = $this->consultas->execute($consulta, $val);
+
+        $consulta2 = "DELETE FROM detallepago WHERE detalle_tagencabezado=:tag;";
+        $val2 = array("tag" => $tag);
+        $eliminado2 = $this->consultas->execute($consulta2, $val2);
+        return $eliminado;
     }
 }

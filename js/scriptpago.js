@@ -349,6 +349,7 @@ function loadFactura(idfactura, type, tag) {
             if (bandera == '0') {
                 alertify.error(res);
             } else {
+                alert(type);
                 $("#type-" + tag).val(type);
                 setvaloresFactura(datos, tag);
             }
@@ -659,3 +660,29 @@ function setValoresEditarPago(datos) {
     $("#btn-form-pago").attr("onclick", "actualizarPago(" + idpago + ");");
     cargandoHide();
 }
+
+function eliminarPago(idpago) {
+    alertify.confirm("¿Estás seguro que deseas eliminar este pago?", function () {
+        cargandoHide();
+        cargandoShow();
+        var tag = $("#tabs").find('.sub-tab-active').attr("data-tab");
+        $.ajax({
+            url: "com.sine.enlace/enlacepago.php",
+            type: "POST",
+            data: {transaccion: "eliminarpago", idpago: idpago},
+            success: function (datos) {
+                var texto = datos.toString();
+                var bandera = texto.substring(0, 1);
+                var res = texto.substring(1, 1000);
+                if (bandera == '0') {
+                    alertify.error(res);
+                } else {
+                    alertify.success(datos);
+                    loadView('listapago');
+                }
+                cargandoHide();
+            }
+        });
+    }).set({title: "Q-ik"});
+}
+
