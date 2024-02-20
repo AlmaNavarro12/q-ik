@@ -12,6 +12,7 @@ use SWServices\Toolkit\SignService as Sellar;
 use SWServices\Stamp\StampService as StampService;
 use SWServices\Cancelation\CancelationService as CancelationService;
 use SWServices\SatQuery\SatQueryService as consultaCfdiSAT;
+use PHPMailer\PHPMailer\PHPMailer;
 
 class ControladorPago{
 
@@ -457,7 +458,6 @@ class ControladorPago{
                     </div>
                 </div>
             </div>
-
             <div class='row scrollX'>
                 <div class='col-md-12'>
                     <table class='table tab-hover table-condensed table-responsive table-row thead-form'>
@@ -961,12 +961,10 @@ class ControladorPago{
         return $consultado;
     }
 
-    public function insertarComplemento($p)
-    {
+    public function insertarComplemento($p) {
         $insertar = false;
         $consulta = "INSERT INTO complemento_pago VALUES (:id, :orden, :idforma, :idmoneda, :tcambio, :fechapago, :horapago, :cuentaord, :cuentabnf, :notransaccion, :total, :tagcomp, :tagpago);";
-        $val = array(
-            "id" => null,
+        $val = array("id" => null,
             "orden" => $p->getOrden(),
             "idforma" => $p->getPagoidformapago(),
             "idmoneda" => $p->getPagoidmoneda(),
@@ -975,11 +973,10 @@ class ControladorPago{
             "horapago" => $p->getHorapago(),
             "cuentaord" => $p->getPago_idbanco(),
             "cuentabnf" => $p->getIdbancoB(),
-            "notransaccion" => $p->getNooperacion(), //
+            "notransaccion" => $p->getNooperacion(),
             "total" => '0',
             "tagcomp" => $p->getTagcomp(),
-            "tagpago" => $p->getTagpago()//
-        );
+            "tagpago" => $p->getTagpago());
         $insertar = $this->consultas->execute($consulta, $val);
         $this->detallePago($p->getSessionid(), $p->getTagpago(), $p->getTagcomp(), $p->getTipocambio(), $p->getPagoidmoneda());
         return $insertar;
@@ -1046,7 +1043,6 @@ class ControladorPago{
         return $datos;
     }
 
-
     private function getTotalesImpuestos($tag){
         $subtotal = 0;
         $traslado = 0;
@@ -1085,7 +1081,6 @@ class ControladorPago{
         $consultado = $this->consultas->getResults($consulta, $val);
         return $consultado;
     }
-
     public function getCFormaPagoXML($idfp) {
         $cforma = "";
         $datos = $this->controladorFormaPago->getFormaById($idfp);
@@ -1713,8 +1708,9 @@ class ControladorPago{
                 <cut>
                 <div id='complemento-$tagcomp' class='sub-div'>
                 <div class='row'>
-            <div class='col-md-4'>
-                <label class='label-form text-right' for='forma-$tagcomp'>TagPago : $tagpago, TagComplemento : $tagcomp, IdSesion : $sid</label> <label class='mark-required text-right'>*</label>
+            <div class='col-md-4 py-2'>
+                <label class='label-form text-right' for='forma-$tagcomp'>Forma de pago </label> <label
+                        class='mark-required text-danger fw-bold'>*</label>
                 <div class='form-group'>
                         <select class='form-control text-center input-form' id='forma-$tagcomp' name='forma-$tagcomp' onchange='disableCuenta();' $disabled>
                             <option value='' id='default-fpago-$tagcomp'>- - - -</option>
@@ -1726,8 +1722,9 @@ class ControladorPago{
                 </div>
             </div>
 
-            <div class='col-md-2'>
-                <label class='label-form text-right' for='moneda-$tagcomp'>Moneda de Pago</label> <label class='mark-required text-right'>*</label>
+            <div class='col-md-2 py-2'>
+                <label class='label-form text-right' for='moneda-$tagcomp'>Moneda de pago</label> <label
+                        class='mark-required text-danger fw-bold'>*</label>
                 <div class='form-group'>
                     <select class='form-control text-center input-form' id='moneda-$tagcomp' name='moneda-$tagcomp' onchange='getTipoCambio(); loadTablaCFDI();' $disabled>
                         <option value='' id='default-moneda-$tagcomp'>- - - -</option>
@@ -1739,16 +1736,18 @@ class ControladorPago{
                 </div>
             </div>
 
-            <div class='col-md-2'>
-                <label class='label-form text-right' for='cambio-$tagcomp'>Tipo de Cambio</label>
+            <div class='col-md-2 py-2'>
+                <label class='label-form text-right' for='cambio-$tagcomp'>Tipo de cambio</label><label
+                class='mark-required text-danger fw-bold'>&nbsp;</label>
                 <div class='form-group'>
                     <input type='text' class='form-control input-form' id='cambio-$tagcomp' placeholder='Tipo de cambio de Moneda' disabled='' value='$tcambio'>
                     <div id='cambio-$tagcomp-errors'></div>
                 </div>
             </div>
 
-            <div class='col-md-4'>
-                <label class='label-form text-right' for='fecha-$tagcomp'>Fecha de Pago</label> <label class='mark-required text-right'>*</label>
+            <div class='col-md-4 py-2'>
+                <label class='label-form text-right' for='fecha-$tagcomp'>Fecha de pago</label> <label
+                        class='mark-required text-danger fw-bold'>*</label>
                 <div class='form-group'>
                     <input class='form-control text-center input-form' id='fecha-$tagcomp' name='fecha-$tagcomp' type='date' value='$fechapago' $disabled/>
                     <div id='fecha-$tagcomp-errors'></div>
@@ -1757,16 +1756,18 @@ class ControladorPago{
         </div>
 
         <div class='row'>
-            <div class='col-md-4'>
-                <label class='label-form text-right' for='hora-$tagcomp'>Hora de Pago</label> <label class='mark-required text-right'>*</label>
+            <div class='col-md-4 py-2'>
+                <label class='label-form text-right' for='hora-$tagcomp'>Hora de pago</label> <label
+                        class='mark-required text-danger fw-bold'>*</label>
                 <div class='form-group'>
                     <input class='form-control text-center input-form' id='hora-$tagcomp' name='hora-$tagcomp' type='time' value='$horapago' $disabled/>
                     <div id='hora-$tagcomp-errors'></div>
                 </div>
             </div>
 
-            <div class='col-md-4'>
-                <label class='label-form text-right' for='uenta-$tagcomp'>Cuenta Ordenante (Cliente)</label>
+            <div class='col-md-4 py-2'>
+                <label class='label-form text-right' for='uenta-$tagcomp'>Cuenta ordenante (Cliente)</label><label
+                class='mark-required text-danger fw-bold'>&nbsp;</label>
                 <div class='form-group'>
                     <select class='form-control text-center input-form' id='cuenta-$tagcomp' name='cuenta-$tagcomp' disabled>
                         <option value='' id='default-cuenta-$tagcomp'>- - - -</option>
@@ -1776,8 +1777,9 @@ class ControladorPago{
                 </div>
             </div>
 
-            <div class='col-md-4'>
-                <label class='label-form text-right' for='benef-$tagcomp'>Cuenta Beneficiario (Mis Cuentas)</label>
+            <div class='col-md-4 py-2'>
+                <label class='label-form text-right' for='benef-$tagcomp'>Cuenta beneficiario (Mis cuentas)</label>
+                <label class='mark-required text-danger fw-bold'></label>
                 <div class='form-group'>
                     <select class='form-control text-center input-form' id='benef-$tagcomp' name='benef-$tagcomp' disabled>
                         <option value='' id='default-benef-$tagcomp'>- - - -</option>
@@ -1791,8 +1793,9 @@ class ControladorPago{
         </div>
 
         <div class='row'>
-            <div class='col-md-4'>
-                <label class='label-form text-right' for='transaccion-$tagcomp'>N° de Transaccion</label>
+            <div class='col-md-4 py-2'>
+                <label class='label-form text-right' for='transaccion-$tagcomp'>No. de transacción</label><label
+                class='mark-required text-danger fw-bold'>&nbsp;</label>
                 <div class='form-group'>
                     <input class='form-control text-center input-form' id='transaccion-$tagcomp' name='transaccion-$tagcomp' placeholder='N° de Transaccion' type='number' disabled value='$numtransaccion'/>
                     <div id='transaccion-$tagcomp-errors'>
@@ -1801,10 +1804,11 @@ class ControladorPago{
             </div>
         </div>
 
-        <div class='row'>
+        <div class='row mt-3'>
             <div class='col-md-12'>
                 <div class='new-tooltip icon tip'> 
-                    <label class='label-sub' for='fecha-creacion'>CFDIS RELACIONADOS </label> <span class='glyphicon glyphicon-question-sign'></span>
+                    <label class='label-sub' for='fecha-creacion'>CFDIS RELACIONADOS </label>  <span
+                    class='fas fa-question-circle small text-primary-emphasis'></span>
                     <span class='tiptext'>Para agregar una factura realice la b&uacute;squeda por Folio de la factura y se cargaran los datos, la b&uacute;squeda se limita a las facturas asignadas al cliente seleccionado en el campo Cliente.</span>
                 </div>
             </div>
@@ -1816,15 +1820,15 @@ class ControladorPago{
                     <tbody >
                         <tr>
                             <td colspan='2'>
-                                <label class='label-form text-right' for='factura-$tagcomp'>Folio Factura</label>
+                                <label class='label-form mb-1' for='factura-$tagcomp'>Folio factura</label>
                                 <input id='id-factura-$tagcomp' type='hidden' /><input class='form-control text-center input-form' id='factura-$tagcomp' name='factura-$tagcomp' placeholder='Factura' type='text' oninput='aucompletarFactura();'/>
                             </td>
                             <td colspan='2'>
-                                <label class='label-form text-right' for='uuid-$tagcomp'>UUID Factura</label>
+                                <label class='label-form mb-1' for='uuid-$tagcomp'>UUID Factura</label>
                                 <input class='form-control cfdi text-center input-form' id='uuid-$tagcomp' name='uuid-$tagcomp' placeholder='UUID del cfdi' type='text'/>
                             </td>
                             <td>
-                                <label class='label-form text-right' for='type-$tagcomp'>Tipo Factura</label>
+                                <label class='label-form mb-1' for='type-$tagcomp'>Tipo factura</label>
                                 <select class='form-control text-center input-form' id='type-$tagcomp' name='type-$tagcomp'>
                                     <option value='' id='default-tipo-$tagcomp'>- - - -</option>
                                     <option value='f' id='tipo-f-$tagcomp'>Factura</option>
@@ -1832,7 +1836,7 @@ class ControladorPago{
                                 </select>
                             </td>
                             <td>
-                                <label class='label-form text-right' for='monedarel-$tagcomp'>Moneda Factura</label>
+                                <label class='label-form mb-1' for='monedarel-$tagcomp'>Moneda factura</label>
                                 <input id='cambiocfdi-$tagcomp' type='hidden' />
                                 <input id='metcfdi-$tagcomp' type='hidden' />
                                 <select class='form-control text-center input-form' id='monedarel-$tagcomp' name='monedarel-$tagcomp'>
@@ -1843,28 +1847,28 @@ class ControladorPago{
                         </tr>
                         <tr>
                             <td>
-                                <label class='label-form text-right' for='parcialidad-$tagcomp'>N° Parcialidad</label>
+                                <label class='label-form mb-1' for='parcialidad-$tagcomp'>No. Parcialidad</label>
                                 <input class='form-control text-center input-form' id='parcialidad-$tagcomp' name='parcialidad-$tagcomp' placeholder='No Parcialidad' type='text'/>
                             </td>
                             <td>
-                                <label class='label-form text-right' for='total-$tagcomp'>Total Factura</label>
+                                <label class='label-form mb-1' for='total-$tagcomp'>Total factura</label>
                                 <input class='form-control text-center input-form' id='total-$tagcomp' name='total-$tagcomp' placeholder='Total de Factura' type='number' step='any'/>
                             </td>
                             <td>
-                                <label class='label-form text-right' for='anterior-$tagcomp'>Monto Anterior</label>
+                                <label class='label-form mb-1' for='anterior-$tagcomp'>Monto anterior</label>
                                 <input class='form-control text-center input-form' id='anterior-$tagcomp' name='anterior-$tagcomp' placeholder='Monto Anterior' type='number' step='any'/>
                             </td>
                             <td>
-                                <label class='label-form text-right' for='monto-$tagcomp'>Monto a Pagar</label>
+                                <label class='label-form mb-1' for='monto-$tagcomp'>Monto a pagar</label>
                                 <input class='form-control text-center input-form' id='monto-$tagcomp' name='monto-$tagcomp' placeholder='Monto Pagado' type='number' step='any' oninput='calcularRestante()'/>
                             </td>
                             <td>
-                                <label class='label-form text-right' for='restante-$tagcomp'>Monto Restante</label>
+                                <label class='label-form mb-1' for='restante-$tagcomp'>Monto restante</label>
                                 <input class='form-control text-center input-form' id='restante-$tagcomp' name='cantidad' placeholder='Monto Restante' type='number' step='any'/>
                             </td>
-                            <td>
-                                <label class='label-space' for='btn-agregar-cfdi'></label>
-                                <button id='btn-agregar-cfdi' class='button-modal' onclick='agregarCFDI();' $disabled><span class='glyphicon glyphicon-plus'></span> Agregar</button>
+                            <td class='text-center'>
+                                    <label class='label-space text-light' for='btn-agregar-cfdi'>Algo</label>
+                                    <button id='btn-agregar-cfdi' class='button-modal col-12' onclick='agregarCFDI();'><span class='fas fa-plus'></span> Agregar</button>
                             </td>
                         </tr>
                     </tbody>
@@ -1955,5 +1959,398 @@ class ControladorPago{
         $val2 = array("tag" => $tag);
         $eliminado2 = $this->consultas->execute($consulta2, $val2);
         return $eliminado;
+    }
+
+    private function getConfigMailAux() {
+        $consultado = false;
+        $consulta = "SELECT * FROM correoenvio WHERE chuso2=:id;";
+        $valores = array("id" => '1');
+        $consultado = $this->consultas->getResults($consulta, $valores);
+        return $consultado;
+    }
+
+    private function getConfigMail() {
+        $datos = "";
+        $get = $this->getConfigMailAux();
+        foreach ($get as $actual) {
+            $correo = $actual['correo'];
+            $pass = $actual['password'];
+            $remitente = $actual['remitente'];
+            $host = $actual['host'];
+            $puerto = $actual['puerto'];
+            $seguridad = $actual['seguridad'];
+            $datos = "$correo</tr>$pass</tr>$remitente</tr>$host</tr>$puerto</tr>$seguridad";
+        }
+        return $datos;
+    }
+
+    public function mail($sm) {
+        require_once '../com.sine.controlador/ControladorConfiguracion.php';
+        $cc = new ControladorConfiguracion();
+        $body = $cc->getMailBody('2');
+        $divM = explode("</tr>", $body);
+        $asunto = $divM[1];
+        $saludo = $divM[2];
+        $msg = $divM[3];
+        $logo = $divM[4];
+
+        $config = $this->getConfigMail();
+        if ($config != "") {
+            $div = explode("</tr>", $config);
+            $correoenvio = $div[0];
+            $pass = $div[1];
+            $remitente = $div[2];
+            $host = $div[3];
+            $puerto = $div[4];
+            $seguridad = $div[5];
+
+            $mail = new PHPMailer;
+            $mail->isSMTP();
+            $mail->Mailer = 'smtp';
+            $mail->SMTPAuth = true;
+            $mail->Host = $host;
+            $mail->Port = $puerto;
+            $mail->SMTPSecure = $seguridad;
+            $mail->Username = $correoenvio;
+            $mail->Password = $pass;
+            $mail->From = $correoenvio;
+            $mail->FromName = $remitente;
+
+            $mail->Subject =  iconv('UTF-8', 'windows-1252', $asunto);
+            $mail->isHTML(true);
+            $mail->Body = $this->bodyMail($asunto, $saludo, $sm->getRazonsocial(), $msg, $logo);
+
+            if ($sm->getChmail1() == '1') {
+                $mail->addAddress($sm->getMailalt1());
+            }
+            if ($sm->getChmail2() == '1') {
+                $mail->addAddress($sm->getMailalt2());
+            }
+            if ($sm->getChmail3() == '1') {
+                $mail->addAddress($sm->getMailalt3());
+            }
+            if ($sm->getChmail4() == '1') {
+                $mail->addAddress($sm->getMailalt4());
+            }
+            if ($sm->getChmail5() == '1') {
+                $mail->addAddress($sm->getMailalt5());
+            }
+            if ($sm->getChmail6() == '1') {
+                $mail->addAddress($sm->getMailalt6());
+            }
+
+            $mail->addStringAttachment($sm->getPdfstring(), $sm->getFolio() . "_" . $sm->getRfcemisor() . "_" . $sm->getUuid() . ".pdf");
+            if ($sm->getCfdistring() != "") {
+                $mail->addStringAttachment($sm->getCfdistring(), $sm->getFolio() . "_" . $sm->getRfcemisor() . "_" . $sm->getUuid() . ".xml");
+            }
+            if (!$mail->send()) {
+                echo '0No se envio el mensaje: ' . $mail->ErrorInfo;
+            } else {
+                return '1Se ha enviado el pago.';
+            }
+        } else {
+            return "0No se ha configurado un correo de envio para esta área. Ingrese a Configuración -> Correo, e ingrese uno para Pagos.";
+        }
+    }
+
+    private function bodyMail($asunto, $saludo, $nombre, $msg, $logo) {
+        $archivo = "../com.sine.dao/configuracion.ini";
+        $ajustes = parse_ini_file($archivo, true);
+        if (!$ajustes) {
+            throw new Exception("No se puede abrir el archivo " . $archivo);
+        }
+        $rfcfolder = $ajustes['cron']['rfcfolder'];
+
+        $txt = str_replace("<corte>", "</p><p style='font-size:18px; text-align: justify;'>", $msg);
+        $message = "<html>
+                        <body>
+                            <table width='100%' bgcolor='#e0e0e0' cellpadding='0' cellspacing='0' border='0' style='border-radius: 25px;'>
+                                <tr>
+                                    <td>
+                                        <table align='center' width='100%' border='0' cellpadding='0' cellspacing='0' style='max-width:650px; border-radius: 20px; background-color:#fff; font-family:sans-serif;'>
+                                            <thead>
+                                                <tr height='80'>
+                                                    <th align='left' colspan='4' style='padding: 6px; background-color:#f5f5f5; border-radius: 20px; border-bottom:solid 1px #bdbdbd;' ><img src='https://q-ik.mx/$rfcfolder/img/$logo' height='100px'/></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr align='center' height='10' style='font-family:sans-serif; '>
+                                                    <td style='background-color:#09096B; text-align:center; border-radius: 5px;'></td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan='4' style='padding:15px;'>
+                                                        <h1>$asunto</h1>
+                                                        <p style='font-size:20px;'>$saludo $nombre</p>
+                                                        <hr/>
+                                                        <p style='font-size:18px; text-align: justify;'>$txt</p>
+                                                    </td>
+                                                </tr>
+
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </body>
+                    </html>";
+        return $message;
+    }
+
+    private function getUUID($idfactura) {
+        $datos = "";
+        $uuid = $this->getUUIDAux($idfactura);
+        foreach ($uuid as $u) {
+            $uuid = $u['uuidpago'];
+            $folio = $u['letra'] . $u['foliopago'];
+            $rfc = $u['rfc'];
+            $pass = $u['passcsd'];
+            $csd = $u['csd'];
+            $key = $u['keyb64'];
+            $datos = "$uuid</tr>$folio</tr>$rfc</tr>$pass</tr>$csd</tr>$key";
+        }
+        return $datos;
+    }
+
+    private function getUUIDAux($idpago) {
+        $consultado = false;
+        $consulta = "SELECT p.uuidpago, p.letra, p.foliopago, df.rfc, df.passcsd, df.keyb64,df.csd FROM pagos p INNER JOIN datos_facturacion df ON (p.pago_idfiscales=df.id_datos) WHERE p.idpago=:id;";
+        $val = array("id" => $idpago);
+        $consultado = $this->consultas->getResults($consulta, $val);
+        return $consultado;
+    }
+
+    function cancelarTimbre($idpago, $motivo, $reemplazo) {
+        $swaccess = $this->getSWAccess();
+        $div = explode("</tr>", $swaccess);
+        $url = $div[0];
+        $token = $div[1];
+
+        $get = $this->getUUID($idpago);
+        $divideU = explode("</tr>", $get);
+        $uuid = $divideU[0];
+        $rfc = $divideU[2];
+        $pass = $divideU[3];
+        $csd = $divideU[4];
+        $key = $divideU[5];
+
+        if ($motivo == '01') {
+            $params = array(
+                "url" => $url,
+                "token" => $token,
+                "uuid" => $uuid,
+                "password" => $pass,
+                "rfc" => $rfc,
+                "motivo" => $motivo,
+                "foliosustitucion" => $reemplazo,
+                "cerB64" => $csd,
+                "keyB64" => $key
+            );
+        } else {
+            $params = array(
+                "url" => $url,
+                "token" => $token,
+                "uuid" => $uuid,
+                "password" => $pass,
+                "rfc" => $rfc,
+                "motivo" => $motivo,
+                "cerB64" => $csd,
+                "keyB64" => $key
+            );
+        }
+
+        try {
+            header('Content-type: text/plain');
+            $cancelationService = CancelationService::Set($params);
+            $result = $cancelationService::CancelationByCSD();
+            if ($result->status == "error") {
+                echo '0';
+                return var_dump($result);
+            } else if ($result->status == "success") {
+                $guardar = $this->cancelarPago($idpago, $result->data->acuse);
+                var_dump($result);
+                return $guardar;
+            }
+        } catch (Exception $e) {
+            echo 'Caught exception: ', $e->getMessage(), "\n";
+        }
+        return var_dump($result);
+    }
+
+    private function cancelarPago($idpago, $cfdi) {
+        $actualizado = false;
+        $consulta = "UPDATE `pagos` SET cancelado=:estado, cfdicancel=:cfdi WHERE idpago=:id;);";
+        $valores = array("id" => $idpago,
+            "estado" => '1',
+            "cfdi" => $cfdi);
+        $actualizado = $this->consultas->execute($consulta, $valores);
+        return $actualizado;
+    }
+
+    public function validarActualizarPago($p, $objimpuesto) {
+        $datos = $this->actualizarPago($p, $objimpuesto);
+        return $datos;
+    }
+
+    private function actualizarPago($p, $objimpuesto) {
+        $updfolio = "";
+        $serie = "";
+        $letra = "";
+        $nfolio = "";
+
+        if ($p->getFoliopago() != '0') {
+            $updfolio = "serie=:serie, letra=:letra, foliopago=:folio,";
+            $folios = $this->getFolio($p->getFoliopago());
+            $Fdiv = explode("</tr>", $folios);
+            $serie = $Fdiv[0];
+            $letra = $Fdiv[1];
+            $nfolio = $Fdiv[2];
+        }
+
+        $insertado = false;
+        $consulta = "UPDATE `pagos` SET $updfolio pago_idcliente=:pago_idcliente, nombrecliente=:cliente, rfcreceptor=:rfcreceptor, razonreceptor=:razonreceptor, regfiscalreceptor=:regfiscalreceptor, codpreceptor=:codpreceptor, pago_idfiscales=:pago_idfiscales, chfirmar=:chfirmar, objimpuesto=:objimpuesto WHERE idpago=:id;";
+        $valores = array("id" => $p->getIdpago(),
+            "serie" => $serie,
+            "letra" => $letra,
+            "folio" => $nfolio,
+            "pago_idcliente" => $p->getIdcliente(),
+            "cliente" => $p->getNombrecliente(),
+            "rfcreceptor" => $p->getRfccliente(),
+            "razonreceptor" => $p->getRazoncliente(),
+            "regfiscalreceptor" => $p->getRegfiscalcliente(),
+            "codpreceptor" => $p->getCodpostal(),
+            "pago_idfiscales" => $p->getPago_idfiscales(),
+            "chfirmar" => $p->getChfirmar(),
+            "objimpuesto" => $objimpuesto
+        );
+        $insertado = $this->consultas->execute($consulta, $valores);
+
+        $this->eliminarComplementos($p->getTagpago());
+        $update1 = "UPDATE `pagos` SET totalpagado='0' WHERE tagpago=:tag;";
+        $valores5 = array("tag" => $p->getTagpago());
+        $insertado = $this->consultas->execute($update1, $valores5);
+        return $insertado;
+    }
+
+    private function eliminarComplementos($tag) {
+        $eliminado = false;
+        $consulta = "DELETE FROM complemento_pago WHERE tagpago=:tag;";
+        $val = array("tag" => $tag);
+        $eliminado = $this->consultas->execute($consulta, $val);
+
+        $consulta2 = "DELETE FROM detallepago WHERE detalle_tagencabezado=:tag;";
+        $val2 = array("tag" => $tag);
+        $eliminado2 = $this->consultas->execute($consulta2, $val2);
+        return $eliminado;
+    }
+
+    public function actualizarComplemento($p) {
+        $insertar = false;
+        $consulta = "INSERT INTO complemento_pago VALUES (:id, :orden, :idforma, :idmoneda, :tcambio, :fechapago, :horapago, :cuentaord, :cuentabnf, :notransaccion, :total, :tagcomp, :tagpago)";
+        $val = array("id" => null,
+            "orden" => $p->getOrden(),
+            "idforma" => $p->getPagoidformapago(),
+            "idmoneda" => $p->getPagoidmoneda(),
+            "tcambio" => $p->getTipocambio(),
+            "fechapago" => $p->getFechapago(),
+            "horapago" => $p->getHorapago(),
+            "cuentaord" => $p->getPago_idbanco(),
+            "cuentabnf" => $p->getIdbancoB(),
+            "notransaccion" => $p->getNooperacion(),
+            "total" => '0',
+            "tagcomp" => $p->getTagcomp(),
+            "tagpago" => $p->getTagpago());
+        $insertar = $this->consultas->execute($consulta, $val);
+        $this->actualizarDetalle($p->getSessionid(), $p->getTagpago(), $p->getTagcomp(), $p->getTipocambio(), $p->getPagoidmoneda());
+        return $insertar;
+    }
+
+    public function actualizarDetalle($idsession, $tagpago, $tagcomp, $tcambio, $monedapago) {
+        $totalpagado = 0;
+        $cfdi = $this->getPagosTMP($idsession, $tagcomp);
+        foreach ($cfdi as $actual) {
+            $parcialidad = $actual['noparcialidadtmp'];
+            $idfactura = $actual['idfacturatmp'];
+            $folio = $actual['foliofacturatmp'];
+            $uuid = $actual['uuidtmp'];
+            $tcambiodoc = $actual['tcambiotmp'];
+            $idmonedaF = $actual['idmonedatmp'];
+            $cmetodotmp = $actual['idmetodotmp'];
+            $montopagado = $actual['montotmp'];
+            $montoanterior = $actual['montoanteriortmp'];
+            $montoinsoluto = $actual['montoinsolutotmp'];
+            $totalfactura = $actual['totalfacturatmp'];
+            $type = $actual['type'];
+            $tag = $actual['tmptagcomp'];
+
+            $totalpagado += $montopagado;
+
+            $consulta2 = "INSERT INTO `detallepago` VALUES (:iddetallepago, :noparcialidad, :pagoidfactura, :folio, :uuid, :tcambio, :idmoneda, :cmetodo, :monto, :montoanterior, :montoinsoluto, :totalfactura, :type, :tagpago, :tagcomp);";
+            $valores2 = array("iddetallepago" => null,
+                "noparcialidad" => $parcialidad,
+                "pagoidfactura" => $idfactura,
+                "folio" => $folio,
+                "uuid" => $uuid,
+                "tcambio" => $tcambiodoc,
+                "idmoneda" => $idmonedaF,
+                "cmetodo" => $cmetodotmp,
+                "monto" => $montopagado,
+                "montoanterior" => $montoanterior,
+                "montoinsoluto" => $montoinsoluto,
+                "totalfactura" => $totalfactura,
+                "type" => $type,
+                "tagpago" => $tagpago,
+                "tagcomp" => $tagcomp);
+            $insertado = $this->consultas->execute($consulta2, $valores2);
+            if ($montoinsoluto != '0') {
+                $estado = '4';
+            } else if ($montoinsoluto == '0') {
+                $estado = '1';
+            }
+            if ($idfactura != '0') {
+                $this->estadoFactura($idfactura, $estado, $type);
+            }
+        }
+
+        $this->cancelar($idsession, $tagcomp);
+        $update = "UPDATE `complemento_pago` SET total_complemento=:total WHERE tagcomplemento=:tag";
+        $valores4 = array("tag" => $tagcomp,
+            "total" => $totalpagado);
+        $insertado = $this->consultas->execute($update, $valores4);
+
+        $update1 = "UPDATE `pagos` SET totalpagado=(totalpagado+$totalpagado) WHERE tagpago=:tag";
+        $valores5 = array("tag" => $tagpago);
+        $insertado = $this->consultas->execute($update1, $valores5);
+        return $insertado;
+    }
+
+    public function getCorreo($idfactura) {
+        $datos = "";
+        $correos = $this->getCorreosAux($idfactura);
+        foreach ($correos as $actual) {
+            $correo1 = $actual['email_informacion'];
+            $correo2 = $actual['email_facturacion'];
+            $correo3 = $actual['email_gerencia'];
+            $correo4 = $actual['correoalt1'];
+            $correo5 = $actual['correoalt2'];
+            $correo6 = $actual['correoalt3'];
+            $datos .= "$correo1<corte>$correo2<corte>$correo3<corte>$correo4<corte>$correo5<corte>$correo6";
+        }
+        return $datos;
+    }
+
+    public function getCorreosAux($idfactura) {
+        $consultado = false;
+        $consulta = "SELECT c.email_informacion, c.email_facturacion, c.email_gerencia, c.correoalt1, c.correoalt2, c.correoalt3 FROM pagos p INNER JOIN cliente c ON (p.pago_idcliente=c.id_cliente) WHERE p.idpago=:id;";
+        $valores = array("id" => $idfactura);
+        $consultado = $this->consultas->getResults($consulta, $valores);
+        return $consultado;
+    }
+
+    public function getXMLInfo($id) {
+        $consultado = false;
+        $consulta = "SELECT * FROM pagos p WHERE p.idpago=:id;";
+        $val = array("id" => $id);
+        $consultado = $this->consultas->getResults($consulta, $val);
+        return $consultado;
     }
 }

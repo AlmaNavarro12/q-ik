@@ -29,4 +29,6 @@ class ControladorFactura
         $datos = "$d/$m/$y";
         return $datos;
     }
+
+    
 }

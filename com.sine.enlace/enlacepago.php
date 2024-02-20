@@ -73,6 +73,58 @@ if (isset($_POST['transaccion'])) {
             $eliminado = $cp->cancelar(session_id());
             echo $eliminado != "" ? $eliminado : "0No se han econtrado datos.";
             break;
+        case 'pdf':
+            $datos = $cp->mail($$_POST['idpago']);
+            echo $datos != "" ? $datos : "0No hay pagos activos.";
+            break;
+            /*case 'loaddatosfiscales':
+            $datos = $cf->loadFiscales($_POST['idcarta']);
+            echo $datos != "" ? $datos : "0No se han econtrado datos.";
+            break;
+        case 'tipocambio':
+            $datos = $cp->updateTipoCambio();
+            echo $datos != "" ? $datos : "0Error al obtener los datos.";
+            break;*/
+        case 'mail':
+            $datos = $cf->mail($_POST['idfactura']);
+            echo $datos != "" ? $datos : "0No hay facturas activos.";
+            break;
+            /*case 'cfdipago':
+            $datos = $cp->cfdisPago($_POST['idpago'], session_id());
+            echo $datos != "" ? $datos : "0Ha ocurrido un error.";
+            break;*/
+        case 'cancelartimbre':
+            $eliminado = $cp->cancelarTimbre($_POST['idpago'], $_POST['motivo'],  $_POST['reemplazo']);
+            echo $eliminado != "" ? $eliminado : "0No se han econtrado datos.";
+            break;
+        case 'actualizarpago':
+            $p = obtenerDatosPago();
+            $insertado = $cp->validarActualizarPago($p, $_POST['objimpuesto']);
+            echo $insertado != "" ? $insertado : "0Error: No se inserto el registro.";
+            break;
+        case 'actualizarcomplementos':
+            $p = obtenerDatosComplementoPago();
+            $insertado = $cp->actualizarComplemento($p);
+            echo $insertado ? $insertado : "0Error.";
+            break;
+            /*case 'eliminarfactura':
+            $eliminado = $cf->eliminarFactura($_POST['idfactura'], $_POST['folio']);
+            echo $eliminado ? "1Registro eliminado" : "0No se han encontrado datos.";
+            break;*/
+        case 'fecha':
+            echo $fecha ? $fecha : "0No se han encontrado datos.";
+            break;
+        case 'documento':
+            echo $cpp->getDocumento() ?: "0No se han encontrado datos.";
+            break;
+            /*case 'filtrarfolio':
+            $datos = $cf->listaServiciosHistorial($_POST['FO']);
+            echo $datos != "" ? $datos : "0Ha ocurrido un error.";
+            break;*/
+        case 'getcorreos':
+            $datos = $cp->getCorreo($_POST['idfactura']);
+            echo $datos != "" ? $datos : "0No se encontrarón correos registrados.";
+            break;
     }
 }
 
@@ -105,8 +157,8 @@ function crearTMPPagoDesdePOST()
 function obtenerDatosPago()
 {
     $p = new Pago();
-    $p->setTagpago(isset($_POST['tag']) ? $_POST['tag'] : null);
-    $p->setIdpago(isset($_POST['idpago']) ? $_POST['idpago'] : null);
+    $p->setTagpago($_POST['tag']);
+    $p->setIdpago($_POST['idpago']);
     $p->setFoliopago($_POST['folio']);
     $p->setIdcliente($_POST['idcliente']);
     $p->setNombrecliente($_POST['cliente']);
@@ -125,7 +177,7 @@ function obtenerDatosPago()
 function obtenerDatosComplementoPago()
 {
     $p = new Pago();
-    $p->setTagpago(isset($_POST['tag']) ? $_POST['tag'] : null);
+    $p->setTagpago(($_POST['tag']));
     $p->setTagcomp($_POST['tagcomp']);
     $p->setOrden($_POST['orden']);
     $p->setPagoidformapago($_POST['idformapago']);
@@ -139,80 +191,3 @@ function obtenerDatosComplementoPago()
     $p->setSessionid(session_id());
     return $p;
 }
-
-
-/**<?php
-
-require_once '../com.sine.modelo/TMPPago.php';
-require_once '../com.sine.controlador/ControladorPago.php';
-require_once '../com.sine.modelo/Usuario.php';
-require_once '../com.sine.modelo/Session.php';
-require_once '../com.sine.modelo/Pago.php';
-
-$cp = new ControladorPago();
-$cf = new ControladorFactura();
-$cpp = new ControladorPagoPermi();
-
-if (isset($_POST['transaccion'])) {
-    $transaccion = $_POST['transaccion'];
-    switch ($transaccion) {
-        
-        
-        case 'pdf':
-            $datos = $cp->mail($$_POST['idpago']);
-            echo $datos != "" ? $datos : "0No hay pagos activos.";
-            break;
-        case 'loaddatosfiscales':
-            $datos = $cf->loadFiscales($_POST['idcarta']);
-            echo $datos != "" ? $datos : "0No se han econtrado datos.";
-            break;
-        case 'tipocambio':
-            $datos = $cp->updateTipoCambio();
-            echo $datos != "" ? $datos : "0Error al obtener los datos.";
-            break;
-        
-        case 'mail':
-            $idfactura =
-                $datos = $cf->mail($_POST['idfactura']);
-            echo $datos != "" ? $datos : "0No hay facturas activos.";
-            break;
-        case 'cfdipago':
-            $datos = $cp->cfdisPago($_POST['idpago'], session_id());
-            echo $datos != "" ? $datos : "0Ha ocurrido un error.";
-            break;
-        case 'cancelartimbre':
-            $eliminado = $cp->cancelarTimbre($_POST['idpago'], $_POST['motivo'],  $_POST['reemplazo']);
-            echo $eliminado != "" ? $eliminado : "0No se han econtrado datos.";
-            break;
-        
-        
-        case 'actualizarpago':
-            $p = obtenerDatosPago();
-            $insertado = $cf->validarActualizarPago($p, $_POST['objimpuesto']);
-            echo $insertado != "" ? $insertado : "0Error: No se inserto el registro.";
-            break;
-        case 'actualizarcomplementos':
-            $p = obtenerDatosComplementoPago();
-            $insertado = $cp->actualizarComplemento($p);
-            echo $insertado ? $insertado : "0Error.";
-            break;
-        case 'eliminarfactura':
-            $eliminado = $cf->eliminarFactura($_POST['idfactura'], $_POST['folio']);
-            echo $eliminado ? "1Registro eliminado" : "0No se han encontrado datos.";
-            break;
-        
-        case 'fecha':
-            echo $fecha ? $fecha : "0No se han encontrado datos.";
-            break;
-        case 'documento':
-            echo $cpp->getDocumento() ?: "0No se han encontrado datos.";
-            break;
-        case 'filtrarfolio':
-            $datos = $cf->listaServiciosHistorial($_POST['FO']);
-            echo $datos != "" ? $datos : "0Ha ocurrido un error.";
-            break;
-        
-        
-    }
-}
- */

@@ -319,6 +319,21 @@ function isPositive(val, id) {
     }
 }
 
+function isEmailtoSend(val, id) {
+    expr = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+    if (!expr.test(val)) {
+        $("#" + id).css("border-color", "red");
+        $("#" + id + "-errors").text("La direccion de correo (Email) no es valida");
+        $("#" + id + "-errors").css("color", "red");
+        $("#" + id).focus();
+        return false;
+    } else {
+        $("#" + id + "-errors").text("");
+        $("#" + id).css("border-color", "#D6D6DF");
+        return true;
+    }
+}
+
 //Función para ocultar el menu responsivo
 function resetMenu() {
     if (window.innerWidth >= 700) {
@@ -452,7 +467,7 @@ function loadView(vista) {
         'datosempresa': ["firmaCanvas()", 400, "loadOpcionesBanco()", 400, "loadOpcionesEstado()", 500],
         'nuevocontrato': ["truncateTmpCot()", 300, "loadOpcionesFolios()", 320, "filtrarProductos()", 350, "loadFecha()", 370, "loadOpcionesFormaPago()", 400, "loadOpcionesMetodoPago()", 420, "loadOpcionesMoneda()", 450, "loadOpcionesUsoCFDI()", 470, "loadOpcionesFacturacion()", 500, "loadOpcionesProveedor()", 520],
         'precio': ["truncateTmp()", 400, "truncateTmpCot()", 450],
-        'pago': ["loadFecha()", 300, /**"cancelarPago2()", 320, */ "loadOpcionesFolios('3')", 350, "loadOpcionesMoneda()", 400, "loadOpcionesFormaPago2()", 420, "loadOpcionesFacturacion()", 500],
+        'pago': ["loadFecha()", 300, "cancelarPago2()", 320,  "loadOpcionesFolios('3')", 350, "loadOpcionesMoneda()", 400, "loadOpcionesFormaPago2()", 420, "loadOpcionesFacturacion()", 500],
         'listapago': ["loadBtnCrear('pago')", 350, "opcionesMotivoCancelar()", 380, "loadListaPago()", 400],
         'factura': ["truncateTmp()", 300, "loadOpcionesFacturacion()", 320, "loadFecha()", 350, "loadOpcionesFolios('1')", 370, "filtrarProducto()", 400, "loadOpcionesFormaPago()", 420, "loadOpcionesMetodoPago()", 450, "loadOpcionesMoneda()", 470, "loadOpcionesUsoCFDI()", 500, "loadOpcionesComprobante()", 520, "loadOpcionesProveedor()", 550, "loadOpcionesTipoRelacion()", 570, "opcionesPeriodoGlobal()", 600, "opcionesMeses()", 620, "opcionesAnoGlobal()", 650],
         'listafactura': ["truncateTmp()", 300, "truncateTmpCot()", 350, "loadBtnCrear('factura')", 400, "opcionesMotivoCancelar()", 420, "filtrarFolio()", 450],

@@ -74,14 +74,14 @@ class ControladorButton{
                 if ($accion == 'folio') {
                     foreach ($permisos as $usuarioactual) {
                         if ($usuarioactual[$permiso] == '1') {
-                            $btn = "<button class='button-create' onclick=\"loadViewConfig('$accion');\">$texto <span class='lnr lnr-plus-circle icon-size'></span></button>";
+                            $btn = "<button class='button-create text-uppercase' onclick=\"loadViewConfig('$accion');\">$texto <span class='lnr lnr-plus-circle icon-size'></span></button>";
                             break;
                         }
                     }
                 } else {
                     foreach ($permisos as $usuarioactual) {
                         if ($usuarioactual[$permiso] == '1') {
-                            $btn = "<button class='button-create' onclick=\"loadView('$accion');\">$texto <span class='lnr lnr-plus-circle icon-size'></span></button>";
+                            $btn = "<button class='button-create text-uppercase' onclick=\"loadView('$accion');\">$texto <span class='lnr lnr-plus-circle icon-size'></span></button>";
                             break;
                         }
                     }

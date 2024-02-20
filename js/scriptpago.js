@@ -165,6 +165,40 @@ function insertarComplemento(tag) {
         });
     }
 }
+
+function actualizarComplementos(tag) {
+    var input = document.getElementsByName('tab-complemento');
+    for (var i = 0; i < input.length; i++) {
+        var a = input[i];
+        var tagcomp = $(a).attr('data-tab');
+        var orden = $(a).attr('data-ord');
+        var idformapago = $("#forma-" + tagcomp).val();
+        var moneda = $("#moneda-" + tagcomp).val();
+        var tcambio = $("#cambio-" + tagcomp).val();
+        var fechapago = $("#fecha-" + tagcomp).val();
+        var horapago = $("#hora-" + tagcomp).val();
+        var cuenta = $("#cuenta-" + tagcomp).val() || '0';
+        var beneficiario = $("#benef-" + tagcomp).val() || '0';
+        var numtransaccion = $("#transaccion-" + tagcomp).val();
+
+        $.ajax({
+            url: "com.sine.enlace/enlacepago.php",
+            type: "POST",
+            data: {transaccion: "actualizarcomplementos", tag: tag, tagcomp: tagcomp, orden:orden, idformapago: idformapago, moneda: moneda, tcambio: tcambio, fechapago: fechapago, horapago: horapago, cuenta: cuenta, beneficiario: beneficiario, numtransaccion: numtransaccion},
+            success: function (datos) {
+                var texto = datos.toString();
+                var bandera = texto.substring(0, 1);
+                var res = texto.substring(1, 1000);
+                if (bandera == '0') {
+                    alertify.error(res);
+                } else {
+                    alertify.success('Complemento actualizado.');
+                }
+            }
+        });
+    }
+}
+
 //-------------------TMPPAGO Y PAGO
 function insertarPago() {
     var folio = $("#folio-pago").val();
@@ -204,6 +238,45 @@ function insertarPago() {
     }
 }
 
+function actualizarPago(idpago) {
+    var tag = $("#tagpago").val();
+    var folio = $("#folio-pago").val();
+    var datosfiscales = $("#datos-facturacion").val();
+    var idcliente = $("#id-cliente").val() || '0';
+    var cliente = $("#nombre-cliente").val();
+    var rfccliente = $("#rfc-cliente").val();
+    var razoncliente = $("#razon-cliente").val();
+    var regfiscalcliente = $("#regfiscal-cliente").val();
+    var codpostal = $("#cp-cliente").val();
+    var objimpuesto = $('#obj-impuesto').val()
+    var chfirma = 0;
+    if ($("#chfirma").prop('checked')) {
+        chfirma = 1;
+    }
+
+    if (isnEmpty(folio, "folio-pago") && isnEmpty(datosfiscales, "datos-facturacion") && isnEmpty(rfccliente, "rfc-cliente") && isnEmpty(razoncliente, "razon-cliente") && isnEmpty(regfiscalcliente, "regfiscal-cliente") && isnEmpty(codpostal, "cp-cliente") && isnEmpty(objimpuesto, "obj-impuesto")) {
+        $.ajax({
+            url: "com.sine.enlace/enlacepago.php",
+            type: "POST",
+            data: {transaccion: "actualizarpago", tag: tag, idpago: idpago, folio: folio, idcliente: idcliente, cliente: cliente, rfccliente: rfccliente, razoncliente: razoncliente, regfiscalcliente: regfiscalcliente, codpostal: codpostal, datosfiscales: datosfiscales, chfirma: chfirma, objimpuesto: objimpuesto},
+            success: function (datos) {
+                var texto = datos.toString();
+                var bandera = texto.substring(0, 1);
+                var res = texto.substring(1, 1000);
+                if (bandera == '0') {
+
+                    alertify.error(res);
+                } else {
+                    actualizarComplementos(tag);
+                    loadView('listapago');
+                    alertify.success('Pago actualizado.');
+                }
+            }
+        });
+
+    }
+}
+
 function eliminarPago(idpago) {
     alertify.confirm("¿Estás seguro que deseas eliminar este pago?", function () {
         cargandoHide();
@@ -220,7 +293,7 @@ function eliminarPago(idpago) {
                 if (bandera == '0') {
                     alertify.error(res);
                 } else {
-                    alertify.success(datos);
+                    alertify.success('Pago eliminado.');
                     loadView('listapago');
                 }
                 cargandoHide();
@@ -345,8 +418,6 @@ function setValoresEditarPago(datos) {
                         $("#complemento-" + first).show();
                         $("#tab-" + first).addClass("sub-tab-active");
                     }
-                    alert('mandando a la tabla '+ i);
-                    alert(tag1);
                     tablaRowCFDI(tag1, uuid);
                 }
             }
@@ -357,6 +428,55 @@ function setValoresEditarPago(datos) {
     $("#form-pago").append("<input id='tagpago' name='tagpago' type='hidden' value='" + tag + "'/>");
     $("#btn-form-pago").attr("onclick", "actualizarPago(" + idpago + ");");
     cargandoHide();
+}
+
+function setCancelarPago(fid) {
+    $("#motivo-cancelacion").val();
+    $("#uuid-reemplazo").val();
+    $("#div-reemplazo").hide('slow');
+    $("#btn-cancelar").attr('onclick', 'cancelarTimbrePago(' + fid + ')')
+}
+
+function checkCancelarPago() {
+    var motivo = $("#motivo-cancelacion").val();
+    if (motivo === '01') {
+        $("#div-reemplazo").show('slow');
+    } else {
+        $("#div-reemplazo").hide('slow');
+    }
+}
+
+function tablaRowCFDI(tag, uuid = "") {
+    var idmoneda = $("#moneda-" + tag).val();
+    var tcambio = $("#cambio-" + tag).val();
+    $.ajax({
+        url: "com.sine.enlace/enlacepago.php",
+        type: "POST",
+        //Al editar llegan dos datos
+        data: {transaccion: "loadtabla", tag: tag, idmoneda: idmoneda, tcambio: tcambio, uuid: uuid},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 1000);
+            if (bandera == '0') {
+                alertify.error(res);
+            } else {
+                var array = datos.split("<corte>");
+                var p2 = array[1];
+                $("#lista-cfdi-" + tag).html(p2);
+            }
+            cargandoHide();
+        }
+    });
+}
+
+function setvaloresCuentas(idordenante, idbeneficiario) {
+    if (idordenante != '0') {
+        $("#id-bancocuenta").val(idordenante);
+    }
+    if (idbeneficiario != '0') {
+        $("#id-bancobeneficiario").val(idbeneficiario);
+    }
 }
 
 //-------------------FECHA
@@ -377,6 +497,7 @@ function loadFecha() {
         }
     });
 }
+
 //-------------------CATALOGOS SAT
 function loadFormaPago(tag = "") {
     $.ajax({
@@ -533,6 +654,52 @@ function loadBancoBeneficiario(tag) {
     });
 }
 
+function tablaMoneda() {
+    var tag = $("#tabs").find('.sub-tab-active').attr("data-tab");
+    var uuid = "";
+    if (isnEmpty(idmoneda, "moneda-" + tag)) {
+        $.ajax({
+            url: "com.sine.enlace/enlacepago.php",
+            type: "POST",
+            data: {transaccion: "loadtabla", idmoneda: $("#moneda-" + tag).val(), tcambio: $("#cambio-" + tag).val(), uuid: uuid},
+            success: function (datos) {
+                var texto = datos.toString();
+                var bandera = texto.substring(0, 1);
+                var res = texto.substring(1, 1000);
+                if (bandera == '0') {
+                    alertify.error(res);
+                } else {
+                    var array = datos.split("<corte>");
+                    var p2 = array[1];
+                    $("#lista-cfdi-" + tag).html(p2);
+                }
+                cargandoHide();
+            }
+        });
+    }
+}
+
+function tablaPagos(idfactura) {
+    $.ajax({
+        url: "com.sine.enlace/enlacefactura.php",
+        type: "POST",
+        data: {transaccion: "pagosfactura", idfactura: idfactura},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 1000);
+            if (bandera == '0') {
+                alertify.error(res);
+            } else {
+                var array = datos.split("<corte>");
+                var p2 = array[1];
+                var p3 = array[2];
+                $("#pagostabla").html(p2);
+            }
+        }
+    });
+}
+
 //-----------------------------------------CANCELAR
 function cancelarPago2() {
     $.ajax({
@@ -562,6 +729,112 @@ function cancelarPago() {
     });
 }
 
+function resetPagos(idfactura, idcliente, monto) {
+    $.ajax({
+        url: "com.sine.enlace/enlacefactura.php",
+        type: "POST",
+        data: {transaccion: "resetpagos"},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 1000);
+            if (bandera == '0') {
+                alertify.error(res);
+            } else {
+                cambiarEstado(idfactura, idcliente, monto);
+            }
+        }
+    });
+}
+
+function loadPagos(idfactura) {
+    $.ajax({
+        url: "com.sine.enlace/enlacefactura.php",
+        type: "POST",
+        data: {transaccion: "loadpagos", idfactura: idfactura},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 1000);
+            if (bandera == '0') {
+                alertify.error(res);
+            } else {
+                var array = datos.split("<corte>");
+                var p2 = array[1];
+                var p3 = array[2];
+                if (!p3) {
+                    parcialidad = 0;
+                } else {
+                    parcialidad = p3;
+                }
+                $("#resultadospagos").html(p2);
+            }
+        }
+    });
+}
+
+function checkStatusCancelacion(fid) {
+    $("#cod-status").html('');
+    $("#estado-cfdi").html('');
+    $("#cfdi-cancelable").html('');
+    $("#estado-cancelacion").html('');
+    $("#div-reset").html('');
+    cargandoHide();
+    cargandoShow();
+    $.ajax({
+        url: "com.sine.enlace/enlacepago.php",
+        type: "POST",
+        data: {transaccion: "statuscfdi", fid: fid},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 1000);
+            if (bandera == '0') {
+                alertify.error(res);
+            } else {
+                var array = datos.split("</tr>");
+                var codstatus = array[0];
+                var estado = array[1];
+                var cancelable = array[2];
+                var stcancelacion = array[3];
+                var reset = array[4];
+
+                $("#cod-status").html(codstatus);
+                $("#estado-cfdi").html(estado);
+                $("#cfdi-cancelable").html(cancelable);
+                $("#estado-cancelacion").html(stcancelacion);
+                $("#div-reset").html(reset);
+            }
+            cargandoHide();
+        }
+    });
+}
+
+function resetCfdiPago(idpago) {
+    alertify.confirm("Este proceso devolverá borrado el acuse de cancelación generado, ¿Desea continuar?", function () {
+        cargandoHide();
+        cargandoShow();
+        $.ajax({
+            url: "com.sine.enlace/enlacepago.php",
+            type: "POST",
+            data: {transaccion: "editarestado", idpago: idpago},
+            success: function (datos) {
+                var texto = datos.toString();
+                var bandera = texto.substring(0, 1);
+                var res = texto.substring(0, 1000);
+                if (bandera == '0') {
+                    alertify.error(res);
+                } else {
+                    alertify.success('Pago Restaurado');
+                    $("#modal-stcfdi").modal('hide');
+                    loadListaPago();
+                }
+                cargandoHide();
+            }
+        });
+    }).set({title: "Q-ik"});
+}
+
 //-----------------------IMPRIMIR
 function imprimirReporteFactura() {
     var fechainicio = $("#fecha-inicio").val();
@@ -586,6 +859,81 @@ function imprimirReporteFactura() {
             }
         });
     }
+}
+
+function imprimirFactura(idfactura) {
+    cargandoHide();
+    cargandoShow();
+    $.ajax({
+        url: "com.sine.enlace/enlacefactura.php",
+        type: "POST",
+        data: {transaccion: "getfacturapdf", idfactura: idfactura},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 1000);
+            if (bandera == '0') {
+                alertify.error(res);
+            } else {
+                sendPDFDatos(datos);
+            }
+
+        }
+    });
+}
+
+function imprimirRecibo(idpago) {
+    cargandoHide();
+    cargandoShow();
+    $.ajax({
+        url: "com.sine.imprimir/imprimirrecibo.php",
+        type: "POST",
+        data: {transaccion: "pdf", idpago: idpago},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(0, 1000);
+            if (bandera == '0') {
+                alertify.error(res);
+            } else {
+                $("#pagosfactura").modal('hide');
+                enviarRecibo(idpago);
+            }
+            cargandoHide();
+        }
+    });
+}
+
+function imprimirpago(id) {
+    cargandoHide();
+    cargandoShow();
+    VentanaCentrada('./com.sine.imprimir/imprimirpago.php?pago=' + id, 'Pago', '', '1024', '768', 'true');
+    cargandoHide();
+}
+
+function xmlPago(idpago) {
+    alertify.confirm("¿Estás seguro que deseas timbrar los pagos de esta factura?", function () {
+        cargandoHide();
+        cargandoShow();
+        $.ajax({
+            url: "com.sine.enlace/enlacepago.php",
+            type: "POST",
+            data: {transaccion: "xmlpago", idpago: idpago},
+            success: function (datos) {
+                var texto = datos.toString();
+                var bandera = texto.substring(0, 1);
+                var res = texto.substring(0, 1000);
+                if (bandera == '0') {
+                    alertify.error(res);
+                } else {
+                    $("#pagosfactura").modal('hide');
+                    window.setTimeout("loadView('listafactura');", 300);
+
+                }
+                cargandoHide();
+            }
+        });
+    }).set({title: "Q-ik"});
 }
 
 //----------------------------------------FACTURAS
@@ -651,6 +999,44 @@ function calcularRestante(tag = "") {
     $("#restante-" + tag).val(restante);
 }
 
+function cambiarEstado(idfactura, idcliente, monto) {
+    cargandoHide();
+    cargandoShow();
+    loadOpcionesBancoCliente(idcliente);
+    $("#resultadospagos").html('');
+    loadPagos(idfactura);
+    $("#regpago").modal('show');
+    $("#monto-pago").val(monto);
+    $("#idfactura").val(idfactura);
+    $("#idcliente").val(idcliente);
+    $("#totalfactura").val(monto);
+    parcialidad = 0;
+    cargandoHide();
+}
+
+function setidFacturaCancelar(idfactura) {
+    $("#idfacturacancelar").val(idfactura);
+    $("#passcsd").val('');
+}
+
+function facturaRastreo(idcarta, folio) {
+    $.ajax({
+        url: "com.sine.enlace/enlacefactura.php",
+        type: "POST",
+        data: {transaccion: "facturarastreo", idcarta: idcarta, folio: folio},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 1000);
+            if (bandera == '0') {
+                alertify.error(res);
+            } else {
+
+            }
+        }
+    });
+}
+
 //----------------------------------------TIMBRES
 function getTimbres() {
     $.ajax({
@@ -696,6 +1082,38 @@ function xml(idpago) {
     }).set({title: "Q-ik"});
 }
 
+function cancelarTimbrePago(idpago) {
+    var motivo = $("#motivo-cancelacion").val();
+    var reemplazo = "0";
+    if (motivo === '01') {
+        reemplazo = $("#uuid-reemplazo").val();
+    }
+    if (isnEmpty(motivo, "motivo-cancelacion") && isnEmpty(reemplazo, "uuid-reemplazo")) {
+        alertify.confirm("Esta seguro que desea cancelar este pago?", function () {
+            cargandoHide();
+            cargandoShow();
+            $.ajax({
+                url: "com.sine.enlace/enlacepago.php",
+                type: "POST",
+                data: {transaccion: "cancelartimbre", idpago: idpago, motivo: motivo, reemplazo: reemplazo},
+                success: function (datos) {
+                    var texto = datos.toString();
+                    var bandera = texto.substring(0, 1);
+                    var res = texto.substring(1, 1000);
+                    if (bandera == '0') {
+                        alertify.error(res);
+                        cargandoHide();
+                    } else {
+                        cargandoHide();
+                        $("#modalcancelar").modal('hide');
+                        alertify.success(datos);
+                        buscarPago();
+                    }
+                }
+            });
+        }).set({title: "Q-ik"});
+    }
+}
 
 //-----------------------------CFDIS
 function loadTablaCFDI(uuid = "") {
@@ -798,135 +1216,7 @@ function eliminarcfdi(idtemp) {
     }).set({title: "Q-ik"});
 }
 
-function resetPagos(idfactura, idcliente, monto) {
-    $.ajax({
-        url: "com.sine.enlace/enlacefactura.php",
-        type: "POST",
-        data: {transaccion: "resetpagos"},
-        success: function (datos) {
-            var texto = datos.toString();
-            var bandera = texto.substring(0, 1);
-            var res = texto.substring(1, 1000);
-            if (bandera == '0') {
-                alertify.error(res);
-            } else {
-                cambiarEstado(idfactura, idcliente, monto);
-            }
-        }
-    });
-}
-
-function loadPagos(idfactura) {
-    $.ajax({
-        url: "com.sine.enlace/enlacefactura.php",
-        type: "POST",
-        data: {transaccion: "loadpagos", idfactura: idfactura},
-        success: function (datos) {
-            var texto = datos.toString();
-            var bandera = texto.substring(0, 1);
-            var res = texto.substring(1, 1000);
-            if (bandera == '0') {
-                alertify.error(res);
-            } else {
-                var array = datos.split("<corte>");
-                var p2 = array[1];
-                var p3 = array[2];
-                if (!p3) {
-                    parcialidad = 0;
-                } else {
-                    parcialidad = p3;
-                }
-                $("#resultadospagos").html(p2);
-            }
-        }
-    });
-}
-
-function cambiarEstado(idfactura, idcliente, monto) {
-    cargandoHide();
-    cargandoShow();
-    loadOpcionesBancoCliente(idcliente);
-    $("#resultadospagos").html('');
-    loadPagos(idfactura);
-    $("#regpago").modal('show');
-    $("#monto-pago").val(monto);
-    $("#idfactura").val(idfactura);
-    $("#idcliente").val(idcliente);
-    $("#totalfactura").val(monto);
-    parcialidad = 0;
-    cargandoHide();
-}
-
-function tablaMoneda() {
-    var tag = $("#tabs").find('.sub-tab-active').attr("data-tab");
-    var idmoneda = $("#moneda-" + tag).val();
-    var tcambio = $("#cambio-" + tag).val();
-    var uuid = "";
-    if (isnEmpty(idmoneda, "moneda-" + tag)) {
-        $.ajax({
-            url: "com.sine.enlace/enlacepago.php",
-            type: "POST",
-            data: {transaccion: "loadtabla", idmoneda: idmoneda, tcambio: tcambio, uuid: uuid},
-            success: function (datos) {
-                var texto = datos.toString();
-                var bandera = texto.substring(0, 1);
-                var res = texto.substring(1, 1000);
-                if (bandera == '0') {
-                    alertify.error(res);
-                } else {
-                    var array = datos.split("<corte>");
-                    var p2 = array[1];
-                    $("#lista-cfdi-" + tag).html(p2);
-                }
-                cargandoHide();
-            }
-        });
-    }
-}
-
-function tablaPagos(idfactura) {
-    $.ajax({
-        url: "com.sine.enlace/enlacefactura.php",
-        type: "POST",
-        data: {transaccion: "pagosfactura", idfactura: idfactura},
-        success: function (datos) {
-            var texto = datos.toString();
-            var bandera = texto.substring(0, 1);
-            var res = texto.substring(1, 1000);
-            if (bandera == '0') {
-                alertify.error(res);
-            } else {
-                var array = datos.split("<corte>");
-                var p2 = array[1];
-                var p3 = array[2];
-                $("#pagostabla").html(p2);
-            }
-        }
-    });
-}
-
-function imprimirRecibo(idpago) {
-    cargandoHide();
-    cargandoShow();
-    $.ajax({
-        url: "com.sine.imprimir/imprimirrecibo.php",
-        type: "POST",
-        data: {transaccion: "pdf", idpago: idpago},
-        success: function (datos) {
-            var texto = datos.toString();
-            var bandera = texto.substring(0, 1);
-            var res = texto.substring(0, 1000);
-            if (bandera == '0') {
-                alertify.error(res);
-            } else {
-                $("#pagosfactura").modal('hide');
-                enviarRecibo(idpago);
-            }
-            cargandoHide();
-        }
-    });
-}
-
+//------------------------OTROS
 function agregarEntrega() {
     var codprod = $("#codigo-prod").val();
     var claveprod = $("#clave-prod").val();
@@ -1016,204 +1306,7 @@ function loadDocumento() {
     });
 }
 
-function setidFacturaCancelar(idfactura) {
-    $("#idfacturacancelar").val(idfactura);
-    $("#passcsd").val('');
-}
-
-function setCancelarPago(fid) {
-    $("#motivo-cancelacion").val();
-    $("#uuid-reemplazo").val();
-    $("#div-reemplazo").hide('slow');
-    $("#btn-cancelar").attr('onclick', 'cancelarTimbrePago(' + fid + ')')
-}
-
-function checkCancelarPago() {
-    var motivo = $("#motivo-cancelacion").val();
-    if (motivo === '01') {
-        $("#div-reemplazo").show('slow');
-    } else {
-        $("#div-reemplazo").hide('slow');
-    }
-}
-
-function cancelarTimbrePago(idpago) {
-    var motivo = $("#motivo-cancelacion").val();
-    var reemplazo = "0";
-    if (motivo === '01') {
-        reemplazo = $("#uuid-reemplazo").val();
-    }
-    if (isnEmpty(motivo, "motivo-cancelacion") && isnEmpty(reemplazo, "uuid-reemplazo")) {
-        alertify.confirm("Esta seguro que desea cancelar este pago?", function () {
-            cargandoHide();
-            cargandoShow();
-            $.ajax({
-                url: "com.sine.enlace/enlacepago.php",
-                type: "POST",
-                data: {transaccion: "cancelartimbre", idpago: idpago, motivo: motivo, reemplazo: reemplazo},
-                success: function (datos) {
-                    var texto = datos.toString();
-                    var bandera = texto.substring(0, 1);
-                    var res = texto.substring(1, 1000);
-                    if (bandera == '0') {
-                        alertify.error(res);
-                        cargandoHide();
-                    } else {
-                        cargandoHide();
-                        $("#modalcancelar").modal('hide');
-                        alertify.success(datos);
-                        buscarPago();
-                    }
-                }
-            });
-        }).set({title: "Q-ik"});
-    }
-}
-
-function facturaRastreo(idcarta, folio) {
-    $.ajax({
-        url: "com.sine.enlace/enlacefactura.php",
-        type: "POST",
-        data: {transaccion: "facturarastreo", idcarta: idcarta, folio: folio},
-        success: function (datos) {
-            var texto = datos.toString();
-            var bandera = texto.substring(0, 1);
-            var res = texto.substring(1, 1000);
-            if (bandera == '0') {
-                alertify.error(res);
-            } else {
-
-            }
-        }
-    });
-}
-
-function tablaRowCFDI(tag, uuid = "") {
-    var idmoneda = $("#moneda-" + tag).val();
-    var tcambio = $("#cambio-" + tag).val();
-    $.ajax({
-        url: "com.sine.enlace/enlacepago.php",
-        type: "POST",
-        //Al editar llegan dos datos
-        data: {transaccion: "loadtabla", tag: tag, idmoneda: idmoneda, tcambio: tcambio, uuid: uuid},
-        success: function (datos) {
-            var texto = datos.toString();
-            var bandera = texto.substring(0, 1);
-            var res = texto.substring(1, 1000);
-            if (bandera == '0') {
-                alertify.error(res);
-            } else {
-                var array = datos.split("<corte>");
-                var p2 = array[1];
-                $("#lista-cfdi-" + tag).html(p2);
-            }
-            cargandoHide();
-        }
-    });
-}
-
-function setvaloresCuentas(idordenante, idbeneficiario) {
-    if (idordenante != '0') {
-        $("#id-bancocuenta").val(idordenante);
-    }
-    if (idbeneficiario != '0') {
-        $("#id-bancobeneficiario").val(idbeneficiario);
-    }
-}
-
-function actualizarPago(idpago) {
-    var tag = $("#tagpago").val();
-    var foliopago = $("#folio-pago").val();
-    var pago_idfiscales = $("#datos-facturacion").val();
-    var idcliente = $("#id-cliente").val() || '0';
-    var cliente = $("#nombre-cliente").val();
-    var rfccliente = $("#rfc-cliente").val();
-    var razoncliente = $("#razon-cliente").val();
-    var regfiscalcliente = $("#regfiscal-cliente").val();
-    var codpostal = $("#cp-cliente").val();
-    var objimpuesto = $('#obj-impuesto').val()
-    var chfirmar = 0;
-    if ($("#chfirma").prop('checked')) {
-        chfirmar = 1;
-    }
-
-    if (isnEmpty(foliopago, "folio-pago") && isnEmpty(pago_idfiscales, "datos-facturacion") && isnEmpty(rfccliente, "rfc-cliente") && isnEmpty(razoncliente, "razon-cliente") && isnEmpty(regfiscalcliente, "regfiscal-cliente") && isnEmpty(codpostal, "cp-cliente") && isnEmpty(objimpuesto, "obj-impuesto")) {
-        $.ajax({
-            url: "com.sine.enlace/enlacepago.php",
-            type: "POST",
-            data: {transaccion: "actualizarpago", tag: tag, idpago: idpago, foliopago: foliopago, idcliente: idcliente, cliente: cliente, rfccliente: rfccliente, razoncliente: razoncliente, regfiscalcliente: regfiscalcliente, codpostal: codpostal, pago_idfiscales: pago_idfiscales, chfirmar: chfirmar, objimpuesto: objimpuesto},
-            success: function (datos) {
-                var texto = datos.toString();
-                var bandera = texto.substring(0, 1);
-                var res = texto.substring(1, 1000);
-                if (bandera == '0') {
-
-                    alertify.error(res);
-                } else {
-                    actualizarComplementos(tag);
-                    loadView('listapago');
-                    alertify.success(datos);
-                }
-            }
-        });
-
-    }
-}
-
-function actualizarComplementos(tag) {
-    var input = document.getElementsByName('tab-complemento');
-    for (var i = 0; i < input.length; i++) {
-        var a = input[i];
-        var tagcomp = $(a).attr('data-tab');
-        var orden = $(a).attr('data-ord');
-        var idformapago = $("#forma-" + tagcomp).val();
-        var moneda = $("#moneda-" + tagcomp).val();
-        var tcambio = $("#cambio-" + tagcomp).val();
-        var fechapago = $("#fecha-" + tagcomp).val();
-        var horapago = $("#hora-" + tagcomp).val();
-        var cuenta = $("#cuenta-" + tagcomp).val() || '0';
-        var beneficiario = $("#benef-" + tagcomp).val() || '0';
-        var numtransaccion = $("#transaccion-" + tagcomp).val();
-
-        $.ajax({
-            url: "com.sine.enlace/enlacepago.php",
-            type: "POST",
-            data: {transaccion: "actualizarcomplementos", tag: tag, tagcomp: tagcomp, orden:orden, idformapago: idformapago, moneda: moneda, tcambio: tcambio, fechapago: fechapago, horapago: horapago, cuenta: cuenta, beneficiario: beneficiario, numtransaccion: numtransaccion},
-            success: function (datos) {
-                var texto = datos.toString();
-                var bandera = texto.substring(0, 1);
-                var res = texto.substring(1, 1000);
-                if (bandera == '0') {
-                    alertify.error(res);
-                } else {
-                    alertify.success(datos);
-                }
-            }
-        });
-    }
-}
-
-function imprimirFactura(idfactura) {
-    cargandoHide();
-    cargandoShow();
-    $.ajax({
-        url: "com.sine.enlace/enlacefactura.php",
-        type: "POST",
-        data: {transaccion: "getfacturapdf", idfactura: idfactura},
-        success: function (datos) {
-            var texto = datos.toString();
-            var bandera = texto.substring(0, 1);
-            var res = texto.substring(1, 1000);
-            if (bandera == '0') {
-                alertify.error(res);
-            } else {
-                sendPDFDatos(datos);
-            }
-
-        }
-    });
-}
-
+//----------------------CORREOS
 function getCorreos(idfactura) {
     $.ajax({
         url: "com.sine.enlace/enlacepago.php",
@@ -1264,86 +1357,41 @@ function showCorreos(idfactura) {
     cargandoHide();
 }
 
-function imprimirpago(id) {
-    cargandoHide();
-    cargandoShow();
-    VentanaCentrada('./com.sine.imprimir/imprimirpago.php?pago=' + id, 'Pago', '', '1024', '768', 'true');
-    cargandoHide();
-}
-
-function xmlPago(idpago) {
-    alertify.confirm("Esta seguro que desea timbrar los pagos de esta factura?", function () {
-        cargandoHide();
-        cargandoShow();
-        $.ajax({
-            url: "com.sine.enlace/enlacepago.php",
-            type: "POST",
-            data: {transaccion: "xmlpago", idpago: idpago},
-            success: function (datos) {
-                var texto = datos.toString();
-                var bandera = texto.substring(0, 1);
-                var res = texto.substring(0, 1000);
-                if (bandera == '0') {
-                    alertify.error(res);
-                } else {
-                    $("#pagosfactura").modal('hide');
-                    window.setTimeout("loadView('listafactura');", 300);
-
-                }
-                cargandoHide();
-            }
-        });
-    }).set({title: "Q-ik"});
-}
-
 function enviarPago() {
     var idpago = $("#idreciboenvio").val();
-    var mailalt1 = "ejemplo@ejemplo.com";
-    var mailalt2 = "ejemplo@ejemplo.com";
-    var mailalt3 = "ejemplo@ejemplo.com";
-    var mailalt4 = "ejemplo@ejemplo.com";
-    var mailalt5 = "ejemplo@ejemplo.com";
-    var mailalt6 = "ejemplo@ejemplo.com";
-    var chcorreo1 = 0;
-    var chcorreo2 = 0;
-    var chcorreo3 = 0;
-    var chcorreo4 = 0;
-    var chcorreo5 = 0;
-    var chcorreo6 = 0;
+    var mails = ["ejemplo@ejemplo.com", "ejemplo@ejemplo.com", "ejemplo@ejemplo.com", "ejemplo@ejemplo.com", "ejemplo@ejemplo.com", "ejemplo@ejemplo.com"];
+    var checks = [0, 0, 0, 0, 0, 0];
 
-    if ($("#chcorreo1").prop('checked')) {
-        chcorreo1 = 1;
-        mailalt1 = $("#correo1").val();
-    }
-    if ($("#chcorreo2").prop('checked')) {
-        chcorreo2 = 1;
-        mailalt2 = $("#correo2").val();
-    }
-    if ($("#chcorreo3").prop('checked')) {
-        chcorreo3 = 1;
-        mailalt3 = $("#correo3").val();
-    }
-    if ($("#chcorreo4").prop('checked')) {
-        chcorreo4 = 1;
-        mailalt4 = $("#correo4").val();
-    }
-    if ($("#chcorreo5").prop('checked')) {
-        chcorreo5 = 1;
-        mailalt5 = $("#correo5").val();
-    }
-    if ($("#chcorreo6").prop('checked')) {
-        chcorreo6 = 1;
-        mailalt6 = $("#correo6").val();
+    for (var i = 1; i <= 6; i++) {
+        if ($("#chcorreo" + i).prop('checked')) {
+            checks[i - 1] = 1;
+            mails[i - 1] = $("#correo" + i).val();
+        }
     }
 
-    if (isEmailtoSend(mailalt1, "correo1") && isEmailtoSend(mailalt2, "correo2") && isEmailtoSend(mailalt3, "correo3") && isEmailtoSend(mailalt4, "correo4") && isEmailtoSend(mailalt5, "correo5") && isEmailtoSend(mailalt6, "correo6") && isCheckedMailSend(chcorreo1, chcorreo2, chcorreo3, chcorreo4, chcorreo5, chcorreo6)) {
+    if (mails.every(isEmailtoSend) && checks.some(Boolean)) {
         cargandoHide();
         cargandoShow();
         $.ajax({
             url: "com.sine.imprimir/imprimirpago.php",
             type: "POST",
-            data: {transaccion: "pdf", idpago: idpago, ch1: chcorreo1, ch2: chcorreo2, ch3: chcorreo3, ch4: chcorreo4, ch5: chcorreo5, ch6: chcorreo6, mailalt1: mailalt1, mailalt2: mailalt2, mailalt3: mailalt3, mailalt4: mailalt4, mailalt5: mailalt5, mailalt6: mailalt6},
-            success: function (datos) {
+            data: {
+                transaccion: "pdf",
+                idpago: idpago,
+                ch1: checks[0],
+                ch2: checks[1],
+                ch3: checks[2],
+                ch4: checks[3],
+                ch5: checks[4],
+                ch6: checks[5],
+                mailalt1: mails[0],
+                mailalt2: mails[1],
+                mailalt3: mails[2],
+                mailalt4: mails[3],
+                mailalt5: mails[4],
+                mailalt6: mails[5]
+            },
+            success: function(datos) {
                 var texto = datos.toString();
                 var bandera = texto.substring(0, 1);
                 var res = texto.substring(1, 1000);
@@ -1357,66 +1405,4 @@ function enviarPago() {
             }
         });
     }
-}
-
-function checkStatusCancelacion(fid) {
-    $("#cod-status").html('');
-    $("#estado-cfdi").html('');
-    $("#cfdi-cancelable").html('');
-    $("#estado-cancelacion").html('');
-    $("#div-reset").html('');
-    cargandoHide();
-    cargandoShow();
-    $.ajax({
-        url: "com.sine.enlace/enlacepago.php",
-        type: "POST",
-        data: {transaccion: "statuscfdi", fid: fid},
-        success: function (datos) {
-            var texto = datos.toString();
-            var bandera = texto.substring(0, 1);
-            var res = texto.substring(1, 1000);
-            if (bandera == '0') {
-                alertify.error(res);
-            } else {
-                var array = datos.split("</tr>");
-                var codstatus = array[0];
-                var estado = array[1];
-                var cancelable = array[2];
-                var stcancelacion = array[3];
-                var reset = array[4];
-
-                $("#cod-status").html(codstatus);
-                $("#estado-cfdi").html(estado);
-                $("#cfdi-cancelable").html(cancelable);
-                $("#estado-cancelacion").html(stcancelacion);
-                $("#div-reset").html(reset);
-            }
-            cargandoHide();
-        }
-    });
-}
-
-function resetCfdiPago(idpago) {
-    alertify.confirm("Este proceso devolvera borrara el acuse de cancelacion generado, ¿Desea continuar?", function () {
-        cargandoHide();
-        cargandoShow();
-        $.ajax({
-            url: "com.sine.enlace/enlacepago.php",
-            type: "POST",
-            data: {transaccion: "editarestado", idpago: idpago},
-            success: function (datos) {
-                var texto = datos.toString();
-                var bandera = texto.substring(0, 1);
-                var res = texto.substring(0, 1000);
-                if (bandera == '0') {
-                    alertify.error(res);
-                } else {
-                    alertify.success('Pago Restaurado');
-                    $("#modal-stcfdi").modal('hide');
-                    loadListaPago();
-                }
-                cargandoHide();
-            }
-        });
-    }).set({title: "Q-ik"});
 }

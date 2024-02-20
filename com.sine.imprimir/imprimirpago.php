@@ -647,7 +647,7 @@ class PDF extends FPDF {
 
 $cf = new ControladorPago();
 $cformapgo = new ControladorFormaPagos();
-$cmoneda = new ControladorMonedas();
+$controladormoneda = new ControladorMonedas();
 
 
 if (isset($_GET['pago'])) {
@@ -705,7 +705,6 @@ $fechaemision = "$divfecha[2]/$mesE/$divfecha[0]";
 
 require_once '../com.sine.controlador/ControladorConfiguracion.php';
 $cc = new ControladorConfiguracion();
-$cmoneda = new ControladorMonedas();
 $encabezado = $cc->getDatosEncabezado('2');
 foreach ($encabezado as $actual) {
     $titulo = $actual['tituloencabezado'];
@@ -893,7 +892,7 @@ foreach ($detallepago as $actualcfdi) {
     $cformapago = $cformapgo->getCFormaPago($idformapago);
     $idmoneda = $actualcfdi['complemento_idmoneda'];
     $tcambio = $actualcfdi['complemento_tcambio'];
-    $cmoneda = $cmoneda->getCMoneda($idmoneda);
+    $cmoneda = $controladormoneda->getCMoneda($idmoneda);
     $fechapago = $actualcfdi['complemento_fechapago'];
     $horapago = $actualcfdi['complemento_horapago'];
     $cuentaord = $actualcfdi['complemento_idcuentaOrd'];
@@ -1113,6 +1112,6 @@ if (isset($_GET['pago'])) {
     $sm->setMailalt6($_POST['mailalt6']);
     $sm->setPdfstring($pdf->Output('S'));
     $sm->setCfdistring($cfdistring);
-    //$send = $cf->mail($sm);
+    $send = $cf->mail($sm);
     echo $send;
 }

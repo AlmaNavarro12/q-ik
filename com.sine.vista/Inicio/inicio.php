@@ -38,7 +38,7 @@ if (isset($_SESSION[sha1('paquete')])) {
             <div class="row mt-2">
                 <div class="col-md-6">
                     <div class="form-group">
-                        <select class="select-control text-center input-form" id="opciones-ano" name="opciones-ano" onchange="buscarGrafica()">
+                        <select class="select-control col-10 text-center input-form" id="opciones-ano" name="opciones-ano" onchange="buscarGrafica()">
                             <option value="" id="option-default-opciones-ano">A&ntilde;o de emisi&oacute;n</option>
                             <optgroup id="ano" class="contenedor-ano text-left"> </optgroup>
                         </select>

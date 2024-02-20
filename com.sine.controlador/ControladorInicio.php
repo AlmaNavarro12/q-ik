@@ -285,7 +285,6 @@ class ControladorInicio {
             } else {
                 $sintimbre .= "$notimbre";
             }
-
             $contador++;
         }
         return $datos . "<dataset>" . $totales . "<dataset>" . $cancelados . "<dataset>" . $sintimbre;
@@ -302,7 +301,7 @@ class ControladorInicio {
         $total = 0;
         $gettotales = $this->getTotalesAux($y, $m);
         foreach ($gettotales as $actual) {
-            //$total += $this->totalDivisa($actual['total'], $actual['tcambio'], 1, $actual['id_moneda']);
+            $total += $this->totalDivisa($actual['total'], $actual['tcambio'], 1, $actual['id_moneda']);
         }
         return $total;
     }
