@@ -121,7 +121,7 @@ class ControladorOpcion {
         return $consultado;
     }
 
-    private function getNomBanco($idbanco) {
+    public function getNomBanco($idbanco) {
         $banco = $this->getNombancoaux($idbanco);
         $nombre = "";
         foreach ($banco as $bactual) {

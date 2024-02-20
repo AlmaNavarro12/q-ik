@@ -835,4 +835,222 @@ class ControladorConfiguracion
         $consultado = $this->consultas->getResults($consulta, $valores);
         return $consultado;
     }
+
+    //-----------------------------------------------------ENCABEZADO
+    public function hex2rgb($hex) {
+        $hex = str_replace("#", "", $hex);
+        if (strlen($hex) == 3) {
+            $r = hexdec(substr($hex, 0, 1) . substr($hex, 0, 1));
+            $g = hexdec(substr($hex, 1, 1) . substr($hex, 1, 1));
+            $b = hexdec(substr($hex, 2, 1) . substr($hex, 2, 1));
+        } else {
+            $r = hexdec(substr($hex, 0, 2));
+            $g = hexdec(substr($hex, 2, 2));
+            $b = hexdec(substr($hex, 4, 2));
+        }
+        return "$r-$g-$b";
+    }
+
+    private function getLogoFirmaAux() {
+        $consultado = false;
+        $consulta = "SELECT * FROM logofirma WHERE idlogofirma=:id;";
+        $valores = array("id" => '1');
+        $consultado = $this->consultas->getResults($consulta, $valores);
+        return $consultado;
+    }
+
+    public function getLogoFirma() {
+        $datos = "";
+        $data = $this->getLogoFirmaAux();
+        foreach ($data as $actual) {
+            $logo = $actual['logo'];
+            $firma = $actual['firma'];
+            $datos = "$logo</tr>$firma";
+        }
+        return $datos;
+    }
+
+    public function guardarFirma($firma, $firmaanterior) {
+        $hoy = date("Y.m.d.H.i.s");
+        $firma = str_replace('data:image/png;base64,', '', $firma);
+        $firma = str_replace(' ', '+', $firma);
+        $fileData = base64_decode($firma);
+        $fileName = 'firma' . $hoy . '.png';
+        file_put_contents("../img/logo/" . $fileName, $fileData);
+        $actualizar = $this->actualizarFirma($fileName);
+        unlink("../img/logo/$firmaanterior");
+        return "<corte>" . $fileName . "<corte>";
+    }
+
+    private function actualizarFirma($firma) {
+        $consulta = "UPDATE `logofirma` set firma=:firma WHERE idlogofirma=:id;);";
+        $valores = array("id" => '1',
+            "firma" => $firma);
+        $actualizado = $this->consultas->execute($consulta, $valores);
+        return $actualizado;
+    }
+
+    public function guardarLogo($logo, $logoactual) {
+        $consulta = "UPDATE `logofirma` set logo=:logo WHERE idlogofirma=:id;);";
+        $valores = array("id" => '1',
+            "logo" => $logo);
+        $actualizado = $this->consultas->execute($consulta, $valores);
+        $div1 = explode("/", $logoactual);
+        unlink("../img/logo/$div1[0]");
+        $div = explode("/", $logo);
+        rename("../img/" . $div[0], "../img/logo/" . $div[0]);
+        return "<corte>" . $logo . "<corte>";
+    }
+
+    private function getFirmarAux($id) {
+        $consultado = false;
+        $consulta = "SELECT firma,nombre_contribuyente FROM datos_facturacion WHERE id_datos=:id;";
+        $valores = array("id" => $id);
+        $consultado = $this->consultas->getResults($consulta, $valores);
+        return $consultado;
+    }
+
+    public function getFirma($id) {
+        $datos = "";
+        $encabezado = $this->getFirmarAux($id);
+        foreach ($encabezado as $actual) {
+            $firma = $actual['firma'];
+            $nombre = $actual['nombre_contribuyente'];
+            $datos .= "$firma</tr>$nombre";
+        }
+        return $datos;
+    }
+
+    public function getDatosEncabezado($id) {
+        $consultado = false;
+        $consulta = "SELECT * FROM encabezados WHERE idencabezado=:id;";
+        $valores = array("id" => $id);
+        $consultado = $this->consultas->getResults($consulta, $valores);
+        return $consultado;
+    }
+
+    public function datosEncabezado($id) {
+        $datos = "";
+        $encabezado = $this->getDatosEncabezado($id);
+        foreach ($encabezado as $actual) {
+            $tituloencabezado = $actual['tituloencabezado'];
+            $titulocarta = $actual['titulocarta'];
+            $colortitulo = $actual['colortitulo'];
+            $colorcelda = $actual['colorceltitulo'];
+            $colorcuadro = $actual['colorcuadro'];
+            $colorsubtitulos = $actual['colorsubtitulos'];
+            $colorfdatos = $actual['colorfdatos'];
+            $colorbold = $actual['colorbold'];
+            $colortexto = $actual['colortexto'];
+            $colorhtabla = $actual['colorhtabla'];
+            $colortittabla = $actual['colortittabla'];
+            $pagina = $actual['pagina'];
+            $correo = $actual['correo'];
+            $telefono1 = $actual['telefono1'];
+            $telefono2 = $actual['telefono2'];
+            $numpag = $actual['numpag'];
+            $colorpie = $actual['colorpie'];
+            $imglogo = $actual['imglogo'];
+            $observaciones = $actual['observacionescot'];
+
+            $datos = "$tituloencabezado</tr>$titulocarta</tr>$colortitulo</tr>$colorcelda</tr>$colorcuadro</tr>$colorsubtitulos</tr>$colorfdatos</tr>$colorbold</tr>$colortexto</tr>$colorhtabla</tr>$colortittabla</tr>$pagina</tr>$correo</tr>$telefono1</tr>$telefono2</tr>$numpag</tr>$colorpie</tr>$imglogo</tr>$observaciones";
+        }
+        return $datos;
+    }
+
+    public function actualizarEncabezado($c) {
+        $img = $c->getImglogo();
+        if ($img == "") {
+            $img = $c->getImgactualizar();
+        } else if ($c->getImglogo() != $c->getImgactualizar()) {
+            if ($c->getImglogo() != "") {
+                rename('../temporal/tmp/' . $img, '../img/logo/' . $img);
+                if ($c->getChlogo() == '1') {
+                    unlink('../img/logo/' . $c->getImgactualizar());
+                }
+            }
+        }
+      
+        $actualizado = false;
+        $consulta = "UPDATE `encabezados` set tituloencabezado=:tituloencabezado, titulocarta=:titulocarta, colortitulo=:colortitulo, colorceltitulo=:colorceltitulo, colorcuadro=:colorcuadro, colorsubtitulos=:colorsubtitulos, colorfdatos=:colorfdatos, colorbold=:colorbold, colortexto=:colortexto, colorhtabla=:colorhtabla, colortittabla=:colortittabla, pagina=:pagina, correo=:correo, telefono1=:telefono1, telefono2=:telefono2, numpag=:numpag, colorpie=:colorpie, imglogo=:imglogo, observacionescot=:observaciones WHERE idencabezado=:id";
+        $valores = array("id" => $c->getIdencabezado(),
+            "tituloencabezado" => $c->getTituloencabezado(),
+            "titulocarta" => $c->getTitulocarta(),
+            "colortitulo" => $c->getColortitulo(),
+            "colorceltitulo" => $c->getColorcelda(),
+            "colorcuadro" => $c->getColorcuadro(),
+            "colorsubtitulos" => $c->getColorsub(),
+            "colorfdatos" => $c->getColorfdatos(),
+            "colorbold" => $c->getColorbold(),
+            "colortexto" => $c->getColortxt(),
+            "colorhtabla" => $c->getColortabla(),
+            "colortittabla" => $c->getTitulostabla(),
+            "pagina" => $c->getPagina(),
+            "correo" => $c->getCorreo(),
+            "telefono1" => $c->getTel1(),
+            "telefono2" => $c->getTel2(),
+            "numpag" => $c->getNumpagina(),
+            "colorpie" => $c->getColorpie(),
+            "imglogo" => $img,
+            "observaciones" => $c->getObservaciones()
+        );
+        
+        $actualizado = $this->consultas->execute($consulta, $valores);
+        if ($c->getChlogo() == '1') {
+            $logos = $this->actualizarLogos($c); 
+        }
+        return $actualizado;
+    }
+
+    private function getEncabezadosLogos($id) {
+        $consultado = false;
+        $consulta = "SELECT * FROM encabezados WHERE idencabezado !=:id;";
+        $valores = array("id" => $id);
+        $consultado = $this->consultas->getResults($consulta, $valores);
+        return $consultado;
+    }
+
+    private function actualizarLogos($c) {
+        $id = $c->getIdencabezado();
+        $img = $c->getImglogo();
+        if ($img == "") {
+            $img = $c->getImgactualizar();
+        }
+        $logos = $this->getEncabezadosLogos($id);
+        foreach ($logos as $actual) {
+            $idencabezado = $actual['idencabezado'];
+            $actualizar = $this->actualizarLogoGeneral($idencabezado, $c);
+            copy("../img/logo/$id/$img", "../img/logo/$idencabezado/$img");
+        }
+    }
+
+    public function actualizarLogoGeneral($idencabezado, $c) {
+        $img = $c->getImglogo();
+        if ($img == "/") {
+            $img = $c->getImgactualizar();
+        }
+        $actualizado = false;
+        $consulta = "UPDATE `encabezados` set colortitulo=:colortitulo, colorceltitulo=:colorceltitulo, colorcuadro=:colorcuadro, colorsubtitulos=:colorsubtitulos, colorfdatos=:colorfdatos, colorbold=:colorbold, colortexto=:colortexto, colorhtabla=:colorhtabla, colortittabla=:colortittabla, pagina=:pagina, correo=:correo, telefono1=:telefono1, telefono2=:telefono2, numpag=:numpag, colorpie=:colorpie, imglogo=:imglogo WHERE idencabezado=:id";
+        $valores = array("id" => $idencabezado,
+            "colortitulo" => $c->getColortitulo(),
+            "colorceltitulo" => $c->getColorcelda(),
+            "colorcuadro" => $c->getColorcuadro(),
+            "colorsubtitulos" => $c->getColorsub(),
+            "colorfdatos" => $c->getColorfdatos(),
+            "colorbold" => $c->getColorbold(),
+            "colortexto" => $c->getColortxt(),
+            "colorhtabla" => $c->getColortabla(),
+            "colortittabla" => $c->getTitulostabla(),
+            "pagina" => $c->getPagina(),
+            "correo" => $c->getCorreo(),
+            "telefono1" => $c->getTel1(),
+            "telefono2" => $c->getTel2(),
+            "numpag" => $c->getNumpagina(),
+            "colorpie" => $c->getColorpie(),
+            "imglogo" => $img);
+    
+        $actualizado = $this->consultas->execute($consulta, $valores); //sfsdf
+        return $actualizado;
+       
+    }
 }

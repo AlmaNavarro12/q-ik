@@ -50,7 +50,7 @@ class ControladorAuto {
     public function getCoincidenciasFacturas($referencia, $iddatos) {
         $datos = [];
     
-        $consultaFactura = "SELECT * FROM datos_factura WHERE (concat(letra, folio_interno_fac) LIKE '%$referencia%') AND idcliente = '$iddatos' AND status_pago != '3' ORDER BY folio_interno_fac DESC LIMIT 15;";
+        $consultaFactura = "SELECT * FROM datos_factura WHERE (concat(letra, folio_interno_fac) LIKE '%$referencia%') AND idcliente = '$iddatos' AND status_pago != '1' AND status_pago != '3' ORDER BY folio_interno_fac DESC LIMIT 15;";
         $resultadosFactura = $this->consultas->getResults($consultaFactura, null);
         foreach ($resultadosFactura as $resultado) {
             $datos[] = [
@@ -60,7 +60,7 @@ class ControladorAuto {
             ];
         }
     
-        $consultaCarta = "SELECT * FROM factura_carta WHERE (concat(letra, foliocarta) LIKE '%$referencia%') AND idcliente = '$iddatos' AND status_pago != '3' ORDER BY foliocarta DESC LIMIT 15;";
+        $consultaCarta = "SELECT * FROM factura_carta WHERE (concat(letra, foliocarta) LIKE '%$referencia%') AND idcliente = '$iddatos' AND status_pago != '1' AND status_pago != '3' ORDER BY foliocarta DESC LIMIT 15;";
         $resultadosCarta = $this->consultas->getResults($consultaCarta, null);
         foreach ($resultadosCarta as $resultado) {
             $datos[] = [

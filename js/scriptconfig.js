@@ -839,3 +839,359 @@ function loadArchivo() {
         });
     }
 }
+
+//--------------------------------ENCABEZADOS
+function loadEncabezado() {
+    var encabezado = $("#id-encabezado").val();
+    if (isnEmpty(encabezado, "id-encabezado")) {
+        cargandoHide();
+        cargandoShow();
+        $.ajax({
+            url: "com.sine.enlace/enlaceconfig.php",
+            type: "POST",
+            data: {transaccion: "editarencabezado", encabezado: encabezado},
+            success: function (datos) {
+                var texto = datos.toString();
+                var bandera = texto.substring(0, 1);
+                var res = texto.substring(1, 1000);
+                if (bandera == '0') {
+                    alertify.error(res);
+                    cargandoHide();
+                } else {
+                    
+                    hideCommon();
+                    setValoresEncabezado(datos);
+                }
+            }
+        });
+    }
+}
+
+function setValoresEncabezado(datos) {
+    var idencabezado = $("#id-encabezado").val();
+    var array = datos.split("</tr>");
+    var tituloenc = array[0];
+    var titulocarta = array[1];
+    var colortitulo = array[2];
+    var colorceltitulo = array[3];
+    var colorcuadro = array[4];
+    var colorsub = array[5];
+    var colorfdatos = array[6];
+    var colorbold = array[7];
+    var colortexto = array[8];
+    var colorhtabla = array[9];
+    var colortittabla = array[10];
+    var pagina = array[11];
+    var correo = array[12];
+    var tel1 = array[13];
+    var tel2 = array[14];
+    var numpag = array[15];
+    var colorpie = array[16];
+    var imglogo = array[17];
+    var imgarr = imglogo.split("/");
+    var observaciones = array[18];
+
+    $("#titulo").val(tituloenc);
+    $("#color-titulo").val(colortitulo);
+    $("#color-celda").val(colorceltitulo);
+    $("#color-cuadro").val(colorcuadro);
+    $("#color-subtitulo").val(colorsub);
+    $("#fondo-datos").val(colorfdatos);
+    $("#texto-bold").val(colorbold);
+    $("#color-texto").val(colortexto);
+    $("#color-tabla").val(colorhtabla);
+    $("#titulos-tabla").val(colortittabla);
+    $("#pagina").val(pagina);
+    $("#correo").val(correo);
+    $("#telefono1").val(tel1);
+    $("#telefono2").val(tel2);
+    $("#color-pie").val(colorpie);
+    $("#filename").val(imgarr[0]);
+    $("#imgactualizar").val(imglogo);
+
+    if( idencabezado == '12' ){
+        $('#width-ticket').val(numpag);
+        var array_datos = titulocarta.split('</>');
+
+        if( array_datos[0] == 1){
+            $('#chk-data').prop('checked', true);
+            $('#datos-empresa').show('slow');
+            $('#header-logo').show('slow');
+
+        } else if( array_datos[0] == 2){
+            $('#chk-logo').prop('checked', true);
+            $('#data-empresa').hide('slow');
+            $('#header-logo').show('slow');
+
+        }else if( array_datos[0] == 3){
+            $('#chk-only-data').prop('checked', true);
+            $('#datos-empresa').show('slow');
+            $('#header-logo').hide('slow');
+        }
+        
+        $('#nombre-empresa').val(array_datos[1]);
+        $('#razon-social').val(array_datos[2]);
+        $('#direccion').val(array_datos[3]);
+        $('#rfc-empresa').val(array_datos[4]);
+    }
+
+    if (numpag == '1') {
+        $("#chnum").prop('checked', true);
+    } else {
+        $("#chnum").removeAttr('checked');
+    }
+
+    if (imglogo !== '') {
+        $("#muestraimagen").html("<img src='img/logo/" + imglogo + "' height='150px'>");
+    }
+
+    if (idencabezado == '3' || idencabezado == '12') {
+        var txtbd = observaciones.replace(new RegExp("<ent>", 'g'), '\n');
+        $("#add-observaciones").removeAttr('hidden');
+        $("#observaciones-cot").val(txtbd);
+    } else {
+        $("#add-observaciones").attr('hidden', true);
+        $("#observaciones-cot").val('');
+    }
+    
+    if (idencabezado == '11') {
+        $("#carta-titulo").removeAttr('hidden');
+        $("#titulo2").val(titulocarta);
+    } else {
+        $("#carta-titulo").attr('hidden', true);
+        $("#titulo2").val('');
+    }
+    
+    cargandoHide();
+    visualizarPDF();
+}
+
+function cargarLogo() {
+    var formData = new FormData(document.getElementById("form-encabezado"));
+    var idencabezado = $("#id-encabezado").val();
+    var img = $("#imagen").val();
+    if (isnEmpty(idencabezado, "id-encabezado") && isnEmpty(img, "imagen")) {
+        $.ajax({
+            url: 'com.sine.enlace/cargarimg.php',
+            type: "POST",
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function (datos) {
+                //alert(datos);
+                var array = datos.split("<corte>");
+                $("#muestraimagen").html(array[0]);
+                $("#filename").val(array[1]);
+                visualizarPDF();
+            }
+        });
+    }
+}
+
+function visualizarPDF() {
+    var widthticket = $('#width-ticket').val();
+    if (widthticket < 58) {
+        widthticket = 58;
+        $('#width-ticket').val(58); 
+    }
+    var idencabezado = $("#id-encabezado").val();
+    var titulo = $("#titulo").val();
+    var titulo2 = $("#titulo2").val();
+    var clrtitulo = $("#color-titulo").val();
+    var colorcelda = $("#color-celda").val();
+    var clrcuadro = $("#color-cuadro").val();
+    var clrsub = $("#color-subtitulo").val();
+    var clrfdatos = $("#fondo-datos").val();
+    var txtbold = $("#texto-bold").val();
+    var clrtxt = $("#color-texto").val();
+    var colorhtabla = $("#color-tabla").val();
+    var tittabla = $("#titulos-tabla").val();
+    var pagina = $("#pagina").val();
+    var correo = $("#correo").val();
+    var tel1 = $("#telefono1").val();
+    var tel2 = $("#telefono2").val();
+    var clrpie = $("#color-pie").val();
+    var imagen = $('#filename').val();
+    var widthticket = $('#width-ticket').val();
+    var rfcempresa = $('#rfc-empresa').val();
+    var direccion = $('#direccion').val();
+    var razonsocial = $('#razon-social').val();
+    var nombreempresa = $('#nombre-empresa').val(); 
+
+    var observaciones = "";
+    if (idencabezado == '3' || idencabezado == '12') {
+        observaciones = $("#observaciones-cot").val();
+    }
+
+    var chnum = 0;
+    if ($("#chnum").prop('checked')) {
+        chnum = 1;
+    }
+    var chlogo = 0;
+    if ($("#chlogo").prop('checked')) {
+        chlogo = 1;
+    }
+
+    var chkdata = 0;
+    if( $('#chk-data').is(':checked') ){//datos y logo
+        chkdata = 1;
+    } else if( $('#chk-logo').is(':checked') ){//solo logo
+        chkdata = 2;
+    }else if( $('#chk-only-data').is(':checked') ){//solo datos
+        chkdata = 3;
+    }
+    if (isnEmpty(idencabezado, "id-encabezado")) {
+        console.log(widthticket);
+        $.ajax({
+            url: "com.sine.imprimir/configpdf.php",
+            type: "POST",
+            data: {transaccion: "pdf", idencabezado: idencabezado, titulo: titulo, clrtitulo: clrtitulo, colorcelda: colorcelda, clrcuadro: clrcuadro, clrsub: clrsub, clrfdatos: clrfdatos, txtbold: txtbold, clrtxt: clrtxt, colorhtabla: colorhtabla, tittabla: tittabla, pagina: pagina, correo: correo, tel1: tel1, tel2: tel2, clrpie: clrpie, imagen: imagen, chnum: chnum, chlogo: chlogo, observaciones: observaciones, widthticket: widthticket, titulo2: titulo2, rfcempresa: rfcempresa, direccion: direccion, razonsocial: razonsocial, nombreempresa: nombreempresa, chkdata: chkdata},
+            success: function (datos) {
+                var texto = datos.toString();
+                var bandera = texto.substring(0, 1);
+                var res = texto.substring(0, 1000);
+                if (bandera == '0') {
+                    alertify.error(res);
+                } else {
+                    
+                    document.getElementById('myIframe').contentDocument.location.reload()
+                }
+                cargandoHide();
+            }
+        });
+    }
+}
+
+function actualizarEncabezado() {
+    var idencabezado = $("#id-encabezado").val();
+    var titulo = $("#titulo").val();
+    var titulocarta = $("#titulo2").val();
+    var clrtitulo = $("#color-titulo").val();
+    var colorcelda = $("#color-celda").val();
+    var clrcuadro = $("#color-cuadro").val();
+    var clrsub = $("#color-subtitulo").val();
+    var clrfdatos = $("#fondo-datos").val();
+    var txtbold = $("#texto-bold").val();
+    var clrtxt = $("#color-texto").val();
+    var colorhtabla = $("#color-tabla").val();
+    var tittabla = $("#titulos-tabla").val();
+    var pagina = $("#pagina").val();
+    var correo = $("#correo").val();
+    var tel1 = $("#telefono1").val();
+    var tel2 = $("#telefono2").val();
+    var clrpie = $("#color-pie").val();
+    var imagen = $('#filename').val();
+    var imgactualizar = $("#imgactualizar").val();
+    var txtbd = "";
+    if (idencabezado == '3' || idencabezado == '12') {
+        var observaciones = $("#observaciones-cot").val();
+        txtbd = observaciones.replace(new RegExp("\n", 'g'), '<ent>');
+    }
+
+    var chnum = 0;
+    if ($("#chnum").prop('checked')) {
+        chnum = 1;
+    }
+
+    if( idencabezado == '12' ){
+        var chkdata = 0;
+        var rfcempresa = $('#rfc-empresa').val();
+        var direccion = $('#direccion').val();
+        var razonsocial = $('#razon-social').val();
+        var nombreempresa = $('#nombre-empresa').val();
+
+        chnum = $('#width-ticket').val();
+
+        if( $('#chk-data').is(':checked') ){//datos y logo
+        chkdata = 1;
+        } else if( $('#chk-logo').is(':checked') ){//solo logo
+            chkdata = 2;
+        }else if( $('#chk-only-data').is(':checked') ){//solo datos
+            chkdata = 3;
+        }
+        titulocarta =  chkdata+'</>'+nombreempresa+'</>'+razonsocial+'</>'+direccion+'</>'+rfcempresa;
+    }
+
+    var chlogo = 0;
+    if ($("#chlogo").prop('checked')) {
+        chlogo = 1;
+    }
+
+    if (isnEmpty(idencabezado, "id-encabezado") && isnEmpty(titulo, "titulo") && isnEmpty(clrtitulo, "color-titulo") && isnEmpty(tel1, "telefono1")) {
+        cargandoHide();
+        cargandoShow();
+        $.ajax({
+            url: "com.sine.enlace/enlaceconfig.php",
+            type: "POST",
+            data: {transaccion: "actualizarencabezado", idencabezado: idencabezado, titulo: titulo, titulocarta:titulocarta, clrtitulo: clrtitulo, colorcelda: colorcelda, clrcuadro: clrcuadro, clrsub: clrsub, clrfdatos: clrfdatos, txtbold: txtbold, clrtxt: clrtxt, colorhtabla: colorhtabla, tittabla: tittabla, pagina: pagina, correo: correo, tel1: tel1, tel2: tel2, clrpie: clrpie, imagen: imagen, chnum: chnum, imgactualizar: imgactualizar, chlogo: chlogo, observaciones: txtbd},
+            success: function (datos) {
+                var texto = datos.toString();
+                var bandera = texto.substring(0, 1);
+                var res = texto.substring(1, 1000);
+                if (bandera == '0') {
+                    cargandoHide();
+                    alertify.error(res);
+                } else {
+                    cargandoHide();
+                    
+                    alertify.success('Datos Guardados');
+                    loadViewConfig('encabezado');
+                }
+            }
+        });
+    }
+}
+
+function hideCommon(){
+    if( $('#id-encabezado').val() == 12 ){
+        $('#common-ticket').show();
+        $('#datos-empresa').show();
+        $('#common-cuerpo').hide();
+        $('#common-pie').hide();
+        $('#common-subtitulos').hide();
+        $('#common-table').hide();
+        $('#config-gral').hide();
+        $('#lbl-despedida').html('Mensaje Pie Ticket');
+        $('#lbl-pagina').html('Inferior Izquierda');
+        $('#lbl-correo').html('Inferior Derecha');
+    }
+    else {
+        $('#common-ticket').hide();
+        $('#datos-empresa').hide();
+        $('#common-cuerpo').show();
+        $('#common-pie').show();
+        $('#common-subtitulos').show();
+        $('#common-table').show();
+        $('#config-gral').show();
+        $('#lbl-despedida').html('Mensaje de Observaciones');
+        $('#lbl-pagina').html('Pagina');
+        $('#lbl-correo').html('Correo');
+    }
+}
+
+function habilitarDatos() {
+    if( $('#chk-data').is(':checked') ){//datos y logo
+        $('#data-empressa').show('slow');
+        $('#header-logo').show('slow');
+
+    } else if( $('#chk-logo').is(':checked') ){//solo logo
+         $('#data-empressa').hide('slow');
+        $('#header-logo').show('slow');
+        
+    }else if ($('#chk-only-data').is(':checked')) {//solo datos
+        $('#data-empressa').show('slow');
+        $('#header-logo').toggle('slow');
+    }
+    visualizarPDF();
+}
+
+function verificaAnchoticket() {
+    var width = $('#width-ticket').val();
+    if (width >= 58) {
+        visualizarPDF();
+    } else {
+        alertify.error("El tamaño mínimo del ancho del ticket es de 58mm.");
+        $('#width-ticket').val(58);
+        visualizarPDF(); 
+    }
+}

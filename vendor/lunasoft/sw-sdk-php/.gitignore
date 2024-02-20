@@ -9,4 +9,3 @@ Samples/vendor/composer/autoload_psr4.php
 Samples/vendor/composer/autoload_real.php
 Samples/vendor/composer/autoload_static.php
 Samples/vendor/composer/installed.json
-.fake

@@ -74,6 +74,19 @@ if (isset($_POST['transaccion'])) {
             $tabla = $_POST['tabla'];
             echo ($datos = $cc->importTable($fnm, $tabla)) != "" ? $datos : "0Error: El archivo no contiene los campos esperados. O bien, no contiene datos.";
             break;
+            //------------------------------ENCABEZADO
+        case 'editarencabezado':
+            $datos = $cc->datosEncabezado($_POST['encabezado']);
+            echo $datos != "" ? $datos : "0Botón activo.";
+            break;
+        case 'actualizarencabezado':
+            $actualizado = $cc->actualizarEncabezado(obtenerDatosEncabezados());
+            echo !$actualizado ? "0Error en la actualización de encabezados." : "";
+            break;
+        case 'testcolor':
+            $datos = $cc->hex2rgb($_POST['color']);
+            echo $datos != "" ? $datos : "0Botón activo.";
+            break;
     }
 
     if (isset($insertado)) {
@@ -119,7 +132,8 @@ function obtenerDatosCorreo()
     return $c;
 }
 
-function obtenerDatosTesteo() {
+function obtenerDatosTesteo()
+{
     $c = new Configuracion();
     $c->setCorreoEnvio($_POST['correo']);
     $c->setPassCorreo($_POST['pass']);
@@ -141,5 +155,33 @@ function obtenerDatosBodyCorreo()
     $c->setImgLogo($_POST['filenm']);
     $c->setImgActualizar($_POST['imgactualizar']);
     $c->setChLogo($_POST['chlogo']);
+    return $c;
+}
+
+function obtenerDatosEncabezados()
+{
+    $c = new Configuracion();
+    $c->setIdencabezado($_POST['idencabezado']);
+    $c->setTituloencabezado($_POST['titulo']);
+    $c->setTitulocarta($_POST['titulocarta']);
+    $c->setColortitulo($_POST['clrtitulo']);
+    $c->setColorcelda($_POST['colorcelda']);
+    $c->setColorcuadro($_POST['clrcuadro']);
+    $c->setColorsub($_POST['clrsub']);
+    $c->setColorfdatos($_POST['clrfdatos']);
+    $c->setColorbold($_POST['txtbold']);
+    $c->setColortxt($_POST['clrtxt']);
+    $c->setColortabla($_POST['colorhtabla']);
+    $c->setTitulostabla($_POST['tittabla']);
+    $c->setPagina($_POST['pagina']);
+    $c->setCorreo($_POST['correo']);
+    $c->setTel1($_POST['tel1']);
+    $c->setTel2($_POST['tel2']);
+    $c->setColorpie($_POST['clrpie']);
+    $c->setImglogo($_POST["imagen"]);
+    $c->setImgactualizar($_POST['imgactualizar']);
+    $c->setNumpagina($_POST['chnum']);
+    $c->setChlogo($_POST['chlogo']);
+    $c->setObservaciones($_POST['observaciones']);
     return $c;
 }

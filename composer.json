@@ -3,6 +3,7 @@
         "phpoffice/phpspreadsheet": "^1.29",
         "phpmailer/phpmailer": "^6.9",
         "twilio/sdk": "^7.14",
-        "lunasoft/sw-sdk-php": "dev-master" 
+        "lunasoft/sw-sdk-php": "dev-master",
+        "setasign/fpdf": "^1.8" 
     }
 }

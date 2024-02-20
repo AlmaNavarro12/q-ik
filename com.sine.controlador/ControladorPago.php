@@ -36,11 +36,11 @@ class ControladorPago{
         $datos = "<thead class='p-0 mb-3'>
             <tr >
                 <th></th>
-                <th class='col-auto'>No. Folio </th>
-                <th class='col-auto'>Creaci&oacute;n </th>
-                <th class='col-auto'>Emisor </th>
-                <th class='col-auto'>Receptor </th>
-                <th class='col-auto text-center'>Fecha / Hora de pago </th>
+                <th class='col-auto text-center'>No. Folio </th>
+                <th class='col-auto text-center'>Fecha de creaci&oacute;n </th>
+                <th class='col-auto text-center'>Emisor </th>
+                <th class='col-auto text-center'>Receptor </th>
+                <th class='col-auto text-center'>Timbre </th>
                 <th class='col-auto text-center'>Total </th>
                 <th class='col-auto text-center'>Opci&oacute;n</th>
             </tr>
@@ -112,18 +112,18 @@ class ControladorPago{
 
                 $datos .= "<tr>
                         <td style='background-color: $colorrow;'></td>
-                        <td>$foliopago</td>
-                        <td>$fechaemision</td>
-                        <td>$emisor</td>
-                        <td>$receptor</td>
+                        <td class='text-center'>$foliopago</td>
+                        <td class='text-center'>$fechaemision</td>
+                        <td class='text-center'>$emisor</td>
+                        <td class='text-center'>$receptor</td>
                         <td class='text-center'>
                             <div class='small-tooltip icon tip'>
                                 <span style='color: $colorB;' class='fas $iconbell'></span>
                                 <span class='tiptext $class'>$titbell</span>
                             </div>
                         </td>
-                        <td>$ " . number_format($totalpagado, 2, '.', ',') . "</td>
-                        <td align='center'>
+                        <td class='text-center'>$ " . number_format($totalpagado, 2, '.', ',') . "</td>
+                        <td class='text-center'>
                         <div class='dropdown'>
                         <button class='button-list dropdown-toggle' title='Opciones' type='button' data-bs-toggle='dropdown' aria-expanded='false'>
                         <span class='fas fa-ellipsis-v'></span>
@@ -132,13 +132,12 @@ class ControladorPago{
                 if ($div[1] == '1') {
                     $datos .= "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' onclick='editarPago($idpago);'>Editar pago <span class='text-muted small fas fa-edit'></span></a></li>";
                 }
-                if ($div[2] == '1' && $uuidpago == "") {
+                if ($div[2] == '1') {
                     $datos .= "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' onclick=\"eliminarPago('$idpago');\">Eliminar pago <span class='text-muted small fas fa-times'></span></a></li>";
                 }
-                if ($uuidpago != "") {
+                
                     $datos .= "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' onclick=\"imprimirpago($idpago);\">Ver pago <span class='text-muted small fas fa-file'></span></a></li>
-                    <li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' href='./com.sine.imprimir/imprimirxml.php?p=$idpago&t=a' target='_blank'>Ver XML <span class='text-muted small fas fa-download'></span></a></li>";
-                }
+                    <div class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' href='./com.sine.imprimir/imprimirxml.php?p=$idpago&t=a' target='_blank'>Ver XML <span class='text-muted small fas fa-download'></span></a></div>";
                 if ($div[3] == '1') {
                     $datos .= "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' $functiontimbre> $titletimbre <span class='text-muted small fas fa-bell'></span></a></li>";
                 }
@@ -235,7 +234,7 @@ class ControladorPago{
         return $consultado;
     }
 
-    private function translateMonth($m)
+    public function translateMonth($m)
     {
         $months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
         $m = intval($m);
@@ -303,7 +302,7 @@ class ControladorPago{
                     <td class='text-center'>$ " . number_format($montoanterior, 2, '.', ',') . "</td>
                     <td class='text-center'>$ " . number_format($monto, 2, '.', ',') . "</td>
                     <td class='text-center'>$ " . number_format($montoinsoluto, 2, '.', ',') . "</td>
-                    <td class='text-center'><a $disuuid class='btn button-list d-flex align-items-center justify-content-center' title='Eliminar' onclick='eliminarcfdi($idtmp);'><span class='fas fa-times'></span></a></td>
+                    <td class='text-center d-flex justify-content-center'><a $disuuid class='btn button-list d-flex align-items-center justify-content-center' title='Eliminar' onclick='eliminarcfdi($idtmp);'><span class='fas fa-times'></span></a></td>
                 </tr>";
         }
 
@@ -589,7 +588,8 @@ class ControladorPago{
     private function getParcialidadAux($idfactura, $idpago)
     {
         $consultado = false;
-        $consulta = "SELECT (noparcialidad)+1 par FROM detallepago dt INNER JOIN pagos p ON (p.tagpago=dt.detalle_tagencabezado) WHERE pago_idfactura=:id AND cancelado != '1' AND p.tagpago != :idpago AND type=:tipo;";
+        $consulta = "SELECT (noparcialidad)+1 par FROM detallepago dt INNER JOIN pagos p ON (p.tagpago=dt.detalle_tagencabezado) 
+        WHERE pago_idfactura=:id AND cancelado != '1' AND p.tagpago != :idpago AND type=:tipo;";
         $valores = array(
             "id" => $idfactura,
             "idpago" => $idpago,
@@ -823,7 +823,7 @@ class ControladorPago{
             return false;
         }
 
-        $consulta = "INSERT INTO `tmppago` VALUES (:id, :parcialidad, :idfactura, :folio, :uuid, :tcambio, :idmoneda, :cmetodo, :monto, :montoant, :montoins, :total, :type, :session, :tag);";
+        $consulta = "INSERT INTO `tmppago` VALUES (:id, :parcialidad, :idfactura, :folio, :uuid, :tcambio, :idmoneda, :cmetodo, :monto, :montoant, :montoins, :total, :type, :tag, :session);";
         $valores = array(
             "id" => null,
             "parcialidad" => $t->getParcialidadtmp(),
@@ -838,8 +838,8 @@ class ControladorPago{
             "montoins" => bcdiv($t->getMontoinsolutotmp(), '1', 2),
             "total" => $t->getTotalfacturatmp(),
             "type" => $t->getType(),
-            "session" => $t->getSessionid(),
-            "tag" => $t->getTag()
+            "tag" => $t->getTag(),
+            "session" => $t->getSessionid()
         );
         $insertado = $this->consultas->execute($consulta, $valores);
         return $insertado;
@@ -884,7 +884,7 @@ class ControladorPago{
         $folios = $this->getFolio($p->getFoliopago());
         list($serie, $letra, $nfolio) = explode("</tr>", $folios, 3);
 
-        $consulta = "INSERT INTO `pagos` VALUES (:idpago, :rfcemisor, :razonemisor, :clvregemisor, :regfiscalemisor, :codpemisor, :serie, :letra, :foliopago, :fechacreacion, :pago_idcliente, :nombrecliente, :rfcreceptor, :razonreceptor, :regfiscalreceptor, :codpreceptor, :pago_idfiscales, :pago_idformapago, :pago_idmoneda, :pago_tcambio, :fechapago, :horapago, :idcuentaOrd, :idcuentaBnf, :notransaccion, :totalpagado, :chfirmar, :cadenaoriginalpago, :nocertsatpago, :nocertcfdipago, :uuidpago, :sellosatpago, :sellocfdipago, :fechatimbrado, :qrcode, :cfdipago, :cfdicancel, :cancelado, :tagpago, :objimpuesto)";
+        $consulta = "INSERT INTO `pagos` VALUES (:idpago, :rfcemisor, :razonemisor, :clvregemisor, :regfiscalemisor, :codpemisor, :serie, :letra, :foliopago, :fechacreacion, :pago_idcliente, :nombrecliente, :rfcreceptor, :razonreceptor, :regfiscalreceptor, :codpreceptor, :pago_idfiscales, :totalpagado, :chfirmar, :cadenaoriginalpago, :nocertsatpago, :nocertcfdipago, :uuidpago, :sellosatpago, :sellocfdipago, :fechatimbrado, :qrcode, :cfdipago, :cfdicancel, :cancelado, :tagpago, :objimpuesto)";
         $valores = array(
             "idpago" => null,
             "rfcemisor" => '',
@@ -903,14 +903,6 @@ class ControladorPago{
             "regfiscalreceptor" => $p->getRegfiscalcliente(),
             "codpreceptor" => $p->getCodpostal(),
             "pago_idfiscales" => $p->getPago_idfiscales(),
-            "pago_idformapago" => null,
-            "pago_idmoneda" => null,
-            "pago_tcambio" => null,
-            "fechapago" => null,
-            "horapago" => null,
-            "idcuentaOrd" => null,
-            "idcuentaBnf" => 0,
-            "notransaccion" => null,
             "totalpagado" => '0',
             "chfirmar" => $p->getChfirmar(),
             "cadenaoriginalpago" => null,
@@ -928,7 +920,7 @@ class ControladorPago{
             "objimpuesto" => $objimpuesto
         );
         $insertado = $this->consultas->execute($consulta, $valores);
-        return $insertado;
+        return "<cut>$tag<cut>";
     }
 
     private function getFoliobyID($id)
@@ -984,10 +976,10 @@ class ControladorPago{
             "horapago" => $p->getHorapago(),
             "cuentaord" => $p->getPago_idbanco(),
             "cuentabnf" => $p->getIdbancoB(),
-            "notransaccion" => $p->getNooperacion(),
+            "notransaccion" => $p->getNooperacion(), //
             "total" => '0',
             "tagcomp" => $p->getTagcomp(),
-            "tagpago" => $p->getTagpago()
+            "tagpago" => $p->getTagpago()//
         );
         $insertar = $this->consultas->execute($consulta, $val);
         $this->detallePago($p->getSessionid(), $p->getTagpago(), $p->getTagcomp(), $p->getTipocambio(), $p->getPagoidmoneda());
@@ -1000,23 +992,22 @@ class ControladorPago{
         $cfdi = $this->getPagosTMP($idsession, $tagcomp);
         foreach ($cfdi as $actual) {
             $totalpagado += $actual['montotmp'];
-            $this->consultas->execute("INSERT INTO `detallepago` VALUES (null, :noparcialidad, :pagoidfactura, :folio, :uuid, :tcambio, :idmoneda, :cmetodo, :monto, :montoanterior, :montoinsoluto, :totalfactura, :type, :tagpago, :tagcomp, :detalle_tagencabezado);", [
+            $this->consultas->execute("INSERT INTO `detallepago` VALUES (:iddetallepago, :noparcialidad, :pagoidfactura, :folio, :uuid, :tcambio, :idmoneda, :cmetodo, :monto, :montoanterior, :montoinsoluto, :totalfactura, :type, :tagpago, :tagcomp);", [
+                "iddetallepago" => null,
                 "noparcialidad" => $actual['noparcialidadtmp'],
                 "pagoidfactura" => $actual['idfacturatmp'],
                 "folio" => $actual['foliofacturatmp'],
                 "uuid" => $actual['uuidtmp'],
                 "tcambio" => $actual['tcambiotmp'],
                 "idmoneda" => $actual['idmonedatmp'],
-                "cmetodo" => $actual['cmetodotmp'],
+                "cmetodo" => $actual['idmetodotmp'],
                 "monto" => $actual['montotmp'],
                 "montoanterior" => $actual['montoanteriortmp'],
                 "montoinsoluto" => $actual['montoinsolutotmp'],
                 "totalfactura" => $actual['totalfacturatmp'],
                 "type" => $actual['type'],
                 "tagpago" => $tagpago,
-                "tagcomp" => $tagcomp,
-                "detalle_tagencabezado" => $tagcomp
-
+                "tagcomp" => $tagcomp
             ]);
 
             $estado = ($actual['montoinsolutotmp'] != '0') ? '4' : '1';
@@ -1056,13 +1047,6 @@ class ControladorPago{
         return $datos;
     }
 
-    public function getPagoById($idpago) {
-        $consultado = false;
-        $consulta = "SELECT p.*, df.nombre_contribuyente, df.firma, df.rfc, df.razon_social, df.codigo_postal, df.c_regimenfiscal, df.regimen_fiscal FROM pagos p INNER JOIN datos_facturacion df ON (df.id_datos=p.pago_idfiscales) WHERE idpago=:idpago;";
-        $val = array("idpago" => $idpago);
-        $consultado = $this->consultas->getResults($consulta, $val);
-        return $consultado;
-    }
 
     private function getTotalesImpuestos($tag){
         $subtotal = 0;
@@ -1107,7 +1091,7 @@ class ControladorPago{
         $cforma = "";
         $datos = $this->controladorFormaPago->getFormaById($idfp);
         foreach ($datos as $actual) {
-            $cforma = $actual['c_pago'];
+            $cforma = $actual['c_formapago'];
         }
         return $cforma;
     }
@@ -1467,11 +1451,9 @@ class ControladorPago{
                     $trasladosPago->setAttribute('ImporteP', bcdiv(round($imp_tras, 2),'1',2));
     
                 }
-
                 
                 $totales->setAttribute('TotalTrasladosBaseIVA16', number_format(round($subTotlGral, 2), 2, '.', ''));
                 $totales->setAttribute('TotalTrasladosImpuestoIVA16', number_format(round($subIvaGral, 2), 2, '.', ''));
-
                 if($retencionIVA > 0){
                     $totales->setAttribute('TotalRetencionesIVA', number_format(round($retencionIVA, 2), 2, '.', ''));
                 }  
@@ -1595,24 +1577,30 @@ class ControladorPago{
         return $actualizado;
     }
 
-    private function opcionesBeneficiario($iddatos, $selected = '') {
+    private function opcionesBeneficiario($iddatos, $selected) {
         $r = "";
         $datos = $this->getDatosFacturacion($iddatos);
-        $bancos = array('idbanco', 'idbanco1', 'idbanco2', 'idbanco3');
-        $cuentas = array('cuenta', 'cuenta1', 'cuenta2', 'cuenta3');
-    
-        for ($i = 0; $i < count($bancos); $i++) {
-            $idbanco = $datos[$bancos[$i]];
-            $cuenta = $datos[$cuentas[$i]];
-    
-            if ($idbanco != '0') {
-                $selected = ($selected == ($i + 1) ? "selected" : "");
-                $banco = $this->controladorOpcion->getNomBanco($idbanco);
-                $r .= "<option value='" . ($i + 1) . "' $selected>" . $banco . " - Cuenta:" . $cuenta . "</option>";
+        foreach ($datos as $actual) {
+            for ($i = 0; $i < 4; $i++) {
+                $idbanco = $actual["idbanco" . ($i == 0 ? '' : $i)];
+                $cuenta = $actual["cuenta" . ($i == 0 ? '' : $i)];
+                if ($idbanco != '0') {
+                    $optionValue = $i + 1;
+                    $optionSelected = ($selected == $optionValue) ? "selected" : "";
+                    $banco = $this->controladorOpcion->getNomBanco($idbanco);
+                    $r .= "<option value='$optionValue' $optionSelected>" . $banco . " - Cuenta: $cuenta</option>";
+                }
             }
         }
-    
         return $r;
+    }
+    
+    public function getPagoById($idpago) {
+        $consultado = false;
+        $consulta = "SELECT p.*, df.nombre_contribuyente, df.firma, df.rfc, df.razon_social, df.codigo_postal, df.c_regimenfiscal, df.regimen_fiscal FROM pagos p INNER JOIN datos_facturacion df ON (df.id_datos=p.pago_idfiscales) WHERE idpago=:idpago;";
+        $val = array("idpago" => $idpago);
+        $consultado = $this->consultas->getResults($consulta, $val);
+        return $consultado;
     }
 
     public function getDatosPago($idpago) {
@@ -1642,7 +1630,9 @@ class ControladorPago{
             $uuidpago = $pagoactual['uuidpago'];
             $tag = $pagoactual['tagpago'];
             $objimpuesto = $pagoactual['objimpuesto'];
+
             $datos = "$idpago</tr>$serie</tr>$letra</tr>$foliopago</tr>$fechacreacion</tr>$pago_idfiscales</tr>$nombrefiscales</tr>$rfcemisor</tr>$razonemisor</tr>$clvregemisor</tr>$regfiscalemisor</tr>$codpemisor</tr>$pago_idcliente</tr>$nombrecliente</tr>$rfcreceptor</tr>$razonreceptor</tr>$regfiscalreceptor</tr>$codpreceptor</tr>$totalpagado</tr>$chfirmar</tr>$uuidpago</tr>$tag</tr>$objimpuesto";
+
             break;
         }
         return $datos;
@@ -1718,13 +1708,12 @@ class ControladorPago{
                 $close = "";
             }
 
-            $this->cfdisPago($tagpago, $tagcomp, $sid);
-
+            //$this->cfdisPago($tagpago, $tagcomp, $sid);
             $datos .= "<button id='tab-$tagcomp' class='tab-pago sub-tab-active' data-tab='$tagcomp' data-ord='$orden' name='tab-complemento' >Complemento $orden &nbsp; $close</button>
                 <cut>
                 <div id='complemento-$tagcomp' class='sub-div'>
                 <div class='row'>
-            <div class='col-md-4'>
+            <div class='col-md-4 py-2'>
                 <label class='label-form text-right' for='forma-$tagcomp'>Forma de pago</label> <label
                         class='mark-required text-danger fw-bold'>*</label>
                 <div class='form-group'>
@@ -1736,7 +1725,7 @@ class ControladorPago{
                 </div>
             </div>
 
-            <div class='col-md-2'>
+            <div class='col-md-2 py-2'>
                 <label class='label-form text-right' for='moneda-$tagcomp'>Moneda de pago</label> <label
                         class='mark-required text-danger fw-bold'>*</label>
                 <div class='form-group'>
@@ -1748,7 +1737,7 @@ class ControladorPago{
                 </div>
             </div>
 
-            <div class='col-md-2'>
+            <div class='col-md-2 py-2'>
                 <label class='label-form text-right' for='cambio-$tagcomp'>Tipo de cambio</label><label
                 class='mark-required text-danger fw-bold'>&nbsp;</label>
                 <div class='form-group'>
@@ -1757,7 +1746,7 @@ class ControladorPago{
                 </div>
             </div>
 
-            <div class='col-md-4'>
+            <div class='col-md-4 py-2'>
                 <label class='label-form text-right' for='fecha-$tagcomp'>Fecha de pago</label> <label
                         class='mark-required text-danger fw-bold'>*</label>
                 <div class='form-group'>
@@ -1768,7 +1757,7 @@ class ControladorPago{
         </div>
 
         <div class='row'>
-            <div class='col-md-4'>
+            <div class='col-md-4 py-2'>
                 <label class='label-form text-right' for='hora-$tagcomp'>Hora de pago</label> <label
                         class='mark-required text-danger fw-bold'>*</label>
                 <div class='form-group'>
@@ -1777,7 +1766,7 @@ class ControladorPago{
                 </div>
             </div>
 
-            <div class='col-md-4'>
+            <div class='col-md-4 py-2'>
                 <label class='label-form text-right' for='uenta-$tagcomp'>Cuenta ordenante (Cliente)</label>
                 <div class='form-group'>
                     <select class='form-control text-center input-form' id='cuenta-$tagcomp' name='cuenta-$tagcomp' disabled>
@@ -1788,7 +1777,7 @@ class ControladorPago{
                 </div>
             </div>
 
-            <div class='col-md-4'>
+            <div class='col-md-4 py-2'>
                 <label class='label-form text-right' for='benef-$tagcomp'>Cuenta beneficiario (Mis Cuentas)</label>
                 <div class='form-group'>
                     <select class='form-control text-center input-form' id='benef-$tagcomp' name='benef-$tagcomp' disabled>
@@ -1803,7 +1792,7 @@ class ControladorPago{
         </div>
 
         <div class='row'>
-            <div class='col-md-4'>
+            <div class='col-md-4 py-2'>
                 <label class='label-form text-right' for='transaccion-$tagcomp'>No. de transacci&oacute;n</label>
                 <div class='form-group'>
                     <input class='form-control text-center input-form' id='transaccion-$tagcomp' name='transaccion-$tagcomp' placeholder='N° de Transaccion' type='number' disabled value='$numtransaccion'/>
@@ -1813,7 +1802,7 @@ class ControladorPago{
             </div>
         </div>
 
-        <div class='row'>
+        <div class='row mt-3'>
             <div class='col-md-12'>
                 <div class='new-tooltip icon tip'> 
                     <label class='label-sub' for='fecha-creacion'>CFDIS RELACIONADOS </label> <span
@@ -1829,15 +1818,15 @@ class ControladorPago{
                     <tbody >
                         <tr>
                             <td colspan='2'>
-                                <label class='label-form text-right' for='factura-$tagcomp'>Folio factura</label>
+                                <label class='label-form mb-1' for='factura-$tagcomp'>Folio factura</label>
                                 <input id='id-factura-$tagcomp' type='hidden' /><input class='form-control text-center input-form' id='factura-$tagcomp' name='factura-$tagcomp' placeholder='Factura' type='text' oninput='aucompletarFactura();'/>
                             </td>
                             <td colspan='2'>
-                                <label class='label-form text-right' for='uuid-$tagcomp'>UUID factura</label>
+                                <label class='label-form mb-1' for='uuid-$tagcomp'>UUID factura</label>
                                 <input class='form-control cfdi text-center input-form' id='uuid-$tagcomp' name='uuid-$tagcomp' placeholder='UUID del cfdi' type='text'/>
                             </td>
                             <td>
-                                <label class='label-form text-right' for='type-$tagcomp'>Tipo factura</label>
+                                <label class='label-form mb-1' for='type-$tagcomp'>Tipo factura</label>
                                 <select class='form-control text-center input-form' id='type-$tagcomp' name='type-$tagcomp'>
                                     <option value='' id='default-tipo-$tagcomp'>- - - -</option>
                                     <option value='f' id='tipo-f-$tagcomp'>Factura</option>
@@ -1845,7 +1834,7 @@ class ControladorPago{
                                 </select>
                             </td>
                             <td>
-                                <label class='label-form text-right' for='monedarel-$tagcomp'>Moneda factura</label>
+                                <label class='label-form mb-1' for='monedarel-$tagcomp'>Moneda factura</label>
                                 <input id='cambiocfdi-$tagcomp' type='hidden' />
                                 <input id='metcfdi-$tagcomp' type='hidden' />
                                 <select class='form-control text-center input-form' id='monedarel-$tagcomp' name='monedarel-$tagcomp'>
@@ -1856,23 +1845,23 @@ class ControladorPago{
                         </tr>
                         <tr>
                             <td>
-                                <label class='label-form text-right' for='parcialidad-$tagcomp'>No. Parcialidad</label>
+                                <label class='label-form mb-1' for='parcialidad-$tagcomp'>No. Parcialidad</label>
                                 <input class='form-control text-center input-form' id='parcialidad-$tagcomp' disabled name='parcialidad-$tagcomp' placeholder='No Parcialidad' type='text'/>
                             </td>
                             <td>
-                                <label class='label-form text-right' for='total-$tagcomp'>Total factura</label>
+                                <label class='label-form mb-1' for='total-$tagcomp'>Total factura</label>
                                 <input class='form-control text-center input-form' id='total-$tagcomp' name='total-$tagcomp' disabled placeholder='Total de Factura' type='number' step='any'/>
                             </td>
                             <td>
-                                <label class='label-form text-right' for='anterior-$tagcomp'>Monto anterior</label>
+                                <label class='label-form mb-1' for='anterior-$tagcomp'>Monto anterior</label>
                                 <input class='form-control text-center input-form' id='anterior-$tagcomp' name='anterior-$tagcomp' placeholder='Monto Anterior' type='number' step='any'/>
                             </td>
                             <td>
-                                <label class='label-form text-right' for='monto-$tagcomp'>Monto a pagar</label>
+                                <label class='label-form mb-1' for='monto-$tagcomp'>Monto a pagar</label>
                                 <input class='form-control text-center input-form' id='monto-$tagcomp' name='monto-$tagcomp' placeholder='Monto Pagado' type='number' step='any' oninput='calcularRestante()'/>
                             </td>
                             <td>
-                                <label class='label-form text-right' for='restante-$tagcomp'>Monto restante</label>
+                                <label class='label-form mb-1' for='restante-$tagcomp'>Monto restante</label>
                                 <input class='form-control text-center input-form' id='restante-$tagcomp' name='cantidad' placeholder='Monto Restante' type='number' step='any'/>
                             </td>
                             <td>
