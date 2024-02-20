@@ -69,8 +69,10 @@ if (isset($_POST['transaccion'])) {
             $eliminado = $cp->eliminarPago($_POST['idpago']);
             echo $eliminado ? $eliminado : "0No se han encontrado datos";
             break;
-            
-            
+        case 'cancelar':
+            $eliminado = $cp->cancelar(session_id());
+            echo $eliminado != "" ? $eliminado : "0No se han econtrado datos.";
+            break;
     }
 }
 
@@ -183,10 +185,7 @@ if (isset($_POST['transaccion'])) {
             echo $eliminado != "" ? $eliminado : "0No se han econtrado datos.";
             break;
         
-        case 'cancelar':
-            $eliminado = $cp->cancelar(session_id());
-            echo $eliminado != "" ? $eliminado : "0No se han econtrado datos.";
-            break;
+        
         case 'actualizarpago':
             $p = obtenerDatosPago();
             $insertado = $cf->validarActualizarPago($p, $_POST['objimpuesto']);

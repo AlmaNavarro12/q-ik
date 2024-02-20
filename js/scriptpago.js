@@ -345,6 +345,8 @@ function setValoresEditarPago(datos) {
                         $("#complemento-" + first).show();
                         $("#tab-" + first).addClass("sub-tab-active");
                     }
+                    alert('mandando a la tabla '+ i);
+                    alert(tag1);
                     tablaRowCFDI(tag1, uuid);
                 }
             }
@@ -1092,6 +1094,7 @@ function tablaRowCFDI(tag, uuid = "") {
     $.ajax({
         url: "com.sine.enlace/enlacepago.php",
         type: "POST",
+        //Al editar llegan dos datos
         data: {transaccion: "loadtabla", tag: tag, idmoneda: idmoneda, tcambio: tcambio, uuid: uuid},
         success: function (datos) {
             var texto = datos.toString();
