@@ -2368,7 +2368,7 @@ class ControladorPago{
                         <select class='form-control text-center input-form' id='forma-$tagcomp' name='forma-$tagcomp' onchange='disableCuenta();'>
                             <option value='' id='default-fpago-$tagcomp'>- - - -</option>
                             <optgroup id='forma-pago-$tagcomp' class='cont-fpago-$tagcomp text-left'>" .
-                $this->opcionesFormaPago($idformapago)
+                $this->controladorFormaPago->opcionesFormaPago($idformapago)
                 . "</optgroup>
                         </select>
                     <div id='forma-$tagcomp-errors'></div>
@@ -2381,7 +2381,7 @@ class ControladorPago{
                     <select class='form-control text-center input-form' id='moneda-$tagcomp' name='moneda-$tagcomp' onchange='getTipoCambio(); loadTablaCFDI();'>
                         <option value='' id='default-moneda-$tagcomp'>- - - -</option>
                         <optgroup id='mpago-$tagcomp' class='contmoneda-$tagcomp text-left'>" .
-                $this->opcionesMoneda($idmoneda)
+                $this->controladorMoneda->opcionesMoneda($idmoneda)
                 . "</optgroup>
                     </select>
                     <div id='moneda-$tagcomp-errors'></div>
