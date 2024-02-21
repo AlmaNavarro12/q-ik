@@ -2059,7 +2059,7 @@ class ControladorPago{
         if (!$ajustes) {
             throw new Exception("No se puede abrir el archivo " . $archivo);
         }
-        $rfcfolder = $ajustes['cron']['rfcfolder'];
+        $rfcfolder = isset($ajustes['cron']['rfcfolder']) ? $ajustes['cron']['rfcfolder'] : 'NAGA021226FJ0';
 
         $txt = str_replace("<corte>", "</p><p style='font-size:18px; text-align: justify;'>", $msg);
         $message = "<html>
@@ -2352,5 +2352,176 @@ class ControladorPago{
         $val = array("id" => $id);
         $consultado = $this->consultas->getResults($consulta, $val);
         return $consultado;
+    }
+
+    public function exportarComplemento($idformapago, $idmoneda, $tcambio, $idfactura, $folio, $sid) {
+        $datos = "";
+        $tagcomp = $this->genTag();
+
+        $datos .= "<button id='tab-$tagcomp' class='tab-pago sub-tab-active' data-tab='$tagcomp' data-ord='1' name='tab-complemento' >Complemento 1 &nbsp; <span data-tab='$tagcomp' type='button' class='close-button' aria-label='Close'><span aria-hidden='true'>&times;</span></span></button>
+                <cut>
+                <div id='complemento-$tagcomp' class='sub-div'>
+                <div class='row'>
+            <div class='col-md-4'>
+                <label class='label-form text-right' for='forma-$tagcomp'>Forma de Pago</label> <label class='mark-required text-right'>*</label>
+                <div class='form-group'>
+                        <select class='form-control text-center input-form' id='forma-$tagcomp' name='forma-$tagcomp' onchange='disableCuenta();'>
+                            <option value='' id='default-fpago-$tagcomp'>- - - -</option>
+                            <optgroup id='forma-pago-$tagcomp' class='cont-fpago-$tagcomp text-left'>" .
+                $this->opcionesFormaPago($idformapago)
+                . "</optgroup>
+                        </select>
+                    <div id='forma-$tagcomp-errors'></div>
+                </div>
+            </div>
+
+            <div class='col-md-2'>
+                <label class='label-form text-right' for='moneda-$tagcomp'>Moneda de Pago</label> <label class='mark-required text-right'>*</label>
+                <div class='form-group'>
+                    <select class='form-control text-center input-form' id='moneda-$tagcomp' name='moneda-$tagcomp' onchange='getTipoCambio(); loadTablaCFDI();'>
+                        <option value='' id='default-moneda-$tagcomp'>- - - -</option>
+                        <optgroup id='mpago-$tagcomp' class='contmoneda-$tagcomp text-left'>" .
+                $this->opcionesMoneda($idmoneda)
+                . "</optgroup>
+                    </select>
+                    <div id='moneda-$tagcomp-errors'></div>
+                </div>
+            </div>
+
+            <div class='col-md-2'>
+                <label class='label-form text-right' for='cambio-$tagcomp'>Tipo de Cambio</label>
+                <div class='form-group'>
+                    <input type='text' class='form-control input-form' id='cambio-$tagcomp' placeholder='Tipo de cambio de Moneda' disabled='' value='$tcambio'>
+                    <div id='cambio-$tagcomp-errors'></div>
+                </div>
+            </div>
+
+            <div class='col-md-4'>
+                <label class='label-form text-right' for='fecha-$tagcomp'>Fecha de Pago</label> <label class='mark-required text-right'>*</label>
+                <div class='form-group'>
+                    <input class='form-control text-center input-form' id='fecha-$tagcomp' name='fecha-$tagcomp' type='date' />
+                    <div id='fecha-$tagcomp-errors'></div>
+                </div>
+            </div>
+        </div>
+
+        <div class='row'>
+            <div class='col-md-4'>
+                <label class='label-form text-right' for='hora-$tagcomp'>Hora de Pago</label> <label class='mark-required text-right'>*</label>
+                <div class='form-group'>
+                    <input class='form-control text-center input-form' id='hora-$tagcomp' name='hora-$tagcomp' type='time'/>
+                    <div id='hora-$tagcomp-errors'></div>
+                </div>
+            </div>
+
+            <div class='col-md-4'>
+                <label class='label-form text-right' for='uenta-$tagcomp'>Cuenta Ordenante (Cliente)</label>
+                <div class='form-group'>
+                    <select class='form-control text-center input-form' id='cuenta-$tagcomp' name='cuenta-$tagcomp' disabled>
+                        <option value='' id='default-cuenta-$tagcomp'>- - - -</option>
+                        <optgroup id='ordenante-$tagcomp' class='contenedor-cuenta-$tagcomp text-left'></optgroup>
+                    </select>
+                    <div id='cuenta-$tagcomp-errors'></div>
+                </div>
+            </div>
+
+            <div class='col-md-4'>
+                <label class='label-form text-right' for='benef-$tagcomp'>Cuenta Beneficiario (Mis Cuentas)</label>
+                <div class='form-group'>
+                    <select class='form-control text-center input-form' id='benef-$tagcomp' name='benef-$tagcomp' disabled>
+                        <option value='' id='default-benef-$tagcomp'>- - - -</option>
+                        <optgroup id='beneficiario-$tagcomp' class='contenedor-beneficiario-$tagcomp text-left'></optgroup>
+                    </select>
+                    <div id='benef-$tagcomp-errors'></div>
+                </div>
+            </div>
+        </div>
+
+        <div class='row'>
+            <div class='col-md-4'>
+                <label class='label-form text-right' for='transaccion-$tagcomp'>N° de Transaccion</label>
+                <div class='form-group'>
+                    <input class='form-control text-center input-form' id='transaccion-$tagcomp' name='transaccion-$tagcomp' placeholder='N° de Transaccion' type='number' disabled />
+                    <div id='transaccion-$tagcomp-errors'>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class='row'>
+            <div class='col-md-12'>
+                <div class='new-tooltip icon tip'> 
+                    <label class='label-sub' for='fecha-creacion'>CFDIS RELACIONADOS </label> <span class='glyphicon glyphicon-question-sign'></span>
+                    <span class='tiptext'>Para agregar una factura realice la b&uacute;squeda por Folio de la factura y se cargaran los datos, la b&uacute;squeda se limita a las facturas asignadas al cliente seleccionado en el campo Cliente.</span>
+                </div>
+            </div>
+        </div>
+
+        <div class='row scrollX'>
+            <div class='col-md-12'>
+                <table class='table tab-hover table-condensed table-responsive table-row thead-form'>
+                    <tbody >
+                        <tr>
+                            <td colspan='2'>
+                                <label class='label-form text-right' for='factura-$tagcomp'>Folio Factura</label>
+                                <input id='id-factura-$tagcomp' type='hidden' value='$idfactura' /><input class='form-control text-center input-form' id='factura-$tagcomp' name='factura-$tagcomp' placeholder='Factura' type='text' oninput='aucompletarFactura();' value='Factura-$folio'/>
+                            </td>
+                            <td colspan='2'>
+                                <label class='label-form text-right' for='uuid-$tagcomp'>UUID Factura</label>
+                                <input class='form-control cfdi text-center input-form' id='uuid-$tagcomp' name='uuid-$tagcomp' placeholder='UUID del cfdi' type='text'/>
+                            </td>
+                            <td>
+                                <label class='label-form text-right' for='type-$tagcomp'>Tipo Factura</label>
+                                <select class='form-control text-center input-form' id='type-$tagcomp' name='type-$tagcomp'>
+                                    <option value='' id='default-tipo-$tagcomp'>- - - -</option>
+                                    <option value='f' id='tipo-f-$tagcomp'>Factura</option>
+                                    <option value='c' id='tipo-c-$tagcomp'>Carta Porte</option>
+                                </select>
+                            </td>
+                            <td>
+                                <label class='label-form text-right' for='monedarel-$tagcomp'>Moneda Factura</label>
+                                <input id='cambiocfdi-$tagcomp' type='hidden' />
+                                <input id='metcfdi-$tagcomp' type='hidden' />
+                                <select class='form-control text-center input-form' id='monedarel-$tagcomp' name='monedarel-$tagcomp'>
+                                    <option value='' id='default-moneda-$tagcomp'>- - - -</option>
+                                    <optgroup id='moncfdi-$tagcomp' class='contenedor-moneda-$tagcomp text-left'> </optgroup>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label class='label-form text-right' for='parcialidad-$tagcomp'>N° Parcialidad</label>
+                                <input class='form-control text-center input-form' id='parcialidad-$tagcomp' name='parcialidad-$tagcomp' placeholder='No Parcialidad' type='text'/>
+                            </td>
+                            <td>
+                                <label class='label-form text-right' for='total-$tagcomp'>Total Factura</label>
+                                <input class='form-control text-center input-form' id='total-$tagcomp' name='total-$tagcomp' placeholder='Total de Factura' type='number' step='any'/>
+                            </td>
+                            <td>
+                                <label class='label-form text-right' for='anterior-$tagcomp'>Monto Anterior</label>
+                                <input class='form-control text-center input-form' id='anterior-$tagcomp' name='anterior-$tagcomp' placeholder='Monto Anterior' type='number' step='any'/>
+                            </td>
+                            <td>
+                                <label class='label-form text-right' for='monto-$tagcomp'>Monto a Pagar</label>
+                                <input class='form-control text-center input-form' id='monto-$tagcomp' name='monto-$tagcomp' placeholder='Monto Pagado' type='number' step='any' oninput='calcularRestante()'/>
+                            </td>
+                            <td>
+                                <label class='label-form text-right' for='restante-$tagcomp'>Monto Restante</label>
+                                <input class='form-control text-center input-form' id='restante-$tagcomp' name='cantidad' placeholder='Monto Restante' type='number' step='any'/>
+                            </td>
+                            <td>
+                                <label class='label-space' for='btn-agregar-cfdi'></label>
+                                <button id='btn-agregar-cfdi' class='button-modal' onclick='agregarCFDI();'><span class='glyphicon glyphicon-plus'></span> Agregar</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table class='table tab-hover table-condensed table-responsive table-row table-head' id='lista-cfdi-$tagcomp'>
+
+                </table>
+            </div>
+        </div>
+        </div><cut>$tagcomp<comp>";
+        return $datos;
     }
 }

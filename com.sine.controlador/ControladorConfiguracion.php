@@ -823,7 +823,7 @@ class ControladorConfiguracion
     </html>";
         $mail->addAddress($sm->getCorreoenvio());
         if (!$mail->send()) {
-            echo '0No se envió el mensaje' . $mail->ErrorInfo;
+            echo '0Error en conexión: ' . $mail->ErrorInfo;
         } else {
             return '1Se ha enviado el correo.';
         }

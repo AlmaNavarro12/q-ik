@@ -66,7 +66,7 @@ if (isset($_POST['transaccion'])) {
             break;
         case 'testcorreo':
             $datos = $cc->mailPrueba(obtenerDatosTesteo());
-            echo $datos != "" ? $datos : "0No hay clientes registrados.";
+            echo $datos != "" ? $datos : "";
             break;
             //------------------------------------TABLAS
         case 'loadexcel':

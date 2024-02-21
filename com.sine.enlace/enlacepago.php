@@ -103,8 +103,7 @@ if (isset($_POST['transaccion'])) {
             echo $insertado != "" ? $insertado : "0Error: No se inserto el registro.";
             break;
         case 'actualizarcomplementos':
-            $p = obtenerDatosComplementoPago();
-            $insertado = $cp->actualizarComplemento($p);
+            $insertado = $cp->actualizarComplemento(obtenerDatosComplementoPago());
             echo $insertado ? $insertado : "0Error.";
             break;
             /*case 'eliminarfactura':
@@ -124,6 +123,10 @@ if (isset($_POST['transaccion'])) {
         case 'getcorreos':
             $datos = $cp->getCorreo($_POST['idfactura']);
             echo $datos != "" ? $datos : "0No se encontrarón correos registrados.";
+            break;
+        case 'expcomplementos':
+            $complementos = $cp->exportarComplemento($_POST['idformapago'], $_POST['idmoneda'], $_POST['tcambio'], $_POST['idfactura'], $_POST['foliofactura'], session_id());
+            echo $complementos != "" ? $complementos : "0Error en recuperar datos.";
             break;
     }
 }
@@ -177,7 +180,7 @@ function obtenerDatosPago()
 function obtenerDatosComplementoPago()
 {
     $p = new Pago();
-    $p->setTagpago(($_POST['tag']));
+    $p->setTagpago($_POST['tag']);
     $p->setTagcomp($_POST['tagcomp']);
     $p->setOrden($_POST['orden']);
     $p->setPagoidformapago($_POST['idformapago']);
