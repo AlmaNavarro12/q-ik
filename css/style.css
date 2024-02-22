@@ -868,8 +868,8 @@ article {
 
 .button-create {
     outline: none !important;
-    width: 257px;
     height: 65px;
+    width: 70%;
     background: none;
     border: 2px solid #CECEE2;
     box-sizing: border-box;
@@ -881,7 +881,11 @@ article {
     line-height: 250.7%;
     text-align: center;
     color: #17177C;
+    overflow: hidden;
     white-space: nowrap;
+    text-overflow: ellipsis;
+    padding-left: 15px; 
+    padding-right: 15px;
 }
 
 /*--------------------------------FORMULARIO DE FOLIO CONFIGURACION --------------------*/

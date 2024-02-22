@@ -537,12 +537,11 @@ $("#correo-uso").on("keyup", function () {
 });
 
 function cargarLogoMail() {
-    var formData = new FormData(document.getElementById("form-correo"));
-    var idbody = $("#id-body").val();
-    var img = $("#imagen").val();
-    if (isnEmpty(idbody, "id-body") && isnEmpty(img, "imagen")) {
-        cargandoHide();
-        cargandoShow();
+    var formData = new FormData();
+    var imgInput = $("#imagen")[0].files[0]; 
+    if (imgInput) {
+        formData.append("imagen", imgInput);
+
         $.ajax({
             url: 'com.sine.enlace/cargarimg.php',
             type: "POST",
@@ -557,6 +556,8 @@ function cargarLogoMail() {
                 cargandoHide();
             }
         });
+    } else {
+        alert("Por favor selecciona una imagen.");
     }
 }
 

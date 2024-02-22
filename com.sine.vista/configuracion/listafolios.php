@@ -15,7 +15,7 @@
             </select>
         </div>
         
-        <div class="col-sm-4 py-1 d-flex justify-content-end" id="btn-crear-folio">
+        <div class="col-sm-4 py-1 text-end" id="btn-crear-folio">
         </div>
     </div>
 </form>
@@ -29,7 +29,7 @@
             <th class="col-2">N° Inicio</th>
             <th class="col-2">Folio Actual</th>
             <th class="col-2">Uso del folio</th>
-            <th class="col-2 text-center">Opción <span class='fas fa-ellipsis-v text-muted'></span></th>
+            <th class="col-2 text-center">Opción</th>
             </tr>
         </thead>
         <tbody>

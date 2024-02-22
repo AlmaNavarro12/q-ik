@@ -213,9 +213,11 @@ function checkContrasena() {
 }
 
 function cargarImgUsuario() {
-    var formData = new FormData(document.getElementById("form-usuario"));
-    var img = $("#imagenperfil").val();
-    if (isnEmpty(img, 'imagenperfil')) {
+    var formData = new FormData();
+    var imgInput = $("#imagenperfil")[0].files[0]; 
+    if (imgInput) {
+        formData.append("imagenperfil", imgInput);
+
         $.ajax({
             url: 'com.sine.enlace/cargarimg.php',
             type: "POST",
@@ -231,6 +233,8 @@ function cargarImgUsuario() {
                 $("#imagenperfil").val('');
             }
         });
+    } else {
+        alert("Por favor selecciona una imagen.");
     }
 }
 
@@ -373,8 +377,8 @@ function actualizarPermisos(idusuario) {
         facturas: ["crearfactura", "editarfactura", "eliminarfactura", "listafactura"],
         pago: ["crearpago", "editarpago", "eliminarpago", "listapago"],
         nomina: ["listaempleado", "crearempleado", "editarempleado", "eliminarempleado", "listanomina", "crearnomina", "editarnomina", "eliminarnomina"],
-        cartaporte: ["listaubicacion", "crearubicacion", "editarubicacion", "eliminarubicacion", "listatransporte", "creartransporte", "editartransporte", "eliminartransporte", "listaremolque", "crearremolque", "editarremolque", "eliminarremolque", "listaoperador", "crearoperador", "editaroperador", "eliminaroperador", "listacarta", "crearcarta", "editarcarta", "eliminarcarta"],
-        cotizacion: ["crearcotizacion", "editarcotizacion", "eliminarcotizacion", "listacotizacion", "anticipo"],
+        configuracion: ["addfolio", "listafolio", "editarfolio", "eliminarfolio", "addcomision", "encabezados", "confcorreo", "importar"],
+        usuarios: ["crearusuario", "listausuario", "eliminarusuario", "asignarpermiso"],
         cliente: ["crearcliente", "editarcliente", "eliminarcliente", "listacliente"],
         comunicado: ["crearcomunicado", "editarcomunicado", "eliminarcomunicado", "listacomunicado"],
         producto: ["crearproducto", "editarproducto", "eliminarproducto", "listaproducto"],
@@ -382,11 +386,10 @@ function actualizarPermisos(idusuario) {
         impuesto: ["crearimpuesto", "editarimpuesto", "eliminarimpuesto", "listaimpuesto"],
         datosfacturacion: ["creardatos", "editardatos", "listadatos"],
         contrato: ["crearcontrato", "editarcontrato", "eliminarcontrato", "listacontrato"],
-        usuarios: ["crearusuario", "listausuario", "eliminarusuario", "asignarpermiso"],
+        cotizacion: ["crearcotizacion", "editarcotizacion", "eliminarcotizacion", "listacotizacion", "anticipo"],
         reporte: ["reportefactura", "reportepago", "reportegrafica", "reporteiva", "datosiva", "reporteventas"],
-        configuracion: ["addfolio", "listafolio", "editarfolio", "eliminarfolio", "addcomision", "encabezados", "confcorreo", "importar"],
+        cartaporte: ["listaubicacion", "crearubicacion", "editarubicacion", "eliminarubicacion", "listatransporte", "creartransporte", "editartransporte", "eliminartransporte", "listaremolque", "crearremolque", "editarremolque", "eliminarremolque", "listaoperador", "crearoperador", "editaroperador", "eliminaroperador", "listacarta", "crearcarta", "editarcarta", "eliminarcarta"],
         ventas: ["crearventa", "cancelarventa", "exportarventa"],
-
     };
 
     var datos = {
@@ -396,18 +399,19 @@ function actualizarPermisos(idusuario) {
     };
 
     for (var categoria in categorias) {
-        datos[categoria] = 0;
-
-        for (var i = 0; i < categorias[categoria].length; i++) {
-            var permiso = categorias[categoria][i];
-            var valorCheckbox = $("#" + permiso).prop('checked') ? 1 : 0;
-            datos[permiso] = valorCheckbox;
-
-            if (valorCheckbox == 1) {
-                datos[categoria] = 1;
+        if ($("#collapse-" + categoria).hasClass('show')) {
+            datos[categoria] = 1;
+    
+            for (var i = 0; i < categorias[categoria].length; i++) {
+                var permiso = categorias[categoria][i];
+                var valorCheckbox = $("#" + permiso).prop('checked') ? 1 : 0;
+                datos[permiso] = valorCheckbox;
             }
+        } else {
+            datos[categoria] = 0;
         }
     }
+    
     $.ajax({
         url: "com.sine.enlace/enlaceusuario.php",
         type: "POST",

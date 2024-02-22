@@ -8,7 +8,8 @@ date_default_timezone_set("America/Mexico_City");
 $maxsz = isset($_POST['imgsz']) ? $_POST['imgsz'] : 200;
 $carpeta = "../temporal/tmp/";
 
-function crearNombre($extension){
+function crearNombre($extension)
+{
     $sessionid = session_id();
     $idusuario = $_SESSION[sha1("idusuario")];
     $fecha = date('YmdHis');
@@ -84,8 +85,8 @@ if (isset($_FILES["imagenusuario"]) || isset($_FILES["imagenperfil"])) {
     $data = file_get_contents($carpeta . $nombre);
     $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
     echo "<img src='$base64' width='200' class='rounded-circle border border-secondary shadow-sm' id='img'><corte>$nombre";
-
 } 
+
 else if (isset($_FILES["imagen"])) {
     $file = $_FILES["imagen"];
     $nombre = crearNombre(pathinfo($file["name"], PATHINFO_EXTENSION));
@@ -98,7 +99,9 @@ else if (isset($_FILES["imagen"])) {
     $height = $dimensiones[1];
 
     if (($size > 900 * 900) || ($width > 2000 || $height > 2000)) {
-        procesarImagen($ruta_provisional, $carpeta, $nombre, 0.5, 0.5, 0);
+        $newwidth = $width * 0.5;
+        $newheight = $height * 0.5;
+        procesarImagen($ruta_provisional, $carpeta, $nombre, $newheight, $newheight, 0);
     } else if ($width < 60 || $height < 60) {
         echo "Error: La anchura y la altura mínima permitida es 60px.<corte>";
     } else if ($tipo == 'image/png') {
@@ -123,6 +126,7 @@ else if (isset($_FILES["imagen"])) {
     $data = file_get_contents("../" . $vista);
     $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
     if ($tipo != 'application/pdf') {
+        $maxsz = 200; 
         if ($width >= $height) {
             $height = ($height * $maxsz) / $width;
             $padding = $maxsz - $height;
@@ -136,7 +140,8 @@ else if (isset($_FILES["imagen"])) {
     }
 }
 
-function procesarImagen($ruta_provisional, $carpeta, $nombre, $max_width, $max_height, $quality) {
+function procesarImagen($ruta_provisional, $carpeta, $nombre, $max_width, $max_height, $quality)
+{
     $dimensiones = getimagesize($ruta_provisional);
     $width = $dimensiones[0];
     $height = $dimensiones[1];
@@ -164,7 +169,21 @@ function procesarImagen($ruta_provisional, $carpeta, $nombre, $max_width, $max_h
     $white = imagecolorallocate($imagen_p, 255, 255, 255);
     imagefilledrectangle($imagen_p, 0, 0, $max_width, $max_height, $white);
     imagecopyresampled($imagen_p, $imagen, 0, 0, 0, 0, $max_width, $max_height, $width, $height);
-    $image_save_func($imagen_p, $carpeta . $nombre, $quality);
+
+    switch ($tipo) {
+        case 'image/jpeg':
+            $image_save_func($imagen_p, $carpeta . $nombre, $quality);
+            break;
+        case 'image/png':
+            $image_save_func($imagen_p, $carpeta . $nombre, $quality);
+            break;
+        case 'image/gif':
+            $image_save_func($imagen_p, $carpeta . $nombre);
+            break;
+        default:
+            throw new Exception('Tipo de imagen desconocido.');
+    }
+
     imagedestroy($imagen_p);
     imagedestroy($imagen);
 }
