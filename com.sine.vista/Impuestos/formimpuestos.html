@@ -9,16 +9,16 @@
                 <label class="fw-bold text-danger small">* Campo obligatorio</label>
             </div>
         </div>
-        <input  id="tipo" name="tipo" type="hidden" />
-        <input  id="rango-min" name="rango-min" type="hidden" />
-        <input  id="rango-max" name="rango-max" type="hidden" />
+        <input id="tipo" name="tipo" type="hidden" />
+        <input id="rango-min" name="rango-min" type="hidden" />
+        <input id="rango-max" name="rango-max" type="hidden" />
         <div class="row">
             <div class="col-md-6 py-2">
                 <label class="label-form" for="descripcion-impuesto">Nombre</label> <label
                     class="mark-required text-danger fw-bold">*</label>
                 <div class="form-group">
                     <input class="form-control text-center input-form" id="descripcion-impuesto"
-                        name="descripcion-impuesto" placeholder="Descripci&oacute;n del Impuesto" type="text" />
+                        name="descripcion-impuesto" placeholder="Descripci&oacute;n del impuesto" type="text" />
                     <div id="descripcion-impuesto-errors">
                     </div>
                 </div>
@@ -27,11 +27,11 @@
                 <label class="label-form" for="tipo-impuesto">Tipo de impuesto</label> <label
                     class="mark-required text-danger fw-bold">*</label>
                 <div class="form-group">
-                    <select class="select-control col-12 text-center input-form" id="tipo-impuesto" name="tipo-impuesto"
+                    <select class="form-select col-12 text-center input-form" id="tipo-impuesto" name="tipo-impuesto"
                         onchange="loadImpuesto(); loadOpcionesTasa();">
                         <option value="" id="option-default-tipo-impuesto">- - - -</option>
-                        <option class="text-left" id="tipo1" value="1">Traslado</option>
-                        <option class="text-left" id="tipo2" value="2">Retencion</option>
+                        <option class="text-start" id="tipo1" value="1">Traslado</option>
+                        <option class="text-start" id="tipo2" value="2">Retencion</option>
                     </select>
                     <div id="tipo-impuesto-errors"></div>
                 </div>
@@ -42,10 +42,10 @@
                 <label class="label-form" for="impuesto-aplicado">Impuesto</label> <label
                     class="mark-required text-danger fw-bold">*</label>
                 <div class="form-group">
-                    <select class="select-control col-12 text-center input-form" id="impuesto-aplicado"
+                    <select class="form-select col-12 text-center input-form" id="impuesto-aplicado"
                         name="impuesto-aplicado" onchange="loadOpcionesTasa();">
                         <option value="" id="option-default-impuesto-aplicado">- - - -</option>
-                        <optgroup id="impuestos" class="contenedor-impuestos text-left"> </optgroup>
+                        <optgroup id="impuestos" class="contenedor-impuestos text-start"> </optgroup>
                     </select>
                     <div id="impuesto-aplicado-errors"></div>
                 </div>
@@ -54,11 +54,11 @@
                 <label class="label-form" for="tipo-factor">Factor</label> <label
                     class="mark-required text-danger fw-bold">*</label>
                 <div class="form-group">
-                    <select class="select-control col-12 text-center input-form" id="tipo-factor" name="tipo-factor"
+                    <select class="form-select col-12 text-center input-form" id="tipo-factor" name="tipo-factor"
                         onchange="loadOpcionesTasa();">
                         <option value="" id="option-default-tipo-factor">- - - -</option>
-                        <option class="text-left" id="factor1" value="1">Tasa</option>
-                        <option class="text-left" id="factor2" value="2">Cuota</option>
+                        <option class="text-start" id="factor1" value="1">Tasa</option>
+                        <option class="text-start" id="factor2" value="2">Cuota</option>
                     </select>
                     <div id="tipo-factor-errors"></div>
                 </div>
@@ -71,7 +71,7 @@
                 <div id="tasa-num">
                     <div class="form-group">
                         <input class="form-control text-center input-form" id="tasa-impuesto" name="tasa-impuesto"
-                            placeholder="Tasa del Impuesto" type="number" />
+                            placeholder="Tasa del impuesto" type="number" />
                         <div id="tasa-impuesto-rango" class="text-muted mt-2">
                         </div>
                         <div id="tasa-impuesto-errors" class="text-muted mt-2">
@@ -80,9 +80,9 @@
                 </div>
                 <div id="tasa-opt" hidden>
                     <div class="form-group">
-                        <select class="form-control text-center input-form" id="tasa-opcion" name="tasa-opcion">
+                        <select class="form-select text-center input-form" id="tasa-opcion" name="tasa-opcion">
                             <option value="" id="option-default-tasa-opcion">- - - -</option>
-                            <optgroup id="tasaopcion" class="contenedor-tasa text-left"> </optgroup>
+                            <optgroup id="tasaopcion" class="contenedor-tasa text-start"> </optgroup>
                         </select>
                         <div id="tasa-opcion-errors"></div>
                     </div>

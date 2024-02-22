@@ -46,7 +46,7 @@ function guardarImpuesto(idimpuesto = null) {
     var impuesto = $("#impuesto-aplicado").val();
     var factor = $("#tipo-factor").val();
     var tipotasa = $("#tipo").val();
-        var tasa = "";
+    var tasa = "";
     var id = "";
     if(tipotasa == 'fijo'){
         tasa = $("#tasa-opcion").val();
@@ -55,6 +55,9 @@ function guardarImpuesto(idimpuesto = null) {
         tasa = $("#tasa-impuesto").val();
         id = "tasa-impuesto";
     }
+
+    console.log('tipotasa: ' + tipotasa);
+    console.log('tasa: '+ tasa);
     var chuso = ($("#chuso").prop('checked')) ? "1" : "0";
     
     if (isnEmpty(nombre, "descripcion-impuesto") && isnEmpty(tipo, "tipo-impuesto") && isnEmpty(impuesto, "impuesto-aplicado") && isnEmpty(factor, "tipo-factor") && isnEmpty(tasa, id)) {
@@ -87,7 +90,7 @@ function guardarImpuesto(idimpuesto = null) {
                     alertify.error(res);
                 } else {
                     cargandoHide();
-                    var mensaje = (idimpuesto != null) ? 'Impuesto Actualizado.' : 'Impuesto Guardado.';
+                    var mensaje = (idimpuesto != null) ? 'Impuesto actualizado.' : 'Impuesto guardado.';
                     alertify.success(mensaje);
                     loadView('listaimpuesto');
                 }
@@ -118,13 +121,13 @@ function loadOpcionesTasa() {
 function setPorcentajes(datos){
     var array = datos.split("</tr>");
     var tipo = array[0];
-    if(tipo == '\r\nfijo'){
+    if(tipo == 'fijo'){
         $("#tipo").val(tipo);
         $("#tasa-num").attr('hidden',true);
         $("#tasa-opt").attr('hidden',false);
         $(".contenedor-tasa").html(array[1]);
         $("#tasa-impuesto-rango").text('');
-    }else if(tipo=='\r\nrango'){
+    }else if(tipo=='rango'){
         var min = array[1];
         var max = array[2];
         $("#tipo").val(tipo);
@@ -178,7 +181,7 @@ function editarImpuesto(idimpuesto) {
 }
 
 function setValoresEditarImpuesto(datos) {
-    changeText("#contenedor-titulo-form-impuesto", "Editar impuesto");
+    changeText("#contenedor-titulo-form-impuesto", "Editar Impuesto");
     changeText("#btn-form-impuesto", "Guardar cambios <span class='fas fa-save'></span></a>");
 
     var array = datos.split("</tr>");
@@ -254,7 +257,7 @@ function eliminarImpuesto(id){
                 if (bandera == '0') {
                     alertify.error(res);
                 } else {
-                    alertify.success("Registro Eliminado");
+                    alertify.success("Registro eliminado.");
                     loadView('listaimpuesto');
                 }
                 cargandoHide();

@@ -985,3 +985,17 @@ function opcionesMotivoCancelar() {
         }
     });
 }
+
+function loadOpcionesBanco() {
+    $.ajax({
+        data : {transaccion: 'getOptions'},
+        url  : '../CATSAT/CATSAT/com.sine.enlace/enlaceBanco.php',
+        type : 'POST',
+        dataType : 'JSON',
+        success  : function(res){
+            if(res.status > 0){
+                $('.contenedor-banco').html(res.datos);
+            }
+        }
+    });
+}

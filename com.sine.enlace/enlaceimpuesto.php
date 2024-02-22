@@ -24,7 +24,7 @@ if (isset($_POST['transaccion'])) {
         case 'actualizarimpuesto':
             $i = obtenerDatosImpuesto();
             $i->setIdimpuesto($_POST['idimpuesto']);
-            $insertado = $ci->checkImpuesto($cf);
+            $insertado = $ci->checkUpdImpuesto($i);
             echo $insertado ? "Impuesto actualizado." : "Error: No se actualizó el impuesto.";
             break;
         case 'eliminarimpuesto':

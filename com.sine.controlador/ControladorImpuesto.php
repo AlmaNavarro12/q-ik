@@ -2,8 +2,7 @@
 
 require_once '../com.sine.dao/Consultas.php';
 require_once '../com.sine.modelo/Session.php';
-require_once '../com.sine.common/pagination.php';
-Session::start();
+
 
 class ControladorImpuesto {
 
@@ -14,6 +13,8 @@ class ControladorImpuesto {
     }
 
     public function listaImpuesto($pag, $REF, $numreg) {
+        include '../com.sine.common/pagination.php';
+        Session::start();
         $idlogin = $_SESSION[sha1("idusuario")];
         $datos = "<thead class='sin-paddding'>
             <tr >
@@ -85,7 +86,7 @@ class ControladorImpuesto {
                         <ul class='dropdown-menu dropdown-menu-right'>";
                 
                 if ($div[1] == '1') {
-                    $datos .= "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' onclick='editarImpuesto($idimpuesto)'>Editar impuesto <span class='fas fa-edit'></span></a></li>";
+                    $datos .= "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' onclick='editarImpuesto($idimpuesto)'>Editar impuesto <span class='text-muted small fas fa-edit'></span></a></li>";
                 }
                 
                 if ($div[2] == '1') {
@@ -202,10 +203,11 @@ class ControladorImpuesto {
         return $datos;
     }
 
+
     private function guardarImpuesto($cf) {
-        $consulta = ($cf->getIdimpuesto() === null) ?
-            "INSERT INTO `impuesto` VALUES (NULL, :nombre, :tipo, :impuesto, :factor, :tipotasa, :tasa, :chuso);" :
-            "UPDATE `impuesto` SET nombre=:nombre, tipoimpuesto=:tipo, impuesto=:impuesto, factor=:factor, tipotasa=:tipotasa, porcentaje=:tasa, chuso=:chuso WHERE idimpuesto=:id;";
+        $consulta = ($cf->getIdimpuesto() != null) ?
+        "UPDATE `impuesto` SET nombre=:nombre, tipoimpuesto=:tipo, impuesto=:impuesto, factor=:factor, tipotasa=:tipotasa, porcentaje=:tasa, chuso=:chuso WHERE idimpuesto=:id;":
+        "INSERT INTO `impuesto` VALUES (NULL, :nombre, :tipo, :impuesto, :factor, :tipotasa, :tasa, :chuso);";
         
         $valores = array(
             "id" => $cf->getIdimpuesto(),
@@ -219,6 +221,15 @@ class ControladorImpuesto {
         );
     
         return $this->consultas->execute($consulta, $valores);
+    }
+
+    public function checkUpdImpuesto($cf) {
+        $datos = false;
+        $check = $this->checkImpuestoAux($cf);
+        if (!$check) {
+            $datos = $this->guardarImpuesto($cf);
+        }
+        return $datos;
     }
 
     public function getPorcentajes($tipo, $impuesto, $factor) {

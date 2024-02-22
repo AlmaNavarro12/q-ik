@@ -157,8 +157,8 @@ class ControladorPago{
             $finales += $inicios - 1;
             $function = "buscarPago";
 
-            $datos .= "</tbody><tfoot><tr><th colspan='5' class='align-top'>Mostrando $inicios al $finales de $numrows registros</th>";
-            $datos .= "<th colspan='3'>" . paginate($page, $total_pages, $adjacents, $function) . "</th></tr></tfoot>";
+            $datos .= "</tbody><tfoot><tr><th colspan='4' class='align-top'>Mostrando $inicios al $finales de $numrows registros</th>";
+            $datos .= "<th colspan='4'>" . paginate($page, $total_pages, $adjacents, $function) . "</th></tr></tfoot>";
 
             if ($finales == 0) {
                 $datos .= "<tr><td colspan='10' class='fs-6'>No se encontraron registros.</td></tr>";
