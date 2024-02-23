@@ -999,3 +999,21 @@ function loadOpcionesBanco() {
         }
     });
 }
+
+function loadOpcionesProveedor(idprov = "") {
+    $.ajax({
+        url: 'com.sine.enlace/enlaceopcion.php',
+        type: 'POST',
+        data: {transaccion: 'opcionesproveedor', idprov:idprov},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 5000);
+            if (bandera == 0) {
+                alertify.error(res);
+            } else {
+                $(".contenedor-proveedores").html(datos);
+            }
+        }
+    });
+}

@@ -104,7 +104,6 @@ class ControladorOpcion {
         return $r;
     }
     
-
     private function getClienteID($idcliente) {
         $consultado = false;
         $consulta = "select * from cliente where id_cliente=:cid;";
@@ -150,7 +149,7 @@ class ControladorOpcion {
     
         return $r;
     }
-    
+
     private function getDatosFacturacionbyID($id) {
         $consultado = false;
         $consulta = "select * from datos_facturacion where id_datos=:id";
@@ -195,5 +194,25 @@ class ControladorOpcion {
             $op .= "<option id='motivo" . $clv . "' value='" . $clv . "'>" . $clv . " " . $descripcion . "</option>";
         }
         return $op;
+    }
+
+    private function getProveedor() {
+        $consultado = false;
+        $consulta = "select * from proveedor order by empresa";
+        $consultado = $this->consultas->getResults($consulta, null);
+        return $consultado;
+    }
+
+    public function opcionesProveedor($idprov = "") {
+        $proveedor = $this->getProveedor();
+        $r = "";
+        foreach ($proveedor as $proveedoractual) {
+            $selected = "";
+            if($idprov == $proveedoractual['idproveedor']){
+                $selected = "selected";
+            }
+            $r = $r . "<option $selected value='" . $proveedoractual['idproveedor'] . "' id='proveedor" . $proveedoractual['idproveedor'] . "'>" . $proveedoractual['empresa'] . "</option>";
+        }
+        return $r;
     }
 }

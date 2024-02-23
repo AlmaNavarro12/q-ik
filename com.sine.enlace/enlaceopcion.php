@@ -36,11 +36,11 @@ if (isset($_POST['transaccion'])) {
             break;
         case 'opcionescomprobante':
             $datos = $co->opcionesComprobante($_POST['id']);
-            break;
+            break;*/
         case 'opcionesproveedor':
             $datos = $co->opcionesProveedor($_POST['idprov']);
             break;
-        case 'opcionesregimen':
+        /*case 'opcionesregimen':
             $datos = $co->opcionesRegimen($_POST['idregimen']);
             break;
         case 'opcionesperiodicidad':
