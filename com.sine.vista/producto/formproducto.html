@@ -11,7 +11,7 @@
     </div>
     <div class="row">
         <div class="col-md-6 py-2">
-            <label class="label-form text-right" for="codigo-producto">C&oacute;digo producto</label> <label
+            <label class="label-form" for="codigo-producto">C&oacute;digo producto</label> <label
                 class="mark-required text-danger fw-bold">*</label>
             <div class="form-group">
                 <input class="form-control text-center input-form" id="codigo-producto" name="codigo-producto"
@@ -22,7 +22,7 @@
         </div>
 
         <div class="col-md-6 py-2">
-            <label class="label-form text-right" for="producto">Nombre</label> <label
+            <label class="label-form" for="producto">Nombre</label> <label
                 class="mark-required text-danger fw-bold">*</label>
             <div class="form-group">
                 <input class="form-control text-center input-form" id="producto" name="producto" placeholder="Producto"
@@ -35,7 +35,7 @@
 
     <div class="row">
         <div class="col-md-6 py-2">
-            <label class="label-form text-right" for="descripcion">Descripci&oacute;n</label><label
+            <label class="label-form" for="descripcion">Descripci&oacute;n</label><label
                 class="mark-required text-danger fw-bold">&nbsp;</label>
             <div class="form-group">
                 <input class="form-control text-center input-form" id="descripcion" name="descripcion"
@@ -46,7 +46,7 @@
         </div>
 
         <div class="col-md-6 py-2">
-            <label class="label-form text-right" for="clave-fiscal">Clave fiscal</label> <label
+            <label class="label-form" for="clave-fiscal">Clave fiscal</label> <label
                 class="mark-required text-danger fw-bold">*</label>
             <div class="form-group">
                 <input class="form-control text-center input-form" id="clave-fiscal" name="clave-fiscal"
@@ -60,8 +60,7 @@
 
     <div class="row">
         <div class="col-md-6 py-2">
-            <label class="label-form text-right" for="tipo">Tipo</label> <label
-                class="mark-required text-danger fw-bold">*</label>
+            <label class="label-form" for="tipo">Tipo</label> <label class="mark-required text-danger fw-bold">*</label>
             <div class="form-group">
                 <select class="form-select text-center input-form" id="tipo" name="tipo" onchange="addinventario()">
                     <option value="" id="option-default-tipo">- - - -</option>
@@ -74,7 +73,7 @@
         </div>
 
         <div class="col-md-6 py-2">
-            <label class="label-form text-right" for="clave-unidad">Clave Unidad</label> <label
+            <label class="label-form" for="clave-unidad">Clave Unidad</label> <label
                 class="mark-required text-danger fw-bold">*</label>
             <div class="form-group">
                 <input class="form-control text-center input-form" id="clave-unidad" name="clave-unidad"
@@ -85,37 +84,38 @@
             </div>
         </div>
     </div>
-
     <div class="row">
-        <div id="inventario" class="col-6 py-2">
-            <div class="row">
-                <div class="col-md-6 col-sm-12 py-2">
-                    <div class="form-group d-flex aling-items-center">
-                        <input class="input-check" checked="" id="chinventario" name="chinventario" type="checkbox"
-                            onchange="addinventario()" />
-                        <label class="label-form ms-2" for="chinventario">¿Activar inventario?</label>
-                        <div id="chinventario-errors">
+        <div class="col-md-6">
+            <div id="inventario" class="col-12 py-2" style="display: none;">
+                <div class="row">
+                    <div class="col-md-6 col-sm-12 py-2">
+                        <div class="form-group d-flex aling-items-center">
+                            <input class="input-check" checked="" id="chinventario" name="chinventario" type="checkbox"
+                                onchange="addinventario()" />
+                            <label class="label-form ms-2" for="chinventario">¿Activar inventario?</label>
+                            <div id="chinventario-errors">
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="col-md-6">
-                    <label class="label-form text-right" for="cantidad">Cantidad</label>
-                    <label class="mark-required text-danger fw-bold"></label>
-                    <div class="form-group">
-                        <input class="form-control text-center input-form col-12" id="cantidad" disabled name="producto"
-                            placeholder="Producto" type="number" value="0" />
-                        <div id="cantidad-errors">
+                    <div class="col-md-6">
+                        <label class="label-form" for="cantidad">Cantidad</label>
+                        <label class="mark-required text-danger fw-bold"></label>
+                        <div class="form-group">
+                            <input class="form-control text-center input-form col-12" id="cantidad" disabled
+                                name="producto" placeholder="Producto" type="number" value="0" />
+                            <div id="cantidad-errors">
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
         <div class="col-md-6 py-2">
-            <label class="label-form  text-right" for="pcompra">Precio de compra</label>
+            <label class="label-form " for="pcompra">Precio de compra</label>
             <label class="mark-required text-danger fw-bold"></label>
             <div class="form-group">
-                <input class="form-control text-center input-form" id="pcompra" name="pcompra"
-                    placeholder="Precio de Compra" type="text" oninput="calcularGanancia()" value="0" />
+                <input class="form-control text-center input-form" id="pcompra" name="pcompra" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1'); calcularGanancia();"
+                    placeholder="Precio de Compra" type="text" value="0" />
                 <div id="pcompra-errors">
                 </div>
             </div>
@@ -123,17 +123,17 @@
     </div>
     <div class="row">
         <div class="col-md-6 py-2">
-            <label class="label-form text-right" for="porganancia">Porcentaje ganancia</label>
+            <label class="label-form" for="porganancia">Porcentaje ganancia</label>
             <label class="mark-required text-danger fw-bold"></label>
             <div class="form-group">
                 <input class="form-control text-center input-form" id="porganancia" name="porganancia"
-                    placeholder="Porcentaje de ganancia" value="0" type="text" oninput="calcularGanancia()" />
+                    placeholder="Porcentaje de ganancia" value="0" type="text" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1'); calcularGanancia();" />
                 <div id="porganancia-errors">
                 </div>
             </div>
         </div>
         <div class="col-md-6 py-2">
-            <label class="label-form text-right" for="ganancia">Importe ganancia</label>
+            <label class="label-form" for="ganancia">Importe ganancia</label>
             <label class="mark-required text-danger fw-bold"></label>
             <input class="form-control text-center input-form" id="ganancia" name="ganancia"
                 placeholder="Importe ganancia" type="text" disabled value='0' />
@@ -141,68 +141,70 @@
             </div>
         </div>
     </div>
-<div class="row">
-    <div style="padding: 0 15px 0 15px;">
-        <label class="label-form">Impuestos aplicables</label>
-        <div id="imp-apli"></div>
-    </div>
-    <div class="col-md-2">
-        <label class="label-form text-right" for="pventa">Costo</label> <label
-            class="mark-required text-danger fw-bold">*</label>
-        <div class="form-group">
-            <input class="form-control text-center input-form" id="pventa" name="pventa" placeholder="Precio de Venta"
-                type="text" value="0" onkeyup="calcularImpuestosTotal()" />
-            <div id="pventa-errors">
+    <div class="col-md-12">
+        <div>
+            <label class="label-form">Impuestos aplicables</label>
+            <div id="imp-apli" class="row"></div>
+        </div>
+        <div class="row mt-2">
+            <div class="col-md-2">
+                <label class="label-form text-right" for="pventa">Costo</label> <label
+                    class="mark-required text-danger fw-bold">*</label>
+                <div class="form-group">
+                    <input class="form-control text-center input-form" id="pventa" name="pventa" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"
+                        placeholder="Precio de Venta" type="text" value="0" onkeyup="calcularImpuestosTotal()" />
+                    <div id="pventa-errors">
+                    </div>
+                </div>
+            </div>
+            <div id="input-imp-apli" class="row col-auto">
+            </div>
+            <div class="col-md-2">
+                <label class="label-form text-right" for="ptotiva">Precio público</label>
+                <label class="mark-required text-danger fw-bold"></label>
+                <div class="form-group">
+                    <input class="form-control text-center input-form" id="ptotiva" name="ptotiva" value="0" type="text" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"
+                        onkeyup="calcularImpuestosTotalReverse()" />
+                </div>
             </div>
         </div>
     </div>
-    <div id="input-imp-apli">
-    </div>
-    <div class="col-md-2">
-        <label class="label-form text-right" for="ptotiva">Precio Público</label>
-        <div class="form-group">
-            <input class="form-control text-center input-form" id="ptotiva" name="ptotiva" value="0" type="text"
-                onkeyup="calcularImpuestosTotalReverse()" />
-        </div>
-    </div>
-</div>
-<div class="row">
-    <div class="col-md-6 py-2">
-        <label class="label-form text-right" for="id-proveedor">Proveedor</label>
-        <div class="form-group">
-            <select class="form-control text-center input-form" id="id-proveedor" name="id-proveedor">
-                <option value="" id="option-default-proveedor">- - - -</option>
-                <optgroup class="contenedor-proveedores text-left"> </optgroup>
-            </select>
-            <div id="id-proveedor-errors">
+    <div class="row">
+        <div class="col-md-6 py-2">
+            <label class="label-form" for="id-proveedor">Proveedor</label><label
+                class="mark-required text-danger fw-bold">&nbsp;</label>
+            <div class="form-group">
+                <select class="form-control text-center input-form" id="id-proveedor" name="id-proveedor">
+                    <option value="" id="option-default-proveedor">- - - -</option>
+                    <optgroup class="contenedor-proveedores text-left"> </optgroup>
+                </select>
+                <div id="id-proveedor-errors">
+                </div>
             </div>
         </div>
-    </div>
-
-    <div class="col-md-3">
-        <label class="label-space text-right"></label>
-        <div class="form-group">
-            <label class="button-file text-right" for="imagen"><span class="glyphicon glyphicon-picture"></span>
-                Imagen del Producto</label>
-            <input class="form-control text-center upload" id="imagen" name="imagen" type="file"
-                onchange="cargarImgProducto();" />
-            <input id="filename" name="filename" type="hidden" />
-            <div id="imagen-errors">
+        <div class="col-md-3">
+            <label class="label-space"></label>
+            <div class="form-group">
+                <label class="button-file mt-2" for="imagen"><span class="fas fa-image"></span>
+                    Imagen del producto</label>
+                <input class="form-control text-center upload" hidden id="imagen" name="imagen" type="file"
+                    accept=".png, .jpg, .jgep" onchange="cargarImgProducto();" />
+                <input id="filename" name="filename" type="hidden" />
+                <div id="imagen-errors">
+                </div>
             </div>
         </div>
+        <div class="text-center col-md-3" id="muestraimagen">
+        </div>
     </div>
-    <div class="text-left col-md-3" id="muestraimagen">
+    <div class="row mt-3">
+        <div class="col-md-12 text-end">
+            <button class="button-form btn btn-danger" onclick="eliminarImgTpm(); loadView('listaproductoaltas');">Cancelar <span
+                    class="fas fa-times"></span></button> &nbsp;
+            <button class="button-form btn btn-primary" onclick="gestionarProducto()"
+                id="btn-form-producto-guardar">Guardar
+                <span class="fas fa-save"></span></button>
+        </div>
     </div>
-</div>
-
-<br>
-<div class="row">
-    <div class="col-md-12 text-right">
-        <button class="button-form btn btn-danger" onclick="loadView('listaproductoaltas');">Cancelar <span
-                class="glyphicon glyphicon-remove"></span></button> &nbsp;
-        <button class="button-form btn btn-primary" onclick="insertarProducto()" id="btn-form-producto-guardar">Guardar
-            <span class="glyphicon glyphicon-floppy-disk"></span></button>
-    </div>
-</div>
 </div>
 <script type="text/javascript" src="js/scriptproducto.js"></script>

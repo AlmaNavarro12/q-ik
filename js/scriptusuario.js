@@ -215,9 +215,10 @@ function checkContrasena() {
 function cargarImgUsuario() {
     var formData = new FormData();
     var imgInput = $("#imagenperfil")[0].files[0]; 
+    var rutaUsuarios = "temporal/usuarios/";
     if (imgInput) {
         formData.append("imagenperfil", imgInput);
-
+        formData.append("ruta_personalizada", rutaUsuarios);
         $.ajax({
             url: 'com.sine.enlace/cargarimg.php',
             type: "POST",
@@ -322,22 +323,22 @@ function setValoresAsignarPermisos(datos) {
     var array = datos.split("</tr>");
     var permisos = [
         "idusuario", "nombre",
-        "facturas", "crearfactura", "editarfactura", "eliminarfactura", "listafactura",
-        "pago", "crearpago", "editarpago", "eliminarpago", "listapago",
-        "nomina", "listaempleado", "crearempleado", "editarempleado", "eliminarempleado", "listanomina", "crearnomina", "editarnomina", "eliminarnomina",
-        "cartaporte", "listaubicacion", "crearubicacion", "editarubicacion", "eliminarubicacion", "listatransporte", "creartransporte", "editartransporte", "eliminartransporte", "listaremolque", "crearremolque", "editarremolque", "eliminarremolque", "listaoperador", "crearoperador", "editaroperador", "eliminaroperador", "listacarta", "crearcarta", "editarcarta", "eliminarcarta",
-        "cotizacion", "crearcotizacion", "editarcotizacion", "eliminarcotizacion", "listacotizacion",
-        "anticipo", "cliente", "crearcliente", "editarcliente", "eliminarcliente", "listacliente",
+        "facturas", "crearfactura", "editarfactura", "eliminarfactura", "listafactura", "timbrarfactura", //Timbrar
+        "pago", "crearpago", "editarpago", "eliminarpago", "listapago", "timbrarpago", //Timbrar
+        "nomina", "listaempleado", "crearempleado", "editarempleado", "eliminarempleado", "listanomina", "crearnomina", "editarnomina", "eliminarnomina", "timbrarnomina", //Timbrar
+        "cartaporte", "listaubicacion", "crearubicacion", "editarubicacion", "eliminarubicacion", "listatransporte", "creartransporte", "editartransporte", "eliminartransporte", "listaremolque", "crearremolque", "editarremolque", "eliminarremolque", "listaoperador", "crearoperador", "editaroperador", "eliminaroperador", "listacarta", "crearcarta", "editarcarta", "eliminarcarta", "timbrarcarta", //Timbrar
+        "cotizacion", "crearcotizacion", "editarcotizacion", "eliminarcotizacion", "listacotizacion","anticipo", 
+        "cliente", "crearcliente", "editarcliente", "eliminarcliente", "listacliente",
         "comunicado", "crearcomunicado", "editarcomunicado", "eliminarcomunicado", "listacomunicado",
         "producto", "crearproducto", "editarproducto", "eliminarproducto", "listaproducto",
         "proveedor", "crearproveedor", "editarproveedor", "eliminarproveedor", "listaproveedor",
         "impuesto", "crearimpuesto", "editarimpuesto", "eliminarimpuesto", "listaimpuesto",
-        "datosfacturacion", "creardatos", "editardatos", "listadatos",
+        "datosfacturacion", "creardatos", "editardatos", "listadatos", "eliminardatos", "descargardatos", //Eliminar, descargar archivos
         "contrato", "crearcontrato", "editarcontrato", "eliminarcontrato", "listacontrato",
         "usuarios", "crearusuario", "listausuario", "eliminarusuario", "asignarpermiso",
         "reporte", "reportefactura", "reportepago", "reportegrafica", "reporteiva", "datosiva", "reporteventas",
-        "configuracion", "addfolio", "listafolio", "editarfolio", "eliminarfolio", "addcomision", "encabezados", "confcorreo",
-        "importar", "ventas", "crearventa", "cancelarventa", "exportarventa", "accion", "idlogin"
+        "configuracion", "addfolio", "listafolio", "editarfolio", "eliminarfolio", "addcomision", "encabezados", "confcorreo", "importar", 
+        "ventas", "crearventa", "cancelarventa", "exportarventa", "accion", "idlogin"
     ];
 
     var permisosMapa = {};
@@ -374,9 +375,9 @@ function actualizarPermisos(idusuario) {
     var accion = $("#accion").val();
 
     var categorias = {
-        facturas: ["crearfactura", "editarfactura", "eliminarfactura", "listafactura"],
-        pago: ["crearpago", "editarpago", "eliminarpago", "listapago"],
-        nomina: ["listaempleado", "crearempleado", "editarempleado", "eliminarempleado", "listanomina", "crearnomina", "editarnomina", "eliminarnomina"],
+        facturas: ["crearfactura", "editarfactura", "eliminarfactura", "listafactura", "timbrarfactura"],
+        pago: ["crearpago", "editarpago", "eliminarpago", "listapago", "timbrarpago"],
+        nomina: ["listaempleado", "crearempleado", "editarempleado", "eliminarempleado", "listanomina", "crearnomina", "editarnomina", "eliminarnomina", "timbrarnomina"],
         configuracion: ["addfolio", "listafolio", "editarfolio", "eliminarfolio", "addcomision", "encabezados", "confcorreo", "importar"],
         usuarios: ["crearusuario", "listausuario", "eliminarusuario", "asignarpermiso"],
         cliente: ["crearcliente", "editarcliente", "eliminarcliente", "listacliente"],
@@ -384,11 +385,11 @@ function actualizarPermisos(idusuario) {
         producto: ["crearproducto", "editarproducto", "eliminarproducto", "listaproducto"],
         proveedor: ["crearproveedor", "editarproveedor", "eliminarproveedor", "listaproveedor"],
         impuesto: ["crearimpuesto", "editarimpuesto", "eliminarimpuesto", "listaimpuesto"],
-        datosfacturacion: ["creardatos", "editardatos", "listadatos"],
+        datosfacturacion: ["creardatos", "editardatos", "listadatos", "eliminardatos", "descargardatos"],
         contrato: ["crearcontrato", "editarcontrato", "eliminarcontrato", "listacontrato"],
         cotizacion: ["crearcotizacion", "editarcotizacion", "eliminarcotizacion", "listacotizacion", "anticipo"],
         reporte: ["reportefactura", "reportepago", "reportegrafica", "reporteiva", "datosiva", "reporteventas"],
-        cartaporte: ["listaubicacion", "crearubicacion", "editarubicacion", "eliminarubicacion", "listatransporte", "creartransporte", "editartransporte", "eliminartransporte", "listaremolque", "crearremolque", "editarremolque", "eliminarremolque", "listaoperador", "crearoperador", "editaroperador", "eliminaroperador", "listacarta", "crearcarta", "editarcarta", "eliminarcarta"],
+        cartaporte: ["listaubicacion", "crearubicacion", "editarubicacion", "eliminarubicacion", "listatransporte", "creartransporte", "editartransporte", "eliminartransporte", "listaremolque", "crearremolque", "editarremolque", "eliminarremolque", "listaoperador", "crearoperador", "editaroperador", "eliminaroperador", "listacarta", "crearcarta", "editarcarta", "eliminarcarta", "timbrarcarta"],
         ventas: ["crearventa", "cancelarventa", "exportarventa"],
     };
 
@@ -447,3 +448,4 @@ function resposiveButton() {
         $("#bdos > div").removeClass('col-12 mb-3').addClass('col-md-6 mb-3');
     }
 }
+

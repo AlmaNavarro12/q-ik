@@ -109,6 +109,12 @@ class Permiso {
     private $crearventa;
     private $cancelarventa;
     private $exportarventa;
+    private $timbrarfactura;
+    private $timbrarpago;
+    private $timbrarnomina;
+    private $timbrarcarta;
+    private $eliminardatos;
+    private $descargardatos;
 
     function __construct() {
         
@@ -168,6 +174,30 @@ class Permiso {
 
     function getCrearempleado() {
         return $this->crearempleado;
+    }
+
+    function getTimbrarFactura() {
+        return $this->timbrarfactura;
+    }
+
+    function getTimbrarPago() {
+        return $this->timbrarpago;
+    }
+
+    function getTimbrarNomina() {
+        return $this->timbrarnomina;
+    }
+
+    function getTimbrarCarta() {
+        return $this->timbrarcarta;
+    }
+
+    function getEliminarDatos() {
+        return $this->eliminardatos;
+    }
+
+    function getDescargarDatos() {
+        return $this->descargardatos;
     }
 
     function getEditarempleado() {
@@ -546,8 +576,32 @@ class Permiso {
         $this->pago = $pago;
     }
 
-    function setCrearpago($crearpago) {
+    function setCrearPago($crearpago) {
         $this->crearpago = $crearpago;
+    }
+
+    function setTimbrarFactura($timbrarfactura) {
+        $this->timbrarfactura = $timbrarfactura;
+    }
+
+    function setTimbrarNomina($timbrarnomina) {
+        $this->timbrarnomina = $timbrarnomina;
+    }
+    
+    function setTimbrarPago($timbrarpago) {
+        $this->timbrarpago = $timbrarpago;
+    }
+    
+    function setTimbrarCarta($timbrarcarta) {
+        $this->timbrarcarta = $timbrarcarta;
+    }
+    
+    function setEliminarDatos($eliminardatos) {
+        $this->eliminardatos = $eliminardatos;
+    }
+
+    function setDescargarDatos($descargardatos) {
+        $this->descargardatos = $descargardatos;
     }
 
     function setEditarpago($editarpago) {

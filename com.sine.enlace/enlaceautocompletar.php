@@ -29,7 +29,7 @@ if (isset($_GET['transaccion'])) {
             break;
         /*case 'catunidad':
             echo json_encode($cp->getCoincidenciasCatalogoUnidad($_GET['term']));
-            break;
+            break; 
         case 'foliocotizaion':
             echo json_encode($cp->getCoincidenciasFolioCotizacion($_GET['term']));
             break;

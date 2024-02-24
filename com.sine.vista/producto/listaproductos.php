@@ -1,4 +1,7 @@
-<div><div class="titulo-lista">Productos </div> </div>
+<?php
+include("modals.php");
+?>
+<div><div class="titulo-lista">Productos</div></div>
 <div class="form-horizontal ps-3">
     <div class="row col-12 p-0">
         <div class="col-sm-6 py-1">

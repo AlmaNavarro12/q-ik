@@ -1334,3 +1334,9 @@ table.table-row tr td {
 .small-tooltip.tip .tiptext {
     color: #4183d7;
 }
+
+a.state-link{
+    color: #444444;
+    text-decoration: none;
+    cursor: pointer;
+}

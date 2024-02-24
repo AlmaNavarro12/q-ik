@@ -7,22 +7,22 @@ class ControladorUsuario
     private $consultas;
 
     private $permisos = [
-        "facturas", "crearfactura", "editarfactura", "eliminarfactura", "listafactura",
-        "pago", "crearpago", "editarpago", "eliminarpago", "listapago",
-        "nomina", "listaempleado", "crearempleado", "editarempleado", "eliminarempleado", "listanomina", "crearnomina", "editarnomina", "eliminarnomina",
-        "cartaporte", "listaubicacion", "crearubicacion", "editarubicacion", "eliminarubicacion", "listatransporte", "creartransporte", "editartransporte", "eliminartransporte", "listaremolque", "crearremolque", "editarremolque", "eliminarremolque", "listaoperador", "crearoperador", "editaroperador", "eliminaroperador", "listacarta", "crearcarta", "editarcarta", "eliminarcarta",
-        "cotizacion", "crearcotizacion", "editarcotizacion", "eliminarcotizacion", "listacotizacion",
-        "anticipo", "cliente", "crearcliente", "editarcliente", "eliminarcliente", "listacliente",
-        "comunicado", "crearcomunicado", "editarcomunicado", "eliminarcomunicado", "listacomunicado",
+        "facturas", "crearfactura", "editarfactura", "eliminarfactura", "listafactura", "timbrarfactura", //Timbrar
+        "pago", "crearpago", "editarpago", "eliminarpago", "listapago", "timbrarpago", //Timbrar
+        "nomina", "listaempleado", "crearempleado", "editarempleado", "eliminarempleado", "listanomina", "crearnomina", "editarnomina", "eliminarnomina", "timbrarnomina", //Timbrar
+        "cartaporte", "listaubicacion", "crearubicacion", "editarubicacion", "eliminarubicacion", "listatransporte", "creartransporte", "editartransporte", "eliminartransporte", "listaremolque", "crearremolque", "editarremolque", "eliminarremolque", "listaoperador", "crearoperador", "editaroperador", "eliminaroperador", "listacarta", "crearcarta", "editarcarta", "eliminarcarta", "timbrarcarta", //Timbrar
+        "cotizacion", "crearcotizacion", "editarcotizacion", "eliminarcotizacion", "listacotizacion","anticipo", 
+        "cliente", "crearcliente", "editarcliente", "eliminarcliente", "listacliente",
+        "comunicado", "crearcomunicado", "editarcomunicado", "eliminarcomunicado", "listacomunicado", "exportarventa",
         "producto", "crearproducto", "editarproducto", "eliminarproducto", "listaproducto",
         "proveedor", "crearproveedor", "editarproveedor", "eliminarproveedor", "listaproveedor",
         "impuesto", "crearimpuesto", "editarimpuesto", "eliminarimpuesto", "listaimpuesto",
-        "datosfacturacion", "creardatos", "editardatos", "listadatos",
+        "datosfacturacion", "creardatos", "editardatos", "listadatos", "eliminardatos", "descargardatos", //Eliminar, descargar archivos
         "contrato", "crearcontrato", "editarcontrato", "eliminarcontrato", "listacontrato",
         "usuario", "crearusuario", "listausuario", "eliminarusuario", "asignarpermiso",
         "reporte", "reportefactura", "reportepago", "reportegrafica", "reporteiva", "datosiva", "reporteventa",
-        "configuracion", "addfolio", "listafolio", "editarfolio", "eliminarfolio", "addcomision", "encabezados", "confcorreo", "importar",
-        "ventas", "crearventa", "cancelarventa", "exportarventa"
+        "configuracion", "addfolio", "listafolio", "editarfolio", "eliminarfolio", "addcomision", "encabezados", "confcorreo", "importar", 
+        "ventas", "crearventa", "cancelarventa"
     ];
 
     function __construct()
@@ -233,7 +233,7 @@ class ControladorUsuario
             if ($u->getIdUsuario() == 0) {
                 $img = ($img == '') ? $this->crearImg($u->getNombre()) : $img;
                 if ($img != '') {
-                    rename('../temporal/tmp/' . $img, '../img/usuarios/' . $img);
+                    rename('../temporal/usuarios/' . $img, '../img/usuarios/' . $img);
                 }
             } else {
                 if ($img == '') {
@@ -241,7 +241,7 @@ class ControladorUsuario
                 } else if ($img != $u->getNameImg()) {
                     $nuevaRuta = '../img/usuarios/' . $img;
                     $viejaRuta = '../img/usuarios/' . $u->getNameImg();
-                    rename('../temporal/tmp/' . $img, $nuevaRuta);
+                    rename('../temporal/usuarios/' . $img, $nuevaRuta);
 
                     if (file_exists($viejaRuta)) {
                         unlink($viejaRuta);
@@ -555,7 +555,6 @@ class ControladorUsuario
     private function actualizarPermisos($u)
     {
         $actualizado = false;
-
         $mapeoGet = array(
             "editarcotizacion" => "getEditarcot",
             "eliminarcotizacion" => "getEliminarcot",
@@ -612,7 +611,7 @@ class ControladorUsuario
             $idusuario = $usuarioactual['idusuario'];
             $nombreusuario = $usuarioactual['nombre'] . ' ' . $usuarioactual['apellido_paterno'] . ' ' . $usuarioactual['apellido_materno'];
 
-            $datos = "$idusuario</tr>$nombreusuario</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>1</tr>$usuariologin";
+            $datos = "$idusuario</tr>$nombreusuario</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>1</tr>$usuariologin";
             break;
         }
         return $datos;
@@ -640,5 +639,15 @@ class ControladorUsuario
         }
 
         return $datos;
+    }
+
+    public function eliminarImgTmp($imgtmp){
+        $viejaruta = '../temporal/usuarios/' . $imgtmp;
+        if ($imgtmp != '') {
+            if (file_exists($viejaruta)) {
+                unlink($viejaruta);
+            }
+        }
+        return true;
     }
 }

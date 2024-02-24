@@ -17,7 +17,7 @@ function crearNombre($extension)
     return $fecha . $ranstr . '_' . $idusuario . $sessionid . '.' . $extension;
 }
 
-if (isset($_FILES["imagenusuario"]) || isset($_FILES["imagenperfil"])) {
+if ((isset($_FILES["imagenusuario"]) || isset($_FILES["imagenperfil"])) && isset($_POST["ruta_personalizada"]) ) {
     $imgtmp = $_FILES["imagenusuario"] ?? $_FILES["imagenperfil"];
     $file = $imgtmp;
     $tipo = $file["type"];
@@ -25,8 +25,11 @@ if (isset($_FILES["imagenusuario"]) || isset($_FILES["imagenperfil"])) {
     $size = $file["size"];
     $prevfile = isset($_POST['fileuser']) ? $_POST['fileuser'] : (isset($_POST['filename']) ? $_POST['filename'] : '');
 
-    if ($prevfile && file_exists($carpeta . $prevfile)) {
-        unlink($carpeta . $prevfile);
+    $rutaPersonalizada = $_POST["ruta_personalizada"];
+    $rutaFile = '../' . $rutaPersonalizada;
+
+    if ($prevfile && file_exists($rutaFile . $prevfile)) {
+        unlink($rutaFile . $prevfile);
     }
 
     $dimensiones = getimagesize($ruta_provisional);
@@ -76,23 +79,28 @@ if (isset($_FILES["imagenusuario"]) || isset($_FILES["imagenperfil"])) {
         imagecopyresampled($dst_img, $src_img, 0, 0, $w_point, 0, $max_width, $max_height, $width_new, $height);
     }
 
-    $image($dst_img, $carpeta . $nombre);
+    $image($dst_img, $rutaFile . $nombre);
     //$insertar = $ci->insertarImg($nombre, $tmpnombre, $extension , $sessionid); 
     if ($dst_img) imagedestroy($dst_img);
     if ($src_img) imagedestroy($src_img);
 
-    $type = pathinfo($carpeta . $nombre, PATHINFO_EXTENSION);
-    $data = file_get_contents($carpeta . $nombre);
+    
+    $vista = $rutaPersonalizada . $nombre;
+    $type = pathinfo("../" . $vista, PATHINFO_EXTENSION);
+    $data = file_get_contents("../" . $vista);
     $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
     echo "<img src='$base64' width='200' class='rounded-circle border border-secondary shadow-sm' id='img'><corte>$nombre";
 } 
 
-else if (isset($_FILES["imagen"])) {
+else if (isset($_FILES["imagen"]) && isset($_POST["ruta_personalizada"])) {
     $file = $_FILES["imagen"];
     $nombre = crearNombre(pathinfo($file["name"], PATHINFO_EXTENSION));
     $tipo = $file["type"];
     $ruta_provisional = $file["tmp_name"];
     $size = $file["size"];
+    
+    $rutaPersonalizada = $_POST["ruta_personalizada"];
+    $rutaFile = '../' . $rutaPersonalizada;
 
     $dimensiones = getimagesize($ruta_provisional);
     $width = $dimensiones[0];
@@ -101,7 +109,7 @@ else if (isset($_FILES["imagen"])) {
     if (($size > 900 * 900) || ($width > 2000 || $height > 2000)) {
         $newwidth = $width * 0.5;
         $newheight = $height * 0.5;
-        procesarImagen($ruta_provisional, $carpeta, $nombre, $newheight, $newheight, 0);
+        procesarImagen($ruta_provisional, $rutaFile, $nombre, $newheight, $newheight, 0);
     } else if ($width < 60 || $height < 60) {
         echo "Error: La anchura y la altura mínima permitida es 60px.<corte>";
     } else if ($tipo == 'image/png') {
@@ -112,16 +120,16 @@ else if (isset($_FILES["imagen"])) {
         $white = imagecolorallocate($imagen_p, 255, 255, 255);
         imagefilledrectangle($imagen_p, 0, 0, $width, $height, $white);
         imagecopyresampled($imagen_p, $imagen, 0, 0, 0, 0, $newwidth, $newheight, $width, $height);
-        $img = imagepng($imagen_p, $carpeta . $nombre);
+        $img = imagepng($imagen_p, $rutaFile . $nombre);
         imageDestroy($imagen_p);
     } else {
         $rawBaseName = pathinfo($nombre, PATHINFO_FILENAME);
         $extension = pathinfo($nombre, PATHINFO_EXTENSION);
-        $src = $carpeta . $nombre;
+        $src = $rutaFile . $nombre;
         move_uploaded_file($ruta_provisional, $src);
     }
 
-    $vista = "temporal/tmp/" . $nombre;
+    $vista = $rutaPersonalizada . $nombre;
     $type = pathinfo("../" . $vista, PATHINFO_EXTENSION);
     $data = file_get_contents("../" . $vista);
     $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
@@ -140,7 +148,7 @@ else if (isset($_FILES["imagen"])) {
     }
 }
 
-function procesarImagen($ruta_provisional, $carpeta, $nombre, $max_width, $max_height, $quality)
+function procesarImagen($ruta_provisional, $rutaFile, $nombre, $max_width, $max_height, $quality)
 {
     $dimensiones = getimagesize($ruta_provisional);
     $width = $dimensiones[0];
@@ -172,13 +180,13 @@ function procesarImagen($ruta_provisional, $carpeta, $nombre, $max_width, $max_h
 
     switch ($tipo) {
         case 'image/jpeg':
-            $image_save_func($imagen_p, $carpeta . $nombre, $quality);
+            $image_save_func($imagen_p, $rutaFile . $nombre, $quality);
             break;
         case 'image/png':
-            $image_save_func($imagen_p, $carpeta . $nombre, $quality);
+            $image_save_func($imagen_p, $rutaFile . $nombre, $quality);
             break;
         case 'image/gif':
-            $image_save_func($imagen_p, $carpeta . $nombre);
+            $image_save_func($imagen_p, $rutaFile . $nombre);
             break;
         default:
             throw new Exception('Tipo de imagen desconocido.');

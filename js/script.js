@@ -145,12 +145,12 @@ function changeText(elemento, texto) {
     $(elemento).html(texto);
 }
 
-function validarNum(input) {
-    input.value = input.value.replace(/[^0-9]/g, '');
-}
-
 function validarLet(input) {
     input.value = input.value.replace(/[^A-Za-z. ]/g, '');
+}
+
+function validarFol(input) {
+    input.value = input.value.replace(/[^A-Za-z]/g, '');
 }
 
 function validarFol(input) {
@@ -218,6 +218,12 @@ function isNumber(val, id) {
                 $("#" + id).focus();
                 return false;
             }
+        } else {
+            $("#" + id).css("border-color", "red");
+            $("#" + id + "-errors").text("Este campo debe contener solo números");
+            $("#" + id + "-errors").css("color", "red");
+            $("#" + id).focus();
+            return false;
         }
     } else {
         $("#" + id).css("border-color", "red");
@@ -333,6 +339,22 @@ function isEmailtoSend(val, id) {
         return true;
     }
 }
+
+function isList(val, id) {
+    expr = /^([a-zA-Z0-9 :+-.,#"$%&/()\[\]=;áéíóúÁÉÍÓÚñÑ])+\-(([a-zA-Z0-9 :+-.,#"$%&/()\[\]=;áéíóúÁÉÍÓÚñÑ]))/;
+    if (!expr.test(val)) {
+        $("#" + id).css("border-color", "red");
+        $("#" + id + "-errors").text("Debes seleccionar un elemento de la lista.");
+        $("#" + id + "-errors").css("color", "red");
+        $("#" + id).focus();
+        return false;
+    } else {
+        $("#" + id + "-errors").text("");
+        $("#" + id).css("border-color", "green");
+        return true;
+    }
+}
+
 
 //Función para ocultar el menu responsivo
 function resetMenu() {
@@ -453,7 +475,7 @@ function loadView(vista) {
         'asignarpermisos': ["truncateTmp()", 300, "truncateTmpCot()", 350],
         'categoria': [],
         'listacategoria': ["loadBtnCrear('categoria')", 360, "loadListaCategorias()", 500],
-        'nuevoproducto': ["truncateTmp()", 300, "truncateTmpCot()", 350, "loadOpcionesProveedor()", 350],
+        'nuevoproducto': ["truncateTmp()", 300, "truncateTmpCot()", 350, "loadOpcionesProveedor()", 350, "getOptionsTaxes()", 300],
         'listaproductoaltas': ["truncateTmp()", 300, "truncateTmpCot()", 350, "loadBtnCrear('producto')", 370, "loadListaProductosaltas()", 400],
         'valrfc': [],
         'nuevocliente': ["truncateTmpCot()", 350, "truncateTmp()", 400, "loadOpcionesEstado()", 420, "loadOpcionesBanco()", 450],
@@ -653,8 +675,13 @@ function actualizarImgPerfil(idusuario) {
 }
 
 function cargarImgPerfil() {
-    var formData = new FormData(document.getElementById("form-profile"));
+    var formData = new FormData();
+    var imgInput = $("#imagenusuario")[0].files[0]; 
+    var rutaUsuarios = "temporal/usuarios/";
     var img = $("#imagenusuario").val();
+    
+    formData.append("imagenperfil", imgInput);
+    formData.append("ruta_personalizada", rutaUsuarios);
     if (isnEmpty(img, 'imagenusuario')) {
         $.ajax({
             url: 'com.sine.enlace/cargarimg.php',
@@ -669,6 +696,22 @@ function cargarImgPerfil() {
                 $("#profimg").html(view);
                 $("#fileuser").val(fn);
                 $("#imagenusuario").val('');
+            }
+        });
+    }
+}
+
+function eliminarImgTpm(){
+    var imgtmp = $("#filename").val() ? $("#filename").val(): $("#fileuser").val();
+    if(imgtmp != ''){
+        $.ajax({
+            data : { transaccion: "eliminarimgtmp", imgtmp: imgtmp},
+            url  : 'com.sine.enlace/enlaceusuario.php',
+            type : 'POST',
+            dataType : 'JSON',
+            success: function (datos) {
+                cargandoHide();
+                console.log(datos);
             }
         });
     }
@@ -1010,7 +1053,7 @@ function loadOpcionesProveedor(idprov = "") {
             var bandera = texto.substring(0, 1);
             var res = texto.substring(1, 5000);
             if (bandera == 0) {
-                alertify.error(res);
+                alertify.error('No hay proveedores registrados.');
             } else {
                 $(".contenedor-proveedores").html(datos);
             }

@@ -48,6 +48,10 @@ if (isset($_POST['transaccion'])) {
         case 'asignarpermiso':
             $insertado = $cu->checkPermisos($_POST['idusuario']);
             break;
+        case 'eliminarimgtmp':
+            $datos = $cu->eliminarImgTmp($_POST['imgtmp']);
+            echo $datos != "" ? $datos : "0Ha ocurrido un error.";
+            break;
     }
 
     if (isset($insertado)) {
@@ -182,7 +186,12 @@ function obtenerDatosPermisos()
     $p->setVentas($_POST['ventas']);
     $p->setCrearVenta($_POST['crearventa']);
     $p->setCancelarVenta($_POST['cancelarventa']);
-    $p->setExportarVenta($_POST['exportarventa']);
+    $p->setTimbrarFactura($_POST['timbrarfactura']);
+    $p->setTimbrarNomina($_POST['timbrarnomina']);
+    $p->setTimbrarPago($_POST['timbrarpago']);
+    $p->setTimbrarCarta($_POST['timbrarcarta']);
+    $p->setEliminarDatos($_POST['eliminardatos']);
+    $p->setDescargarDatos($_POST['descargardatos']);
     return $p;
 }
 
