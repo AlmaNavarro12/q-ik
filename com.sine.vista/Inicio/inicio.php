@@ -5,7 +5,7 @@ if (isset($_SESSION[sha1('paquete')])) {
     echo "<script>var paquete = '1';</script>";
 }?>
 
-<div class=" p-0 m-0">
+<div class="p-0 m-0">
     <div class="p-0 m-0 fijo z-1">
         <div class="row pt-0 mt-0">
             <div class="col-md-6">

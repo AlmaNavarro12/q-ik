@@ -25,6 +25,8 @@ class Producto {
     private $insert;
     private $idtmp;
     private $taxes;
+    private $nameimg;
+
 
     function __construct() {
         
@@ -68,6 +70,10 @@ class Producto {
 
     function getGanancia() {
         return $this->ganancia;
+    }
+
+    function getNameImg() {
+        return $this->nameimg;
     }
 
     function getPrecio_compra() {
@@ -192,6 +198,10 @@ class Producto {
 
     function setImagen($imagen) {
         $this->imagen = $imagen;
+    }
+
+    function setNameImg($nameimg) {
+        $this->nameimg = $nameimg;
     }
 
     function setImgactualizar($imgactualizar) {

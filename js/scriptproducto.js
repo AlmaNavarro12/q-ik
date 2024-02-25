@@ -60,9 +60,11 @@ function addinventario() {
         $("#inventario").show('slow');
         if ($("#chinventario").prop('checked')) {
             $("#cantidad").removeAttr('disabled');
+            changeText("#labelinventario", "¿Desactivar inventario?")
         } else {
             $("#cantidad").attr('disabled', true);
             $("#cantidad").val('0');
+            changeText("#labelinventario", "¿Activar inventario?")
         }
     } else {
         $("#chinventario").removeAttr('checked');
@@ -156,6 +158,8 @@ function calcularImpuestosTotalReverse() {
 }
 
 function cargarImgProducto() {
+    cargandoShow();
+    cargandoHide();
     var formData = new FormData();
     var imgInput = $("#imagen")[0].files[0];
     var rutaProductos = "temporal/productos/";
@@ -172,9 +176,12 @@ function cargarImgProducto() {
                 var array = datos.split("<corte>");
                 var view = array[0];
                 var fn = array[1];
-                $("#muestraimagen").html(view);
-                $("#filename").val(fn);
-                $("#imagen").val('');
+                if(view != ""){
+                    $("#imagenproducto").show('slow');
+                    $("#muestraimagen").html(view);
+                    $("#filename").val(fn);
+                    $("#imagen").val('');
+                }
                 cargandoHide();
             }
         });
@@ -187,7 +194,7 @@ function eliminarImgTpm() {
     var imgtmp = $("#filename").val();
     if (imgtmp != '') {
         $.ajax({
-            data: { transaccion: "eliminarimgtmp", imgtmp: imgtmp },
+            data: { transaccion: "eliminarimgtmp", imgtmp: imgtmp},
             url: 'com.sine.enlace/enlaceproducto.php',
             type: 'POST',
             dataType: 'JSON',
@@ -213,6 +220,8 @@ function gestionarProducto(idproducto = null) {
     var idproveedor = $("#id-proveedor").val() || '0';
     var imagen = $('#filename').val();
     var chinventario = 0;
+    var imgactualizar= $("#imgactualizar").val();
+    var nameimg= $("#nameimg").val();
     var cantidad = $("#cantidad").val() || '0';
     if ($("#chinventario").prop('checked')) {
         chinventario = 1;
@@ -253,12 +262,10 @@ function gestionarProducto(idproducto = null) {
             cantidad: cantidad,
             imp_apl: imp_apl,
             idproducto: idproducto,
-            insert: null
+            insert: null,
+            imgactualizar: imgactualizar,
+            nameimg: nameimg
         };
-
-        if (idproducto) {
-            data.imgactualizar = $("#imgactualizar").val();
-        }
 
         var mensaje = idproducto ? "Producto actualizado." : "Producto registrado.";
         $.ajax({
@@ -397,3 +404,207 @@ function estadoInventario() {
         }).set({ title: "Q-ik" });
     }
 }
+
+function editarProducto(idproducto) {
+    cargandoHide();
+    cargandoShow();
+    $.ajax({
+        url: "com.sine.enlace/enlaceproducto.php",
+        type: "POST",
+        data: {transaccion: "editarproducto", idproducto: idproducto},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 1000);
+            if (bandera == '0') {
+                alertify.error(res);
+                cargandoHide();
+            } else {
+                loadView('nuevoproducto', '1');
+                window.setTimeout("setValoresEditarProducto('" + datos + "')", 600);
+            }
+        }
+    });
+}
+
+function setValoresEditarProducto(datos) {
+    changeText("#contenedor-titulo-form-producto", "Editar producto");
+    changeText("#btn-form-producto-guardar", "Guardar cambios <span class='fas fa-save'></span></a>");
+
+    var array = datos.split("</tr>");
+    var tipo = array[10];
+    var imagen = array[14];
+    var chinventario = array[15];
+    var img = array[17];
+    console.log(imagen);
+
+    if (tipo == "1") {
+        $("#inventario").show('slow');
+        changeText("#labelinventario", "¿Desactivar inventario?")
+    } else if (tipo == "2") {
+        $("#inventario").hide('slow');
+    }
+
+    if (chinventario == '1') {
+        $("#chinventario").prop('checked', true);
+        $("#cantidad").removeAttr('disabled');
+    }
+
+    $("#codigo-producto").val(array[1]);
+    $("#producto").val(array[2]);
+    $("#tipo").val(tipo);
+    $("#cantidad").val(array[16]);
+    $("#clave-unidad").val(array[11] + "-" + array[12]);
+    $("#descripcion").val(array[5]);
+    $("#pcompra").val(array[6]);
+    $("#porganancia").val(array[7])
+    $("#ganancia").val(array[8]);
+    $("#pventa").val(array[9]);
+    $("#clave-fiscal").val(array[11] + "-" + array[12]);
+    loadOpcionesProveedor(array[13]);
+
+    if (imagen !== '') {
+        $("#imagenproducto").show('slow');
+        $("#muestraimagen").html(img);
+        $("#filename").val(imagen);
+    }
+    $("#nameimg").val(imagen);
+    $("#imgactualizar").val(img);
+    getOptionsTaxes(array[18]);
+    setTimeout(() => {
+        calcularImpuestosTotal();
+    }, 500);
+
+    $("#eliminarimagen").attr("onclick", "eliminarImagen('actualizar')");
+    $("#btn-form-producto-guardar").attr("onclick", "gestionarProducto(" + array[0] + ");");
+    cargandoHide();
+}
+
+function eliminarProducto(idproducto) {
+    alertify.confirm("¿Estás seguro que deseas eliminar este producto?", function () {
+        cargandoHide();
+        cargandoShow();
+        $.ajax({
+            url: "com.sine.enlace/enlaceproducto.php",
+            type: "POST",
+            data: {transaccion: "eliminarproducto", idproducto: idproducto},
+            success: function (datos) {
+                var texto = datos.toString();
+                var bandera = texto.substring(0, 1);
+                var res = texto.substring(1, 1000);
+                if (bandera == '0') {
+                    alertify.error(res);
+                } else {
+                    cargandoHide();
+                    loadView('listaproductoaltas');
+                }
+            }
+        });
+    }).set('oncancel', function (closeEvent) {
+        loadView('listaproductoaltas');
+    }).set({title: "Q-ik"});
+}
+
+function copiarProducto(idproducto) {
+    cargandoHide();
+    cargandoShow();
+    $.ajax({
+        url: "com.sine.enlace/enlaceproducto.php",
+        type: "POST",
+        data: {transaccion: "editarproducto", idproducto: idproducto},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 1000);
+            if (bandera == '0') {
+                alertify.error(res);
+                cargandoHide();
+            } else {
+                loadView('nuevoproducto', '1');
+                window.setTimeout("setValoresCopiarProducto('" + datos + "')", 600);
+            }
+        }
+    });
+}
+
+function setValoresCopiarProducto(datos) {
+    var array = datos.split("</tr>");
+    var idproducto = array[0];
+    var codigo = array[1];
+    var nombre = array[2];
+    var unidad = array[3] + "-" + array[4];
+    var descripcion_producto = array[5];
+    var pcompra = array[6];
+    var porcentaje = array[7];
+    var ganancia = array[8];
+    var pventa = array[9];
+    var tipo = array[10];
+    var clavefiscal = array[11] + "-" + array[12];
+    var idproveedor = array[13];
+    var imagen = array[14];
+    var chinventario = array[15];
+    var cantidad = array[16];
+    var img = array[17];
+
+    if (tipo == "1") {
+        $("#inventario").show('slow');
+        changeText("#labelinventario", "¿Desactivar inventario?")
+    } else if (tipo == "2") {
+        $("#inventario").hide('slow');
+    }
+
+    if (chinventario == '1') {
+        $("#chinventario").prop('checked', true);
+        $("#cantidad").removeAttr('disabled');
+    }
+
+    $("#codigo-producto").val(codigo);
+    $("#producto").val(nombre);
+    $("#tipo").val(tipo);
+    $("#cantidad").val(cantidad);
+    $("#clave-unidad").val(unidad);
+    $("#descripcion").val(descripcion_producto);
+    $("#pcompra").val(pcompra);
+    $("#porganancia").val(porcentaje)
+    $("#ganancia").val(ganancia);
+    $("#pventa").val(pventa);
+    $("#clave-fiscal").val(clavefiscal);
+    loadOpcionesProveedor(idproveedor);
+
+    if (imagen !== '') {
+        $("#imagenproducto").show('slow');
+        $("#muestraimagen").html(img);
+        $("#filename").val(imagen);
+    }
+    cargandoHide();
+
+    $("#eliminarimagen").attr("onclick", "eliminarImagen('copia')")
+}
+
+function eliminarImagen(tipoOperacion, idproducto) {
+    var confirmMessage = "";
+
+    if (tipoOperacion === 'nuevo') {
+        confirmMessage = "¿Estás seguro que deseas eliminar esta imagen?";
+    } else if (tipoOperacion === 'actualizar') {
+        confirmMessage = "¿Estás seguro que deseas eliminar esta imagen en relación al producto? Una vez borrada no se podrá incorporar nuevamente.";
+    } else if (tipoOperacion === 'copia') {
+        confirmMessage = "¿Estás seguro que deseas quitar la imagen actual?";
+    }
+
+    alertify.confirm(confirmMessage, function (e) {
+        if (e) {
+            if (tipoOperacion === 'nuevo') {
+                eliminarImgTpm(); 
+                $("#imagenproducto").hide('slow');
+            } else if (tipoOperacion === 'copia' || tipoOperacion === 'actualizar') {
+                $("#imagenproducto").hide('slow');
+                $("#muestraimagen").html('');
+                $("#filename").val('');
+                $("#nameimg").val('');
+                $("#imgactualizar").val('');
+            }
+        }
+    }).set({ title: "Q-ik" });
+}
+

@@ -501,7 +501,7 @@ class ControladorUsuario
             $img = $u->getImgactualizar();
         } else if ($img != $u->getImgactualizar()) {
             if ($img != "") {
-                rename('../temporal/tmp/' . $img, '../img/usuarios/' . $img);
+                rename('../temporal/usuarios/' . $img, '../img/usuarios/' . $img);
                 unlink("../img/usuarios/" . $u->getImgactualizar());
             }
         }
