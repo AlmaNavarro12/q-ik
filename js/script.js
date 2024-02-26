@@ -153,8 +153,8 @@ function validarFol(input) {
     input.value = input.value.replace(/[^A-Za-z]/g, '');
 }
 
-function validarFol(input) {
-    input.value = input.value.replace(/[^A-Za-z]/g, '');
+function validarNum(input) {
+    input.value = input.value.replace(/[^0-9]/g, '');
 }
 
 //Validacion de campos vacios
@@ -475,7 +475,7 @@ function loadView(vista) {
         'asignarpermisos': ["truncateTmp()", 300, "truncateTmpCot()", 350],
         'categoria': [],
         'listacategoria': ["loadBtnCrear('categoria')", 360, "loadListaCategorias()", 500],
-        'nuevoproducto': ["truncateTmp()", 300, "truncateTmpCot()", 350, "loadOpcionesProveedor()", 350, "getOptionsTaxes()", 300],
+        'nuevoproducto': ["truncateTmp()", 300, "truncateTmpCot()", 350, "loadOpcionesProveedor()", 350, "getOptionsTaxes()", 300, ],
         'listaproductoaltas': ["truncateTmp()", 300, "truncateTmpCot()", 350, "loadBtnCrear('producto')", 370, "loadListaProductosaltas()", 400],
         'valrfc': [],
         'nuevocliente': ["truncateTmpCot()", 350, "truncateTmp()", 400, "loadOpcionesEstado()", 420, "loadOpcionesBanco()", 450],

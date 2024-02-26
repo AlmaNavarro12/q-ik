@@ -436,7 +436,7 @@ function setValoresEditarProducto(datos) {
     var imagen = array[14];
     var chinventario = array[15];
     var img = array[17];
-    console.log(imagen);
+    console.log(array[18]);
 
     if (tipo == "1") {
         $("#inventario").show('slow');
@@ -470,6 +470,7 @@ function setValoresEditarProducto(datos) {
     }
     $("#nameimg").val(imagen);
     $("#imgactualizar").val(img);
+
     getOptionsTaxes(array[18]);
     setTimeout(() => {
         calcularImpuestosTotal();

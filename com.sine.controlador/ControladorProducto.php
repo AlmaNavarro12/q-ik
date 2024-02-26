@@ -406,7 +406,7 @@ class ControladorProducto
                 "imagen" => $p->getImagen(),
                 "chinventario" => $p->getChinventario(),
                 "cantidad" => $p->getCantidad(),
-                "taxes" => $p->getTaxes()
+                "impuestos_aplicables" => $p->getTaxes()
             ];
 
         $insertado = $this->consultas->execute($consulta, $valores);

@@ -73,10 +73,10 @@ function obtenerDatosProducto()
     $p->setTipo($_POST['tipo']);
     $p->setIdproveedor($_POST['idproveedor'] ?? '0');
     $p->setChinventario($_POST['chinventario'] ?? 0);
+    $p->setTaxes($_POST['imp_apl']);
     $p->setCantidad($_POST['cantidad'] ?? '0');
     $p->setImagen($_POST["imagen"]);
     $p->setInsert($_POST['insert']);
-    $p->setTaxes($_POST['imp_apl']);
     return $p;
 }
 
