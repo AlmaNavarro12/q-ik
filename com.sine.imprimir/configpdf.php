@@ -2,7 +2,8 @@
 
 
 require_once '../vendor/autoload.php';
-require_once '../pdf/fpdf.php';
+require_once '../pdf/fpdf/fpdf.php';
+require_once '../pdf/fpdf/NumeroALetras.php';
 require_once '../com.sine.controlador/ControladorConfiguracion.php';
 
 setlocale(LC_MONETARY, 'es_MX.UTF-8');
@@ -1190,7 +1191,7 @@ switch ($idencabezado) {
         
             $pdf->SetFont('Arial', 'BI', 8);
             $pdf->SetTextColor(0, 0, 0);
-            $pdf->Cell(10, 3, '*El pago ' , '$foliopago' , ' ha sido oficialmente cancelado', 0, 0, 'L', 0);
+            $pdf->Cell(10, 3, '*El pago ' , '$foliopago' , ' ha sido oficialmente cancelado', 0, 0, 'L');
         
             $pdf->isFinished = true;
        
@@ -1346,7 +1347,7 @@ switch ($idencabezado) {
         $pdf->Ln(5);
 
         $pdf->Cell(195, 80, '', 0, 0, 'C', 0);
-        $pdf->Image('../comunicado/exampleimg.jpg', 10, $pdf->GetY(), 0, 80);
+        $pdf->Image('../img/exampleimg.jpg', 10, $pdf->GetY(), 0, 80);
         $pdf->TextWithRotation(25.5, 223, '01 01 2021', 25.5, 0);
         $pdf->Image('../img/SelloSine2.png', 10, 180, 70);
         break;
@@ -1377,8 +1378,8 @@ switch ($idencabezado) {
         $pdf->RowWithColor(
             array('ABC1234567','26/Dic/2023',' Ficticia S.A. de C.V.','INOV S.A. de C.V.','GEMA841210ABC ','Factura',"Pendiente",'$ 4,755.86 MXN '), 
             array(
-                'Pendiente' => array(255, 0, 0), // Rojo
-                'Cancelada' => array(165, 42, 42), // Café
+                'Pendiente' => array(255, 255, 0), // Amarillo
+                'Cancelada' => array(255, 0, 0), // Rojo
                 'Pagada' => array(0, 128, 0) // Verde
             ), 
             6 // Índice de la columna "Estado"
@@ -1387,8 +1388,8 @@ switch ($idencabezado) {
         $pdf->RowWithColor(
             array('DEF4567890','18/Dic/2023',' Ficticia S.A. de C.V.','INOV S.A. de C.V.','VEMA841210ABC','Factura',"Cancelada",'$ 1,456.00 MXN '), 
             array(
-                'Pendiente' => array(255, 0, 0), // Rojo
-                'Cancelada' => array(165, 42, 42), // Café
+                'Pendiente' => array(255, 255, 0), // Amarillo
+                'Cancelada' => array(255, 0, 0), // Rojo
                 'Pagada' => array(0, 128, 0) // Verde
             ), 
             6 // Índice de la columna "Estado"
@@ -1397,8 +1398,8 @@ switch ($idencabezado) {
         $pdf->RowWithColor(
             array('GHI7890123','15/Dic/2023',' Ficticia S.A. de C.V.','INOV S.A. de C.V.','XEMA841210ABC','Factura',"Pagada",'$ 2,560.75 MXN '), 
             array(
-                'Pendiente' => array(255, 0, 0), // Rojo
-                'Cancelada' => array(165, 42, 42), // Café
+                'Pendiente' => array(255, 255, 0), // Amarillo
+                'Cancelada' => array(255, 0, 0), // Rojo
                 'Pagada' => array(0, 128, 0) // Verde
             ), 
             6 // Índice de la columna "Estado"
@@ -1508,7 +1509,7 @@ switch ($idencabezado) {
         $pdf->Ln(1);
 
         $type = 2; //añad la varibale erronea
-        $pic = "../img/EjemplosEnc/graficaa.jpeg";
+        $pic = "../img/graficaa.jpeg";
 
         if ($type == "1" ) {
             $pdf->Image($pic, 8, 45, 96, 0, 'png');
@@ -2177,4 +2178,3 @@ switch ($idencabezado) {
 
  $pdf->isFinished = true;
 $pdf->Output('./ejemplo.pdf', 'F');
-?>

@@ -1361,7 +1361,20 @@ a.state-link{
 }
 
 #muestraimagenproducto img {
+    min-width: 180px;
     max-width: 200px;
+    height: 100%;
+    object-fit: contain;
+}
+
+#muestraimagenencabezado {
+    height: 170px;
+    margin: auto;
+}
+
+#muestraimagenencabezado img {
+    min-width: 150px;
+    max-width: 180px;
     height: 100%;
     object-fit: contain;
 }

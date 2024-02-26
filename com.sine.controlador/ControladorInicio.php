@@ -1,6 +1,7 @@
 <?php
 
 require_once '../com.sine.dao/Consultas.php';
+require_once '../com.sine.dao/ConsultasSine.php';
 require_once '../com.sine.modelo/Session.php';
 require_once '../vendor/autoload.php';
 
@@ -12,9 +13,11 @@ use Twilio\Rest\Client;
 class ControladorInicio {
 
     private $consultas;
+    private $consultasSine;
 
     function __construct() {
         $this->consultas = new Consultas();
+        $this->consultasSine = new ConsultasSine();
     }
     
     public function sendMSG() {
@@ -125,28 +128,19 @@ class ControladorInicio {
     }
     
     private function  getNombrePaquete($aid) {
+        $consulta = "SELECT * FROM paquete WHERE idpaquete = :aid;";
+        $valores = array("aid" => $aid);
+        $resultados = $this->consultasSine->getResults($consulta, $valores);
         $paquete = "Prueba";
-        $servidor = "localhost";
-        $basedatos = "sineacceso";
-        $puerto = "3306";
-        $mysql_user = "root";
-        $mysql_password = "";
-        try {
-            $db = new PDO("mysql:host=$servidor;port=$puerto;dbname=$basedatos", $mysql_user, $mysql_password);
-            $stmttable = $db->prepare("SELECT * FROM paquete WHERE idpaquete='$aid'");
-
-            if ($stmttable->execute()) {
-                $resultado = $stmttable->fetchAll(PDO::FETCH_ASSOC);
-                foreach ($resultado as $actual) {
-                    $paquete = $actual["nombre"];
-                }
-                return "$paquete";
-            } else {
-                return "0Error";
+        if ($resultados) {
+            foreach ($resultados as $actual) {
+                $paquete = $actual["nombre"];
             }
-        } catch (PDOException $ex) {
-            echo '<e>No se puede conectar a la bd ' . $ex->getMessage();
+            return "$paquete";
+        } else {
+            $modulos = "0"; 
         }
+        return $modulos;
     }
 
     public function opcionesAno() {

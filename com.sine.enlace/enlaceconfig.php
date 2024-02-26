@@ -77,7 +77,7 @@ if (isset($_POST['transaccion'])) {
             //------------------------------ENCABEZADO
         case 'editarencabezado':
             $datos = $cc->datosEncabezado($_POST['encabezado']);
-            echo $datos != "" ? $datos : "0Botón activo.";
+            echo $datos != "" ? $datos : "0Encabezado no disponible.";
             break;
         case 'actualizarencabezado':
             $actualizado = $cc->actualizarEncabezado(obtenerDatosEncabezados());

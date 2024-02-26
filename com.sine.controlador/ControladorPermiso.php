@@ -1,37 +1,34 @@
 <?php
 
 require_once './com.sine.dao/Consultas.php';
+require_once './com.sine.dao/ConsultasSine.php';
 
 class ControladorPermiso {
 
     private $consultas;
+    private $consultasSine;
 
     function __construct() {
         $this->consultas = new Consultas();
+        $this->consultasSine = new ConsultasSine();
     }
 
     public function getAcceso($aid) {
-        $servidor = "localhost";
-        $basedatos = "sineacceso";
-        $puerto = "3306";
-        $mysql_user = "root";
-        $mysql_password = "";
-    
-        try {
-            $db = new PDO("mysql:host=$servidor;port=$puerto;dbname=$basedatos", $mysql_user, $mysql_password);
-            $stmttable = $db->prepare("SELECT modulo FROM paquete WHERE idpaquete=:aid");
-            $stmttable->bindParam(':aid', $aid, PDO::PARAM_INT);
-    
-            if ($stmttable->execute()) {
-                $modulos = $stmttable->fetchColumn();
-                return $modulos != false ? $modulos : "0";
-            } else {
-                return "0";
+        $consulta = "SELECT modulo FROM paquete WHERE idpaquete = :aid;";
+        $valores = array("aid" => $aid);
+        $resultados = $this->consultasSine->getResults($consulta, $valores);
+        $modulos = "1-2-3-4-5-6-7-8-9-10-11-12";
+        if ($resultados) {
+            foreach ($resultados as $actual) {
+                $modulos = $actual["modulo"];
             }
-        } catch (PDOException $ex) {
-            echo '<e>No se puede conectar a la base de datos ' . $ex->getMessage();
+            return "$modulos";
+        } else {
+            $modulos = "0"; 
         }
+        return $modulos;
     }
+    
     
     private function getPermisoById() {
         $idusuario = $_SESSION[sha1("idusuario")];

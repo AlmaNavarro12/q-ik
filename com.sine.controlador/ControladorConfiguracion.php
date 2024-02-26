@@ -737,7 +737,7 @@ class ControladorConfiguracion
             "saludo" => $c->getSaludobody(),
             "mensaje" => $c->getTxtbody(),
             "img" => $img);
-        rename("../temporal/tmp/" . $img, "../img/" . $img);
+        rename("../temporal/tmp/" . $img, "../img/logo/" . $img);
         $actualizado = $this->consultas->execute($consulta, $valores);
         if ($c->getChlogo()) {
             $this->updateLogoBody($c->getIdbodymail(), $img);
@@ -765,11 +765,11 @@ class ControladorConfiguracion
             $imagen = $actual['logomsg'];
             $img = "";
             if ($imagen != "") {
-                $imgfile = "../img/" . $imagen;
+                $imgfile = "../img/logo/" . $imagen;
                 $type = pathinfo($imgfile, PATHINFO_EXTENSION);
                 $data = file_get_contents($imgfile);
                 $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
-                $img = "<div class=\"col-4\"><img src=\"$base64\" style=\"max-width:100%; height:auto;\" class=\"img-fluid\"></div>";
+                $img = "<div class=\"col-4\"><img src=\"$base64\" style=\"max-width:70%; max-height: 100px;\" class=\"img-fluid\"></div>";
             }
             $datos = "$idmailbody</tr>$asunto</tr>$saludo</tr>$mensaje</tr>$imagen</tr>$img";
         }
@@ -898,7 +898,7 @@ class ControladorConfiguracion
         $div1 = explode("/", $logoactual);
         unlink("../img/logo/$div1[0]");
         $div = explode("/", $logo);
-        rename("../img/" . $div[0], "../img/logo/" . $div[0]);
+        rename("../img/logo/" . $div[0], "../img/logo/" . $div[0]);
         return "<corte>" . $logo . "<corte>";
     }
 

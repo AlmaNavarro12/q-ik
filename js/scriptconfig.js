@@ -945,7 +945,7 @@ function setValoresEncabezado(datos) {
 
     if (imglogo !== '') {
         $("#imagenencabezado").show('slow');
-        $("#muestraimagen").html("<img src='img/logo/" + imglogo + "' height='150px'>");
+        $("#muestraimagenencabezado").html("<img src='img/logo/" + imglogo + "'>");
     }
 
     if (idencabezado == '3' || idencabezado == '12') {
@@ -989,7 +989,7 @@ function cargarLogo() {
                 var array = datos.split("<corte>");
                 if(array[0] != ""){
                     $("#imagenencabezado").show('slow');
-                    $("#muestraimagen").html(array[0]);
+                    $("#muestraimagenencabezado").html(array[0]);
                     $("#filename").val(array[1]);
                 }
                 visualizarPDF();
@@ -1240,7 +1240,7 @@ function eliminarImagen(tipoOperacion, idproducto) {
                 $("#imagenencabezado").hide('slow');
             } else if (tipoOperacion === 'actualizar') {
                 $("#imagenencabezado").hide('slow');
-                $("#muestraimagen").html('');
+                $("#muestraimagenencabezado").html('');
                 $("#filename").val('');
                 $("#imgactualizar").val('');
             }

@@ -133,8 +133,15 @@ else if (isset($_FILES["imagen"]) && isset($_POST["ruta_personalizada"])) {
     $type = pathinfo("../" . $vista, PATHINFO_EXTENSION);
     $data = file_get_contents("../" . $vista);
     $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+
     if ($tipo != 'application/pdf') {
-        $maxsz = 150; 
+        list($width, $height) = getimagesize("../" . $vista);
+
+        $maxsz = 120;
+        if (isset($_POST['imgsz'])) {
+            $maxsz = $_POST['imgsz'];
+        }
+        
         if ($width >= $height) {
             $height = ($height * $maxsz) / $width;
             $padding = $maxsz - $height;
@@ -143,9 +150,8 @@ else if (isset($_FILES["imagen"]) && isset($_POST["ruta_personalizada"])) {
             $width = ($width * $maxsz) / $height;
             echo "<img src='$base64' width='$width.px' height='" . $maxsz . "px' id='img'><corte>$nombre";
         }
-    } else {
-        echo "Vista previa no disponible";
     }
+
 }
 
 function procesarImagen($ruta_provisional, $rutaFile, $nombre, $max_width, $max_height, $quality)
