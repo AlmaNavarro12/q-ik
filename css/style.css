@@ -651,7 +651,7 @@ article {
 .div-form {
     margin-top: auto;
     max-width: 100%;
-    border-radius: 15px;
+    border-radius: 10px;
     background: #FFFFFF;
     box-shadow: 0px 17px 19px -6px rgba(197, 197, 213, 0.4);
 }
@@ -718,11 +718,13 @@ article {
 .button-file:disabled {
     color: #17177ca7;
     cursor: not-allowed;
+    background: #FFFFFF;
     transition:  border-color 0.3s ease, color 0.3s ease;
 }
 
 .button-file:hover, .button-file:active {
     color: #17177c;
+    background: #FFFFFF !important;
     outline: none !important;
     border: 2px solid #A3A3A3 !important;
 }
@@ -955,11 +957,14 @@ table.table-head thead tr th {
     font-size: 14px;
     color: #17177C;
     text-transform: uppercase;
+    position: sticky;
+    top: 0;
 }
 
 table.table-row tfoot {
     border-top: 2.8px solid #EDEDF4;
 }
+
 
 table.table-head tfoot tr th {
     background: #FFFFFF;
@@ -1157,6 +1162,14 @@ table.table-row tr td {
     min-height: 70px;
     top: 90; 
     z-index: 100;
+    padding-bottom: 20px;
+}
+
+#tabla-productos {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background-color: #ffffff; /* Color de fondo del thead */
 }
 
 .line {
@@ -1342,12 +1355,12 @@ a.state-link{
     cursor: pointer;
 }
 
-#muestraimagen {
+#muestraimagenproducto {
     height: 200px;
     margin: auto;
 }
 
-#muestraimagen img {
+#muestraimagenproducto img {
     max-width: 200px;
     height: 100%;
     object-fit: contain;

@@ -109,7 +109,7 @@ else if (isset($_FILES["imagen"]) && isset($_POST["ruta_personalizada"])) {
     if (($size > 900 * 900) || ($width > 2000 || $height > 2000)) {
         $newwidth = $width * 0.5;
         $newheight = $height * 0.5;
-        procesarImagen($ruta_provisional, $rutaFile, $nombre, $newheight, $newheight, 0);
+        procesarImagen($ruta_provisional, $rutaFile, $nombre, $newwidth, $newheight, 0);
     } else if ($width < 60 || $height < 60) {
         echo "Error: La anchura y la altura mínima permitida es 60px.<corte>";
     } else if ($tipo == 'image/png') {
@@ -134,7 +134,7 @@ else if (isset($_FILES["imagen"]) && isset($_POST["ruta_personalizada"])) {
     $data = file_get_contents("../" . $vista);
     $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
     if ($tipo != 'application/pdf') {
-        $maxsz = 200; 
+        $maxsz = 150; 
         if ($width >= $height) {
             $height = ($height * $maxsz) / $width;
             $padding = $maxsz - $height;

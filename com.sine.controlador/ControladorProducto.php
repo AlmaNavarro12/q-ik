@@ -23,7 +23,7 @@ class ControladorProducto
                 <th class='text-center col-auto'>Unidad </th>
                 <th class='text-center col-auto'>P.Compra </th>
                 <th class='text-center col-auto'>P.Venta</th>
-                <th class='text-center col-auto'>Clave Fiscal </th>
+                <th class='text-center col-auto'>C. Fiscal </th>
                 <th class='text-center col-auto'>Proveedor</th>
                 <th class='text-center col-auto'>Inventario</th>
                 <th class='text-center col-auto'>Cantidad</th>
@@ -114,14 +114,14 @@ class ControladorProducto
                     <tr>
                         <td class='text-center'>$codigo</td>
                         <td class='text-center'>$nombre - $descripcion_producto</td>
-                        <td class='text-center'>$unidad</td>
-                        <td class='text-center'>$ " . number_format($numero_compra, 2, '.', ',') . "</td>
-                        <td class='text-center'>$ " . number_format($numero_venta, 2, '.', ',') . "</td>
-                        <td class='text-center'>$clavefiscal - $descripcion</td>
+                        <td class='text-center text-wreak'>$unidad</td>
+                        <td class='text-center'>$" . number_format($numero_compra, 2, '.', ',') . "</td>
+                        <td class='text-center'>$" . number_format($numero_venta, 2, '.', ',') . "</td>
+                        <td class='text-center text-wreak'>$clavefiscal - $descripcion</td>
                         <td class='text-center'>$proveedor</td>
                         <td class='text-center'><a class='state-link fw-bold' style='color: $color;' $modal $function title='$title'><span>$estadoinv</span></a></td>
                         <td class='text-center'><a class='state-link fw-bold' $modal2 $function2 title='$title2'><span>$cantidad</span></a></td>
-                        <td align='center'><div class='dropdown'>
+                        <td class='text-center'><div class='dropdown'>
                         <button class='button-list dropdown-toggle' title='Opciones'  type='button' data-bs-toggle='dropdown'><span class='fas fa-ellipsis-v text-muted'></span>
                         <span class='caret'></span></button>
                         <ul class='dropdown-menu dropdown-menu-right'>";

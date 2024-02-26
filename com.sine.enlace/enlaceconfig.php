@@ -87,6 +87,11 @@ if (isset($_POST['transaccion'])) {
             $datos = $cc->hex2rgb($_POST['color']);
             echo $datos != "" ? $datos : "0Botón activo.";
             break;
+        case 'eliminarimgtmp':
+            $datos = $cp->eliminarImgTmp($_POST['imgtmp']);
+            echo $datos != "" ? $datos : "0Ha ocurrido un error.";
+            break;
+
     }
 
     if (isset($insertado)) {

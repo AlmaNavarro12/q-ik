@@ -539,9 +539,11 @@ $("#correo-uso").on("keyup", function () {
 function cargarLogoMail() {
     var formData = new FormData();
     var imgInput = $("#imagen")[0].files[0]; 
+    var rutaLogoMail = "temporal/tmp/";
+
     if (imgInput) {
         formData.append("imagen", imgInput);
-
+        formData.append("ruta_personalizada", rutaLogoMail);
         $.ajax({
             url: 'com.sine.enlace/cargarimg.php',
             type: "POST",
@@ -859,7 +861,6 @@ function loadEncabezado() {
                     alertify.error(res);
                     cargandoHide();
                 } else {
-                    
                     hideCommon();
                     setValoresEncabezado(datos);
                 }
@@ -943,6 +944,7 @@ function setValoresEncabezado(datos) {
     }
 
     if (imglogo !== '') {
+        $("#imagenencabezado").show('slow');
         $("#muestraimagen").html("<img src='img/logo/" + imglogo + "' height='150px'>");
     }
 
@@ -962,15 +964,20 @@ function setValoresEncabezado(datos) {
         $("#carta-titulo").attr('hidden', true);
         $("#titulo2").val('');
     }
-    
+    $("#eliminarimagen").attr("onclick", "eliminarImagen('actualizar')");
     cargandoHide();
     visualizarPDF();
 }
 
 function cargarLogo() {
-    var formData = new FormData(document.getElementById("form-encabezado"));
+    var formData = new FormData();
+    var imgInput = $("#imagen")[0].files[0]; 
+    var rutaLogos = "temporal/tmp/";
     var idencabezado = $("#id-encabezado").val();
     var img = $("#imagen").val();
+    
+    formData.append("imagen", imgInput);
+    formData.append("ruta_personalizada", rutaLogos);
     if (isnEmpty(idencabezado, "id-encabezado") && isnEmpty(img, "imagen")) {
         $.ajax({
             url: 'com.sine.enlace/cargarimg.php',
@@ -979,10 +986,12 @@ function cargarLogo() {
             contentType: false,
             processData: false,
             success: function (datos) {
-                //alert(datos);
                 var array = datos.split("<corte>");
-                $("#muestraimagen").html(array[0]);
-                $("#filename").val(array[1]);
+                if(array[0] != ""){
+                    $("#imagenencabezado").show('slow');
+                    $("#muestraimagen").html(array[0]);
+                    $("#filename").val(array[1]);
+                }
                 visualizarPDF();
             }
         });
@@ -1042,7 +1051,6 @@ function visualizarPDF() {
         chkdata = 3;
     }
     if (isnEmpty(idencabezado, "id-encabezado")) {
-        console.log(widthticket);
         $.ajax({
             url: "com.sine.imprimir/configpdf.php",
             type: "POST",
@@ -1113,6 +1121,7 @@ function actualizarEncabezado() {
         titulocarta =  chkdata+'</>'+nombreempresa+'</>'+razonsocial+'</>'+direccion+'</>'+rfcempresa;
     }
 
+    $("#eliminarimagen").attr("onclick", "eliminarImagen('actualizar')");
     var chlogo = 0;
     if ($("#chlogo").prop('checked')) {
         chlogo = 1;
@@ -1195,4 +1204,46 @@ function verificaAnchoticket() {
         $('#width-ticket').val(58);
         visualizarPDF(); 
     }
+}
+
+function eliminarImgTpm() {
+    var imgtmp = $("#filename").val();
+    if (imgtmp != '') {
+        $.ajax({
+            data: { transaccion: "eliminarimgtmp", imgtmp: imgtmp},
+            url: 'com.sine.enlace/enlaceproducto.php',
+            type: 'POST',
+            dataType: 'JSON',
+            success: function (datos) {
+                cargandoHide();
+                console.log(datos);
+            }
+        });
+    }
+}
+
+function eliminarImagen(tipoOperacion, idproducto) {
+    var confirmMessage = "";
+
+    if (tipoOperacion === 'nuevo') {
+        confirmMessage = "¿Estás seguro que deseas eliminar esta imagen?";
+    } else if (tipoOperacion === 'actualizar') {
+        confirmMessage = "¿Estás seguro que deseas eliminar esta imagen en relación al producto? Una vez borrada no se podrá incorporar nuevamente.";
+    } else if (tipoOperacion === 'copia') {
+        confirmMessage = "¿Estás seguro que deseas quitar la imagen actual?";
+    }
+
+    alertify.confirm(confirmMessage, function (e) {
+        if (e) {
+            if (tipoOperacion === 'nuevo') {
+                eliminarImgTpm(); 
+                $("#imagenencabezado").hide('slow');
+            } else if (tipoOperacion === 'actualizar') {
+                $("#imagenencabezado").hide('slow');
+                $("#muestraimagen").html('');
+                $("#filename").val('');
+                $("#imgactualizar").val('');
+            }
+        }
+    }).set({ title: "Q-ik" });
 }

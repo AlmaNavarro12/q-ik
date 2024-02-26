@@ -929,6 +929,18 @@ class ControladorConfiguracion
         return $consultado;
     }
 
+    
+    public function eliminarImgTmp($imgtmp)
+    {
+        $viejaruta = '../temporal/tmp/' . $imgtmp;
+        if ($imgtmp != '') {
+            if (file_exists($viejaruta)) {
+                unlink($viejaruta);
+            }
+        }
+        return true;
+    }
+
     public function datosEncabezado($id) {
         $datos = "";
         $encabezado = $this->getDatosEncabezado($id);

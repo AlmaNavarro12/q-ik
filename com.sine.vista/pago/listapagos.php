@@ -1,8 +1,8 @@
 <?php
 include("modals.php");
 ?>
+<div class="form-horizontal ps-3 fijo z-1">
 <div><div class="titulo-lista">Pagos </div> </div>
-<form class="form-horizontal ps-3" onsubmit="return false;">
     <div class="row col-12 p-0">
         <div class="col-sm-6 py-1">
             <input type="text" class="form-control input-search text-secondary-emphasis" id="buscar-pago"
@@ -18,11 +18,11 @@ include("modals.php");
                 <option value="100">100</option>
             </select>
         </div>
-        <div class="col-sm-4 py-1 d-flex justify-content-end" id="btn-crear">
+        <div class="col-sm-4 py-1 px-1 text-end" id="btn-crear">
         </div>
     </div>
-</form>
-<div class="scrollX div-form mw-100 bg-light mx-3 mt-3 border border-secondary-subtle">
+</div>
+<div class="scrollX div-form mw-100 bg-light mx-3 border border-secondary-subtle">
     <table class="table tab-hover table-condensed table-responsive table-row table-head" id="body-lista-pagos">
         <thead class="p-0">
             <tr>

@@ -178,7 +178,7 @@ function cargarImgProducto() {
                 var fn = array[1];
                 if(view != ""){
                     $("#imagenproducto").show('slow');
-                    $("#muestraimagen").html(view);
+                    $("#muestraimagenproducto").html(view);
                     $("#filename").val(fn);
                     $("#imagen").val('');
                 }
@@ -465,7 +465,7 @@ function setValoresEditarProducto(datos) {
 
     if (imagen !== '') {
         $("#imagenproducto").show('slow');
-        $("#muestraimagen").html(img);
+        $("#muestraimagenproducto").html(img);
         $("#filename").val(imagen);
     }
     $("#nameimg").val(imagen);
@@ -573,12 +573,12 @@ function setValoresCopiarProducto(datos) {
 
     if (imagen !== '') {
         $("#imagenproducto").show('slow');
-        $("#muestraimagen").html(img);
+        $("#muestraimagenproducto").html(img);
         $("#filename").val(imagen);
     }
     cargandoHide();
 
-    $("#eliminarimagen").attr("onclick", "eliminarImagen('copia')")
+    $("#eliminarimagen").attr("onclick", "eliminarImagen('copia')");
 }
 
 function eliminarImagen(tipoOperacion, idproducto) {
@@ -599,7 +599,7 @@ function eliminarImagen(tipoOperacion, idproducto) {
                 $("#imagenproducto").hide('slow');
             } else if (tipoOperacion === 'copia' || tipoOperacion === 'actualizar') {
                 $("#imagenproducto").hide('slow');
-                $("#muestraimagen").html('');
+                $("#muestraimagenproducto").html('');
                 $("#filename").val('');
                 $("#nameimg").val('');
                 $("#imgactualizar").val('');
