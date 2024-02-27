@@ -14,7 +14,7 @@ class ControladorProveedor {
         session_start();
         $idlogin = $_SESSION[sha1("idusuario")];
         $datos = "<thead>
-            <tr>
+            <tr class='align-middle'>
                 <th class='col-auto text-center'>Empresa</th>
                 <th class='col-auto text-center'>Representante</th>
                 <th class='col-auto text-center'>Contacto</th>
@@ -90,8 +90,8 @@ class ControladorProveedor {
             if ($finales == 0) {
                 $datos .= "<tr><td colspan='10'>No se encontraron registros</td></tr>";
             }
-            $datos .= "</tbody><tfoot><tr><th colspan='5' class='align-top'>Mostrando $inicios al $finales de $numrows registros</th>";
-            $datos .= "<th colspan='4'>" . paginate($page, $total_pages, $adjacents, $function) . "</th></tr></tfoot>";
+            $datos .= "</tbody><tfoot><tr><th colspan='3' class='align-top'>Mostrando $inicios al $finales de $numrows registros</th>";
+            $datos .= "<th colspan='6'>" . paginate($page, $total_pages, $adjacents, $function) . "</th></tr></tfoot>";
         }
         return $datos;
     }

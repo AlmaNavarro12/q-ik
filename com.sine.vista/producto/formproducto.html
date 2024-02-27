@@ -104,7 +104,7 @@
                         <label class="mark-required text-danger fw-bold"></label>
                         <div class="form-group">
                             <input class="form-control text-center input-form col-12" id="cantidad" disabled
-                                name="producto" placeholder="Producto" type="number" value="0" />
+                                name="producto" placeholder="Producto" type="text" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" />
                             <div id="cantidad-errors">
                             </div>
                         </div>
@@ -117,7 +117,7 @@
             <label class="mark-required text-danger fw-bold"></label>
             <div class="form-group">
                 <input class="form-control text-center input-form" id="pcompra" name="pcompra" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1'); calcularGanancia();"
-                    placeholder="Precio de Compra" type="text" value="0" />
+                    placeholder="Precio de Compra" type="text"  />
                 <div id="pcompra-errors">
                 </div>
             </div>
@@ -129,7 +129,7 @@
             <label class="mark-required text-danger fw-bold"></label>
             <div class="form-group">
                 <input class="form-control text-center input-form" id="porganancia" name="porganancia"
-                    placeholder="Porcentaje de ganancia" value="0" type="text" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1'); calcularGanancia();" />
+                    placeholder="Porcentaje de ganancia"  type="text" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1'); calcularGanancia();" />
                 <div id="porganancia-errors">
                 </div>
             </div>

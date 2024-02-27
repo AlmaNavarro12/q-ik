@@ -17,7 +17,7 @@ class ControladorImpuesto {
         Session::start();
         $idlogin = $_SESSION[sha1("idusuario")];
         $datos = "<thead class='sin-paddding'>
-            <tr >
+            <tr class='align-middle'>
                 <th class='text-center col-2'>Nombre</th>
                 <th class='text-center col-2'>Tipo</th>
                 <th class='text-center col-2'>Impuesto</th>
@@ -104,8 +104,8 @@ class ControladorImpuesto {
             if ($finales == 0) {
                 $datos .= "<tr><td colspan='11'>No se encontraron registros</td></tr>";
             }
-            $datos .= "</tbody><tfoot><tr><th colspan='3' class='align-top'>Mostrando $inicios al $finales de $numrows registros</th>";
-            $datos .= "<th colspan='3'>" . paginate($page, $total_pages, $adjacents, $function) . "</th></tr></tfoot>";
+            $datos .= "</tbody><tfoot><tr><th colspan='2' class='align-top'>Mostrando $inicios al $finales de $numrows registros</th>";
+            $datos .= "<th colspan='4'>" . paginate($page, $total_pages, $adjacents, $function) . "</th></tr></tfoot>";
             }
         return $datos;
     }

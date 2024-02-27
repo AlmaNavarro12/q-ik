@@ -38,15 +38,15 @@ class ControladorUsuario
         $permisos = explode("</tr>", $this->getPermisosUsuarioAsig($idlogin));
 
         $datos = "<thead class='p-0'>
-        <tr>
-            <th class='col-auto'>Usuario</th>
-            <th class='col-auto'>Nombre</th>
-            <th class='col-auto'>Apellido paterno</th>
-            <th class='col-auto'>Apellido materno</th>
-            <th class='col-auto'>Correo</th>
-            <th class='col-auto'>Celular</th>
-            <th class='col-auto'>Teléfono</th>
-            <th class='col-auto'>Opción</th>
+        <tr class='align-middle'>
+            <th>Usuario</th>
+            <th>Nombre</th>
+            <th>Apellido paterno</th>
+            <th>Apellido materno</th>
+            <th class='col-auto text-center'>Correo</th>
+            <th class='col-auto text-center'>Celular</th>
+            <th class='col-auto text-center'>Teléfono</th>
+            <th class='col-auto text-center'>Opción</th>
         </tr>
     </thead>
     <tbody>";
@@ -82,9 +82,9 @@ class ControladorUsuario
                 <td>$nombre</td>
                 <td>$apellido_paterno</td>
                 <td>$apellido_materno</td>
-                <td>$correo</td>
-                <td>$celular</td>
-                <td>$telefono</td>
+                <td class='text-center'>$correo</td>
+                <td class='text-center'>$celular</td>
+                <td class='text-center'>$telefono</td>
                 <td class='text-center'>
                     <div class='dropdown'>
                         <button class='button-list dropdown-toggle' title='Opciones' type='button' data-bs-toggle='dropdown' aria-expanded='false'>
@@ -108,8 +108,8 @@ class ControladorUsuario
         }
 
         $function = "buscarUsuario";
-        $datos .= "</tbody><tfoot><tr><th colspan='5' class='align-top'>Mostrando $inicios al $finales de $numrows registros</th>";
-        $datos .= "<th colspan='3'>" . paginate($page, $total_pages, $adjacents, $function) . "</th></tr></tfoot>";
+        $datos .= "</tbody><tfoot><tr><th colspan='3' class='align-top'>Mostrando $inicios al $finales de $numrows registros</th>";
+        $datos .= "<th colspan='5'>" . paginate($page, $total_pages, $adjacents, $function) . "</th></tr></tfoot>";
 
         return $datos;
     }

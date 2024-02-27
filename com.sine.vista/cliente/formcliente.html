@@ -1,0 +1,451 @@
+<div class="col-md-12">
+    <div class="titulo-lista" id="contenedor-titulo-form-cliente">Nuevo Cliente </div>
+</div>
+<div id="div-space" class="div-space">
+</div>
+<div class="div-form">
+    <div class="row">
+        <div class="col-md-12 text-right">
+            <label class="mark-required text-right">*</label> <label class="label-required text-right"> Campo
+                Obligatorio</label>
+            <input class="form-control text-center input-form hidden" id="id-cliente" name="id-cliente"
+                placeholder="id-cliente" type="text">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <label class="label-form text-right" for="nombre">Nombre</label> <label
+                class="mark-required text-right">*</label>
+            <div class="form-group">
+                <input class="form-control text-center input-form" id="nombre" name="nombre" placeholder="Nombre"
+                    type="text" oninput="validarLet(this)">
+                <div id="nombre-errors">
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <label class="label-form text-right" for="apellido-paterno">Apellido paterno</label> <label
+                class="mark-required text-right">*</label>
+            <div class="form-group">
+                <input class="form-control text-center input-form" id="apellido-paterno" name="apellido-paterno"
+                    placeholder="Apellido paterno" type="text" oninput="validarLet(this)">
+                <div id="apellido-paterno-errors">
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <label class="label-form text-right" for="apellido-materno">Apellido materno</label> <label
+                class="mark-required text-right">*</label>
+            <div class="form-group">
+                <input class="form-control text-center input-form" id="apellido-materno" name="apellido-materno"
+                    placeholder="Apellido materno" type="text" oninput="validarLet(this)">
+                <div id="apellido-materno-errors">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <label class="label-form text-right" for="nombre_empresa">Nombre de empresa</label> <label
+                class="mark-required text-right">*</label>
+            <div class="form-group">
+                <input class="form-control text-center input-form" id="nombre_empresa" name="nombre_empresa"
+                    placeholder="Nombre de la empresa" type="text">
+                <div id="nombre_empresa-errors">
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <label class="label-form text-right" for="correo_info">Correo para información</label>
+            <div class="form-group">
+                <input class="form-control text-center input-form" id="correo_info" name="correo_info"
+                    placeholder="Correo para información" type="email">
+                <div id="correo_info-errors">
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <label class="label-form text-right" for="correo_fact">Correo para facturación</label> <label
+                class="mark-required text-right">*</label>
+            <div class="form-group">
+                <input class="form-control text-center input-form" id="correo_fact" name="correo_fact"
+                    placeholder="Correo para facturación" type="email">
+                <div id="correo_fact-errors">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <label class="label-form text-right" for="correo_gerencia">Correo de gerencia</label>
+            <div class="form-group">
+                <input class="form-control text-center input-form" id="correo_gerencia" name="correo_gerencia"
+                    placeholder="Correo de la gerencia" type="email">
+                <div id="correo_gerencia-errors">
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <label class="label-form text-right" for="correo_alt1">Correo adicional 1</label>
+            <div class="form-group">
+                <input class="form-control text-center input-form" id="correo_alt1" name="correo_alt1"
+                    placeholder="Correo alternativo de envío" type="email">
+                <div id="correo_alt1-errors">
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <label class="label-form text-right" for="correo_alt2">Correo adicional 2</label>
+            <div class="form-group">
+                <input class="form-control text-center input-form" id="correo_alt2" name="correo_alt2"
+                    placeholder="Correo alternativo de envío" type="email">
+                <div id="correo_alt2-errors">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <label class="label-form text-right" for="correo_alt3">Correo adicional 3</label>
+            <div class="form-group">
+                <input class="form-control text-center input-form" id="correo_alt3" name="correo_alt3"
+                    placeholder="Correo alternativo de envío" type="email">
+                <div id="correo_alt3-errors">
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <label class="label-form text-right" for="telefono">Teléfono</label> <label
+                class="mark-required text-right">*</label>
+            <div class="form-group">
+                <input class="form-control text-center input-form" id="telefono" name="telefono" placeholder="Ingrese solo números"
+                    type="text" maxlength="10" minlength="10" oninput="validarNum(this)">
+                <div id="telefono-errors">
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <label class="label-form text-right" for="id-banco">Banco</label>
+            <div class="form-group">
+                <select class="form-control text-center input-form" id="id-banco" name="id-banco">
+                    <option value="" id="option-default-banco">- - - -</option>
+                    <optgroup id="banco" class="contenedor-banco text-left"> </optgroup>
+                </select>
+                <div id="id-banco-errors"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <label class="label-form text-right" for="cuenta"> Cuenta </label>
+            <div class="form-group">
+                <input class="form-control text-center input-form" id="cuenta" name="cuenta"
+                    placeholder="Numero de cuenta bancaria" maxlength="20">
+                <div id="cuenta-errors"></div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <label class="label-form text-right" for="clabe"> Clabe </label>
+            <div class="form-group">
+                <input class="form-control text-center input-form" id="clabe" name="clabe"
+                    placeholder="Clabe Interbancaria" maxlength="18">
+                <div id="clabe-errors"></div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <label class="label-form text-right">Añadir cuentas</label>
+            <div class="form-group">
+                <a class="btn button-list-add" id="addcuentas" title="Agregar otra cuenta" onclick="nuevoCampo();"><span
+                        class="glyphicon glyphicon-plus"></span></a>
+            </div>
+        </div>
+
+    </div>
+    <div class="row" id="addcuentas1" hidden="">
+        <div class="row">
+            <div class="col-md-4">
+                <label class="label-form text-right" for="id-banco1">Banco 2</label>
+                <div class="form-group">
+                    <select class="form-control text-center input-form" id="id-banco1" name="id-banco">
+                        <option value="" id="option-default-banco1">- - - -</option>
+                        <optgroup id="banco1" class="contenedor-banco1 text-left"> </optgroup>
+                    </select>
+                    <div id="id-banco1-errors"></div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <label class="label-form text-right" for="cuenta1">Cuenta 2</label>
+                <div class="form-group">
+                    <input class="form-control text-center input-form" id="cuenta1" name="cuenta1"
+                        placeholder="Numero de cuenta bancaria" maxlength="20">
+                    <div id="cuenta1-errors"></div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <label class="label-form text-right" for="clabe1"> Clabe 2</label>
+                <div class="form-group">
+                    <input class="form-control text-center input-form" id="clabe1" name="clabe1"
+                        placeholder="Clabe Interbancaria" maxlength="18">
+                    <div id="clabe1-errors"></div>
+                </div>
+            </div>
+            <div class="col-md-1">
+                <label class="label-form text-right" for="rmvcuentas1"> Borrar</label>
+                <a class="btn button-list-add" id="rmvcuentas1" title="Remover cuenta" onclick="confirmarEliminacion(1);"><span
+                    class="glyphicon glyphicon-remove"></span></a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" id="addcuentas2" hidden="">
+        <div class="row">
+            <div class="col-md-4">
+                <label class="label-form text-right" for="id-banco2">Banco 3</label>
+                <div class="form-group">
+                    <select class="form-control text-center input-form" id="id-banco2" name="id-banco2">
+                        <option value="" id="option-default-banco2">- - - -</option>
+                        <optgroup id="banco2" class="contenedor-banco2 text-left"> </optgroup>
+                    </select>
+                    <div id="id-banco2-errors"></div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <label class="label-form text-right" for="cuenta2">Cuenta 3</label>
+                <div class="form-group">
+                    <input class="form-control text-center input-form" id="cuenta2" name="cuenta2"
+                        placeholder="Numero de cuenta bancaria" maxlength="20">
+                    <div id="cuenta2-errors"></div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <label class="label-form text-right" for="clabe2"> Clabe 3</label>
+                <div class="form-group ">
+                    <input class="form-control text-center input-form" id="clabe2" name="clabe2"
+                        placeholder="Clabe Interbancaria" maxlength="18">
+                    <div id="clabe2-errors"></div>
+                </div>
+            </div>
+            
+            <div class="col-md-1">
+                <label class="label-form text-right" for="rmvcuentas2"> Borrar</label>
+                <a class="btn button-list-add" id="rmvcuentas2" title="Remover cuenta" onclick="confirmarEliminacion(2);"><span
+                    class="glyphicon glyphicon-remove"></span></a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" id="addcuentas3" hidden="">
+        <div class="row">
+            <div class="col-md-4">
+                <label class="label-form text-right" for="id-banco3">Banco 4</label>
+                <div class="form-group">
+                    <select class="form-control text-center input-form" id="id-banco3" name="id-banco3">
+                        <option value="" id="option-default-banco3">- - - -</option>
+                        <optgroup id="banco3" class="contenedor-banco3 text-left"> </optgroup>
+                    </select>
+                    <div id="id-banco3-errors"></div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <label class="label-form text-right" for="cuenta3">Cuenta 4</label>
+                <div class="form-group">
+                    <input class="form-control text-center input-form" id="cuenta3" name="cuenta3"
+                        placeholder="Numero de cuenta bancaria" maxlength="20">
+                    <div id="cuenta3-errors"></div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <label class="label-form text-right" for="clabe3"> Clabe 4</label>
+                <div class="form-group">
+                    <input class="form-control text-center input-form" id="clabe3" name="clabe3"
+                        placeholder="Clabe Interbancaria" maxlength="18">
+                    <div id="clabe3-errors"></div>
+                </div>
+            </div>
+            
+            <div class="col-md-1">
+                <label class="label-form text-right" for="rmvcuentas3"> Borrar</label>
+                <a class="btn button-list-add" id="rmvcuentas3" title="Remover cuenta" onclick="confirmarEliminacion(3);"><span
+                    class="glyphicon glyphicon-remove middle"></span></a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group row">
+                <input class="input-check" checked="" id="datosficales" name="datosfiscales" type="checkbox">
+                <label class="label-form text-right mx-5" for="datosficales"> </label>
+                <label class="label-form text-right mx-5" for="datosficales">¿Desea ingresar datos fiscales?</label>
+                <div id="datosficales-errors">
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+    <div id="fiscales" class="hideable">
+        <div class="row">
+            <div class="new-tooltip icon tip col-md-12">
+                <label class="label-sub click-label" onclick="validarRFC();">Validación de RFC <span
+                        class="glyphicon glyphicon-pencil"></span></label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <label class="label-form text-right" for="rfc">RFC <label class="mark-required text-right">*</label>
+                </label>
+                <div class="form-group">
+                    <input class="form-control text-center input-form" style="text-transform: uppercase;" id="rfc" name="rfc" placeholder="RFC" type="text"
+                        maxlength="13" minlength="13">
+                    <div id="rfc-errors"></div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <label class="label-form text-right" for="razon_social">Razón social <label
+                        class="mark-required text-right">*</label></label>
+                <div class="form-group">
+                    <input class="form-control text-center input-form" id="razon_social" name="razon_social"
+                        placeholder="Razón social de la empresa" type="text">
+                    <div id="razon_social-errors">
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <label class="label-form text-right" for="regimen-fiscal">Régimen fiscal <label
+                        class="mark-required text-right">*</label> </label>
+                <div class="form-group">
+                    <input class="form-control text-center input-form" id="regimen-fiscal" name="regimen-fiscal" placeholder="Régimen fiscal" type="text" maxlength="100" oninput="aucompletarRegimen()"/>
+                    <div id="regimen-fiscal-errors">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                <label class="label-form text-right" for="calle">Calle <label
+                        class="mark-required text-right">*</label></label>
+                <div class="form-group">
+                    <input class="form-control text-center input-form" id="calle" name="calle"
+                        placeholder="Calle de la empresa" type="text">
+                    <div id="calle-errors">
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <label class="label-form text-right" for="num_interior">N° Interior</label>
+                <div class="form-group">
+                    <input class="form-control text-center input-form" id="num_interior" name="num_interior"
+                        placeholder="Número interior" type="text">
+                    <div id="num_interior-errors">
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <label class="label-form text-right" for="num_exterior">N° Exterior <label
+                        class="mark-required text-right">*</label></label>
+                <div class="form-group">
+                    <input class="form-control text-center input-form" id="num_exterior" name="num_exterior"
+                        placeholder="Número exterior" type="text">
+                    <div id="num_exterior-errors">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                <label class="label-form text-right" for="id-estado">Estado</label> <label
+                    class="mark-required text-right">*</label>
+                <div class="form-group">
+                    <select class="form-control text-center input-form" id="id-estado" name="id-estado"
+                        onchange='loadOpcionesMunicipio();'>
+                        <option value="" id="option-default-estado">- - - -</option>
+                        <optgroup class="contenedor-estado text-left"> </optgroup>
+                    </select>
+                    <div id="id-estado-errors">
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <label class="label-form text-right" for="id-municipio">Municipio <label
+                        class="mark-required text-right">*</label></label>
+                <div class="form-group">
+                    <select class="form-control text-center input-form" id="id-municipio" name="id-municipio">
+                        <option value="" id="option-default-municipio">- - - -</option>
+                        <optgroup class="contenedor-municipio text-left"> </optgroup>
+                    </select>
+                    <div id="id-municipio-errors">
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <label class="label-form text-right" for="localidad">Colonia <label
+                        class="mark-required text-right">*</label></label>
+                <div class="form-group">
+                    <input class="form-control text-center input-form" id="localidad" name="localidad"
+                        placeholder="Colonia" type="text">
+                    <div id="localidad-errors">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                <label class="label-form text-right" for="codigo_postal">Código Postal <label
+                        class="mark-required text-right">*</label></label>
+                <div class="form-group">
+                    <input class="form-control text-center input-form" id="codigo_postal" name="codigo_postal"
+                        placeholder="Código postal" type="text" maxlength="5" minlength="5" oninput="validarNum(this)">
+                    <div id="codigo_postal-errors">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12 text-right">
+            <button class="button-form btn-danger" onclick="loadView('listaclientealtas');">Cancelar <span
+                    class="glyphicon glyphicon-remove"></span></button> &nbsp;
+            <button class="button-form btn-primary " onclick="insertarCliente();" id="btn-form-cliente-guardar">Guardar
+                <span class="glyphicon glyphicon-floppy-disk"></span></button>
+        </div>
+    </div>
+</div>
+<br>
+<script src="js/scriptcliente.js"></script>
+<script>
+    $(document).ready(function () {
+        var cleave = new Cleave('.cfdi', {
+            delimiter: '-',
+            blocks: [8, 4, 4, 4, 12]
+        });
+
+    });
+    window.addEventListener('resize', resetDiv);
+    resetDiv();
+</script>

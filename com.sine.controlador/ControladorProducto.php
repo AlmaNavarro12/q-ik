@@ -17,7 +17,7 @@ class ControladorProducto
         session_start();
         $idlogin = $_SESSION[sha1("idusuario")];
         $datos = "<thead>
-            <tr>
+            <tr class='align-middle'>
                 <th class='text-center col-auto'>C&oacute;digo</th>
                 <th class='text-center col-auto'>Producto/Servicio </th>
                 <th class='text-center col-auto'>Unidad </th>
@@ -147,8 +147,8 @@ class ControladorProducto
             $inicios = $offset + 1;
             $finales += $inicios - 1;
             $function = "buscarProducto";
-            $datos .= "</tbody><tfoot><tr><th colspan='7' class='align-top'>Mostrando $inicios al $finales de $numrows registros</th>";
-            $datos .= "<th colspan='3'>" . paginate($page, $total_pages, $adjacents, $function) . "</th></tr></tfoot>";
+            $datos .= "</tbody><tfoot><tr><th colspan='3' class='align-top'>Mostrando $inicios al $finales de $numrows registros</th>";
+            $datos .= "<th colspan='7'>" . paginate($page, $total_pages, $adjacents, $function) . "</th></tr></tfoot>";
 
             if ($finales == 0) {
                 $datos .= "<tr><td colspan='12'>No se encontraron registros</td></tr>";
