@@ -352,6 +352,7 @@ function setValoresAsignarPermisos(datos) {
     for (var permiso in permisosMapa) {
         if (permisosMapa[permiso] == '1' && permiso !== 'idusuario' && permiso !== 'accion' && permiso !== 'idlogin') {
             $("#" + permiso).attr('checked', true);
+            console.log(permiso);
             tienePermisos = true;
         }
     }
@@ -378,8 +379,8 @@ function actualizarPermisos(idusuario) {
         facturas: ["crearfactura", "editarfactura", "eliminarfactura", "listafactura", "timbrarfactura"],
         pago: ["crearpago", "editarpago", "eliminarpago", "listapago", "timbrarpago"],
         nomina: ["listaempleado", "crearempleado", "editarempleado", "eliminarempleado", "listanomina", "crearnomina", "editarnomina", "eliminarnomina", "timbrarnomina"],
-        configuracion: ["addfolio", "listafolio", "editarfolio", "eliminarfolio", "addcomision", "encabezados", "confcorreo", "importar"],
-        usuarios: ["crearusuario", "listausuario", "eliminarusuario", "asignarpermiso"],
+        cartaporte: ["listaubicacion", "crearubicacion", "editarubicacion", "eliminarubicacion", "listatransporte", "creartransporte", "editartransporte", "eliminartransporte", "listaremolque", "crearremolque", "editarremolque", "eliminarremolque", "listaoperador", "crearoperador", "editaroperador", "eliminaroperador", "listacarta", "crearcarta", "editarcarta", "eliminarcarta", "timbrarcarta"],
+        cotizacion: ["crearcotizacion", "editarcotizacion", "eliminarcotizacion", "listacotizacion", "anticipo"],
         cliente: ["crearcliente", "editarcliente", "eliminarcliente", "listacliente"],
         comunicado: ["crearcomunicado", "editarcomunicado", "eliminarcomunicado", "listacomunicado"],
         producto: ["crearproducto", "editarproducto", "eliminarproducto", "listaproducto"],
@@ -387,9 +388,9 @@ function actualizarPermisos(idusuario) {
         impuesto: ["crearimpuesto", "editarimpuesto", "eliminarimpuesto", "listaimpuesto"],
         datosfacturacion: ["creardatos", "editardatos", "listadatos", "eliminardatos", "descargardatos"],
         contrato: ["crearcontrato", "editarcontrato", "eliminarcontrato", "listacontrato"],
-        cotizacion: ["crearcotizacion", "editarcotizacion", "eliminarcotizacion", "listacotizacion", "anticipo"],
+        usuarios: ["crearusuario", "listausuario", "eliminarusuario", "asignarpermiso"],
         reporte: ["reportefactura", "reportepago", "reportegrafica", "reporteiva", "datosiva", "reporteventas"],
-        cartaporte: ["listaubicacion", "crearubicacion", "editarubicacion", "eliminarubicacion", "listatransporte", "creartransporte", "editartransporte", "eliminartransporte", "listaremolque", "crearremolque", "editarremolque", "eliminarremolque", "listaoperador", "crearoperador", "editaroperador", "eliminaroperador", "listacarta", "crearcarta", "editarcarta", "eliminarcarta", "timbrarcarta"],
+        configuracion: ["addfolio", "listafolio", "editarfolio", "eliminarfolio", "addcomision", "encabezados", "confcorreo", "importar"],
         ventas: ["crearventa", "cancelarventa", "exportarventa"],
     };
 
@@ -410,9 +411,14 @@ function actualizarPermisos(idusuario) {
             }
         } else {
             datos[categoria] = 0;
+            for (var i = 0; i < categorias[categoria].length; i++) {
+                var permiso = categorias[categoria][i];
+                datos[permiso] = 0;
+            }
         }
     }
     
+    console.log(datos);
     $.ajax({
         url: "com.sine.enlace/enlaceusuario.php",
         type: "POST",

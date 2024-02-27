@@ -1378,3 +1378,28 @@ a.state-link{
     height: 100%;
     object-fit: contain;
 }
+
+.button-list-add {
+    outline:none !important;
+    background: none;
+    width:  100%;
+    height: 45px;
+    border: 2px solid #CECEE2 !important;
+    box-sizing: border-box;
+    border-radius: 5px;
+    font-family: sans-serif;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 13px;
+    line-height: 250.7%;
+    text-align: center;
+    color: #17177C;
+}
+
+.button-list-add:hover{
+    background: #EDEDF4;
+}
+
+.icono{
+    top: 25%;
+}

@@ -6,6 +6,7 @@ require_once '../com.sine.controlador/ControladorProducto.php';
 if (isset($_POST['transaccion'])) {
     $transaccion = $_POST['transaccion'];
     $cp = new ControladorProducto();
+    $p = new Producto();
 
     switch ($transaccion) {
         case 'insertarproducto':
@@ -50,7 +51,12 @@ if (isset($_POST['transaccion'])) {
             $actualizado = $cp->valCodigoActualizar($p);
             echo $actualizado ? "Producto actualizado." : "0Error: No se pudo realizar la operación.";
             break;
-    
+        case 'cambiarcantidad':
+            $p->setIdProducto($_POST['idproducto']);
+            $p->setCantidad($_POST['cantidad']);
+            $inventario = $cp->insertarInventario($p);
+            echo $inventario ? "Inventario cambiado." : "0Error: No se pudo realizar la operación.";
+            break;
     }
 }
 
@@ -84,7 +90,7 @@ function obtenerDatosInventario()
 {
     $p = new Producto();
     $p->setIdProducto($_POST['idproducto']);
-    $p->setCantidad($_POST['cantidad']);
     $p->setChinventario($_POST['estado']);
+    $p->setCantidad($_POST['cantidad']);
     return $p;
 }

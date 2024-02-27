@@ -81,7 +81,21 @@ function obtenerDatosPermisos()
     $p = new Permiso();
     $p->setIdUsuario($_POST['idusuario']);
     $p->setAccion($_POST['accion']);
+
     $p->setFacturas($_POST['facturas']);
+    $p->setCrearfactura($_POST['crearfactura']);
+    $p->setEditarfactura($_POST['editarfactura']);
+    $p->setEliminarfactura($_POST['eliminarfactura']);
+    $p->setListafactura($_POST['listafactura']);
+    $p->setTimbrarFactura($_POST['timbrarfactura']);
+
+    $p->setPago($_POST['pago']);
+    $p->setCrearpago($_POST['crearpago']);
+    $p->setEditarpago($_POST['editarpago']);
+    $p->setEliminarpago($_POST['eliminarpago']);
+    $p->setListapago($_POST['listapago']);
+    $p->setTimbrarPago($_POST['timbrarpago']);
+
     $p->setNomina($_POST['nomina']);
     $p->setListaempleado($_POST['listaempleado']);
     $p->setCrearempleado($_POST['crearempleado']);
@@ -92,6 +106,9 @@ function obtenerDatosPermisos()
     $p->setEditarnomina($_POST['editarnomina']);
     $p->setEliminarnomina($_POST['eliminarnomina']);
     $p->setListanomina($_POST['listanomina']);
+    $p->setTimbrarNomina($_POST['timbrarnomina']);
+    
+    $p->setCartaporte($_POST['cartaporte']);
     $p->setListaubicacion($_POST['listaubicacion']);
     $p->setCrearubicacion($_POST['crearubicacion']);
     $p->setEditarubicacion($_POST['editarubicacion']);
@@ -108,65 +125,68 @@ function obtenerDatosPermisos()
     $p->setCrearoperador($_POST['crearoperador']);
     $p->setEditaroperador($_POST['editaroperador']);
     $p->setEliminaroperador($_POST['eliminaroperador']);
-    $p->setCrearfactura($_POST['crearfactura']);
-    $p->setEditarfactura($_POST['editarfactura']);
-    $p->setEliminarfactura($_POST['eliminarfactura']);
-    $p->setListafactura($_POST['listafactura']);
-    $p->setPago($_POST['pago']);
-    $p->setCrearpago($_POST['crearpago']);
-    $p->setEditarpago($_POST['editarpago']);
-    $p->setEliminarpago($_POST['eliminarpago']);
-    $p->setListapago($_POST['listapago']);
+    $p->setCrearcarta($_POST['crearcarta']);
+    $p->setEditarcarta($_POST['editarcarta']);
+    $p->setEliminarcarta($_POST['eliminarcarta']);
+    $p->setListacarta($_POST['listacarta']);
+    $p->setTimbrarCarta($_POST['timbrarcarta']);
+    
     $p->setCotizacion($_POST['cotizacion']);
     $p->setCrearcotizacion($_POST['crearcotizacion']);
     $p->setEditarcot($_POST['editarcotizacion']);
     $p->setEliminarcot($_POST['eliminarcotizacion']);
     $p->setListacotizacion($_POST['listacotizacion']);
     $p->setAnticipo($_POST['anticipo']);
+
     $p->setCliente($_POST['cliente']);
-    $p->setCartaporte($_POST['cartaporte']);
-    $p->setCrearcarta($_POST['crearcarta']);
-    $p->setEditarcarta($_POST['editarcarta']);
-    $p->setEliminarcarta($_POST['eliminarcarta']);
-    $p->setListacarta($_POST['listacarta']);
     $p->setCrearcliente($_POST['crearcliente']);
     $p->setEditarcliente($_POST['editarcliente']);
     $p->setEliminarcliente($_POST['eliminarcliente']);
     $p->setListacliente($_POST['listacliente']);
+
     $p->setComunicado($_POST['comunicado']);
     $p->setCrearcomunicado($_POST['crearcomunicado']);
     $p->setEditarcomunicado($_POST['editarcomunicado']);
     $p->setEliminarcomunicado($_POST['eliminarcomunicado']);
     $p->setListacomunicado($_POST['listacomunicado']);
+
     $p->setProducto($_POST['producto']);
     $p->setCrearproducto($_POST['crearproducto']);
     $p->setEditarproducto($_POST['editarproducto']);
     $p->setEliminarproducto($_POST['eliminarproducto']);
     $p->setListaproducto($_POST['listaproducto']);
+
     $p->setProveedor($_POST['proveedor']);
     $p->setCrearproveedor($_POST['crearproveedor']);
     $p->setEditarproveedor($_POST['editarproveedor']);
     $p->setEliminarproveedor($_POST['eliminarproveedor']);
     $p->setListaproveedor($_POST['listaproveedor']);
+
     $p->setImpuesto($_POST['impuesto']);
     $p->setCrearimpuesto($_POST['crearimpuesto']);
     $p->setEditarimpuesto($_POST['editarimpuesto']);
     $p->setEliminarimpuesto($_POST['eliminarimpuesto']);
     $p->setListaimpuesto($_POST['listaimpuesto']);
+
     $p->setDatosfacturacion($_POST['datosfacturacion']);
     $p->setCreardatos($_POST['creardatos']);
     $p->setEditardatos($_POST['editardatos']);
     $p->setListadatos($_POST['listadatos']);
+    $p->setEliminarDatos($_POST['eliminardatos']);
+    $p->setDescargarDatos($_POST['descargardatos']);
+
     $p->setContrato($_POST['contrato']);
     $p->setCrearcontrato($_POST['crearcontrato']);
     $p->setEditarcontrato($_POST['editarcontrato']);
     $p->setEliminarcontrato($_POST['eliminarcontrato']);
     $p->setListacontrato($_POST['listacontrato']);
+
     $p->setUsuarios($_POST['usuarios']);
     $p->setCrearusuario($_POST['crearusuario']);
     $p->setListausuario($_POST['listausuario']);
     $p->setEliminarusuario($_POST['eliminarusuario']);
     $p->setAsignarpermisos($_POST['asignarpermiso']);
+
     $p->setReporte($_POST['reporte']);
     $p->setReportefactura($_POST['reportefactura']);
     $p->setReportepago($_POST['reportepago']);
@@ -174,6 +194,7 @@ function obtenerDatosPermisos()
     $p->setReporteiva($_POST['reporteiva']);
     $p->setDatosiva($_POST['datosiva']);
     $p->setReporteventas($_POST['reporteventas']);
+
     $p->setConfiguracion($_POST['configuracion']);
     $p->setAddfolio($_POST['addfolio']);
     $p->setListafolio($_POST['listafolio']);
@@ -183,15 +204,11 @@ function obtenerDatosPermisos()
     $p->setEncabezados($_POST['encabezados']);
     $p->setConfcorreo($_POST['confcorreo']);
     $p->setImportar($_POST['importar']);
+    
     $p->setVentas($_POST['ventas']);
     $p->setCrearVenta($_POST['crearventa']);
     $p->setCancelarVenta($_POST['cancelarventa']);
-    $p->setTimbrarFactura($_POST['timbrarfactura']);
-    $p->setTimbrarNomina($_POST['timbrarnomina']);
-    $p->setTimbrarPago($_POST['timbrarpago']);
-    $p->setTimbrarCarta($_POST['timbrarcarta']);
-    $p->setEliminarDatos($_POST['eliminardatos']);
-    $p->setDescargarDatos($_POST['descargardatos']);
+    $p->setExportarVenta($_POST['exportarventa']);
     return $p;
 }
 

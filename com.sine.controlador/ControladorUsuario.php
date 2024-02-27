@@ -13,7 +13,7 @@ class ControladorUsuario
         "cartaporte", "listaubicacion", "crearubicacion", "editarubicacion", "eliminarubicacion", "listatransporte", "creartransporte", "editartransporte", "eliminartransporte", "listaremolque", "crearremolque", "editarremolque", "eliminarremolque", "listaoperador", "crearoperador", "editaroperador", "eliminaroperador", "listacarta", "crearcarta", "editarcarta", "eliminarcarta", "timbrarcarta", //Timbrar
         "cotizacion", "crearcotizacion", "editarcotizacion", "eliminarcotizacion", "listacotizacion","anticipo", 
         "cliente", "crearcliente", "editarcliente", "eliminarcliente", "listacliente",
-        "comunicado", "crearcomunicado", "editarcomunicado", "eliminarcomunicado", "listacomunicado", "exportarventa",
+        "comunicado", "crearcomunicado", "editarcomunicado", "eliminarcomunicado", "listacomunicado", 
         "producto", "crearproducto", "editarproducto", "eliminarproducto", "listaproducto",
         "proveedor", "crearproveedor", "editarproveedor", "eliminarproveedor", "listaproveedor",
         "impuesto", "crearimpuesto", "editarimpuesto", "eliminarimpuesto", "listaimpuesto",
@@ -22,7 +22,7 @@ class ControladorUsuario
         "usuario", "crearusuario", "listausuario", "eliminarusuario", "asignarpermiso",
         "reporte", "reportefactura", "reportepago", "reportegrafica", "reporteiva", "datosiva", "reporteventa",
         "configuracion", "addfolio", "listafolio", "editarfolio", "eliminarfolio", "addcomision", "encabezados", "confcorreo", "importar", 
-        "ventas", "crearventa", "cancelarventa"
+        "ventas", "crearventa", "cancelarventa", "exportarventa"
     ];
 
     function __construct()

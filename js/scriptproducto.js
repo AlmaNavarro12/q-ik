@@ -89,11 +89,21 @@ function calcularGanancia() {
     var preciocompra = $("#pcompra").val() || '0';
     var porcentaje = $("#porganancia").val() || '0';
     var importeganancia = (parseFloat(preciocompra) * parseFloat(porcentaje)) / 100;
-    $("#ganancia").val(importeganancia);
+    console.log("Ganancia: " + importeganancia);
+    console.log("Ganancia redondeado: " + myRound(importeganancia, 2));
+    $("#ganancia").val(myRound(importeganancia, 2));
     var precioventa = parseFloat(preciocompra) + parseFloat(importeganancia);
-    $("#pventa").val(precioventa);
+    console.log("costo: " + precioventa);
+    var total = myRound(precioventa, 2)
+    console.log("costo redondeado: " + total);
+    $("#pventa").val(total);
     calcularImpuestosTotal();
 }
+
+function myRound(num, dec) {
+    var exp = Math.pow(10, dec || 2); 
+    return parseInt(num * exp, 10) / exp;
+} 
 
 function calcularImpuestosTotal() {
     var id = "";
@@ -112,7 +122,6 @@ function calcularImpuestosTotal() {
 
         impuesto = costo * porcentaje;
         impuesto = impuesto.toString().match(/^-?\d+(?:\.\d{0,2})?/)[0];
-        //impuesto = Math.round(impuesto * 100) / 100;
 
         if (tipoImp == 1) {
             total = parseFloat(total) + parseFloat(impuesto);
@@ -122,7 +131,10 @@ function calcularImpuestosTotal() {
         }
         $('#p' + id).val(impuesto);
     });
-    $("#ptotiva").val(total);
+    console.log("Total a publico: " + total);
+    var preciopub = myRound(total, 2);
+    console.log("Total a publico redondeado " + preciopub);
+    $("#ptotiva").val(preciopub);
 }
 
 function calcularImpuestosTotalReverse() {
@@ -608,4 +620,3 @@ function eliminarImagen(tipoOperacion, idproducto) {
         }
     }).set({ title: "Q-ik" });
 }
-

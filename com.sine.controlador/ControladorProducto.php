@@ -341,6 +341,14 @@ class ControladorProducto
         return $datos;
     }
 
+    public function insertarInventario($p) {
+        $insertado = false;
+        $consulta = "UPDATE `productos_servicios` SET cantinv=:cantidad WHERE idproser=:id_producto;";
+        $valores = array("id_producto" => $p->getIdProducto(), "cantidad" => $p->getCantidad());
+        $insertado = $this->consultas->execute($consulta, $valores);
+        return $insertado;
+    }
+
     private function gestionarProducto($p)
     {
         $img = $p->getImagen();
