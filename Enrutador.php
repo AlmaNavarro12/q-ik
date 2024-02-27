@@ -216,7 +216,7 @@ class Enrutador {
                     include_once '../com.sine.vista/CartaPorte/listacarta.php';
                     break;
                 case 'puntosdeventa':
-                        include_once '../com.sine.vista/ventas/puntosdeventas.html';
+                        include_once '../com.sine.vista/ventas/formventa.php';
                         break;
                 default:
                     echo "El recurso solicitado no esta disponible<br/>Error 404: $vista Not Found";

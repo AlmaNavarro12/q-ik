@@ -21,7 +21,7 @@ function insertarCliente() {
         correoalt2: $("#correo_alt2").val(),
         correoalt3: $("#correo_alt3").val(),
         telefono: $("#telefono").val(),
-        rfc: null,
+        rfc: 'XAXX010101000',
         razon: null,
         regimenfiscal: null,
         calle: null,
@@ -61,7 +61,7 @@ function insertarCliente() {
         datos.postal = $("#codigo_postal").val();
     }
 
-    if (isnEmpty(datos.nombre, "nombre") && isnEmpty(datos.apellidopaterno, "apellido-paterno") && isnEmpty(datos.apellidomaterno, "apellido-materno") && isnEmpty(datos.nombre_empresa, "nombre_empresa") && validarEmail(datos.correo_fact, "correo_fact") && isnEmpty(datos.telefono, "telefono") && isnEmpty(datos.rfc, "rfc") && isnEmpty(datos.razon, "razon_social") && isnEmpty(datos.regimen, "regimen-fiscal") && isnEmpty(datos.calle, "calle") && isnEmpty(datos.exterior, "num_exterior") && isnEmpty(datos.estado, "id-estado") && isnEmpty(datos.municipio, "id-municipio") && isnEmpty(datos.localidad, "localidad") && isnEmpty(datos.postal, "codigo_postal")) {
+    if (isnEmpty(datos.nombre, "nombre") && isnEmpty(datos.apellidopaterno, "apellido-paterno") && isnEmpty(datos.apellidomaterno, "apellido-materno") && isnEmpty(datos.nombre_empresa, "nombre_empresa") && isEmail(datos.correo_fact, "correo_fact") && isPhoneNumber(datos.telefono, "telefono") && isnEmpty(datos.rfc, "rfc") && isnEmpty(datos.razon, "razon_social") && isnEmpty(datos.regimen, "regimen-fiscal") && isnEmpty(datos.calle, "calle") && isnEmpty(datos.exterior, "num_exterior") && isnEmpty(datos.estado, "id-estado") && isnEmpty(datos.municipio, "id-municipio") && isnEmpty(datos.localidad, "localidad") && isnEmpty(datos.postal, "codigo_postal")) {
         $.ajax({
             url: "com.sine.enlace/enlacecliente.php",
             type: "POST",

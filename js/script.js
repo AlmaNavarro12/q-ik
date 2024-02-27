@@ -470,7 +470,7 @@ function loadView(vista) {
         'paginicio': ["getUserFirstSession()", 300, "getSaldo()", 350, "datosGrafica()", 400, "loadopcionesAno()", 450],
         'notificacion': ["filtrarNotificaciones()", 350],
         'comprar': [],
-        'nuevousuario': ["checkUsuario()", 350, /** "truncateTmp()", 400, "truncateTmpCot()", 400, "loadOpcionesEstado()", 450 */],
+        'nuevousuario': ["checkUsuario()", 350, /** "truncateTmp()", 400, "truncateTmpCot()", 400, */ "loadOpcionesEstado()", 450 ],
         'listasuarioaltas': ["truncateTmp()", 300, "truncateTmpCot()", 350, "loadBtnCrear('usuario')", 370, "filtrarUsuario()", 400],
         'asignarpermisos': ["truncateTmp()", 300, "truncateTmpCot()", 350],
         'categoria': [],
@@ -534,7 +534,7 @@ function loadView(vista) {
         'listaoperador': ["loadBtnCrear('operador')", 300, "filtrarOperador()", 320],
         'carta': ["truncateTmpCarta()", 300, "truncateTmpIMG()", 320, "loadOpcionesFolios('4')", 350, "loadFecha()", 370, "loadOpcionesEstado()", 400, "filtrarProducto()", 420, "loadOpcionesFormaPago()", 450, "loadOpcionesMetodoPago()", 470, "loadOpcionesMoneda()", 500, "loadOpcionesUsoCFDI()", 520, "loadOpcionesComprobante()", 550, "loadOpcionesFacturacion()", 570, "loadOpcionesProveedor()", 600, "opcionesPeriodoGlobal()", 620, "opcionesMeses()", 650, "opcionesAnoGlobal()", 670],
         'listacarta': ["truncateTmpCarta()", 300, "truncateTmpIMG()", 300, "loadBtnCrear('carta')", 300, "filtrarCarta()", 320, "opcionesMotivoCancelar()", 350],
-        'puntosdeventa': [],
+        'puntosdeventa': ["newVenta()", 300],
     };
 
     if (actions[vista]) {
@@ -1059,4 +1059,11 @@ function loadOpcionesProveedor(idprov = "") {
             }
         }
     });
+}
+
+function validarRFC() {
+    cargandoHide();
+    cargandoShow();
+    VentanaCentrada('https://www.sat.gob.mx/aplicacion/operacion/79615/valida-en-linea-rfc%C2%B4s-uno-a-uno-o-de-manera-masiva-hasta-5-mil-registros', 'SAT', '', '1024', '768', 'true');
+    cargandoHide();
 }

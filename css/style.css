@@ -961,6 +961,32 @@ table.table-head thead tr th {
     top: 0;
 }
 
+
+table.table-venta thead tr th{
+    background: #FFFFFF;
+    height: 50px;
+    text-align: left;
+    font-family: sans-serif;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 14px;
+    color:  #17177C;
+    text-transform: uppercase;
+}
+
+table.table-venta tfoot tr th{
+    background: #FFFFFF;
+    height: 50px;
+    font-family: sans-serif;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 15px;
+    line-height: 120%;
+    color:  #17177C;
+    text-transform: uppercase;
+    border-bottom: 1px solid #FFFFFF;
+}
+
 table.table-row tfoot {
     border-top: 2.8px solid #EDEDF4;
 }
@@ -1289,7 +1315,6 @@ table.table-row tr td {
     background-color: #e74c3c;
 }
 
-
 .small-tooltip {
     color: #222;
     display: inline-block;
@@ -1403,3 +1428,30 @@ a.state-link{
 .icono{
     top: 25%;
 }
+
+/*----------------------------------------------------PUTNOS DE VENTAS**/
+.sm-tab{
+    outline:none !important;
+    position: relative;
+    min-width: 100px;
+    max-width: 170px;
+    width: auto;
+    height: 40px;
+    background: #ffffff;
+    padding: 4px 7px;
+    border: 2px solid #CECEE2;
+    border-bottom: none;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    font-family: sans-serif;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 17px;
+    text-align: center;
+    color: #17177C;
+}
+
+.sm-tab:hover{
+    background: #EDEDF4;
+}
+
