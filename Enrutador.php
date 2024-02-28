@@ -2,9 +2,11 @@
 
 require_once 'com.sine.modelo/Session.php';
 
-class Enrutador {
+class Enrutador
+{
 
-    public function cargarVista($vista) {
+    public function cargarVista($vista)
+    {
         Session::start();
         if (isset($_SESSION[sha1("usuario")])) {
             switch ($vista) {
@@ -215,9 +217,15 @@ class Enrutador {
                 case 'listacarta':
                     include_once '../com.sine.vista/CartaPorte/listacarta.php';
                     break;
-                case 'puntosdeventa':
-                        include_once '../com.sine.vista/ventas/formventa.php';
-                        break;
+                case 'puntodeventa':
+                    include_once '../com.sine.vista/ventas/formventa.php';
+                    break;
+                case 'listaticket':
+                    include_once '../com.sine.vista/ventas/listaticket.php';
+                    break;
+                case 'cortecaja':
+                    include_once '../com.sine.vista/ventas/cortecaja.php';
+                    break;
                 default:
                     echo "El recurso solicitado no esta disponible<br/>Error 404: $vista Not Found";
                     break;
@@ -227,4 +235,3 @@ class Enrutador {
         }
     }
 }
-

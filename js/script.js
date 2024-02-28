@@ -2,7 +2,219 @@ $(document).ready(function () {
     loadView('paginicio');
     valPeriodoPrueba();
 
-    if($('#main-menu').length > 0){
+    document.onkeydown = function (event) {
+        if (puntoventa === '1') {
+            switch (event.which) {
+                case 112://TECLA F1 crear nueva venta
+                    if (!$('#punto-venta').hasClass('menu-active')) {
+                        $('.list-element').removeClass("menu-active");
+                        $('.marker').removeClass("marker-active");
+                        $('#punto-venta').addClass("menu-active");
+                        $('#punto-venta').children('div.marker').addClass("marker-active");
+                        loadView('puntodeventa');
+                        window.setTimeout(() => { $('#buscar-producto').focus(); }, 500);
+                    } else {
+                        if ($('#buscar-producto').length > 0) {
+                            newVenta();
+                        } else {
+                            loadView('puntodeventa');
+                            window.setTimeout(() => { $('#buscar-producto').focus(); }, 500);
+                        }
+                    }
+                    return false;
+                case 113://TECLA F2 crear nueva entrada de dinero a la caja
+                    if (!$('#punto-venta').hasClass('menu-active')) {
+                        $('.list-element').removeClass("menu-active");
+                        $('.marker').removeClass("marker-active");
+                        $('#punto-venta').addClass("menu-active");
+                        $('#punto-venta').children('div.marker').addClass("marker-active");
+                        loadView('puntodeventa');
+                        window.setTimeout(() => {
+                            $("#monto-entrada").val('');
+                            $("#concepto-entrada").val('');
+                            $('#label-ingresos').text('Registrar entrada de efectivo');
+                            $("#type-movimiento").val('1');
+                            $('#modal-entradas').modal('show');
+                            window.setTimeout(() => { $('#monto-entrada').select(); }, 500);
+                        }, 500);
+                    } else {
+                        if ($('#buscar-producto').length > 0) {
+                            $("#monto-entrada").val('');
+                            $("#concepto-entrada").val('');
+                            $('#label-ingresos').text('Registrar entrada de efectivo');
+                            $("#type-movimiento").val('1');
+                            $('#modal-entradas').modal('show');
+                            window.setTimeout(() => { $('#monto-entrada').select(); }, 500);
+                        } else {
+                            loadView('puntodeventa');
+                            window.setTimeout(() => {
+                                $("#monto-entrada").val('');
+                                $("#concepto-entrada").val('');
+                                $('#label-ingresos').text('Registrar entrada de efectivo');
+                                $("#type-movimiento").val('1');
+                                $('#modal-entradas').modal('show');
+                                window.setTimeout(() => { $('#monto-entrada').select(); }, 500);
+                            }, 500);
+                        }
+                    }
+                    return false;
+                case 114://TECLA F3 crear nueva salida de dinero de la caja
+                    if (!$('#punto-venta').hasClass('menu-active')) {
+                        $('.list-element').removeClass("menu-active");
+                        $('.marker').removeClass("marker-active");
+                        $('#punto-venta').addClass("menu-active");
+                        $('#punto-venta').children('div.marker').addClass("marker-active");
+                        loadView('puntodeventa');
+                        window.setTimeout(() => {
+                            $("#monto-entrada").val('');
+                            $("#concepto-entrada").val('');
+                            $('#label-ingresos').text('Registrar salida de efectivo');
+                            $("#type-movimiento").val('2');
+                            $('#modal-entradas').modal('show');
+                            window.setTimeout(() => { $('#monto-entrada').select(); }, 500);
+                        }, 500);
+                    } else {
+                        if ($('#buscar-producto').length > 0) {
+                            $("#monto-entrada").val('');
+                            $("#concepto-entrada").val('');
+                            $('#label-ingresos').text('Registrar salida de efectivo');
+                            $("#type-movimiento").val('2');
+                            $('#modal-entradas').modal('show');
+                            window.setTimeout(() => { $('#monto-entrada').select(); }, 500);
+                        } else {
+                            loadView('puntodeventa');
+                            window.setTimeout(() => {
+                                $("#monto-entrada").val('');
+                                $("#concepto-entrada").val('');
+                                $('#label-ingresos').text('Registrar salida de efectivo');
+                                $("#type-movimiento").val('2');
+                                $('#modal-entradas').modal('show');
+                                window.setTimeout(() => { $('#monto-entrada').select(); }, 500);
+                            }, 500);
+                        }
+                    }
+                    return false;
+                case 115://TECLA F4 ir a los tickets antiguos
+                    if (!$('#punto-venta').hasClass('menu-active')) {
+                        $('.list-element').removeClass("menu-active");
+                        $('.marker').removeClass("marker-active");
+                        $('#punto-venta').addClass("menu-active");
+                        $('#punto-venta').children('div.marker').addClass("marker-active");
+                        loadView('listaticket');
+                    } else {
+                        loadView('listaticket');
+                    }
+                    return false;
+                case 116://TECLA F5 crear nuevo porducto
+                    getPermisoNewProducto();
+                    return false;
+                case 118://TECLA F7 cobrar ticket
+                    if (!$('#punto-venta').hasClass('menu-active')) {
+                        $('.list-element').removeClass("menu-active");
+                        $('.marker').removeClass("marker-active");
+                        $('#punto-venta').addClass("menu-active");
+                        $('#punto-venta').children('div.marker').addClass("marker-active");
+                        loadView('puntodeventa');
+                        window.setTimeout(function () {
+                            setValoresCobrar();
+                            $('#modal-cobrar').modal('show');
+                            window.setTimeout(() => {
+                                $("#monto-pagado").select();
+                            }, 500);
+                        }, 900);
+                    } else {
+                        if ($('#buscar-producto').length > 0) {
+                            setValoresCobrar();
+                            $('#modal-cobrar').modal('show');
+                            window.setTimeout(() => {
+                                $("#monto-pagado").select();
+                            }, 500);
+                        } else {
+                            loadView('puntodeventa');
+                            window.setTimeout(function () {
+                                setValoresCobrar();
+                                $('#modal-cobrar').modal('show');
+                                window.setTimeout(() => {
+                                    $("#monto-pagado").select();
+                                }, 500);
+                            }, 900);
+                        }
+                    }
+                    return false;
+                case 120://TECLA F9 ir a crear corte de caja
+                    if (!$('#punto-venta').hasClass('menu-active')) {
+                        $('.list-element').removeClass("menu-active");
+                        $('.marker').removeClass("marker-active");
+                        $('#punto-venta').addClass("menu-active");
+                        $('#punto-venta').children('div.marker').addClass("marker-active");
+                        loadView('cortecaja');
+                    } else {
+                        loadView('cortecaja');
+                    }
+                    return false;
+                case 121://TECLA F10 buscar producto en ticket
+                    if ($('#punto-venta').hasClass('menu-active')) {
+                        if ($('#buscar-producto').length > 0) {
+                            window.scroll(0, 0);
+                            $('#contenedor-vista-right').scrollTop(0);
+                            $('#buscar-producto').focus();
+                        } else {
+                            loadView('puntodeventa');
+                            window.setTimeout(function () {
+                                window.scroll(0, 0);
+                                $('#contenedor-vista-right').scrollTop(0);
+                                $('#buscar-producto').focus();
+                            }, 900);
+                        }
+                    } else {
+                        $('.list-element').removeClass("menu-active");
+                        $('.marker').removeClass("marker-active");
+                        $('#punto-venta').addClass("menu-active");
+                        $('#punto-venta').children('div.marker').addClass("marker-active");
+
+                        loadView('puntodeventa');
+                        window.setTimeout(function () {
+                            window.scroll(0, 0);
+                            $('#contenedor-vista-right').scrollTop(0);
+                            $('#buscar-producto').focus();
+                        }, 900);
+                    }
+                    return false;
+                case 122://TECLA F11 consulta precios de productos
+                    if (!$('#punto-venta').hasClass('menu-active')) {
+                        $('.list-element').removeClass("menu-active");
+                        $('.marker').removeClass("marker-active");
+                        $('#punto-venta').addClass("menu-active");
+                        $('#punto-venta').children('div.marker').addClass("marker-active");
+                        loadView('puntodeventa');
+                        window.setTimeout(function () {
+                            $('#CollapsePrecio').collapse('hide');
+                            $('#cantidad-producto-precio').val(1);
+                            $('#modal-consulta-precios').modal('show');
+                            window.setTimeout(() => { $('#buscar-producto-precio').select(); }, 600);
+                        }, 500);
+                    } else {
+                        if ($('#buscar-producto').length > 0) {
+                            $('#CollapsePrecio').collapse('hide');
+                            $('#cantidad-producto-precio').val(1);
+                            $('#modal-consulta-precios').modal('show');
+                            window.setTimeout(() => { $('#buscar-producto-precio').select(); }, 600);
+                        } else {
+                            loadView('puntodeventa');
+                            window.setTimeout(function () {
+                                $('#CollapsePrecio').collapse('hide');
+                                $('#cantidad-producto-precio').val(1);
+                                $('#modal-consulta-precios').modal('show');
+                                window.setTimeout(() => { $('#buscar-producto-precio').select(); }, 600);
+                            }, 500);
+                        }
+                    }
+                    return false;
+            }
+        }
+    }
+
+    if ($('#main-menu').length > 0) {
         FInicia();
     }
 });
@@ -12,36 +224,35 @@ var min = 0;
 var seg = 0;
 var count_back = 6;
 
-function FReset(){
-	min = 0;
-	seg = 0;
-	count_back = 6;
+function FReset() {
+    min = 0;
+    seg = 0;
+    count_back = 6;
 }
 
-function FInicia(){
-    document.onmousemove = function(){ FReset(); }
-    document.onkeyup = function(){ FReset(); }
+function FInicia() {
+    document.onmousemove = function () { FReset(); }
+    document.onkeyup = function () { FReset(); }
 
-    setInterval(()=>{
+    setInterval(() => {
         seg++;
-        if(seg == 60)
-        {
+        if (seg == 60) {
             min++;
             seg = 0;
         }
-        if(min == 14 && seg == 55){
+        if (min == 14 && seg == 55) {
             alertify.alert().setting({
                 'closable': false,
                 'title': 'ATENCIÓN',
-                'label':'CANCELAR',
-                'message': 'Tu sesión se cerrará por inactividad en <span id="timer"></span> segundos.' ,
-                'onok': function(){ FReset(); }
+                'label': 'CANCELAR',
+                'message': 'Tu sesión se cerrará por inactividad en <span id="timer"></span> segundos.',
+                'onok': function () { FReset(); }
             }).show();
-            
-            setTimeout(function() {
+
+            setTimeout(function () {
                 $('.ajs-button.ajs-ok').css({
                     'color': 'red',
-                    'border':'none !important',
+                    'border': 'none !important',
                     'border': '1px solid red',
                     'border-radius': '5px',
                     'cursor': 'pointer',
@@ -53,15 +264,15 @@ function FInicia(){
                 });
             }, 100);
         }
-        
-        if(min == 14 && seg >= 55){
+
+        if (min == 14 && seg >= 55) {
             count_back--;
             $('#timer').html(count_back);
         }
-        if(count_back == 1){
+        if (count_back == 1) {
             logout(987);
         }
-    },1000);
+    }, 1000);
 }
 
 function logout(p = 0) {
@@ -69,7 +280,7 @@ function logout(p = 0) {
     $.ajax({
         url: 'com.sine.enlace/enlacesession.php',
         type: 'POST',
-        data: {transaccion: 'logout'},
+        data: { transaccion: 'logout' },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -78,12 +289,12 @@ function logout(p = 0) {
                 alertify.error(res);
             } else {
                 if (datos == 'salir') {
-                    if(p == 0) {
+                    if (p == 0) {
                         location.href = 'index.php';
-                    }else{
+                    } else {
                         location.href = 'timeout.php';
                     }
-                    
+
                 } else {
                     alertify.error(res);
                 }
@@ -98,7 +309,7 @@ function valPeriodoPrueba() {
     $.ajax({
         url: 'com.sine.enlace/enlaceinicio.php',
         type: 'POST',
-        data: {transaccion: 'valperiodo'},
+        data: { transaccion: 'valperiodo' },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -117,7 +328,7 @@ function getUserFirstSession() {
     $.ajax({
         url: "com.sine.enlace/enlaceinicio.php",
         type: "POST",
-        data: {transaccion: "firstsession"},
+        data: { transaccion: "firstsession" },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -447,7 +658,7 @@ function getView(view) {
     $.ajax({
         url: 'com.sine.enlace/enlaceenrutador.php',
         type: 'POST',
-        data: {transaccion: "cargarvista", view: view},
+        data: { transaccion: "cargarvista", view: view },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -470,12 +681,12 @@ function loadView(vista) {
         'paginicio': ["getUserFirstSession()", 300, "getSaldo()", 350, "datosGrafica()", 400, "loadopcionesAno()", 450],
         'notificacion': ["filtrarNotificaciones()", 350],
         'comprar': [],
-        'nuevousuario': ["checkUsuario()", 350, /** "truncateTmp()", 400, "truncateTmpCot()", 400, */ "loadOpcionesEstado()", 450 ],
+        'nuevousuario': ["checkUsuario()", 350, /** "truncateTmp()", 400, "truncateTmpCot()", 400, */ "loadOpcionesEstado()", 450],
         'listasuarioaltas': ["truncateTmp()", 300, "truncateTmpCot()", 350, "loadBtnCrear('usuario')", 370, "filtrarUsuario()", 400],
         'asignarpermisos': ["truncateTmp()", 300, "truncateTmpCot()", 350],
         'categoria': [],
         'listacategoria': ["loadBtnCrear('categoria')", 360, "loadListaCategorias()", 500],
-        'nuevoproducto': ["truncateTmp()", 300, "truncateTmpCot()", 350, "loadOpcionesProveedor()", 350, "getOptionsTaxes()", 300, ],
+        'nuevoproducto': ["truncateTmp()", 300, "truncateTmpCot()", 350, "loadOpcionesProveedor()", 350, "getOptionsTaxes()", 300,],
         'listaproductoaltas': ["truncateTmp()", 300, "truncateTmpCot()", 350, "loadBtnCrear('producto')", 370, "loadListaProductosaltas()", 400],
         'valrfc': [],
         'nuevocliente': ["truncateTmpCot()", 350, "truncateTmp()", 400, "loadOpcionesEstado()", 420, "loadOpcionesBanco()", 450],
@@ -489,7 +700,7 @@ function loadView(vista) {
         'datosempresa': ["firmaCanvas()", 400, "loadOpcionesBanco()", 400, "loadOpcionesEstado()", 500],
         'nuevocontrato': ["truncateTmpCot()", 300, "loadOpcionesFolios()", 320, "filtrarProductos()", 350, "loadFecha()", 370, "loadOpcionesFormaPago()", 400, "loadOpcionesMetodoPago()", 420, "loadOpcionesMoneda()", 450, "loadOpcionesUsoCFDI()", 470, "loadOpcionesFacturacion()", 500, "loadOpcionesProveedor()", 520],
         'precio': ["truncateTmp()", 400, "truncateTmpCot()", 450],
-        'pago': ["loadFecha()", 300, "cancelarPago2()", 320,  "loadOpcionesFolios('3')", 350, "loadOpcionesMoneda()", 400, "loadOpcionesFormaPago2()", 420, "loadOpcionesFacturacion()", 500],
+        'pago': ["loadFecha()", 300, "cancelarPago2()", 320, "loadOpcionesFolios('3')", 350, "loadOpcionesMoneda()", 400, "loadOpcionesFormaPago2()", 420, "loadOpcionesFacturacion()", 500],
         'listapago': ["loadBtnCrear('pago')", 350, "opcionesMotivoCancelar()", 380, "loadListaPago()", 400],
         'factura': ["truncateTmp()", 300, "loadOpcionesFacturacion()", 320, "loadFecha()", 350, "loadOpcionesFolios('1')", 370, "filtrarProducto()", 400, "loadOpcionesFormaPago()", 420, "loadOpcionesMetodoPago()", 450, "loadOpcionesMoneda()", 470, "loadOpcionesUsoCFDI()", 500, "loadOpcionesComprobante()", 520, "loadOpcionesProveedor()", 550, "loadOpcionesTipoRelacion()", 570, "opcionesPeriodoGlobal()", 600, "opcionesMeses()", 620, "opcionesAnoGlobal()", 650],
         'listafactura': ["truncateTmp()", 300, "truncateTmpCot()", 350, "loadBtnCrear('factura')", 400, "opcionesMotivoCancelar()", 420, "filtrarFolio()", 450],
@@ -534,12 +745,14 @@ function loadView(vista) {
         'listaoperador': ["loadBtnCrear('operador')", 300, "filtrarOperador()", 320],
         'carta': ["truncateTmpCarta()", 300, "truncateTmpIMG()", 320, "loadOpcionesFolios('4')", 350, "loadFecha()", 370, "loadOpcionesEstado()", 400, "filtrarProducto()", 420, "loadOpcionesFormaPago()", 450, "loadOpcionesMetodoPago()", 470, "loadOpcionesMoneda()", 500, "loadOpcionesUsoCFDI()", 520, "loadOpcionesComprobante()", 550, "loadOpcionesFacturacion()", 570, "loadOpcionesProveedor()", 600, "opcionesPeriodoGlobal()", 620, "opcionesMeses()", 650, "opcionesAnoGlobal()", 670],
         'listacarta': ["truncateTmpCarta()", 300, "truncateTmpIMG()", 300, "loadBtnCrear('carta')", 300, "filtrarCarta()", 320, "opcionesMotivoCancelar()", 350],
-        'puntosdeventa': ["newVenta()", 300],
+        'puntodeventa': ["newVenta()", 300],
+        'listaticket': ["loadBtnCrear('ventas')", 300, "loadOpcionesUsuario()", 300],
+        'cortecaja': ["loadOpcionesUsuario()", 300]
     };
 
     if (actions[vista]) {
-        const timeouts = actions[vista]; 
-        for (let i = 0; i < timeouts.length; i += 2) { 
+        const timeouts = actions[vista];
+        for (let i = 0; i < timeouts.length; i += 2) {
             window.setTimeout(timeouts[i], timeouts[i + 1]);
         }
     }
@@ -549,7 +762,7 @@ function loadBtnCrear(view) {
     $.ajax({
         url: "com.sine.enlace/enlacepermiso.php",
         type: "POST",
-        data: {transaccion: "loadbtn", view: view},
+        data: { transaccion: "loadbtn", view: view },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -569,7 +782,7 @@ $(function () {
         if ($checkbox.length) {
             var $input = $checkbox.find('input');
             var $icon = $checkbox.find('span.far');
-            
+
             $input.prop('checked', !$input.is(':checked'));
             $icon.toggleClass('far fa-square far fa-check-square');
 
@@ -607,7 +820,7 @@ function loadImgPerfil(id) {
     $.ajax({
         url: "com.sine.enlace/enlaceusuario.php",
         type: "POST",
-        data: {transaccion: "editarusuario", idusuario: id},
+        data: { transaccion: "editarusuario", idusuario: id },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -641,7 +854,7 @@ function setImgUsuario(datos) {
     cargandoHide();
 }
 
-function VentanaCentrada(theURL, winName, features, myWidth, myHeight, isCenter) { 
+function VentanaCentrada(theURL, winName, features, myWidth, myHeight, isCenter) {
     if (window.screen)
         if (isCenter)
             if (isCenter == "true") {
@@ -659,7 +872,7 @@ function actualizarImgPerfil(idusuario) {
     $.ajax({
         url: "com.sine.enlace/enlaceusuario.php",
         type: "POST",
-        data: {transaccion: "actualizarimg", idusuario: idusuario, img: img, imgactualizar: imgactualizar},
+        data: { transaccion: "actualizarimg", idusuario: idusuario, img: img, imgactualizar: imgactualizar },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -676,10 +889,10 @@ function actualizarImgPerfil(idusuario) {
 
 function cargarImgPerfil() {
     var formData = new FormData();
-    var imgInput = $("#imagenusuario")[0].files[0]; 
+    var imgInput = $("#imagenusuario")[0].files[0];
     var rutaUsuarios = "temporal/usuarios/";
     var img = $("#imagenusuario").val();
-    
+
     formData.append("imagenperfil", imgInput);
     formData.append("ruta_personalizada", rutaUsuarios);
     if (isnEmpty(img, 'imagenusuario')) {
@@ -701,14 +914,14 @@ function cargarImgPerfil() {
     }
 }
 
-function eliminarImgTpm(){
-    var imgtmp = $("#filename").val() ? $("#filename").val(): $("#fileuser").val();
-    if(imgtmp != ''){
+function eliminarImgTpm() {
+    var imgtmp = $("#filename").val() ? $("#filename").val() : $("#fileuser").val();
+    if (imgtmp != '') {
         $.ajax({
-            data : { transaccion: "eliminarimgtmp", imgtmp: imgtmp},
-            url  : 'com.sine.enlace/enlaceusuario.php',
-            type : 'POST',
-            dataType : 'JSON',
+            data: { transaccion: "eliminarimgtmp", imgtmp: imgtmp },
+            url: 'com.sine.enlace/enlaceusuario.php',
+            type: 'POST',
+            dataType: 'JSON',
             success: function (datos) {
                 cargandoHide();
                 console.log(datos);
@@ -723,7 +936,7 @@ function editarPerfil(idusuario) {
     $.ajax({
         url: "com.sine.enlace/enlaceusuario.php",
         type: "POST",
-        data: {transaccion: "editarusuario", idusuario: idusuario},
+        data: { transaccion: "editarusuario", idusuario: idusuario },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -750,7 +963,7 @@ function getNombreUsuario() {
     $.ajax({
         url: 'com.sine.enlace/enlaceinicio.php',
         type: 'POST',
-        data: {transaccion: 'getnombre'},
+        data: { transaccion: 'getnombre' },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -787,7 +1000,7 @@ function enviarSoporte() {
         $.ajax({
             url: 'com.sine.enlace/enlaceinicio.php',
             type: 'POST',
-            data: {transaccion: 'sendsoporte', nombre: nombre, telefono: telefono, chwhats: chwhats, correo: correo, msg: txtbd},
+            data: { transaccion: 'sendsoporte', nombre: nombre, telefono: telefono, chwhats: chwhats, correo: correo, msg: txtbd },
             success: function (datos) {
                 var texto = datos.toString();
                 var bandera = texto.substring(0, 1);
@@ -808,7 +1021,7 @@ function disabledButton() {
     var saveButton = document.getElementById('btn-form-profile');
     var closeButton = document.getElementById('btn-close-modal');
 
-    fileInput.addEventListener('change', function() {
+    fileInput.addEventListener('change', function () {
         if (fileInput.files.length > 0) {
             saveButton.removeAttribute('disabled');
         } else {
@@ -816,7 +1029,7 @@ function disabledButton() {
         }
     });
 
-    closeButton.addEventListener('click', function() {
+    closeButton.addEventListener('click', function () {
         fileInput.value = '';
         if (fileInput.files.length > 0) {
             saveButton.removeAttribute('disabled');
@@ -830,7 +1043,7 @@ function getNotification(id) {
     $.ajax({
         url: 'com.sine.enlace/enlaceinicio.php',
         type: 'POST',
-        data: {transaccion: 'getnotification', id: id},
+        data: { transaccion: 'getnotification', id: id },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -872,7 +1085,7 @@ function updateNotificacion(id) {
     $.ajax({
         url: 'com.sine.enlace/enlaceinicio.php',
         type: 'POST',
-        data: {transaccion: 'updatenotification', id: id},
+        data: { transaccion: 'updatenotification', id: id },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -898,7 +1111,7 @@ function opcionesCorreoList() {
     $.ajax({
         url: 'com.sine.enlace/enlaceopcion.php',
         type: 'POST',
-        data: {transaccion: 'correolist'},
+        data: { transaccion: 'correolist' },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -915,7 +1128,7 @@ function loadOpcionesUsuario() {
     $.ajax({
         url: 'com.sine.enlace/enlaceopcion.php',
         type: 'POST',
-        data: {transaccion: 'opcionesusuario'},
+        data: { transaccion: 'opcionesusuario' },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -933,7 +1146,7 @@ function loadopcionesAno() {
     $.ajax({
         url: 'com.sine.enlace/enlaceopcion.php',
         type: 'POST',
-        data: {transaccion: 'opcionesano'},
+        data: { transaccion: 'opcionesano' },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -947,11 +1160,11 @@ function loadopcionesAno() {
     });
 }
 
-function loadOpcionesFolios(id = "" , serie = "", folio = "") {
+function loadOpcionesFolios(id = "", serie = "", folio = "") {
     $.ajax({
         url: 'com.sine.enlace/enlaceopcion.php',
         type: 'POST',
-        data: {transaccion: 'opcionesfolio', id:id, serie:serie, folio:folio},
+        data: { transaccion: 'opcionesfolio', id: id, serie: serie, folio: folio },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -967,12 +1180,12 @@ function loadOpcionesFolios(id = "" , serie = "", folio = "") {
 
 function loadOpcionesMoneda() {
     $.ajax({
-        data : {transaccion: 'getOptions'},
-        url  : '../../CATSAT/CATSAT/com.sine.enlace/enlaceMonedas.php',
-        type : 'POST',
-        dataType : 'JSON',
-        success  : function(res){
-            if(res.status > 0){
+        data: { transaccion: 'getOptions' },
+        url: '../../CATSAT/CATSAT/com.sine.enlace/enlaceMonedas.php',
+        type: 'POST',
+        dataType: 'JSON',
+        success: function (res) {
+            if (res.status > 0) {
                 $('#moneda-pago').html(res.datos);
             }
         }
@@ -981,12 +1194,12 @@ function loadOpcionesMoneda() {
 
 function loadOpcionesFormaPago2() {
     $.ajax({
-        data : {transaccion: 'getOptions'},
-        url  : '../../CATSAT/CATSAT/com.sine.enlace/enlaceFormaPago.php',
-        type : 'POST',
-        dataType : 'JSON',
-        success  : function(res){
-            if(res.status > 0){
+        data: { transaccion: 'getOptions' },
+        url: '../../CATSAT/CATSAT/com.sine.enlace/enlaceFormaPago.php',
+        type: 'POST',
+        dataType: 'JSON',
+        success: function (res) {
+            if (res.status > 0) {
                 $('#forma-pago').html(res.datos);
             }
         }
@@ -997,7 +1210,7 @@ function loadOpcionesFacturacion(id = "") {
     $.ajax({
         url: 'com.sine.enlace/enlaceopcion.php',
         type: 'POST',
-        data: {transaccion: 'opcionesfacturacion', id:id},
+        data: { transaccion: 'opcionesfacturacion', id: id },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -1015,7 +1228,7 @@ function opcionesMotivoCancelar() {
     $.ajax({
         url: 'com.sine.enlace/enlaceopcion.php',
         type: 'POST',
-        data: {transaccion: 'opcionesmotivo'},
+        data: { transaccion: 'opcionesmotivo' },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -1031,12 +1244,12 @@ function opcionesMotivoCancelar() {
 
 function loadOpcionesBanco() {
     $.ajax({
-        data : {transaccion: 'getOptions'},
-        url  : '../CATSAT/CATSAT/com.sine.enlace/enlaceBanco.php',
-        type : 'POST',
-        dataType : 'JSON',
-        success  : function(res){
-            if(res.status > 0){
+        data: { transaccion: 'getOptions' },
+        url: '../CATSAT/CATSAT/com.sine.enlace/enlaceBanco.php',
+        type: 'POST',
+        dataType: 'JSON',
+        success: function (res) {
+            if (res.status > 0) {
                 $('.contenedor-banco').html(res.datos);
             }
         }
@@ -1047,7 +1260,7 @@ function loadOpcionesProveedor(idprov = "") {
     $.ajax({
         url: 'com.sine.enlace/enlaceopcion.php',
         type: 'POST',
-        data: {transaccion: 'opcionesproveedor', idprov:idprov},
+        data: { transaccion: 'opcionesproveedor', idprov: idprov },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);

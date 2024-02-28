@@ -87,6 +87,43 @@ $(function () {
 
 });
 
+function registrarDineroInicial() {
+    var monto = $("#monto-inicial").val();
+    if (isnZero(monto, "monto-inicial")) {
+        $.ajax({
+            url: "com.sine.enlace/enlaceventa.php",
+            type: "POST",
+            data: {transaccion: "fondoinicial", monto: monto},
+            success: function (datos) {
+                var texto = datos.toString();
+                var bandera = texto.substring(0, 1);
+                var res = texto.substring(1, 1000);
+                if (bandera == '0') {
+                    alertify.error(res);
+                } else {
+                    $("#modal-dincaja").modal('hide');
+                }
+            }
+        });
+    }
+}
+
+function setLabelIngreso(ele) {
+    var type = $(ele).attr("id");
+    $("#monto-entrada").val('');
+    $("#concepto-entrada").val('');
+    if (type == 'btn-entrada') {
+        $('#label-ingresos').text('Registrar entrada de efectivo');
+        $("#type-movimiento").val('1');
+    } else if (type == 'btn-salida') {
+        $('#label-ingresos').text('Registrar salida de efectivo');
+        $("#type-movimiento").val('2');
+    }
+    window.setTimeout(()=>{
+        $('#monto-entrada').select();
+    },500);
+}
+
 var numticket = 1;
 function newVenta() {
     cargandoHide();
@@ -150,4 +187,115 @@ function cerrarTicket(tab = "") {
             }
         });
     }).set({title: "Q-ik"});
+}
+
+function aucompletarProducto() {
+    $('#buscar-producto').autocomplete({
+        source: "com.sine.enlace/enlaceautocompletar.php?transaccion=producto",
+        select: function (event, ui) {
+            var a = ui.item.value;
+            var id = ui.item.id;
+        }
+    });
+}
+
+function agregarProducto() {
+    var tab = $("#tabs").find('.sub-tab-active').attr("data-tab");
+    var producto = $("#buscar-producto").val();
+    if (isnEmpty(producto, "buscar-producto")) {
+        $.ajax({
+            url: "com.sine.enlace/enlaceventa.php",
+            type: "POST",
+            data: {transaccion: "agregarproducto", producto: producto, tab: tab},
+            success: function (datos) {
+                var texto = datos.toString();
+                var bandera = texto.substring(0, 1);
+                var res = texto.substring(1, 1000);
+                if (bandera == '0') {
+                    alertify.error(res);
+                } else {
+                    $("#buscar-producto").val('');
+                    aucompletarProducto();
+                    tablaProducto();
+                }
+            }
+        });
+    }
+}
+
+function tablaProducto() {
+    var tab = $("#tabs").find('.sub-tab-active').attr("data-tab");
+    $.ajax({
+        url: "com.sine.enlace/enlaceventa.php",
+        type: "POST",
+        data: {transaccion: "tablatmp", tab: tab},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 1000);
+            if (bandera == '0') {
+                alertify.error(res);
+            } else {
+                $("#prod-" + tab).html(datos);
+                cargandoHide();
+            }
+        }
+    });
+}
+
+function registrarEntrada() {
+    var cantidad = $("#monto-entrada").val();
+    var concepto = $("#concepto-entrada").val();
+    if (isNumber(cantidad, "monto-entrada") && isnEmpty(concepto, "concepto-entrada")) {
+        $.ajax({
+            url: 'com.sine.enlace/enlaceventa.php',
+            type: 'POST',
+            data: {transaccion: 'registrarmovimiento', tipo: $("#type-movimiento").val(), cantidad: cantidad, concepto: concepto},
+            success: function (datos) {
+                var texto = datos.toString();
+                var bandera = texto.substring(0, 1);
+                var res = texto.substring(1, 5000);
+                if (bandera == '0') {
+                    alertify.error(res);
+                } else {
+                    $("#modal-entradas").modal("hide");
+                    alertify.success("Movimiento de efectivo registrado.");
+                }
+            }
+        });
+    }
+}
+
+function setValoresCobrar() {
+    var tab = $("#tabs").find('.sub-tab-active').attr("data-tab");
+    $("#label-cambio").val("$0.00");
+    $.ajax({
+        url: 'com.sine.enlace/enlaceventa.php',
+        type: 'POST',
+        data: {transaccion: 'totalticket', tab: tab},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 5000);
+            if (bandera == '0') {
+                alertify.error(res);
+            } else {
+                var array = res.split("</tr>");
+                var total = array[0];
+                var articulos = array[1];
+                var descuento = array[2];
+                $("#label-total").html("$" + total);
+                $("#total-cobrar").val(total);
+                $("#total-original").val(total);
+                $("#monto-pagado").val(total);
+                $("#label-art").html(articulos);
+                $('#label-descuento').html("$ "+descuento);
+                $('#input-descuento').val(descuento);
+                $('#input-descuento-original').val(descuento);
+                window.setTimeout(() => {
+                    $("#monto-pagado").select();
+                }, 500);
+            }
+        }
+    });
 }

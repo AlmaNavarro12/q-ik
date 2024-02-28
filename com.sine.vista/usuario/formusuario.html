@@ -1,144 +1,145 @@
 <div class="col-md-12">
-        <div class="titulo-lista" id="contenedor-titulo-form-usuario">Nuevo usuario </div>
+    <div class="titulo-lista" id="contenedor-titulo-form-usuario">Nuevo usuario </div>
+</div>
+<div id="div-space">
+</div>
+<div class="div-form p-5 border border-secondary-subtle">
+    <div class="row">
+        <div class="col-md-12 d-flex justify-content-end mb-2">
+            <label class="fw-bold text-danger small">* Campo obligatorio</label>
+        </div>
     </div>
-    <div id="div-space">
-    </div>
-    <div class="div-form p-5 border border-secondary-subtle">
-        <div class="row">
-            <div class="col-md-12 d-flex justify-content-end mb-2">
-                <label class="fw-bold text-danger small">* Campo obligatorio</label>
-            </div>
-        </div>
-        <div class="row ">
-            <div class="col-md-6">
-                <div class="col-md-12 ps-0 text-center ex-profile" id="muestraimagen"></div>
-                <label class="label-form" for="perfil"> &nbsp; </label>
-                <div class="col-md-11 col-sm-12 pb-3 mx-auto py-1" id="label">
-                    <label class="button-file col-12" for="imagenperfil"><span class="fas fa-image"></span>
-                        Imagen de perfil</label>
-                    <div class="form-group">
-                        <input class="form-control text-center upload" hidden id="imagenperfil" name="imagenperfil" type="file" accept=".png, .jpeg, .jpg, .gif"
-                            onchange="cargarImgUsuario();" />
-                        <input id="filename" name="filename" type="hidden" />
-                        <div id="imagenperfil-errors">
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <label class="label-form" for="nombre">Nombre</label> <label
-                    class="mark-required text-danger fw-bold">*</label>
+    <div class="row ">
+        <div class="col-md-6">
+            <div class="col-md-12 ps-0 text-center ex-profile" id="muestraimagen"></div>
+            <label class="label-form" for="perfil"> &nbsp; </label>
+            <div class="col-md-11 col-sm-12 pb-3 mx-auto py-1" id="label">
+                <label class="button-file col-12" for="imagenperfil"><span class="fas fa-image"></span>
+                    Imagen de perfil</label>
                 <div class="form-group">
-                    <input class="form-control text-center input-form" id="nombre" name="nombre" placeholder="Nombre"
-                        type="text"  oninput="validarLet(this)"/>
-                    <div id="nombre-errors">
+                    <input class="form-control text-center upload" hidden id="imagenperfil" name="imagenperfil"
+                        type="file" accept=".png, .jpeg, .jpg, .gif" onchange="cargarImgUsuario();" />
+                    <input id="filename" name="filename" type="hidden" />
+                    <div id="imagenperfil-errors">
                     </div>
                 </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col-md-6 py-2">
-                <label class="label-form" for="apellido-paterno">Apellido paterno</label> <label
-                    class="mark-required text-danger fw-bold">*</label>
-                <div class="form-group">
-                    <input class="form-control text-center input-form" id="apellido-paterno" name="apellido-paterno"
-                        placeholder="Apellido paterno" type="text"  oninput="validarLet(this)"/>
-                    <div id="apellido-paterno-errors"></div>
+        <div class="col-md-6">
+            <label class="label-form" for="nombre">Nombre</label> <label
+                class="mark-required text-danger fw-bold">*</label>
+            <div class="form-group">
+                <input class="form-control text-center input-form" id="nombre" name="nombre" placeholder="Nombre"
+                    type="text" oninput="validarLet(this)" />
+                <div id="nombre-errors">
                 </div>
-            </div>
-            <div class="col-md-6 py-2">
-                <label class="label-form" for="apellido-materno">Apellido materno</label> <label
-                    class="mark-required text-danger fw-bold">*</label>
-                <div class="form-group">
-                    <input class="form-control text-center input-form" id="apellido-materno" name="apellido-materno"
-                        placeholder="Apellido materno" type="text"  oninput="validarLet(this)"/>
-                    <div id="apellido-materno-errors">
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-lg-6 col-12 py-2">
-                <label class="label-form" for="usuario">Nombre de usuario</label>
-                <label class="mark-required text-danger fw-bold">*</label>
-                <div class="row">
-                    <div id="div-user" class="form-group">
-                        <input class="form-control input-form" id="usuario" name="usuario"
-                            placeholder="Nombre de usuario" type="text" />
-                        <div id="usuario-errors"></div>
-                    </div>
-                    <span id="span-user" class="">
-                    </span>
-                </div>
-            </div>
-            <div class="col-lg-6 col-12 py-2">
-                <label class="label-form" for="contrasena">Contraseña</label>
-                <label class="mark-required text-danger fw-bold">*</label>
-                <div class="row">
-                    <div id="div-pass" class="form-group">
-                        <input class="form-control input-form" id="contrasena" name="contrasena"
-                            placeholder="Contraseña" type="password" autocomplete="new-password" />
-                        <div id="contrasena-errors"></div>
-                    </div>
-                    <span id="span-pass" class="">
-                    </span>
-                </div>
-            </div>
-        </div>
-        
-        
-        <div class="row">
-            <div class="col-md-6 py-2">
-                <label class="label-form" for="correo">Correo</label> <label
-                    class="mark-required text-danger fw-bold">*</label>
-                <div class="form-group">
-                    <input class="form-control text-center input-form" id="correo" name="correo" placeholder="Correo"
-                        type="email" />
-                    <div id="correo-errors"></div>
-                </div>
-            </div>
-            <div class="col-md-6 py-2">
-                <label class="label-form" for="telefono">Teléfono</label> <label
-                    class="mark-required text-danger fw-bold">*</label>
-                <div class="form-group">
-                    <input class="form-control text-center input-form" id="telefono" name="telefono"
-                        placeholder="Telefono" type="text" maxlength="10" oninput="validarNum(this)"/>
-                    <div id="telefono-errors">
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-6 py-2">
-                <label class="label-form" for="celular">Celular</label> <label class="fw-bold text-white"> </label>
-                <div class="form-group">
-                    <input class="form-control text-center input-form" id="celular" name="celular" placeholder="Celular"
-                        type="text" maxlength="10" oninput="validarNum(this)" />
-                    <div id="correo-errors">
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 py-2">
-                <label class="label-form" for="tipo-usuario">Tipo de usuario</label> <label
-                    class="mark-required text-danger fw-bold">*</label>
-                <div class="form-group">
-                    <select class="form-select text-center input-form" id="tipo-usuario" name="tipo-usuario">
-                        <option value="" id="option-default-tipo">- - - -</option>
-                        <option value="1" id="tipo1">Administrador</option>
-                        <option value="2" id="tipo2">Empleado</option>
-                    </select>
-                    <div id="tipo-usuario-errors">
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row py-2 px-1 mt-3">
-            <div class="col-md-12 d-flex justify-content-end col-12">
-                <button class="button-form col-auto btn btn-danger" onclick="eliminarImgTpm(); loadView('listasuarioaltas');">Cancelar <span
-                        class="fas fa-times"></span></button> &nbsp;
-                <button class="button-form col-auto btn btn-primary" onclick="insertarUsuario()" id="btn-form-usuario">Guardar <span
-                        class="fas fa-save"></span></button>
             </div>
         </div>
     </div>
+    <div class="row">
+        <div class="col-md-6 py-2">
+            <label class="label-form" for="apellido-paterno">Apellido paterno</label> <label
+                class="mark-required text-danger fw-bold">*</label>
+            <div class="form-group">
+                <input class="form-control text-center input-form" id="apellido-paterno" name="apellido-paterno"
+                    placeholder="Apellido paterno" type="text" oninput="validarLet(this)" />
+                <div id="apellido-paterno-errors"></div>
+            </div>
+        </div>
+        <div class="col-md-6 py-2">
+            <label class="label-form" for="apellido-materno">Apellido materno</label> <label
+                class="mark-required text-danger fw-bold">*</label>
+            <div class="form-group">
+                <input class="form-control text-center input-form" id="apellido-materno" name="apellido-materno"
+                    placeholder="Apellido materno" type="text" oninput="validarLet(this)" />
+                <div id="apellido-materno-errors">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-6 col-12 py-2">
+            <label class="label-form" for="usuario">Nombre de usuario</label>
+            <label class="mark-required text-danger fw-bold">*</label>
+            <div class="row">
+                <div id="div-user" class="form-group">
+                    <input class="form-control input-form" id="usuario" name="usuario" placeholder="Nombre de usuario"
+                        type="text" />
+                    <div id="usuario-errors"></div>
+                </div>
+                <span id="span-user" class="">
+                </span>
+            </div>
+        </div>
+        <div class="col-lg-6 col-12 py-2">
+            <label class="label-form" for="contrasena">Contraseña</label>
+            <label class="mark-required text-danger fw-bold">*</label>
+            <div class="row">
+                <div id="div-pass" class="form-group">
+                    <input class="form-control input-form" id="contrasena" name="contrasena" placeholder="Contraseña"
+                        type="password" autocomplete="new-password" />
+                    <div id="contrasena-errors"></div>
+                </div>
+                <span id="span-pass" class="">
+                </span>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-md-6 py-2">
+            <label class="label-form" for="correo">Correo</label> <label
+                class="mark-required text-danger fw-bold">*</label>
+            <div class="form-group">
+                <input class="form-control text-center input-form" id="correo" name="correo" placeholder="Correo"
+                    type="email" />
+                <div id="correo-errors"></div>
+            </div>
+        </div>
+        <div class="col-md-6 py-2">
+            <label class="label-form" for="telefono">Teléfono</label> <label
+                class="mark-required text-danger fw-bold">*</label>
+            <div class="form-group">
+                <input class="form-control text-center input-form" id="telefono" name="telefono" placeholder="Telefono"
+                    type="text" maxlength="10" oninput="validarNum(this)" />
+                <div id="telefono-errors">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 py-2">
+            <label class="label-form" for="celular">Celular</label> <label class="fw-bold text-white"> </label>
+            <div class="form-group">
+                <input class="form-control text-center input-form" id="celular" name="celular" placeholder="Celular"
+                    type="text" maxlength="10" oninput="validarNum(this)" />
+                <div id="correo-errors">
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 py-2">
+            <label class="label-form" for="tipo-usuario">Tipo de usuario</label> <label
+                class="mark-required text-danger fw-bold">*</label>
+            <div class="form-group">
+                <select class="form-select text-center input-form" id="tipo-usuario" name="tipo-usuario">
+                    <option value="" id="option-default-tipo">- - - -</option>
+                    <option value="1" id="tipo1">Administrador</option>
+                    <option value="2" id="tipo2">Empleado</option>
+                </select>
+                <div id="tipo-usuario-errors">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row py-2 px-1 mt-3">
+        <div class="col-md-12 d-flex justify-content-end col-12">
+            <button class="button-form col-auto btn btn-danger"
+                onclick="eliminarImgTpm(); loadView('listasuarioaltas');">Cancelar <span
+                    class="fas fa-times"></span></button> &nbsp;
+            <button class="button-form col-auto btn btn-primary" onclick="insertarUsuario()"
+                id="btn-form-usuario">Guardar <span class="fas fa-save"></span></button>
+        </div>
+    </div>
+</div>
 <script type="text/javascript" src="js/scriptusuario.js"></script>

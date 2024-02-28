@@ -63,7 +63,7 @@ require_once 'Enrutador.php';
     echo "<script>var uid = '" . $uid . "';</script>";
     echo "<script>var nombreusuario = '" . $nombreusuario . "';</script>";
     echo "<script>var imagenperfil = '" . $imgperfil . "';</script>";
-    echo "<script>var cartaportepermiso = '" . $cartaporte . "';</script>";
+    echo "<script>var puntoventa = '" . $ventas . "';</script>";
     ?>
 </head>
 
@@ -361,7 +361,7 @@ require_once 'Enrutador.php';
                                 case '14':
                                     if ($ventas == '1') {
                                     ?>
-                                        <li class="list-element mt-1 list-menu ps-5" data-submenu='puntosdeventa'>
+                                        <li class="list-element mt-1 list-menu ps-5" data-submenu='puntodeventa'>
                                             <div class="marker"></div>
                                             <div class="pad"></div><label> Puntos de ventas</label>
                                         </li>

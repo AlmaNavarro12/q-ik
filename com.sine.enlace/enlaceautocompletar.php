@@ -11,10 +11,10 @@ if (isset($_GET['transaccion'])) {
         case 'nombrecliente':
             echo json_encode($cp->getCoincidenciasBusquedaCliente($_GET['term']));
             break;
-        /*
-        case 'nomcliente':
-            echo json_encode($cp->getCoincidenciasBusquedaCliente2($_GET['term']));
+        case 'producto':
+            echo json_encode($cp->getCoincidenciasBusquedaProducto($_GET['term']));
             break;
+        /*
         case 'emailcliente':
             echo json_encode($cp->getCoincidenciasBusquedaMail($_GET['term']));
             break;

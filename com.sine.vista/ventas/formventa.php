@@ -2,6 +2,7 @@
 include("modals.php");
 ?>
 
+<div class='container'>
 <div class="col-md-12">
     <div class="titulo-lista" id="contenedor-titulo-form-venta">Nueva Venta </div>
 </div>
@@ -32,13 +33,13 @@ include("modals.php");
         </div>
 
         <div class="col-2">
-            <button id="btn-entrada" type="button" class="button-modal col-12" data-toggle="modal" data-target="#modal-entradas" onclick="setLabelIngreso(this)">
+            <button id="btn-entrada" type="button" class="button-modal col-12" data-bs-toggle="modal" data-bs-target="#modal-entradas" onclick="setLabelIngreso(this)">
                 <span class="fas fa-dollar-sign"></span> Registrar <br> Entrada (F2)
             </button>
         </div>
 
         <div class="col-2">
-            <button id="btn-salida" type="button" class="button-modal col-12" data-toggle="modal" data-target="#modal-entradas" onclick="setLabelIngreso(this)">
+            <button id="btn-salida" type="button" class="button-modal col-12" data-bs-toggle="modal" data-bs-target="#modal-entradas" onclick="setLabelIngreso(this)">
                 <span class="fas fa-dollar-sign"></span> Registrar <br> Salida (F3)
             </button>
         </div>
@@ -69,5 +70,6 @@ include("modals.php");
             </div>
         </div>
     </div>
+</div>
 </div>
 <script src="js/scriptventa.js"></script>

@@ -25,6 +25,7 @@ class ControladorButton{
     public function loadButton($view)
     {
         $permisos = $this->getPermisoById();
+        //
         $botones = [
             'factura' => ['crearfactura', 'factura', 'Crear Factura'],
             'pago' => ['crearpago', 'pago', 'Crear Pago'],
@@ -51,7 +52,8 @@ class ControladorButton{
             'transporte' => ['creartransporte', 'transporte', 'Crear Transporte'],
             'remolque' => ['crearremolque', 'remolque', 'Crear Remolque'],
             'operador' => ['crearoperador', 'operador', 'Crear Operador'],
-            'carta' => ['crearcarta', 'carta', 'Crear Carta']
+            'carta' => ['crearcarta', 'carta', 'Crear Carta'],
+            'ventas' => ['crearventa', 'puntodeventa', 'Nueva venta'],
         ];
     
         $btn = "";

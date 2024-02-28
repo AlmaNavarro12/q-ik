@@ -79,4 +79,22 @@ class ControladorAuto {
     
         return $datos;
     }
+
+    public function getCoincidenciasBusquedaProducto($referencia) {
+        $datos = array();
+        $consulta = "SELECT * FROM productos_servicios WHERE ((codproducto LIKE '%$referencia%') OR (nombre_producto LIKE '%$referencia%') OR (descripcion_producto LIKE '%$referencia%') OR (clave_fiscal LIKE '%$referencia%')) LIMIT 15;";
+        $resultados = $this->consultas->getResults($consulta, null);
+        $contador = 0;
+        foreach ($resultados as $resultado) {
+            $datos[] = array("value" => $resultado['codproducto']."-".$resultado['nombre_producto'],
+                "id" => $resultado["idproser"],
+                "codigo" => $resultado['codproducto'],
+                "nombre" => $resultado['nombre_producto']);
+            $contador++;
+        }
+        if ($contador == 0) {
+            $datos [] = array("value" => "No se encontraron registros", "id" => "Ninguno");
+        }
+        return $datos;
+    }
 }
