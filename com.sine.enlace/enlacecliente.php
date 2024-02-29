@@ -8,30 +8,25 @@ if (isset($_POST['transaccion'])) {
 
     switch ($transaccion) {
         case 'insertarcliente':
-            $c = obtenerDatosCliente();
-            $insertado = $cc->nuevoCliente($c);
+            $insertado = $cc->nuevoCliente(obtenerDatosCliente());
             echo $insertado ? "Registro insertado" : "0Error: no insertó el registro";
             break;
-
         case 'editarcliente':
             $idcliente = $_POST['idcliente'];
             $datos = $cc->getDatosCliente($idcliente);
             echo $datos != "" ? $datos : "0No se han encontrado datos";
             break;
-
         case 'actualizarcliente':
             $idcliente = obtenerDatosCliente();
             $idcliente->setIdCliente($_POST['idcliente']);
             $actualizado = $cc->modificarCliente($idcliente);
             echo $actualizado ? "Registro actualizado" : "0Error: no actualizó el registro";
             break;
-
         case 'eliminarcliente':
             $idcliente = $_POST['idcliente'];
             $eliminado = $cc->quitarCliente($idcliente);
             echo $eliminado ? "Registro eliminado" : "0No se han encontrado datos";
             break;
-
         case 'filtrarcliente':
             $REF = $_POST['REF'];
             $pag = $_POST['pag'];

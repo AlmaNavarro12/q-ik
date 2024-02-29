@@ -5,8 +5,6 @@
     <div class="row">
         <div class="col-md-12 d-flex justify-content-end mb-2">
             <label class="fw-bold text-danger small">* Campo obligatorio</label>
-            <input class="form-control text-center input-form hidden" id="id-cliente" name="id-cliente"
-                placeholder="id-cliente" type="text" hidden>
         </div>
     </div>
     <div class="row">
@@ -142,7 +140,7 @@
             <label class="label-form text-right" for="id-banco">Banco</label><label
                 class="mark-required text-danger fw-bold">&nbsp;</label>
             <div class="form-group">
-                <select class="form-select text-center input-form" id="id-banco" name="id-banco">
+                <select class="form-select text-center input-form id-banco" id="id-banco" name="id-banco">
                     <option value="" id="option-default-banco">- - - -</option>
                     <optgroup id="banco" class="contenedor-banco text-left"> </optgroup>
                 </select>
@@ -187,7 +185,7 @@
             <label class="label-form text-right" for="id-banco1">Banco 2</label><label
                 class="mark-required text-danger fw-bold">&nbsp;</label>
             <div class="form-group">
-                <select class="form-select text-center input-form" id="id-banco1" name="id-banco">
+                <select class="form-select text-center input-form id-banco1" id="id-banco1" name="id-banco">
                     <option value="" id="option-default-banco1">- - - -</option>
                     <optgroup id="banco1" class="contenedor-banco1 contenedor-banco"> </optgroup>
                 </select>
@@ -224,7 +222,7 @@
             <label class="label-form text-right" for="id-banco2">Banco 3</label><label
                 class="mark-required text-danger fw-bold">&nbsp;</label>
             <div class="form-group">
-                <select class="form-select text-center input-form" id="id-banco2" name="id-banco2">
+                <select class="form-select text-center input-form id-banco2" id="id-banco2" name="id-banco2">
                     <option value="" id="option-default-banco2">- - - -</option>
                     <optgroup id="banco2" class="contenedor-banco2 contenedor-banco"> </optgroup>
                 </select>
@@ -264,7 +262,7 @@
             <label class="label-form text-right" for="id-banco3">Banco 4</label><label
                 class="mark-required text-danger fw-bold">&nbsp;</label>
             <div class="form-group">
-                <select class="form-select text-center input-form" id="id-banco3" name="id-banco3">
+                <select class="form-select text-center input-form id-banco3" id="id-banco3" name="id-banco3">
                     <option value="" id="option-default-banco3">- - - -</option>
                     <optgroup id="banco3" class="contenedor-banco3 contenedor-banco"> </optgroup>
                 </select>
@@ -439,7 +437,7 @@
         <div class="col-md-12 text-end">
             <button class="button-form btn btn-danger" onclick="loadView('listaclientealtas');">Cancelar <span
                     class="fas fa-times"></span></button> &nbsp;
-            <button class="button-form btn btn-primary" onclick="insertarCliente();"
+            <button class="button-form btn btn-primary" onclick="gestionarCliente();"
                 id="btn-form-cliente-guardar">Guardar
                 <span class="fas fa-save"></span></button>
         </div>

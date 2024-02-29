@@ -209,6 +209,7 @@ function obtenerDatosPermisos()
     $p->setCrearVenta($_POST['crearventa']);
     $p->setCancelarVenta($_POST['cancelarventa']);
     $p->setExportarVenta($_POST['exportarventa']);
+    $p->setListaVenta($_POST['listaventa']);
     return $p;
 }
 

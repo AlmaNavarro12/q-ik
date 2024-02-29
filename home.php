@@ -47,9 +47,11 @@ require_once 'Enrutador.php';
     $reporteventa = $div[29];
     $configuracion = $div[30];
     $ventas = $div[31];
-    $acceso = $div[32];
-    $imgperfil = $div[33];
-    $modulos = $div[34];
+    $crearventa = $div[32];
+    $listaventa = $div[33];
+    $acceso = $div[34];
+    $imgperfil = $div[35];
+    $modulos = $div[36];
 
     $notificaciones = $cp->getNotificacion();
     $divN = explode("<corte>", $notificaciones);
@@ -64,6 +66,7 @@ require_once 'Enrutador.php';
     echo "<script>var nombreusuario = '" . $nombreusuario . "';</script>";
     echo "<script>var imagenperfil = '" . $imgperfil . "';</script>";
     echo "<script>var puntoventa = '" . $ventas . "';</script>";
+    echo "<script>var crearventa = '" . $crearventa . "';</script>";
     ?>
 </head>
 
@@ -359,9 +362,10 @@ require_once 'Enrutador.php';
                                     }
                                     break;
                                 case '14':
-                                    if ($ventas == '1') {
+                                    if ($crearventa == '1' || $listaventa == '1') {
+                                        $ventavista = ($crearventa == '1') ? 'puntodeventa' : 'listaticket';
                                     ?>
-                                        <li class="list-element mt-1 list-menu ps-5" data-submenu='puntodeventa'>
+                                        <li class="list-element mt-1 list-menu ps-5" data-submenu='<?php echo $ventavista; ?>'>
                                             <div class="marker"></div>
                                             <div class="pad"></div><label> Puntos de ventas</label>
                                         </li>

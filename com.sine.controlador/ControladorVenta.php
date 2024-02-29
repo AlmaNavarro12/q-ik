@@ -8,11 +8,13 @@ require_once '../com.sine.modelo/SendMail.php';
 date_default_timezone_set("America/Mexico_City");
 session_start();
 
-class ControladorVenta {
+class ControladorVenta
+{
 
     private $consultas;
 
-    function __construct() {
+    function __construct()
+    {
         $this->consultas = new Consultas();
     }
 
@@ -26,7 +28,8 @@ class ControladorVenta {
         return $tag;
     }
 
-    public function loadNewTicket($ticket) {
+    public function loadNewTicket($ticket)
+    {
         $tag = $this->genTag();
         $tab = "<button id='tab-$tag' class='sm-tab sub-tab-active' data-tab='$tag' name='tab' >Ticket $ticket &nbsp; <span  class='close-button' data-tab='$tag' type='button' aria-label='Close'><span aria-hidden='true'>&times;</span></span></button>
                 <cut>
@@ -34,8 +37,8 @@ class ControladorVenta {
                         <table id='prod-$tag' class='table tab-hover table-condensed table-responsive table-row table-venta'>
                             <thead class='sin-paddding'>
                                 <tr>
-                                    <th class='text-center'>COD BARRAS</th>
-                                    <th class='text-center'>CLV FISCAL</th>
+                                    <th class='text-center'>COD.BARRAS</th>
+                                    <th class='text-center'>CLV.FISCAL</th>
                                     <th class='text-center'>DESCRIPCIÓN</th>
                                     <th class='text-center'>PRECIO</th>
                                     <th class='text-center'>CANT.</th>
@@ -64,23 +67,24 @@ class ControladorVenta {
         return $tab;
     }
 
-    private function newbuildArray($tipo, $precio, $taxes) {
-        $row = [];
+    private function newbuildArray($tipo, $precio, $taxes) { 
+        $row = array();
         $consulta = "SELECT * FROM impuesto WHERE tipoimpuesto = :tipo AND porcentaje IN ($taxes)";
-        $val = ["tipo" => $tipo];
+        $val = array("tipo" => $tipo);
         $imptraslados = $this->consultas->getResults($consulta, $val);
-        
         foreach ($imptraslados as $tactual) {
             $impuesto = $tactual['impuesto'];
             $porcentaje = $tactual['porcentaje'];
-            $imp = $precio * $porcentaje;
-            $row[] = bcdiv($imp, '1', 2) . '-' . $porcentaje . '-' . $impuesto;
+                $imp = $precio * $porcentaje;
+                $row[] = bcdiv($imp, '1', 2) . '-' . $porcentaje . '-' . $impuesto;
         }
-    
-        return implode("<impuesto>", $row);
+
+        $trasarray = implode("<impuesto>", $row);
+        return $trasarray;
     }
 
-    private function getProductobyCodAux($cod) {
+    private function getProductobyCodAux($cod)
+    {
         $datos = false;
         $consulta = "SELECT * FROM productos_servicios WHERE codproducto=:cod";
         $val = array("cod" => $cod);
@@ -88,7 +92,8 @@ class ControladorVenta {
         return $datos;
     }
 
-    public function getProductobyCod($cod) {
+    public function getProductobyCod($cod)
+    {
         $datos = false;
         $prod = $this->getProductobyCodAux($cod);
         foreach ($prod as $actual) {
@@ -98,30 +103,34 @@ class ControladorVenta {
             $nombre = $actual['nombre_producto'];
             $pventa = $actual['precio_venta'];
             $taxes = $actual['impuestos_aplicables'];
-            $datos = "$idprod</tr>$clvfiscal</tr>$clvunidad</tr>$nombre</tr>$pventa</tr>$taxes";
+            $inv = $actual['cantinv'];
+            $datos = "$idprod</tr>$clvfiscal</tr>$clvunidad</tr>$nombre</tr>$pventa</tr>$taxes</tr>$inv";
         }
         return $datos;
     }
 
-    public function agregarProducto($cod, $tab, $sid) {
+    public function agregarProducto($cod, $tab, $sid)
+    {
         $taxes_traslados = [];
         $taxes_retencion = [];
-    
+
         $div = explode("-", $cod);
         $cod = $div[0];
         $prod = $this->getProductobyCod($cod);
-    
+
         if ($prod) {
             $div = explode("</tr>", $prod);
+            $idproducto = $div[0];
             $taxes = $div[5];
+            $cantidad = $div[6];
             $array_taxes = explode("<tr>", $taxes);
-    
+
             foreach ($array_taxes as $tax) {
                 $div_tipo = explode("-", $tax);
                 if ($div_tipo[0] !== "") {
                     $percen_tax = $div_tipo[0];
                     $tipo = $div_tipo[1];
-                    
+
                     if ($tipo == 1) {
                         $taxes_traslados[] = $percen_tax;
                     } else {
@@ -129,12 +138,12 @@ class ControladorVenta {
                     }
                 }
             }
-    
+
             $traslados = $this->newbuildArray('1', $div[4], implode(",", $taxes_traslados));
             $retenciones = $this->newbuildArray('2', $div[4], implode(",", $taxes_retencion));
-    
+
             $insertar = false;
-            
+
             $consulta = "INSERT INTO `tmpticket` VALUES (:id, :idprod, :cod, :cfiscal, :cunidad, :prod, :precio, :cant, :descuento, :impdescuento, :importe, :totaldescuento, :traslados, :retenciones, :tab, :sid);";
             $val = [
                 "id" => null,
@@ -154,25 +163,65 @@ class ControladorVenta {
                 "tab" => $tab,
                 "sid" => $sid
             ];
-    
+
             $insertar = $this->consultas->execute($consulta, $val);
+            $restante = $cantidad - 1;
+            $this->restaurarInvCant($idproducto, $restante);
         } else {
             $insertar = "0No se encontró el producto";
         }
-    
+
         return $insertar;
     }
 
-    private function getTmpTicket($tab, $sid) {
+    private function getTmpTicket($tab, $sid)
+    {
         $consultado = false;
         $consulta = "SELECT * FROM tmpticket WHERE tagtab=:tab AND sid=:sid ORDER BY idtmpticket DESC;";
-        $val = array("tab" => $tab,
-            "sid" => $sid);
+        $val = array(
+            "tab" => $tab,
+            "sid" => $sid
+        );
         $consultado = $this->consultas->getResults($consulta, $val);
         return $consultado;
     }
 
-    private function getImpuestos($tipo) {
+    private function getDineroCajaAux() {
+        $hoy = date("Y-m-d");
+        $uid = $_SESSION[sha1("idusuario")];
+        $datos = false;
+        $consulta = "SELECT * FROM fondocaja WHERE fechaingreso=:fecha AND uidfondo=:uid";
+        $val = array("fecha" => $hoy,
+            "uid" => $uid);
+        $datos = $this->consultas->getResults($consulta, $val);
+        return $datos;
+    }
+
+    public function checkDineroCaja() {
+        $check = false;
+        $datos = $this->getDineroCajaAux();
+        foreach ($datos as $actual) {
+            $check = true;
+        }
+        return $check;
+    }
+
+    public function insertarMontoInicial($monto) {
+        $hoy = date("Y-m-d");
+        $hora = date("H:i");
+        $insertado = false;
+        $consulta = "INSERT INTO fondocaja VALUES (:id, :fecha, :hora, :fondo, :uid);";
+        $val = array("id" => null,
+            "fecha" => $hoy,
+            "hora" => $hora,
+            "fondo" => $monto,
+            "uid" => $_SESSION[sha1("idusuario")]);
+        $insertado = $this->consultas->execute($consulta, $val);
+        return $insertado;
+    }
+
+    private function getImpuestos($tipo)
+    {
         $consultado = false;
         $consulta = "SELECT * FROM impuesto WHERE tipoimpuesto=:tipo";
         $valores = array("tipo" => $tipo);
@@ -180,233 +229,279 @@ class ControladorVenta {
         return $consultado;
     }
 
-    public function tablaTicket($tab, $sid) {
+    public function tablaTicket($tab, $sid)
+    {
         $datos = "<thead class='sin-paddding'>
-                    <tr>
-                      <th class='text-center'>COD. BARRAS</th>
-                      <th class='text-center'>CLV FISCAL</th>
-                      <th class='text-center col-md-3'>DESCRIPCIÓN</th>
-                      <th class='text-center col-md-1'>PRECIO</th>
-                      <th class='text-center col-md-1'>CANT.</th>
-                      <th class='text-center col-sm-2'>IMPORTE</th>
-                      <th class='text-center col-md-1'>DESCUENTOS</th>
-                      <th class='text-center'>TRASLADOS</th>
-                      <th class='text-center'>RETENCIONES</th>
-                      <th class='text-center'>ELIMINAR</th>
-                    </tr>
-                  </thead>
-                  <tbody style='max-height: 280px; overflow-y: auto;'>";
-    
-        $subticket = $sumador_iva = $sumador_ret = $totalticket = $sumador_descuentos = 0;
+                <tr class='align-middle'>
+                    <th class='text-center'>COD. BARRAS</th>
+                    <th class='text-center'>CLV. FISCAL</th>
+                    <th class='text-center col-md-3'>DESCRIPCIÓN</th>
+                    <th class='text-center col-md-1'>PRECIO</th>
+                    <th class='text-center col-md-1'>CANT.</th>
+                    <th class='text-center col-sm-2'>IMPORTE</th>
+                    <th class='text-center col-md-1'>DESCUENTOS</th>
+                    <th class='text-center'>TRASLADOS</th>
+                    <th class='text-center'>RETENCIONES</th>
+                    <th class='text-center'><span class='fas fa-times'></span></th>
+                </tr>
+            </thead>
+            <tbody style='max-width:90%; max-height: 280px; overflow-y: auto;'>";
+
+        $subticket = 0;
+        $sumador_iva = 0;
+        $sumador_ret = 0;
+        $totalticket = 0;
+        $sumador_descuentos = 0;
         $productos = $this->getTmpTicket($tab, $sid);
-    
+
         foreach ($productos as $productoactual) {
-            extract($productoactual);
-            if($descuento != 0){
-                $impdescuentos = bcdiv((($descuento * $tmpimporte) / 100), '1', 2);
+            $tid = $productoactual['idtmpticket'];
+            $cod = $productoactual['tmpcod'];
+            $cfiscal = $productoactual['tmpclvfiscal'];
+            $nmprod = $productoactual['tmpprod'];
+            $precio = $productoactual['tmpprecio'];
+            $cant = $productoactual['tmpcant'];
+            $importe = $productoactual['tmpimporte'];
+            $traslados = $productoactual['tmptraslados'];
+            $retencion = $productoactual['tmpretenciones'];
+            $descuentos = $productoactual['descuento'];
+            $impdescuentos = $productoactual['impdescuento'];
+
+            if ($descuentos != 0) {
+                $impdescuentos = bcdiv((($descuentos * $importe) / 100), '1', 2);
             }
-    
-            $disabledminus = ($tmpcant == '1') ? "disabled" : "";
-    
-            $imp = $ret = 0;
-            $checktraslado = $checkretencion = "";
-    
-            $impuestos = explode("<impuesto>", $tmptraslados);
-            foreach ($impuestos as $tras) {
-                [$precio_imp, $porcentaje, $impuesto] = explode("-", $tras);
-                $checktraslado .= "$porcentaje-$impuesto<imp>";
-                $imp += bcdiv($precio_imp, '1', 2);
+
+            $disabledminus = ($cant == '1') ? "disabled" : "";
+
+            $imp = 0;
+            $checktraslado = "";
+            if ($traslados != "") {
+                $divtras = explode("<impuesto>", $traslados);
+                foreach ($divtras as $tras) {
+                    $impuestos = $tras;
+                    $div = explode("-", $impuestos);
+                    $checktraslado .= $div[1] . "-" . $div[2] . "<imp>";
+                    $imp += bcdiv($div[0], '1', 2);
+                }
             }
-    
-            $retenciones = explode("<impuesto>", $tmpretenciones);
-            foreach ($retenciones as $retn) {
-                [$precio_ret, $porcentaje, $impuesto] = explode("-", $retn);
-                $checkretencion .= "$porcentaje-$impuesto<imp>";
-                $ret += bcdiv($precio_ret, '1', 2);
+
+            $ret = 0;
+            $checkretencion = "";
+            if ($retencion != "") {
+                $divret = explode("<impuesto>", $retencion);
+                foreach ($divret as $retn) {
+                    $retenciones = $retn;
+                    $divr = explode("-", $retenciones);
+                    $checkretencion .= $divr[1] . "-" . $divr[2] . "<imp>";
+                    $ret += bcdiv($divr[0], '1', 2);
+                }
             }
-    
-            $subticket += $tmpimporte;
+
+            $subticket += $importe;
             $sumador_iva += bcdiv($imp, '1', 2);
             $sumador_ret += bcdiv($ret, '1', 2);
             $sumador_descuentos += bcdiv($impdescuentos, '1', 2);
-    
+
             $imptraslados = $this->getImpuestos('1');
             $impretenciones = $this->getImpuestos('2');
-    
-            $optraslados = $opretencion = "";
-    
-            foreach ($imptraslados as $tactual) {
-                $checkedT = (strpos($checktraslado, "{$tactual['porcentaje']}-{$tactual['impuesto']}") !== false) ? "checked" : "";
-                $iconT = ($checkedT === "checked") ? "glyphicon-check" : "glyphicon-unchecked";
-                $optraslados .= "<li data-location='tabla' data-id='$idtmpticket'>
-                                    <label class='dropdown-menu-item checkbox'>
-                                        <input type='checkbox' $checkedT value='{$tactual['porcentaje']}' name='chtrastabla$idtmpticket' data-impuesto='{$tactual['impuesto']}' data-tipo='{$tactual['tipoimpuesto']}'/>
-                                        <span class='glyphicon $iconT'></span>{$tactual['nombre']} ({$tactual['porcentaje']}%)</label>
-                                </li>";
+
+            $optraslados = "";
+            $opretencion = "No hay impuestos de retención.";
+            if($imptraslados != ""){
+                $optraslados = $this->generarOpcionesImpuestos($imptraslados, $checktraslado, $tid);
+            } else if($impretenciones != ""){
+                $opretencion = $this->generarOpcionesImpuestos($impretenciones, $checkretencion, $tid);
             }
-    
-            foreach ($impretenciones as $ractual) {
-                $checkedR = (strpos($checkretencion, "{$ractual['porcentaje']}-{$ractual['impuesto']}") !== false) ? "checked" : "";
-                $iconR = ($checkedR === "checked") ? "glyphicon-check" : "glyphicon-unchecked";
-                $opretencion .= "<li data-location='tabla' data-id='$idtmpticket'>
-                                    <label class='dropdown-menu-item checkbox'>
-                                        <input type='checkbox' $checkedR value='{$ractual['porcentaje']}' name='chrettabla$idtmpticket' data-impuesto='{$ractual['impuesto']}' data-tipo='{$ractual['tipoimpuesto']}'/>
-                                        <span class='glyphicon $iconR'></span>{$ractual['nombre']} ({$ractual['porcentaje']}%)</label>
-                                </li>";
-            }
-    
+
             $datos .= "
-                    <tr>
-                        <td>$tmpcod</td>
-                        <td>$tmpclvfiscal</td>
-                        <td>$tmpprod</td>
-                        <td>$ " . bcdiv($tmpprecio, '1', 2) . "</td>
-                        <td>
-                            <div class='input-group'>
-                                <span class='input-group-btn'>
-                                    <button type='button' class='btn btn-xs btn-default btn-number' $disabledminus data-type='minus' data-field='quant[1]' onclick='reducirCantidad($idtmpticket);'>
-                                        <span class='glyphicon glyphicon-minus'></span>
-                                    </button>
-                                </span>
-                                <button class='badge btn btn-info btn-xs center-block' data-toggle='modal' data-target='#modal-cantidad' onclick='setCantidadVenta($idtmpticket,$tmpcant, $tmpprecio)'>
-                                    <div class='badge' id='badcant$idtmpticket'> $tmpcant</div>
-                                </button>
-                                <span class='input-group-btn'>
-                                    <button type='button' class='btn btn-xs btn-default btn-number' data-type='plus' onclick='incrementarCantidad($idtmpticket);'>
-                                        <span class='glyphicon glyphicon-plus'></span>
-                                    </button>
-                                </span>
-                            </div>
-                        </td>
-                        <td>$ " . bcdiv($tmpimporte, '1', 2) . "</td>
-                        <td class='text-center'> $descuento% <br> $ " . bcdiv($impdescuentos, '1', 2) . "</td>
-                        <td>
-                            <div class='input-group'>
-                                <div class='dropdown'>
-                                    <button type='button' class='button-impuesto dropdown-toggle' data-toggle='dropdown'>Traslados <span class='caret'></span></button>
-                                    <ul class='dropdown-menu'>
-                                        $optraslados
-                                    </ul>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class='input-group'>
-                                <div class='dropdown'>
-                                    <button type='button' class='button-impuesto dropdown-toggle' data-toggle='dropdown'>Retenciones <span class='caret'></span></button>
-                                    <ul class='dropdown-menu'>
-                                        $opretencion
-                                    </ul>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                         <span class='glyphicon glyphicon-remove list-remove-icon' onclick='eliminarProdTmp($idtmpticket);'></span>
-                        </td>
-                    </tr>";
+            <tr>
+                <td class='text-center'>$cod</td>
+                <td class='text-center'>$cfiscal</td>
+                <td class='text-center'>$nmprod</td>
+                <td>$ " . bcdiv($precio, '1', 2) . "</td>
+                <td>
+                    <div class='btn-group btn-group-sm'>
+                            <button type='button' class='btn btn-outline-secondary' $disabledminus data-type='minus' data-field='quant[1]' onclick='reducirCantidad($tid);'>
+                                <span class='fas fa-minus small'></span>
+                            </button>
+                        <button class='badge btn btn-info' data-bs-toggle='modal' data-bs-target='#modal-cantidad' onclick='setCantidadVenta($tid,$cant, $precio)'>
+                            <div class='badge fw-bold small' id='badcant$tid'> $cant</div>
+                        </button>
+                            <button type='button' class='btn btn-outline-secondary' data-type='plus' onclick='incrementarCantidad($tid);'>
+                                <span class='fas fa-plus small'></span>
+                            </button>
+                    </div>
+                </td>
+                <td class='text-center'>$ " . bcdiv($importe, '1', 2) . "</td>
+                <td class='text-center'> " . bcdiv($impdescuentos, '1', 2) . "% <br> $ " . $descuentos  . "</td>
+                <td>
+                    <div class='input-group'>
+                        <div class='dropdown'>
+                            <button type='button' class='button-impuesto dropdown-toggle' data-bs-toggle='dropdown'>Traslados</button>
+                            <ul class='dropdown-menu'>
+                                $optraslados
+                            </ul>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class='input-group'>
+                        <div class='dropdown'>
+                            <button type='button'  class='button-impuesto dropdown-toggle' data-bs-toggle='dropdown'>Retenciones</button>
+                            <ul class='dropdown-menu ps-3'>
+                                $opretencion
+                            </ul>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <span class='fas fa-times list-remove-icon pt-1 ps-2' onclick='eliminarProdTmp($tid);'></span>
+                </td>
+            </tr>";
         }
-    
+
         $totalticket = ((($subticket + $sumador_iva) - $sumador_ret) - $sumador_descuentos);
-    
-        $datos .= "</tbody><tfoot><tr>
+
+        $datos .= "</tbody><tfoot>
+        <tr class='bg-danger'>
             <th colspan='3'></th>
-            <th class='text-right' colspan='2'>SUBTOTAL:</th>
-            <th>$ " . number_format(bcdiv($subticket, '1', 2), 2, '.', ',') . "</th></tr>";
-    
-        if($sumador_descuentos > 0){
-            $datos .= "<tr>
-                <th colspan='3'></th>
-                <th class='text-right' colspan='2'>DESCUENTO:</th>
-                <th>$ " . number_format(bcdiv($sumador_descuentos, '1', 2), 2, '.', ',') . "</th></tr>
-                <tr>
-                <th colspan='3'></th>
-                <th class='text-right' colspan='2'>SUBTOTAL - DESCUENTO:</th>
-                <th>$ " . number_format(bcdiv(($subticket-$sumador_descuentos), '1', 2), 2, '.', ',') . "</th></tr>";
+            <th class='text-end' colspan='2'>SUBTOTAL:</th>
+            <th class='text-start'>$ " . number_format(bcdiv($subticket, '1', 2), 2, '.', ',') . "</th>
+        </tr>";
+
+        if ($sumador_descuentos > 0) {
+            $datos .= "<tr class='align-middle'>
+            <th colspan='3'></th>
+            <th class='text-end' colspan='2'>DESCUENTO:</th>
+            <th class='text-start'>$ " . number_format(bcdiv($sumador_descuentos, '1', 2), 2, '.', ',') . "</th>
+        </tr>
+        <tr class='align-middle'>
+            <th colspan='3'></th>
+            <th class='text-end' colspan='2'>SUBTOTAL - DESCUENTO:</th>
+            <th class='text-start'>$ " . number_format(bcdiv(($subticket - $sumador_descuentos), '1', 2), 2, '.', ',') . "</th>
+        </tr>";
         }
-    
+
         if ($sumador_iva > 0) {
-            $datos .= "<tr>
-                <th colspan='3'></th>
-                <th class='text-right' colspan='2'>TRASLADOS:</th>
-                <th>$ " . number_format(bcdiv($sumador_iva, '1', 2), 2, '.', ',') . "</th></tr>";
+            $datos .= "<tr class='align-middle'>
+            <th colspan='3'></th>
+            <th class='text-end' colspan='2'>TRASLADOS:</th>
+            <th class='text-start'>$ " . number_format(bcdiv($sumador_iva, '1', 2), 2, '.', ',') . "</th>
+        </tr>";
         }
-    
+
         if ($sumador_ret > 0) {
-            $datos .= "<tr>
-                <th colspan='3'></th>
-                <th class='text-right' colspan='2'>RETENCIONES:</th>
-                <th>$ " . number_format(bcdiv($sumador_ret, '1', 2), 2, '.', ',') . "</th></tr>";
+            $datos .= "<tr class='align-middle'>
+            <th colspan='3'></th>
+            <th class='text-end' colspan='2'>RETENCIONES:</th>
+            <th class='text-start'>$ " . number_format(bcdiv($sumador_ret, '1', 2), 2, '.', ',') . "</th>
+        </tr>";
         }
-    
-        $datos .= "<tr>
+
+        $datos .= "<tr class='align-middle'>
         <th colspan='3'></th>
-        <th class='text-right' colspan='2'>GRAN TOTAL:</th>
-        <th>$ " . number_format(bcdiv($totalticket, '1', 2), 2, '.', ',') . "</th></tr></tfoot>";
+        <th class='text-end' colspan='2'>GRAN TOTAL:</th>
+        <th class='text-start'>$ " . number_format(bcdiv($totalticket, '1', 2), 2, '.', ',') . "</th>
+    </tr></tfoot>";
+
         return $datos;
     }
-    
-    public function insertarmovEfectivo($v) {
+
+    private function generarOpcionesImpuestos($impuestos, $check, $tid)
+    {
+        $opciones = "";
+        foreach ($impuestos as $actual) {
+            $icon = "glyphicon-unchecked";
+            $checked = "";
+            $divcheck = explode("<imp>", $check);
+            foreach ($divcheck as $chk) {
+                if ($chk == $actual['porcentaje'] . "-" . $actual['impuesto']) {
+                    $icon = "far fa-check-square";
+                    $checked = "checked";
+                    break;
+                }
+            }
+            $opciones .= "<li class='ps-3' data-location='tabla' data-id='$tid'>
+            <label class='dropdown-menu-item checkbox'>
+            <input type='checkbox' $checked value='" . $actual['porcentaje'] . "' name='chtrastabla$tid' data-impuesto='" . $actual['impuesto'] . "' data-tipo='" . $actual['tipoimpuesto'] . "'/>
+            <span class='$icon me-2' id='chuso1span'></span>" . $actual['nombre'] . " (" . $actual['porcentaje'] . "%)" . "</label></li>";
+        }
+        return $opciones;
+    }
+
+    public function insertarmovEfectivo($v)
+    {
         $insertado = false;
         $hoy = date("Y-m-d");
         $hora = date("H:i");
         $uid = $_SESSION[sha1("idusuario")];
         $consulta = "INSERT INTO movefectivo VALUES (:id, :tipo, :fecha, :hora, :monto, :concepto, :uid);";
-        $val = array("id" => null,
+        $val = array(
+            "id" => null,
             "tipo" => $v->getTipomov(),
             "fecha" => $hoy,
             "hora" => $hora,
             "monto" => $v->getMontomov(),
             "concepto" => $v->getConceptomov(),
-            "uid" => $uid);
+            "uid" => $uid
+        );
         $insertado = $this->consultas->execute($consulta, $val);
         return $insertado;
     }
 
-    private function getTotalTicketAux($tag, $sid) {
+    private function getTotalTicketAux($tag, $sid)
+    {
         $datos = false;
         $consulta = "SELECT tmpimporte, tmptraslados, tmpretenciones, impdescuento FROM tmpticket WHERE tagtab=:tag AND sid=:sid;";
-        $val = array("tag" => $tag,
-            "sid" => $sid);
+        $val = array(
+            "tag" => $tag,
+            "sid" => $sid
+        );
         $datos = $this->consultas->getResults($consulta, $val);
         return $datos;
     }
 
-    private function getTotalArticulos($tag, $sid) {
+    private function getTotalArticulos($tag, $sid)
+    {
         $datos = false;
         $consulta = "SELECT count(tmpcod) articulos FROM tmpticket WHERE tagtab=:tag AND sid=:sid;";
-        $val = array("tag" => $tag,
-            "sid" => $sid);
+        $val = array(
+            "tag" => $tag,
+            "sid" => $sid
+        );
         $datos = $this->consultas->getResults($consulta, $val);
         return $datos;
     }
-    
-    public function getTotalTicket($tag, $sid) {
+
+    public function getTotalTicket($tag, $sid)
+    {
         $subticket = 0;
         $imp = 0;
         $ret = 0;
         $descuento = 0;
         $total = 0;
         $articulos = 0;
-    
+
         $datos = $this->getTotalTicketAux($tag, $sid);
-        
+
         foreach ($datos as $actual) {
             $subticket += $actual['tmpimporte'];
             $descuento += $actual['impdescuento'];
-            
+
             $imp += $this->sumarImpuestos($actual['tmptraslados']);
             $ret += $this->sumarImpuestos($actual['tmpretenciones']);
         }
-    
+
         $total = (($subticket + $imp) - $ret) - $descuento;
-    
+
         $datos2 = $this->getTotalArticulos($tag, $sid);
         $articulos = $datos2[0]['articulos'] ?? 0;
-    
+
         return $total . "</tr>" . $articulos . "</tr>" . $descuento;
     }
-    
-    private function sumarImpuestos($impuestos) {
+
+    private function sumarImpuestos($impuestos)
+    {
         $suma = 0;
         if (!empty($impuestos)) {
             $divImpuestos = explode("<impuesto>", $impuestos);
@@ -417,5 +512,547 @@ class ControladorVenta {
         }
         return $suma;
     }
+
+    private function checkProductoTMPAux($idtmp) {
+        $consultado = false;
+        $consulta = "SELECT * FROM tmpticket WHERE idtmpticket=:id;";
+        $val = array("id" => $idtmp);
+        $consultado = $this->consultas->getResults($consulta, $val);
+        return $consultado;
+    }
+
+    private function reBuildArray2($importe, $array) {
+        $div = explode("<impuesto>", $array);
+        $row = array();
+        $Timp = 0;
+        foreach ($div as $d) {
+            $div2 = explode("-", $d);
+            $imp = ($importe * $div2[1]);
+            $Timp += $imp;
+            if ($Timp > 0) {
+                $row[] = bcdiv($imp, '1', 2) . '-' . $div2[1] . '-' . $div2[2];
+            }
+        }
+        $rearray = implode("<impuesto>", $row);
+        return $rearray;
+    }
+
+    public function incrementarProducto($idtmp) {
+        $check = $this->checkProductoTMPAux($idtmp);
+        $codprod = '';
+        $precio_tmp = 0;
+        $canttmp = 0;
+        $trasladotmp = '';
+        $rettmp = '';
+        $descuento = 0;
     
+        foreach ($check as $actual) {
+            $codprod = $actual['tmpcod'];
+            $precio_tmp = $actual['tmpprecio'];
+            $canttmp = $actual['tmpcant'];
+            $trasladotmp = $actual['tmptraslados'];
+            $rettmp = $actual['tmpretenciones'];
+            $descuento = $actual['descuento'];
+        }
+    
+        $chinv = 0;
+        $cantidad = 0;
+    
+        $prod = $this->getProductobyCodAux($codprod); 
+        foreach ($prod as $pactual) {
+            $chinv = $pactual['chinventario'];
+            $cantidad = $pactual['cantinv'];
+            $idproducto = $pactual['idproser'];
+        }
+        $cant = $canttmp + 1;
+        $importe = $cant * $precio_tmp;
+        $descuento = ($descuento * $importe) / 100;
+        $importe_descuento = $importe - $descuento;
+        $restante = $cantidad - 1;
+    
+        $traslado = '';
+        if ($trasladotmp != "") {
+            $traslado = $this->reBuildArray2($importe_descuento, $trasladotmp);
+        }
+    
+        $retencion = '';
+        if ($rettmp != "") {
+            $retencion = $this->reBuildArray2($importe_descuento, $rettmp);
+        }
+    
+        $consulta = "UPDATE `tmpticket` SET tmpcant=:cant, tmpimporte=:importe, tmptraslados=:tras, tmpretenciones=:ret WHERE idtmpticket=:id;";
+        $valores = array(
+            "id" => $idtmp,
+            "cant" => $cant,
+            "importe" => bcdiv($importe, '1', 2),
+            "tras" => $traslado,
+            "ret" => $retencion
+        );
+    
+        if ($chinv == '1' && $cantidad <= 0) {
+            return "0El inventario no es suficiente para agregar más producto. Hay " . $cantidad . " productos en existencia.";
+        }
+        if ($chinv == '1') {
+            $inv = $this->restaurarInvCant($idproducto, $restante);
+        }
+        $datos = $this->consultas->execute($consulta, $valores);
+        return $datos;
+    }
+
+    public function reducirProducto($idtmp) {
+        $check = $this->checkProductoTMPAux($idtmp);
+        foreach ($check as $actual) {
+            $codprod = $actual['tmpcod'];
+            $precio_tmp = $actual['tmpprecio'];
+            $canttmp = $actual['tmpcant'];
+            $trasladotmp = $actual['tmptraslados'];
+            $rettmp = $actual['tmpretenciones'];
+            $descuento = $actual['descuento'];
+        }
+
+        $chinv = 0;
+        $cantidad = 0;
+
+        $prod = $this->getProductobyCodAux($codprod);
+        foreach ($prod as $pactual) {
+            $chinv = $pactual['chinventario'];
+            $cantidad = $pactual['cantinv'];
+            $idproducto = $pactual['idproser'];
+        }
+
+        $cant = $canttmp - 1;
+        $importe = $cant * $precio_tmp;
+        $descuento = ($descuento * $importe)/100;
+        $importe_descuento = ($importe - $descuento);
+
+        $traslado = $this->reBuildArray2($importe_descuento, $trasladotmp);
+        $retencion = $this->reBuildArray2($importe_descuento, $rettmp);
+
+        $consulta = "UPDATE `tmpticket` SET tmpcant=:cant, tmpimporte=:importe, tmptraslados=:tras, tmpretenciones=:ret WHERE idtmpticket=:id;";
+        $valores = array("id" => $idtmp,
+            "cant" => $cant,
+            "importe" => bcdiv($importe, '1', 2),
+            "tras" => $traslado,
+            "ret" => $retencion);
+        $datos = $this->consultas->execute($consulta, $valores);
+        if ($chinv == '1') {
+            $restante = $cantidad + 1;
+            $inv = $this->restaurarInvCant($idproducto, $restante);
+        }
+        return $datos;
+    }
+
+    public function eliminarProducto($tid) {
+        $eliminado = false;
+        $resultados = $this->checkProductoTMPAux($tid);
+        if ($resultados && count($resultados) > 0) {
+            foreach ($resultados as $resultado) {
+                $idproducto = $resultado['tmpidprod'];
+                $cantidad = $resultado['tmpcant'];
+                $consultaRestaurar = "UPDATE productos_servicios SET cantinv = cantinv + :cantidad WHERE idproser = :idproducto";
+                $valoresRestaurar = array(
+                    "idproducto" => $idproducto,
+                    "cantidad" => $cantidad
+                );
+                $this->consultas->execute($consultaRestaurar, $valoresRestaurar);
+            }
+        }
+        $consultaEliminar = "DELETE FROM tmpticket WHERE idtmpticket=:tid";
+        $valoresEliminar = array("tid" => $tid);
+        $eliminado = $this->consultas->execute($consultaEliminar, $valoresEliminar);
+        return $eliminado;
+    }
+
+    private function checkProductoAux($idtmp) {
+        $consultado = false;
+        $consulta = "SELECT cantinv, chinventario FROM productos_servicios WHERE idproser=:id;";
+        $val = array("id" => $idtmp);
+        $consultado = $this->consultas->getResults($consulta, $val);
+        return $consultado;
+    }
+
+    public function modificarCantidad($idtmp, $cant, $precio) {
+        $check = $this->checkProductoTMPAux($idtmp);
+        $canttmp = $check[0]['tmpcant'];
+        $precio_tmp = $check[0]['tmpprecio'];
+        $trasladotmp = $check[0]['tmptraslados'];
+        $rettmp = $check[0]['tmpretenciones'];
+        $idproducto = $check[0]['tmpidprod'];
+    
+        $chinv = 0;
+        $cantidad = 0;
+
+        $prod = $this->checkProductoAux($idproducto);
+        foreach ($prod as $pactual) {
+            $chinv = $pactual['chinventario'];
+            $cantidad = $pactual['cantinv'];
+        }
+    
+        $importe = $cant * $precio_tmp;
+        $traslado = $trasladotmp != "" ? $this->reBuildArray2($importe, $trasladotmp) : "";
+        $retencion = $rettmp != "" ? $this->reBuildArray2($importe, $rettmp) : "";
+
+        //5+5-
+        $restante = ($cantidad + $canttmp) - $cant;
+    
+        if ($chinv == '1' && $restante < 0) {
+            $datos = "0El inventario no es suficiente para agregar más producto. Hay " . $cantidad + $canttmp . " productos en existencia.";
+        } else {
+            $consulta = "UPDATE `tmpticket` SET tmpcant=:cant, tmpimporte=:totuni, tmptraslados=:traslados, tmpretenciones=:retenciones  WHERE idtmpticket=:id;";
+            $valores = array(
+                "id" => $idtmp,
+                "cant" => $cant,
+                "totuni" => bcdiv($importe, '1', 2),
+                "traslados" => $traslado,
+                "retenciones" => $retencion
+            );
+            $datos = $this->consultas->execute($consulta, $valores);
+            if ($chinv == '1') {
+                $this->restaurarInvCant($idproducto, $restante);
+            }
+        }
+        return $datos;
+    }
+
+    public function restaurarInvCant($idproducto, $restante)
+    {
+        $insertado = false;
+        $consulta = "UPDATE `productos_servicios` SET cantinv=:cantidad WHERE idproser=:idproducto;";
+        $valores = array(
+            "idproducto" => $idproducto,
+            "cantidad" =>  $restante
+        );
+        $insertado = $this->consultas->execute($consulta, $valores);
+        return $insertado;
+    }
+    
+    public function validaProductos($tag){
+        $consulta = "SELECT COUNT(*) AS maximo FROM tmpticket WHERE tagtab = :tag";
+        $val = array("tag" => $tag);
+        $stmt = $this->consultas->getResults($consulta, $val);
+        foreach($stmt as $row) {
+            $maximo = $row['maximo'];
+        }
+        $json = array();
+        $json['maximo'] = $maximo;
+        return $json;
+    }
+
+    private function getFoliobyID() {
+        $consultado = false;
+        $consulta = "SELECT * FROM folio WHERE usofolio LIKE '%7%';";
+        $consultado = $this->consultas->getResults($consulta, null);
+        return $consultado;
+    }
+
+    private function updateFolioConsecutivo($id) {
+        $consultado = false;
+        $consulta = "UPDATE folio SET consecutivo=(consecutivo+1) WHERE idfolio=:id;";
+        $val = array("id" => $id);
+        $consultado = $this->consultas->execute($consulta, $val);
+        return $consultado;
+    }
+
+    private function getFolio() {
+        $datos = "";
+        $folios = $this->getFoliobyID();
+        foreach ($folios as $actual) {
+            $id = $actual['idfolio'];
+            $serie = $actual['serie'];
+            $letra = $actual['letra'];
+            $consecutivo = $actual['consecutivo'];
+            if ($consecutivo < 10) {
+                $consecutivo = "000$consecutivo";
+            } else if ($consecutivo >= 10 && $consecutivo < 100) {
+                $consecutivo = "00$consecutivo";
+            } else if ($consecutivo >= 100 && $consecutivo < 1000) {
+                $consecutivo = "0$consecutivo";
+            }
+            $datos = "$serie</tr>$letra</tr>$consecutivo";
+            $this->updateFolioConsecutivo($id);
+        }
+        return $datos;
+    }
+
+    private function deleteTicket($tag, $sid) {
+        $borrar = false;
+        $consulta = "DELETE FROM tmpticket WHERE tagtab=:tag AND sid=:sid;";
+        $val = array("tag" => $tag,
+            "sid" => $sid);
+        $borrar = $this->consultas->execute($consulta, $val);
+        return $borrar;
+    }
+
+    private function detalleVenta($tag, $sid) {
+        $insertado = false;
+        $detalle = $this->getTmpTicket($tag, $sid);
+        foreach ($detalle as $actual) {
+            $idprod = $actual['tmpidprod'];
+            $cod = $actual['tmpcod'];
+            $cfiscal = $actual['tmpclvfiscal'];
+            $cunidad = $actual['tmpclvunidad'];
+            $nmprod = $actual['tmpprod'];
+            $precio = $actual['tmpprecio'];
+            $cant = $actual['tmpcant'];
+            $importe = $actual['tmpimporte'];
+            $traslados = $actual['tmptraslados'];
+            $retenciones = $actual['tmpretenciones'];
+            $tag = $actual['tagtab'];
+
+            $descuento = $actual['descuento'];
+            $impdescuento = $actual['impdescuento'];
+            $totaldescuento = $actual['totaldescuento'];
+
+            $consulta = "INSERT INTO detalle_venta VALUES (:id, :tag, :idprod, :cod, :clv, :cunidad, :prod, :precio, :cant, :descuento, :impdescuento, :totaldescuento, :importe, :tras, :ret);";
+            $val = array("id" => null,
+                "tag" => $tag,
+                "idprod" => $idprod,
+                "cod" => $cod,
+                "clv" => $cfiscal,
+                "cunidad" => $cunidad,
+                "prod" => $nmprod,
+                "precio" => $precio,
+                "cant" => $cant,
+                "descuento" => $descuento,
+                "impdescuento" => $impdescuento,
+                "totaldescuento" => $totaldescuento,
+                "importe" => $importe,
+                "tras" => $traslados,
+                "ret" => $retenciones);
+            $insertado = $this->consultas->execute($consulta, $val);
+            
+        }
+        $this->deleteTicket($tag, $sid);
+        return $insertado;
+    }
+
+    public function insertarTicket($v) {
+        $insertar = false;
+        $hoy = date("Y-m-d");
+        $hora = date("H:i");
+        $folios = $this->getFolio();
+        $Fdiv = explode("</tr>", $folios);
+        $serie = $Fdiv[0];
+        $letra = $Fdiv[1];
+        $nfolio = $Fdiv[2];
+        if ($v->getFormapago() == 'cash') {
+            $pagado = $v->getMontopagado();
+            $referencia = '';
+            $cambio = ($v->getMontopagado() - $v->getTotalventa());
+        } else if ($v->getFormapago() == 'card' || $v->getFormapago() == 'val') {
+            $pagado = '0';
+            $referencia = $v->getReferencia();
+            $cambio = '0';
+        }
+
+        $consulta = "INSERT INTO datos_venta VALUES (:id, :serie, :letra, :folio, :tag, :fecha, :hora, :percentDescuento, :descuento, :total, :fmpago, :pago, :cambio, :refventa, :uid, :status);";
+        $val = array("id" => null,
+            "serie" => $serie,
+            "letra" => $letra, 
+            "folio" => $nfolio,
+            "tag" => $v->getTagventa(),
+            "fecha" => $hoy,
+            "hora" => $hora,
+            "percentDescuento" => $v->getPercentDescuento(),
+            "descuento" => $v->getDescuento(),
+            "total" => $v->getTotalventa(),
+            "fmpago" => $v->getFormapago(),
+            "pago" => $pagado,
+            "cambio" => $cambio,
+            "refventa" => $referencia,
+            "uid" => $_SESSION[sha1("idusuario")],
+            "status" => '1'
+        );
+        $insertar = $this->consultas->execute($consulta, $val);
+        $this->detalleVenta($v->getTagventa(), $v->getSid());
+        return $insertar;
+    }
+
+    //-------------------------------------TICKETS ANTIGUOS
+    private function getNumrowsAux($condicion) {
+        $consultado = false;
+        $consulta = "SELECT count(iddatos_venta) numrows FROM datos_venta $condicion;";
+        $consultado = $this->consultas->getResults($consulta, null);
+        return $consultado;
+    }
+
+    private function getNumrows($condicion) {
+        $numrows = 0;
+        $rows = $this->getNumrowsAux($condicion);
+        foreach ($rows as $actual) {
+            $numrows = $actual['numrows'];
+        }
+        return $numrows;
+    }
+
+    private function getPermisoById($idusuario) {
+        $consultado = false;
+        $consulta = "SELECT p.crearventa, p.listaventa, p.cancelarventa, p.exportarventa FROM usuariopermiso p WHERE permiso_idusuario=:idusuario;";
+        $valores = array("idusuario" => $idusuario);
+        $consultado = $this->consultas->getResults($consulta, $valores);
+        return $consultado;
+    }
+
+    private function getPermisos($idusuario) {
+        $datos = "";
+        $permisos = $this->getPermisoById($idusuario);
+        foreach ($permisos as $actual) {
+            $lista = $actual['listaventa'];
+            $cancelar = $actual['cancelarventa'];
+            $exportar = $actual['exportarventa'];
+            $datos .= "$lista</tr>$cancelar</tr>$exportar";
+        }
+        return $datos;
+    }
+
+    private function getSevicios($condicion) {
+        $consultado = false;
+        $consulta = "SELECT * FROM datos_venta $condicion;";
+        echo $consulta;
+        $consultado = $this->consultas->getResults($consulta, null);
+        return $consultado;
+    }
+
+    public function getNameUser($id){
+        $nombre = "";
+        $consulta = "SELECT CONCAT(nombre,' ',apellido_paterno,' ',apellido_materno) AS nombre FROM usuario WHERE idusuario = :id";
+        $val = array("id" => $id);
+        $stmt = $this->consultas->getResults($consulta, $val);
+        foreach ($stmt as $row) {
+            $nombre = $row['nombre'];
+        }
+        return $nombre;
+    }
+
+    public function translateMonth($m) {
+        return [
+            '01' => 'Ene',
+            '02' => 'Feb',
+            '03' => 'Mar',
+            '04' => 'Abr',
+            '05' => 'May',
+            '06' => 'Jun',
+            '07' => 'Jul',
+            '08' => 'Ago',
+            '09' => 'Sep',
+            '10' => 'Oct',
+            '11' => 'Nov',
+            '12' => 'Dic'
+        ][$m] ?? '';
+    }
+
+    public function listaServiciosHistorial($pag, $REF, $numreg, $user) {
+        require_once '../com.sine.common/pagination.php';
+        $idlogin = $_SESSION[sha1("idusuario")];
+
+        $datos = "<thead class='sin-paddding'>
+                    <tr>
+                        <th class='text-center col-md-2'>Id Venta </th>
+                        <th class='text-center col-md-3'>Persona Realizó </th>
+                        <th class='text-center'>Fecha de venta </th>
+                        <th class='text-center'>Forma de Pago </th>
+                        <th class='text-center'>Estado </th>
+                        <th class='text-center'>Total </th>
+                        <th class='text-center'>Opción </th>
+                    </tr>
+                </thead>
+                <tbody>";
+
+        $condicion = "";
+        if ($REF == "") {
+            if( $user == 0){
+                $condicion = "ORDER BY iddatos_venta DESC";
+            } else {
+                $condicion = "WHERE uid_venta = $user ORDER BY iddatos_venta DESC";
+            }            
+        } else {
+            if( $user == 0){
+                $condicion = "WHERE (concat(letra,folio) LIKE '%$REF%')";
+            } else {
+                $condicion = "WHERE uid_venta = $user AND (concat(letra,folio) LIKE '%$REF%')";
+            }
+        }
+        $permisos = $this->getPermisos($idlogin);
+        $div = explode("</tr>", $permisos);
+
+        if ($div[0] == '1') {
+        $numrows = $this->getNumrows($condicion);
+        $page = (isset($pag) && !empty($pag)) ? $pag : 1;
+        $per_page = $numreg;
+        $adjacents = 4;
+        $offset = ($page - 1) * $per_page;
+        $total_pages = ceil($numrows / $per_page);
+        $con = $condicion . " LIMIT $offset,$per_page ";
+        $finales = 0;
+        $lista = $this->getSevicios($con);
+        foreach ($lista as $actual) {
+            
+            $idventa = $actual['iddatos_venta'];
+            $folio = $actual['letra'].$actual['folio'];
+            $tagventa = $actual['tagventa'];
+            $fecha = $actual['fecha_venta'];
+            $hora = $actual['hora_venta'];
+            $formapago = $actual['formapago'];
+            ($formapago == "cash") ? "Efectivo" : $formapago;
+            $totalventa = $actual['totalventa'];
+            $status = $actual['status_venta'];
+            $cve_usu = $actual['uid_venta'];
+            $nombre_user = $this->getNameUser($cve_usu);
+            $color = "#1E7457";
+            $estado = "Entregado";
+            if ($div[1] == '1') {
+                $cancelar = "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' onclick='cancelarTicket($idventa);'>Cancelar Ticket <i class='text-muted fas fa-times'></i></a></li>";
+            }
+            
+            if ($div[2] == '1') {
+                $exportar = "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' onclick='exportarTicket($idventa);'>Exportar a factura <span class='fas fa-edit text-muted small'></span></a></li>";
+            }
+
+            if ($status == 0){
+                $color = "#910024";
+                $estado = "Cancelado";
+                $cancelar = "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' onclick='#'>Cancelar Ticket <i class='text-muted fas fa-times'></i></a></li>";
+            }
+
+            $divF = explode("-", $fecha);
+            $mes = $this->translateMonth($divF[1]);
+
+            $fecha = $divF[2] . ' - ' . $mes;
+
+            $datos .= "<tr class='table-row'>
+                           <td class='fw-semibold text-center'>$folio</td>
+                           <td class='fw-semibold text-center'>$nombre_user</td>
+                           <td class='fw-semibold text-center'>$fecha $hora</td>
+                           <td class='fw-semibold text-center'>$formapago</td>
+                           <td class='fw-semibold text-center'><font style='color: $color'><b>$estado</b></font></td>
+                           <td class='fw-semibold text-center'>$ " . number_format($totalventa, 2, '.', ',') . "</td>
+                           <td class='text-center'>
+                              <div class='dropdown'>
+                                <button class='button-list dropdown-toggle' title='Opciones'  type='button' data-bs-toggle='dropdown'><span class='fas fa-ellipsis-v'></span>
+                                <span class='caret'></span></button>
+                                <ul class='dropdown-menu dropdown-menu-right'>
+                                $exportar
+                                <li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' onclick=\"imprimirTicket('$tagventa');\">Imprimir Ticket <span class='text-muted small fas fa-file'></span></a></li>
+                                $cancelar
+                                </ul>
+                              </div>
+                              
+                           </td>
+                       </tr>";
+            $finales++;
+        }
+
+        $inicios = $offset + 1;
+        $finales += $inicios - 1;
+        $function = "buscarVentas";
+
+        if ($finales == 0) {
+            $datos .= "<tr><td colspan='11'>No se encontraron registros</td></tr>";
+        }
+
+        $datos .= "</tbody><tfoot><tr><th colspan='3' class='align-top'>Mostrando $inicios al $finales de $numrows registros</th>";
+        $datos .= "<th colspan='4'>" . paginate($page, $total_pages, $adjacents, $function) . "</th></tr></tfoot>";
+        }
+        return $datos;
+    }
 }

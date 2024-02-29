@@ -115,6 +115,8 @@ class Permiso {
     private $timbrarcarta;
     private $eliminardatos;
     private $descargardatos;
+    private $listaventa;
+
 
     function __construct() {
         
@@ -190,6 +192,10 @@ class Permiso {
 
     function getTimbrarCarta() {
         return $this->timbrarcarta;
+    }
+
+    function getListaVenta() {
+        return $this->listaventa;
     }
 
     function getEliminarDatos() {
@@ -726,6 +732,10 @@ class Permiso {
 
     function setCrearcarta($crearcarta) {
         $this->crearcarta = $crearcarta;
+    }
+
+    function setListaVenta($listaventa) {
+        $this->listaventa = $listaventa;
     }
 
     function setEditarcarta($editarcarta) {

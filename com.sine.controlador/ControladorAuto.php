@@ -82,7 +82,7 @@ class ControladorAuto {
 
     public function getCoincidenciasBusquedaProducto($referencia) {
         $datos = array();
-        $consulta = "SELECT * FROM productos_servicios WHERE ((codproducto LIKE '%$referencia%') OR (nombre_producto LIKE '%$referencia%') OR (descripcion_producto LIKE '%$referencia%') OR (clave_fiscal LIKE '%$referencia%')) LIMIT 15;";
+        $consulta = "SELECT * FROM productos_servicios WHERE ((codproducto LIKE '%$referencia%') OR (nombre_producto LIKE '%$referencia%') OR (descripcion_producto LIKE '%$referencia%') OR (clave_fiscal LIKE '%$referencia%')) AND cantinv > 0 LIMIT 15;";
         $resultados = $this->consultas->getResults($consulta, null);
         $contador = 0;
         foreach ($resultados as $resultado) {

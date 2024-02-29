@@ -45,15 +45,6 @@ function LlenaDescripcion() {
     $("#descripcion").val(producto);
 }
 
-function aucompletarCatalogo() {
-    $('#clave-fiscal').autocomplete({
-        source: "../../CATSAT/CATSAT/com.sine.enlace/enlaceProdServ.php?transaccion=autocompleta",
-        select: function (event, ui) {
-            var a = ui.item.value;
-        }
-    });
-}
-
 function addinventario() {
     var tipo = $("#tipo").val();
     if (tipo == '1') {
@@ -73,16 +64,6 @@ function addinventario() {
         $("#cantidad").val('0');
         $("#clave-unidad").val('E48-Unidad de servicio');
     }
-}
-
-function aucompletarUnidad() {
-    $('#clave-unidad').autocomplete({
-        source: "../CATSAT/CATSAT/com.sine.enlace/enlaceClaveUnidad.php?transaccion=autocompleta",
-        select: function (event, ui) {
-            var a = ui.item.value;
-            var id = ui.item.id;
-        }
-    });
 }
 
 function calcularGanancia() {
@@ -198,7 +179,7 @@ function cargarImgProducto() {
             }
         });
     } else {
-        alert("Por favor selecciona una imagen.");
+        alertify.error("Por favor selecciona una imagen.");
     }
 }
 

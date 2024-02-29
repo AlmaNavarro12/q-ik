@@ -6,78 +6,128 @@ $('#datosficales').on('click', function () {
     }
 });
 
-function insertarCliente() {
-    const datos = {
-        transaccion: "insertarcliente",
-        id: null,
-        nombre: $("#nombre").val(),
-        apellidopaterno: $("#apellido-paterno").val(),
-        apellidomaterno: $("#apellido-materno").val(),
-        nombre_empresa: $("#nombre_empresa").val(),
-        correoinfo: $("#correo_info").val(),
-        correo_fact: $("#correo_fact").val(),
-        correo_gerencia: $("#correo_gerencia").val(),
-        correoalt1: $("#correo_alt1").val(),
-        correoalt2: $("#correo_alt2").val(),
-        correoalt3: $("#correo_alt3").val(),
-        telefono: $("#telefono").val(),
-        rfc: 'XAXX010101000',
-        razon: null,
-        regimenfiscal: null,
-        calle: null,
-        interior: null,
-        exterior: null,
-        estado: null,
-        municipio: null,
-        localidad: null,
-        postal: null,
-        idbanco: ($("#id-banco").val()),
-        cuenta: $("#cuenta").val(),
-        clabe: $("#clabe").val(),
-        idbanco1: ($("#id-banco1").val()),
-        cuenta1: $("#cuenta1").val(),
-        clabe1: $("#clabe1").val(),
-        idbanco2: ($("#id-banco2").val()),
-        cuenta2: $("#cuenta2").val(),
-        clabe2: $("#clabe2").val(),
-        idbanco3: ($("#id-banco3").val()),
-        cuenta3: $("#cuenta3").val(),
-        clabe3: $("#clabe3").val(),
-        correoalt1: $("#correoalt1").val(),
-        correoalt2: $("#correoalt2").val(),
-        correoalt3: $("#correoalt3").val(),
-    };
+function gestionarCliente(idcliente = null) {
+    var nombre = $("#nombre").val();
+    var apellidopaterno = $("#apellido-paterno").val();
+    var apellidomaterno = $("#apellido-materno").val();
+    var nombre_empresa = $("#nombre_empresa").val();
+    var correoinfo = $("#correo_info").val();
+    var correo_fact = $("#correo_fact").val();
+    var correo_gerencia = $("#correo_gerencia").val();
+    var telefono = $("#telefono").val();
+    var correoalt1 = $("#correo_alt1").val();
+    var correoalt2 = $("#correo_alt2").val();
+    var correoalt3 = $("#correo_alt3").val();
+    var rfc = 'XAXX010101000';
+    var razon = nombre + ' ' + apellidopaterno + ' ' + apellidomaterno;
+    var regimenfiscal = "616 - Sin obligaciones fiscales";
+    var calle = null;
+    var interior = null;
+    var exterior = null;
+    var estado = null;
+    var municipio = null;
+    var localidad = null;
+    var postal = null;
+    var idbanco = $("#id-banco").val();
+    var cuenta = $("#cuenta").val();
+    var clabe = $("#clabe").val();
+    var idbanco1 = $("#id-banco1").val();
+    var cuenta1 = $("#cuenta1").val();
+    var clabe1 = $("#clabe1").val();
+    var idbanco2 = $("#id-banco2").val();
+    var cuenta2 = $("#cuenta2").val();
+    var clabe2 = $("#clabe2").val();
+    var idbanco3 = $("#id-banco3").val();
+    var cuenta3 = $("#cuenta3").val();
+    var clabe3 = $("#clabe3").val();
 
     if ($("#datosficales").prop('checked')) {
-        datos.rfc = $("#rfc").val();
-        datos.razon = $("#razon_social").val();
-        datos.regimenfiscal = $("#regimen-fiscal").val();
-        datos.calle = $("#calle").val();
-        datos.interior = $("#num_interior").val();
-        datos.exterior = $("#num_exterior").val();
-        datos.estado = $("#id-estado").val();
-        datos.municipio = $("#id-municipio").val();
-        datos.localidad = $("#localidad").val();
-        datos.postal = $("#codigo_postal").val();
+        rfc = $("#rfc").val();
+        razon = $("#razon_social").val();
+        regimenfiscal = $("#regimen-fiscal").val();
+        calle = $("#calle").val();
+        interior = $("#num_interior").val();
+        exterior = $("#num_exterior").val();
+        estado = $("#id-estado").val();
+        municipio = $("#id-municipio").val();
+        localidad = $("#localidad").val();
+        postal = $("#codigo_postal").val();
     }
 
-    if (isnEmpty(datos.nombre, "nombre") && isnEmpty(datos.apellidopaterno, "apellido-paterno") && isnEmpty(datos.apellidomaterno, "apellido-materno") && isnEmpty(datos.nombre_empresa, "nombre_empresa") && isEmail(datos.correo_fact, "correo_fact") && isPhoneNumber(datos.telefono, "telefono") && isnEmpty(datos.rfc, "rfc") && isnEmpty(datos.razon, "razon_social") && isnEmpty(datos.regimen, "regimen-fiscal") && isnEmpty(datos.calle, "calle") && isnEmpty(datos.exterior, "num_exterior") && isnEmpty(datos.estado, "id-estado") && isnEmpty(datos.municipio, "id-municipio") && isnEmpty(datos.localidad, "localidad") && isnEmpty(datos.postal, "codigo_postal")) {
+    if (isnEmpty(nombre, "nombre") &&
+        isnEmpty(apellidopaterno, "apellido-paterno") &&
+        isnEmpty(apellidomaterno, "apellido-materno") &&
+        isnEmpty(nombre_empresa, "nombre_empresa") &&
+        isEmail(correo_fact, "correo_fact") &&
+        isPhoneNumber(telefono, "telefono") &&
+        isnEmpty(rfc, "rfc") &&
+        isnEmpty(razon, "razon_social") &&
+        isnEmpty(regimenfiscal, "regimen-fiscal") &&
+        isnEmpty(calle, "calle") &&
+        isnEmpty(exterior, "num_exterior") &&
+        isnEmpty(estado, "id-estado") &&
+        isnEmpty(municipio, "id-municipio") &&
+        isnEmpty(localidad, "localidad") &&
+        isnEmpty(postal, "codigo_postal")) {
+
+        cargandoHide();
+        cargandoShow();
+
+        var url = "com.sine.enlace/enlacecliente.php";
+        var transaccion = idcliente ? "actualizarcliente" : "insertarcliente";
+        var data = {
+            transaccion: transaccion,
+            idcliente: idcliente,
+            nombre: nombre,
+            apellidopaterno: apellidopaterno,
+            apellidomaterno: apellidomaterno,
+            nombre_empresa: nombre_empresa,
+            correoinfo: correoinfo,
+            correo_fact: correo_fact,
+            correo_gerencia: correo_gerencia,
+            telefono: telefono,
+            rfc: rfc,
+            razon: razon,
+            regimenfiscal: regimenfiscal,
+            calle: calle,
+            interior: interior,
+            exterior: exterior,
+            estado: estado,
+            municipio: municipio,
+            localidad: localidad,
+            postal: postal,
+            idbanco: idbanco,
+            cuenta: cuenta,
+            clabe: clabe,
+            idbanco1: idbanco1,
+            cuenta1: cuenta1,
+            clabe1: clabe1,
+            idbanco2: idbanco2,
+            cuenta2: cuenta2,
+            clabe2: clabe2,
+            idbanco3: idbanco3,
+            cuenta3: cuenta3,
+            clabe3: clabe3,
+            correoalt1: correoalt1, 
+            correoalt2: correoalt2, 
+            correoalt3: correoalt3
+        };
+
         $.ajax({
-            url: "com.sine.enlace/enlacecliente.php",
+            url: url,
             type: "POST",
-            data: datos,
-            success: function (datos) {
+            data: data,
+            success: function(datos) {
                 var texto = datos.toString();
                 var bandera = texto.substring(0, 1);
                 var res = texto.substring(1, 1000);
                 if (bandera == '0') {
-                    cargandoHide();
                     alertify.error(res);
                 } else {
-                    cargandoHide();
+                    alertify.success("Cliente " + (transaccion === 'insertarcliente' ? 'registrado' : 'actualizado') + " correctamente");
                     loadView('listaclientealtas');
-                    alertify.success('Nuevo cliente registrado');
                 }
+                cargandoHide();
             }
         });
     }
@@ -151,7 +201,6 @@ function editarCliente(idcliente) {
 
 function setValoresEditarCliente(datos) {
     changeText("#contenedor-titulo-form-cliente", "Editar cliente");
-    changeText("#btn-form-cliente-guardar", "Guardar cambios <span class='glyphicon glyphicon-floppy-disk'></span></a>");
     var array = datos.split("</tr>");
     $("#id-cliente").val(array[0]);
     $("#nombre").val(array[1]);
@@ -172,12 +221,13 @@ function setValoresEditarCliente(datos) {
     if (array[15] != '0') {
         loadOpcionesEstado(array[15]);
     }
+
     if (array[16] != '0') {
         loadOpcionesMunicipio(array[16], array[15]);
     }
 
     if (array[19] !== '0') {
-        loadOpcionesBanco(array[19]);
+        loadOpcionesBanco("id-banco", array[19]);
         $("#cuenta").val(array[20]);
         $("#clabe").val(array[21]);
     }
@@ -192,83 +242,13 @@ function setValoresEditarCliente(datos) {
     inicializarCampos(array[25], array[26], array[27], 2);
     inicializarCampos(array[28], array[29], array[30], 3);
 
-    $("#btn-form-cliente-guardar").attr("onclick", "actualizarCliente();");
+    changeText("#btn-form-cliente-guardar", "Guardar cambios <span class='fas fa-save'></span></a>");
+    $("#btn-form-cliente-guardar").attr("onclick", "gestionarCliente("+array[0]+");");
     cargandoHide();
 }
 
-function actualizarCliente() {
-    var idcliente = $("#id-cliente").val();
-    var nombre = $("#nombre").val();
-    var apellidopaterno = $("#apellido-paterno").val();
-    var apellidomaterno = $("#apellido-materno").val();
-    var nombre_empresa = $("#nombre_empresa").val();
-    var correoinfo = $("#correo_info").val();
-    var correo_fact = $("#correo_fact").val();
-    var correo_gerencia = $("#correo_gerencia").val();
-    var correoalt1 = $("#correo_alt1").val();
-    var correoalt2 = $("#correo_alt2").val();
-    var correoalt3 = $("#correo_alt3").val();
-    var telefono = $("#telefono").val();
-    var rfc = null;
-    var razon = null;
-    var regimenfiscal = null;
-    var calle = null;
-    var interior = null;
-    var exterior = null;
-    var estado = null;
-    var municipio = null;
-    var localidad = null;
-    var postal = null;
-    var idbanco = $("#id-banco").val();
-    var cuenta = $("#cuenta").val();
-    var clabe = $("#clabe").val();
-    var idbanco1 = $("#id-banco1").val();
-    var cuenta1 = $("#cuenta1").val();
-    var clabe1 = $("#clabe1").val();
-    var idbanco2 = $("#id-banco2").val();
-    var cuenta2 = $("#cuenta2").val();
-    var clabe2 = $("#clabe2").val();
-    var idbanco3 = $("#id-banco3").val();
-    var cuenta3 = $("#cuenta3").val();
-    var clabe3 = $("#clabe3").val();
-
-    if ($("#datosficales").prop('checked')) {
-        rfc = $("#rfc").val();
-        razon = $("#razon_social").val();
-        regimenfiscal = $("#regimen-fiscal").val();
-        postal = $("#codigo_postal").val();
-        calle = $("#calle").val();
-        interior = $("#num_interior").val();
-        exterior = $("#num_exterior").val();
-        estado = $("#id-estado").val();
-        municipio = $("#id-municipio").val();
-        localidad = $("#localidad").val();
-        postal = $("#localidad").val();
-    }
-    if (isnEmpty(nombre, "nombre") && isnEmpty(apellidopaterno, "apellido-paterno") && isnEmpty(apellidomaterno, "apellido-materno") && isnEmpty(nombre_empresa, "nombre_empresa") && validarEmail(correo_fact, "correo_fact") && isnEmpty(telefono, "telefono") && isnEmpty(rfc, "rfc") && isnEmpty(razon, "razon_social") && isnEmpty(regimenfiscal, "regimen-fiscal") && isnEmpty(calle, "calle") && isnEmpty(exterior, "num_exterior") && isnEmpty(estado, "id-estado") && isnEmpty(municipio, "id-municipio") && isnEmpty(localidad, "localidad") && isnEmpty(postal, "codigo_postal")) {
-        $.ajax({
-            url: "com.sine.enlace/enlacecliente.php",
-            type: "POST",
-            data: { transaccion: "actualizarcliente", idcliente: idcliente, nombre: nombre, apellidopaterno: apellidopaterno, apellidomaterno: apellidomaterno, nombre_empresa: nombre_empresa, correoinfo: correoinfo, correo_fact: correo_fact, correo_gerencia: correo_gerencia, telefono: telefono, rfc: rfc, razon: razon, regimenfiscal: regimenfiscal, calle: calle, interior: interior, exterior: exterior, localidad: localidad, municipio: municipio, estado: estado, postal: postal, idbanco: idbanco, cuenta: cuenta, clabe: clabe, idbanco1: idbanco1, cuenta1: cuenta1, clabe1: clabe1, idbanco2: idbanco2, cuenta2: cuenta2, clabe2: clabe2, idbanco3: idbanco3, cuenta3: cuenta3, clabe3: clabe3, correoalt1: correoalt1, correoalt2: correoalt2, correoalt3: correoalt3 },
-            success: function (datos) {
-                var texto = datos.toString();
-                var bandera = texto.substring(0, 1);
-                var res = texto.substring(1, 1000);
-                if (bandera == '0') {
-                    cargandoHide();
-                    alertify.error(res);
-                } else {
-                    cargandoHide();
-                    loadView('listaclientealtas');
-                    alertify.success('Se han actualizado los datos correctamente ');
-                }
-            }
-        });
-    }
-}
-
 function eliminarCliente(idcliente) {
-    alertify.confirm("Estas seguro que quieres eliminar este cliente?", function () {
+    alertify.confirm("¿Estás seguro que quieres eliminar este cliente?", function () {
         cargandoHide();
         cargandoShow();
         $.ajax({
@@ -284,20 +264,11 @@ function eliminarCliente(idcliente) {
                 } else {
                     cargandoHide();
                     loadView('listaclientealtas');
-                    alertify.success('Los datos del cliente han sido elmininados')
+                    alertify.success('Cliente elmininado.')
                 }
             }
         });
     }).set({ title: "Q-ik" });
-}
-
-function aucompletarRegimen() {
-    $('#regimen-fiscal').autocomplete({
-        source: "com.sine.enlace/enlaceautocompletar.php?transaccion=regimenfiscal",
-        select: function (event, ui) {
-            var a = ui.item.value;
-        }
-    });
 }
 
 var renglon = 0;
@@ -319,7 +290,6 @@ function quitarCampo(id) {
         renglon--;
 }
 
-
 function nuevoCampo() {
     renglon++;
     if (renglon > 3) {
@@ -331,15 +301,15 @@ function nuevoCampo() {
     // Si el campo está oculto, mostrarlo
     if ($(campoActual).is(":hidden")) {
         $(campoActual).attr("hidden", false);
-        addloadOpcionesBanco(renglon);
+        console.log(renglon);
+        loadOpcionesBanco("contenedor-banco"+renglon, "");
     }
 }
-
 
 function inicializarCampos(idbanco, cuenta, clabe, i) {
     if (idbanco !== '0') {
         $("#addcuentas" + i).attr('hidden', false);
-        addloadOpcionesBanco(i.toString(), idbanco);
+        loadOpcionesBanco('id-banco'+i, idbanco);
         $("#cuenta" + i).val(cuenta);
         $("#clabe" + i).val(clabe);
         renglon = i;

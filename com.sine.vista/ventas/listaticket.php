@@ -38,7 +38,7 @@ include("modals.php");
             <tr class='align-middle'>
                 <th></th>
                 <th>No.Folio </th>
-                <th>Fecha de Creaci&oacute;n </th>
+                <th class='text-center'>Fecha de Creaci&oacute;n </th>
                 <th class="col-md-3 text-center">Emisor</th>
                 <th>Cliente</th>
                 <th>Estado </th>
@@ -51,8 +51,4 @@ include("modals.php");
         </thead>
     </table>
 </div>
-<br/>
 <script type="text/javascript" src="js/scriptventa.js"></script>
-<script >
-                    
-</script>

@@ -1456,3 +1456,85 @@ a.state-link{
     background: #EDEDF4;
 }
 
+.button-impuesto{
+    outline:none !important;
+    min-width: 100px;
+    width: 100%;
+    background: none;
+    border: 2px solid #CECEE2;
+    box-sizing: border-box;
+    border-radius: 5px;
+    font-family: sans-serif;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 12px;
+    line-height: 250.7%;
+    text-align: center;
+    color: #17177C;
+}
+
+.button-impuesto:hover{
+    background: #EDEDF4 !important;
+}
+
+.list-remove-icon{
+    width: 35px;
+    height: 35px;
+    font-size: 20px;
+    padding: auto;
+    color: red;
+    cursor: pointer;
+    border: 2px solid #D6D6DF;
+    border-radius: 8px;
+    transition: all 300ms;
+}
+
+.list-remove-icon:hover{
+    background: #D6D6DF !important;
+    transition: all 300ms;
+}
+
+.button-venta{
+    outline:none !important;
+    min-width: 50px;
+    max-width: 90px;
+    min-height: 40px;
+    height: auto;
+    padding: 6px;
+    background: #FFFFFF;
+    border-color: #EDEDF4;
+    border-radius: 10px;
+}
+
+.button-venta:hover{
+    background: #DADADE;
+    color: #17177C;
+}
+
+.label-cambio{
+    font-family: sans-serif;
+    font-style: normal;
+    font-weight: 300;
+    font-size: 30px;
+    line-height: 100%;
+    color: #00C116;
+}
+
+.button-venta-active{
+    background: #6A9AFB;
+}
+
+#cash-icon{
+    max-width: 50px;
+    content:url(../img/cash.icon.png);
+}
+
+#card-icon{
+    max-width: 50px;
+    content:url(../img/credit.card.icon.png);
+}
+
+#vales-icon{
+    max-width: 50px;
+    content:url(../img/vales.icon.png);
+}

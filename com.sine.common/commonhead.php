@@ -36,4 +36,5 @@
     <script src="js/alertify.min.js"></script>
     <script type="text/javascript" src="js/validator.min.js" charset="UTF-8"></script>
     <script src="js/script.js"></script>
+    <script src="js/scriptsat.js"></script>
 </head>

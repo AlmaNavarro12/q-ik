@@ -3,7 +3,7 @@ $(document).ready(function () {
     valPeriodoPrueba();
 
     document.onkeydown = function (event) {
-        if (puntoventa === '1') {
+        if (puntoventa === '1' && crearventa == '1') {
             switch (event.which) {
                 case 112://TECLA F1 crear nueva venta
                     if (!$('#punto-venta').hasClass('menu-active')) {
@@ -689,7 +689,7 @@ function loadView(vista) {
         'nuevoproducto': ["truncateTmp()", 300, "truncateTmpCot()", 350, "loadOpcionesProveedor()", 350, "getOptionsTaxes()", 300,],
         'listaproductoaltas': ["truncateTmp()", 300, "truncateTmpCot()", 350, "loadBtnCrear('producto')", 370, "loadListaProductosaltas()", 400],
         'valrfc': [],
-        'nuevocliente': ["truncateTmpCot()", 350, "truncateTmp()", 400, "loadOpcionesEstado()", 420, "loadOpcionesBanco()", 450],
+        'nuevocliente': ["truncateTmpCot()", 350, "truncateTmp()", 400, "loadOpcionesEstado()", 420, "loadOpcionesBanco('contenedor-banco')", 450],
         'listaclientealtas': ["truncateTmp()", 300, "truncateTmpCot()", 350, "loadBtnCrear('cliente')", 370, "loadListaClientesAltas()", 400],
         'comunicado': ["truncateTmpIMG()", 300, "loadFecha()", 350, "loadOpcionesFacturacion()", 400, "loadContactos()", 420],
         'listacomunicado': ["truncateTmpIMG()", 300, "loadBtnCrear('comunicado')", 350, "listaComunicados()", 400],
@@ -697,7 +697,7 @@ function loadView(vista) {
         'cfdi': ["truncateTmp()", 400],
         'impuesto': [],
         'listaimpuesto': ["loadBtnCrear('impuesto')", 350, "loadListaImpuesto()", 400],
-        'datosempresa': ["firmaCanvas()", 400, "loadOpcionesBanco()", 400, "loadOpcionesEstado()", 500],
+        'datosempresa': ["firmaCanvas()", 400, "loadOpcionesBanco('contenedor-banco')", 400, "loadOpcionesEstado()", 500],
         'nuevocontrato': ["truncateTmpCot()", 300, "loadOpcionesFolios()", 320, "filtrarProductos()", 350, "loadFecha()", 370, "loadOpcionesFormaPago()", 400, "loadOpcionesMetodoPago()", 420, "loadOpcionesMoneda()", 450, "loadOpcionesUsoCFDI()", 470, "loadOpcionesFacturacion()", 500, "loadOpcionesProveedor()", 520],
         'precio': ["truncateTmp()", 400, "truncateTmpCot()", 450],
         'pago': ["loadFecha()", 300, "cancelarPago2()", 320, "loadOpcionesFolios('3')", 350, "loadOpcionesMoneda()", 400, "loadOpcionesFormaPago2()", 420, "loadOpcionesFacturacion()", 500],
@@ -711,7 +711,7 @@ function loadView(vista) {
         'listacontratos': ["truncateTmp()", 300, "truncateTmpCot()", 350, "loadBtnCrear('contrato')", 370, "filtrarContratos()", 400],
         'listaempresa': ["truncateTmp()", 300, "truncateTmpCot()", 350, "loadBtnCrear('datos')", 370, "loadListaEmpresa()", 400],
         'listacfdi': ["truncateTmp()", 300, "truncateTmpCot()", 350, "loadListaCFDI()", 400],
-        'nuevoproveedor': ["truncateTmp()", 300, "truncateTmpCot()", 350, "loadOpcionesBanco()", 400],
+        'nuevoproveedor': ["truncateTmp()", 300, "truncateTmpCot()", 350, "loadOpcionesBanco('contenedor-banco')", 400],
         'listaproveedor': ["truncateTmp()", 300, "truncateTmpCot()", 350, "loadBtnCrear('proveedor')", 370, "loadListaProveedor()", 400],
         'forminventario': ["truncateTmp()", 300, "truncateTmpCot()", 350, "loadOpcionesProducto()", 400],
         'listainventario': ["truncateTmp()", 300, "truncateTmpCot()", 350, "loadListaInventario()", 400],
@@ -731,7 +731,7 @@ function loadView(vista) {
         'nuevafiel': [],
         'listadescsolicitud': ["loadListaSolicitud()", 400],
         'descsolicitud': [],
-        'empleado': ["loadOpcionesRegimen()", 300, "loadOpcionesPeriodicidad()", 310, "loadOpcionesJornada()", 320, "loadOpcionesContrato()", 330, "loadOpcionesEstado()", 330, "loadOpcionesBanco()", 340, "loadOpcionesRiesgo()", 350],
+        'empleado': ["loadOpcionesRegimen()", 300, "loadOpcionesPeriodicidad()", 310, "loadOpcionesJornada()", 320, "loadOpcionesContrato()", 330, "loadOpcionesEstado()", 330, "loadOpcionesBanco('contenedor-banco')", 340, "loadOpcionesRiesgo()", 350],
         'listaempleado': ["loadBtnCrear('empleado')", 300, "loadListaEmpleado()", 310],
         'nomina': ["loadFecha()", 300, "loadOpcionesFacturacion()", 310, "loadOpcionesRegimen()", 320, "listaPercepciones()", 330, "listaDeducciones()", 340, "listaOtrosPagos()", 350, "optionListPercepciones()", 360, "optionListDeducciones()", 370, "optionListOtrosPagos()", 380],
         'listanomina': ["loadBtnCrear('nomina')", 300, "filtrarFolio()", 320],
@@ -745,8 +745,8 @@ function loadView(vista) {
         'listaoperador': ["loadBtnCrear('operador')", 300, "filtrarOperador()", 320],
         'carta': ["truncateTmpCarta()", 300, "truncateTmpIMG()", 320, "loadOpcionesFolios('4')", 350, "loadFecha()", 370, "loadOpcionesEstado()", 400, "filtrarProducto()", 420, "loadOpcionesFormaPago()", 450, "loadOpcionesMetodoPago()", 470, "loadOpcionesMoneda()", 500, "loadOpcionesUsoCFDI()", 520, "loadOpcionesComprobante()", 550, "loadOpcionesFacturacion()", 570, "loadOpcionesProveedor()", 600, "opcionesPeriodoGlobal()", 620, "opcionesMeses()", 650, "opcionesAnoGlobal()", 670],
         'listacarta': ["truncateTmpCarta()", 300, "truncateTmpIMG()", 300, "loadBtnCrear('carta')", 300, "filtrarCarta()", 320, "opcionesMotivoCancelar()", 350],
-        'puntodeventa': ["newVenta()", 300],
-        'listaticket': ["loadBtnCrear('ventas')", 300, "loadOpcionesUsuario()", 300],
+        'puntodeventa': ["newVenta()", 300, "checkFondo()", 300],
+        'listaticket': ["loadBtnCrear('ventas')", 300, "loadOpcionesUsuario()", 300, "filtrarVentas()", 300],
         'cortecaja': ["loadOpcionesUsuario()", 300]
     };
 
@@ -1178,34 +1178,6 @@ function loadOpcionesFolios(id = "", serie = "", folio = "") {
     });
 }
 
-function loadOpcionesMoneda() {
-    $.ajax({
-        data: { transaccion: 'getOptions' },
-        url: '../../CATSAT/CATSAT/com.sine.enlace/enlaceMonedas.php',
-        type: 'POST',
-        dataType: 'JSON',
-        success: function (res) {
-            if (res.status > 0) {
-                $('#moneda-pago').html(res.datos);
-            }
-        }
-    });
-}
-
-function loadOpcionesFormaPago2() {
-    $.ajax({
-        data: { transaccion: 'getOptions' },
-        url: '../../CATSAT/CATSAT/com.sine.enlace/enlaceFormaPago.php',
-        type: 'POST',
-        dataType: 'JSON',
-        success: function (res) {
-            if (res.status > 0) {
-                $('#forma-pago').html(res.datos);
-            }
-        }
-    });
-}
-
 function loadOpcionesFacturacion(id = "") {
     $.ajax({
         url: 'com.sine.enlace/enlaceopcion.php',
@@ -1237,20 +1209,6 @@ function opcionesMotivoCancelar() {
                 alertify.error(res);
             } else {
                 $(".contenedor-motivos").html(datos);
-            }
-        }
-    });
-}
-
-function loadOpcionesBanco() {
-    $.ajax({
-        data: { transaccion: 'getOptions' },
-        url: '../CATSAT/CATSAT/com.sine.enlace/enlaceBanco.php',
-        type: 'POST',
-        dataType: 'JSON',
-        success: function (res) {
-            if (res.status > 0) {
-                $('.contenedor-banco').html(res.datos);
             }
         }
     });

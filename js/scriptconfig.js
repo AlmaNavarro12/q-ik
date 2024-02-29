@@ -198,7 +198,7 @@ function editarFolio(idfolio) {
 
 function setValoresEditarFolio(datos) {
     changeText("#contenedor-titulo-form-folio", "Editar Folio");
-    changeText("#btn-form-folio", "Guardar cambios <span class='far fa-save'></span></a>");
+    changeText("#btn-form-folio", "Guardar cambios <span class='fas fa-save'></span></a>");
 
     var array = datos.split("</tr>");
     var idfolio = array[0];
@@ -559,7 +559,7 @@ function cargarLogoMail() {
             }
         });
     } else {
-        alert("Por favor selecciona una imagen.");
+        alertify.error("Por favor selecciona una imagen.");
     }
 }
 

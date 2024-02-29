@@ -235,7 +235,7 @@ function cargarImgUsuario() {
             }
         });
     } else {
-        alert("Por favor selecciona una imagen.");
+        alertify.error("Por favor selecciona una imagen.");
     }
 }
 
@@ -338,7 +338,7 @@ function setValoresAsignarPermisos(datos) {
         "usuarios", "crearusuario", "listausuario", "eliminarusuario", "asignarpermiso",
         "reporte", "reportefactura", "reportepago", "reportegrafica", "reporteiva", "datosiva", "reporteventas",
         "configuracion", "addfolio", "listafolio", "editarfolio", "eliminarfolio", "addcomision", "encabezados", "confcorreo", "importar", 
-        "ventas", "crearventa", "cancelarventa", "exportarventa", "accion", "idlogin"
+        "ventas", "crearventa", "cancelarventa", "exportarventa", "listaventa", "accion", "idlogin"
     ];
 
     var permisosMapa = {};
@@ -391,7 +391,7 @@ function actualizarPermisos(idusuario) {
         usuarios: ["crearusuario", "listausuario", "eliminarusuario", "asignarpermiso"],
         reporte: ["reportefactura", "reportepago", "reportegrafica", "reporteiva", "datosiva", "reporteventas"],
         configuracion: ["addfolio", "listafolio", "editarfolio", "eliminarfolio", "addcomision", "encabezados", "confcorreo", "importar"],
-        ventas: ["crearventa", "cancelarventa", "exportarventa"],
+        ventas: ["crearventa", "cancelarventa", "exportarventa", "listaventa"],
     };
 
     var datos = {
@@ -402,13 +402,16 @@ function actualizarPermisos(idusuario) {
 
     for (var categoria in categorias) {
         if ($("#collapse-" + categoria).hasClass('show')) {
-            datos[categoria] = 1;
-    
+            var categoriaMarcada = false; 
             for (var i = 0; i < categorias[categoria].length; i++) {
                 var permiso = categorias[categoria][i];
-                var valorCheckbox = $("#" + permiso).prop('checked') ? 1 : 0;
-                datos[permiso] = valorCheckbox;
+                var valorCheckbox = $("#" + permiso).prop('checked');
+                datos[permiso] = valorCheckbox ? 1 : 0;
+                if (valorCheckbox) {
+                    categoriaMarcada = true;
+                }
             }
+            datos[categoria] = categoriaMarcada ? 1 : 0;
         } else {
             datos[categoria] = 0;
             for (var i = 0; i < categorias[categoria].length; i++) {
@@ -417,6 +420,7 @@ function actualizarPermisos(idusuario) {
             }
         }
     }
+    
     
     console.log(datos);
     $.ajax({
