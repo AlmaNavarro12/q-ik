@@ -191,6 +191,7 @@ function editarFolio(idfolio) {
             } else {
                 loadViewConfig('folio');
                 window.setTimeout("setValoresEditarFolio('" + datos + "')", 500);
+                console.log(datos);
             }
         }
     });
@@ -224,7 +225,7 @@ function setValoresEditarFolio(datos) {
 }
 
 function eliminarFolio(idfolio) {
-    alertify.confirm("¿Esta seguro que desea eliminar este folio?", function () {
+    alertify.confirm("¿Estás seguro que deseas eliminar este folio?", function () {
         cargandoHide();
         cargandoShow();
         $.ajax({

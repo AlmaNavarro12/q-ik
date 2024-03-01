@@ -116,6 +116,10 @@ class Permiso {
     private $eliminardatos;
     private $descargardatos;
     private $listaventa;
+    private $registrarentrada;
+    private $registrarsalida;
+    private $cortedecaja;
+
 
 
     function __construct() {
@@ -288,6 +292,18 @@ class Permiso {
 
     function getCrearoperador() {
         return $this->crearoperador;
+    }
+
+    function getRegistrarEntrada() {
+        return $this->registrarentrada;
+    }
+
+    function getRegistrarSalida() {
+        return $this->registrarsalida;
+    }
+
+    function getCortedeCaja() {
+        return $this->cortedecaja;
     }
 
     function getEditaroperador() {
@@ -1033,4 +1049,17 @@ class Permiso {
     function setExportarVenta($exportarventa) {
         $this->exportarventa = $exportarventa;
     }
+
+    function setRegistrarEntrada($registrarentrada) {
+        $this->registrarentrada = $registrarentrada;
+    }
+
+    function setRegistrarSalida($registrarsalida) {
+        $this->registrarsalida = $registrarsalida;
+    }
+
+    function setCortedeCaja($cortedecaja) {
+        $this->cortedecaja = $cortedecaja;
+    }
+
 }

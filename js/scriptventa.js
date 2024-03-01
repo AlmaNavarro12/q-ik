@@ -78,7 +78,6 @@ $(function () {
             validarProductosVenta(1);
 		}
     });
-
 });
 
 function registrarDineroInicial() {
@@ -324,8 +323,8 @@ function checkFondo() {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
             var res = texto.substring(1, 1000);
-            if (!datos) {
-                $("#modal-dincaja").modal({backdrop: 'static', keyboard: false}, 'show');
+            if (datos == false) {
+                $("#modal-dincaja").modal('show');
             }
             cargandoHide();
         }
@@ -421,12 +420,12 @@ function registrarDineroInicial() {
                     alertify.error(res);
                 } else {
                     $("#modal-dincaja").modal('hide');
+                    alertify.success('Monto de $' + monto + ' registrado en caja.')
                 }
             }
         });
     }
 }
-
 
 function setValoresCobrar() {
     var tab = $("#tabs").find('.sub-tab-active').attr("data-tab");
@@ -436,28 +435,27 @@ function setValoresCobrar() {
         type: 'POST',
         data: {transaccion: 'totalticket', tab: tab},
         success: function (datos) {
-            var texto = datos.toString();
-            var bandera = texto.substring(0, 1);
-            var res = texto.substring(1, 5000);
-            if (bandera == '0') {
-                alertify.error(res);
-            } else {
-                var array = datos.split("</tr>");
-                $("#label-total").html("$" + array[0]);
-                $("#total-cobrar").val(array[0]);
-                $("#total-original").val(array[0]);
-                $("#monto-pagado").val(array[0]);
-                $("#label-art").html(array[1]);
-                $('#label-descuento').html("$ "+ array[2]);
-                $('#input-descuento').val(array[2]);
-                $('#input-descuento-original').val(array[2]);
-                window.setTimeout(() => {
-                    $("#monto-pagado").select();
-                }, 500);
-            }
+            var array = datos.split("</tr>");
+            var total = array[0] || "0.00";
+            var art = array[1] || "0";
+            var descuento = array[2] || "0.00";
+
+            $("#label-total").html("$" + total);
+            $("#total-cobrar").val(total);
+            $("#total-original").val(total);
+            $("#monto-pagado").val(total);
+            $("#label-art").html(art);
+            $('#label-descuento').html("$ " + descuento);
+            $('#input-descuento').val(descuento);
+            $('#input-descuento-original').val(descuento);
+
+            window.setTimeout(() => {
+                $("#monto-pagado").select();
+            }, 500);
         }
     });
 }
+
 
 function habilitarDescuento(){
     if( $('#ChkDescuento').is(':checked') ){
@@ -484,7 +482,6 @@ function resetDescuento(){
     $('#groupDesc').hide('slow');
     calcularCambio();
 }
-
 
 function calcularCambio() {
     var total = $("#total-cobrar").val() || '0';
@@ -624,6 +621,26 @@ function buscarVentas(pag = "") {
     });
 }
 
-window.addEventListener("beforeunload", function (e) {
-    alert('Hola');
-});
+function selectedPercepciones() {
+    var percepciones = [];
+    $.each($("input[name='chpercepcion']:checked"), function () {
+        percepciones.push($(this).attr('data-id') + "/" + $(this).attr('value'));
+    });
+
+    $.ajax({
+        url: "com.sine.enlace/enlacenomina.php",
+        type: "POST",
+        data: {transaccion: "selectedpercepcion", percepcion: percepciones},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 1000);
+            if (bandera == '0') {
+                alertify.error(res);
+            } else {
+                $("#selected-percepciones").html(datos);
+            }
+        }
+    });
+    calcularTotalPercepciones();
+}

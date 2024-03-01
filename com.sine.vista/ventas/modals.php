@@ -108,7 +108,7 @@
                             </tr>
                             <tr class="border border-light">
                                 <td>
-                                    <label class="text-start fw-bold text-muted mb-2">Forma de Pago:</label>
+                                    <label class="text-center fw-bold text-muted mb-2">Forma de Pago:</label>
                                     <div id="btn-fmpago" class="row d-flex justify-content-center">
                                         <button pago-tab="cash" class="button-venta col-md-3 me-3 button-venta-active">Efectivo <span id="cash-icon"></span></button>
                                         <button pago-tab="card" class="button-venta col-md-3 me-3">Tarjeta <span id="card-icon"></span></button>
@@ -167,66 +167,31 @@
     </div>
 </div>
 
-<!---ENTRADA DE EFECTIVO-->
-<div class="modal fade bs-example-modal-lg" id="modal-entradas" role="dialog" aria-labelledby="myModalLabel">
-    <div class="modal-dialog modal-sm" role="document">
+
+<!--REGISTRAR DINERO INCIAL EN CAJA-->
+<div class="modal fade shadow-lg rounded rounded-5" id="modal-dincaja" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
         <div class="modal-content">
-            <button type="button" class="close-modal" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="titulo-modal" id="label-ingresos">Registrar Entrada de efectivo</h4>
-            <div class="modal-body">
-                <form id="form-cobrar" onsubmit="return false;">
-                    <input type="hidden" id="type-movimiento" />
-                    <div class="row">
-                        <label class="label-form text-start" for="monto-entrada">Cantidad</label> <label class="mark-required text-start">*</label>
-                        <div class="form-group">
-                            <input class="input-form text-center form-control" type="text" placeholder="Monto" id="monto-entrada" />
-                            <div id="monto-entrada-errors"></div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <label class="label-form text-start" for="concepto-entrada">Concepto</label> <label class="mark-required text-start">*</label>
-                        <div class="form-group">
-                            <input class="input-form text-center form-control" type="text" placeholder="Concepto" id="concepto-entrada" />
-                            <div id="concepto-entrada-errors"></div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="text-start" id="btns">
-                            <button class="button-modal" onclick="registrarEntrada()" id="btn-form-entrada">Registrar <span class="glyphicon glyphicon-usd"></span></button>
-                        </div>
-                    </div>
-                </form>
+            <div class="modal-header">
+                <h4 class="modal-title fs-5" id="label-ingresos">Registrar cantidad inicial</h4>
+                <button type="button" id="btn-close-modal" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-
-        </div>
-    </div>
-</div>
-
-<div class="modal fade bs-example-modal-lg" id="modal-dincaja" role="dialog" aria-labelledby="myModalLabel">
-    <div class="modal-dialog modal-sm" role="document">
-        <div class="modal-content">
-
-            <h4 class="titulo-modal" id="label-ingresos">Registrar Cantidad Inicial</h4>
             <div class="modal-body">
                 <form id="form-cobrar" onsubmit="return false;">
                     <div class="row">
-                        <label class="label-form text-start" for="monto-inicial">Dinero en caja</label> <label class="mark-required text-start">*</label>
+                        <label class="label-form text-start mb-1" for="monto-inicial">Dinero en caja <label class="mark-required text-danger fw-bold">*</label></label>
                         <div class="form-group">
                             <input class="input-form text-center form-control" type="text" placeholder="Monto" id="monto-inicial" name="monto-inicial" />
                             <div id="monto-inicial-errors"></div>
                         </div>
                     </div>
-
-                    <div class="row">
-                        <div class="text-start" id="btns">
-                            <button class="button-modal" onclick="registrarDineroInicial()" id="btn-form-inicial">Registrar <span class="glyphicon glyphicon-usd"></span></button>
+                    <div class="row mt-3">
+                        <div class="text-end" id="btns">
+                            <button class="button-modal" onclick="registrarDineroInicial()" id="btn-form-inicial">Registrar <span class="fas fa-dollar-sign"></span></button>
                         </div>
                     </div>
                 </form>
             </div>
-
         </div>
     </div>
 </div>

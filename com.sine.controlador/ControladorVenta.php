@@ -109,44 +109,40 @@ class ControladorVenta
         return $datos;
     }
 
-    public function agregarProducto($cod, $tab, $sid)
-    {
-        $taxes_traslados = [];
-        $taxes_retencion = [];
+    public function agregarProducto($cod, $tab, $sid) { //YA
+        $taxes_traslados = "''";
+        $taxes_retencion = "''";
 
         $div = explode("-", $cod);
         $cod = $div[0];
         $prod = $this->getProductobyCod($cod);
-
         if ($prod) {
             $div = explode("</tr>", $prod);
-            $idproducto = $div[0];
+            
             $taxes = $div[5];
-            $cantidad = $div[6];
             $array_taxes = explode("<tr>", $taxes);
 
-            foreach ($array_taxes as $tax) {
-                $div_tipo = explode("-", $tax);
-                if ($div_tipo[0] !== "") {
+            for($i = 0; $i < sizeof($array_taxes); $i++) {
+                
+                $div_tipo = explode("-", $array_taxes[$i]);
+                if($div_tipo[0] != ""){
                     $percen_tax = $div_tipo[0];
-                    $tipo = $div_tipo[1];
-
-                    if ($tipo == 1) {
-                        $taxes_traslados[] = $percen_tax;
+                    $tipo = $div_tipo[1];                              
+                
+                    if($tipo == 1){
+                        $taxes_traslados .= ",'".$percen_tax."'";
                     } else {
-                        $taxes_retencion[] = $percen_tax;
+                        $taxes_retencion .= ",'".$percen_tax."'";
                     }
                 }
             }
-
-            $traslados = $this->newbuildArray('1', $div[4], implode(",", $taxes_traslados));
-            $retenciones = $this->newbuildArray('2', $div[4], implode(",", $taxes_retencion));
+            $traslados   = $this->newbuildArray('1', $div[4], $taxes_traslados);
+            $retenciones = $this->newbuildArray('2', $div[4], $taxes_retencion);
 
             $insertar = false;
-
+            
             $consulta = "INSERT INTO `tmpticket` VALUES (:id, :idprod, :cod, :cfiscal, :cunidad, :prod, :precio, :cant, :descuento, :impdescuento, :importe, :totaldescuento, :traslados, :retenciones, :tab, :sid);";
-            $val = [
-                "id" => null,
+            $val = array("id" => null,
                 "idprod" => $div[0],
                 "cod" => $cod,
                 "cfiscal" => $div[1],
@@ -161,14 +157,13 @@ class ControladorVenta
                 "traslados" => $traslados,
                 "retenciones" => $retenciones,
                 "tab" => $tab,
-                "sid" => $sid
-            ];
-
+                "sid" => $sid);
+            
             $insertar = $this->consultas->execute($consulta, $val);
-            $restante = $cantidad - 1;
-            $this->restaurarInvCant($idproducto, $restante);
+            $restante = $div[6] - 1;
+            $this->restaurarInvCant($div[0], $restante);
         } else {
-            $insertar = "0No se encontró el producto";
+            $insertar = "0No se encontro el producto";
         }
 
         return $insertar;
@@ -186,6 +181,8 @@ class ControladorVenta
         return $consultado;
     }
 
+    //-------------------------------CAJA
+
     private function getDineroCajaAux() {
         $hoy = date("Y-m-d");
         $uid = $_SESSION[sha1("idusuario")];
@@ -198,12 +195,8 @@ class ControladorVenta
     }
 
     public function checkDineroCaja() {
-        $check = false;
         $datos = $this->getDineroCajaAux();
-        foreach ($datos as $actual) {
-            $check = true;
-        }
-        return $check;
+        return empty($datos);
     }
 
     public function insertarMontoInicial($monto) {
@@ -220,6 +213,27 @@ class ControladorVenta
         return $insertado;
     }
 
+    public function insertarmovEfectivo($v)
+    {
+        $insertado = false;
+        $hoy = date("Y-m-d");
+        $hora = date("H:i");
+        $uid = $_SESSION[sha1("idusuario")];
+        $consulta = "INSERT INTO movefectivo VALUES (:id, :tipo, :fecha, :hora, :monto, :concepto, :uid);";
+        $val = array(
+            "id" => null,
+            "tipo" => $v->getTipomov(),
+            "fecha" => $hoy,
+            "hora" => $hora,
+            "monto" => $v->getMontomov(),
+            "concepto" => $v->getConceptomov(),
+            "uid" => $uid
+        );
+        $insertado = $this->consultas->execute($consulta, $val);
+        return $insertado;
+    }
+
+    //-------------------------------IMPUESTOS
     private function getImpuestos($tipo)
     {
         $consultado = false;
@@ -234,7 +248,7 @@ class ControladorVenta
         $datos = "<thead class='sin-paddding'>
                 <tr class='align-middle'>
                     <th class='text-center'>COD. BARRAS</th>
-                    <th class='text-center'>CLV. FISCAL</th>
+                    <th class='text-center'>CLV.FISCAL</th>
                     <th class='text-center col-md-3'>DESCRIPCIÓN</th>
                     <th class='text-center col-md-1'>PRECIO</th>
                     <th class='text-center col-md-1'>CANT.</th>
@@ -302,15 +316,22 @@ class ControladorVenta
             $sumador_ret += bcdiv($ret, '1', 2);
             $sumador_descuentos += bcdiv($impdescuentos, '1', 2);
 
+            
+            $optraslados = "";
+            $opretencion = "";
             $imptraslados = $this->getImpuestos('1');
             $impretenciones = $this->getImpuestos('2');
 
-            $optraslados = "";
-            $opretencion = "No hay impuestos de retención.";
             if($imptraslados != ""){
-                $optraslados = $this->generarOpcionesImpuestos($imptraslados, $checktraslado, $tid);
-            } else if($impretenciones != ""){
-                $opretencion = $this->generarOpcionesImpuestos($impretenciones, $checkretencion, $tid);
+                $optraslados = $this->generarOpcionesImpuestos($imptraslados, $checktraslado, $tid, 'tras');
+            } else {
+                $optraslados = "No hay impuestos de traslado.";
+            }
+            
+            if($impretenciones != ""){
+                $opretencion = $this->generarOpcionesImpuestos($impretenciones, $checkretencion, $tid, 'ret');
+            } else {
+                $opretencion = "No hay impuestos de retención.";
             }
 
             $datos .= "
@@ -333,11 +354,11 @@ class ControladorVenta
                     </div>
                 </td>
                 <td class='text-center'>$ " . bcdiv($importe, '1', 2) . "</td>
-                <td class='text-center'> " . bcdiv($impdescuentos, '1', 2) . "% <br> $ " . $descuentos  . "</td>
+                <td class='text-center text-break'> " . bcdiv($impdescuentos, '1', 2) . " % <br>$ " . bcdiv($descuentos, '1', 2)  . "</td>
                 <td>
                     <div class='input-group'>
                         <div class='dropdown'>
-                            <button type='button' class='button-impuesto dropdown-toggle' data-bs-toggle='dropdown'>Traslados</button>
+                            <button type='button' class='button-impuesto dropdown-toggle' data-bs-toggle='dropdown' aria-expanded='true' data-bs-auto-close='outside'>Traslados</button>
                             <ul class='dropdown-menu'>
                                 $optraslados
                             </ul>
@@ -347,8 +368,8 @@ class ControladorVenta
                 <td>
                     <div class='input-group'>
                         <div class='dropdown'>
-                            <button type='button'  class='button-impuesto dropdown-toggle' data-bs-toggle='dropdown'>Retenciones</button>
-                            <ul class='dropdown-menu ps-3'>
+                            <button type='button' class='button-impuesto dropdown-toggle' data-bs-toggle='dropdown'>Retenciones</button>
+                            <ul class='dropdown-menu ps-3 lh-sm'>
                                 $opretencion
                             </ul>
                         </div>
@@ -357,97 +378,97 @@ class ControladorVenta
                 <td>
                     <span class='fas fa-times list-remove-icon pt-1 ps-2' onclick='eliminarProdTmp($tid);'></span>
                 </td>
-            </tr>";
+            </tr></tbody>";
         }
 
         $totalticket = ((($subticket + $sumador_iva) - $sumador_ret) - $sumador_descuentos);
 
-        $datos .= "</tbody><tfoot>
-        <tr class='bg-danger'>
-            <th colspan='3'></th>
-            <th class='text-end' colspan='2'>SUBTOTAL:</th>
-            <th class='text-start'>$ " . number_format(bcdiv($subticket, '1', 2), 2, '.', ',') . "</th>
-        </tr>";
+        if($totalticket != 0){
+            $datos .= "
+        <tfoot class=''>
+        <tr>
+        <th colspan='4'><ul class='list-group mb-3 mt-3'>
+        <li class='list-group-item d-flex justify-content-between lh-sm'>
+            <div>
+                <h6 class='my-0 titulo-lista fs-6 fw-bold'>SUBTOTAL:</h6>
+            </div>
+            <span class='titulo-lista fw-bold fs-5'>$".number_format(bcdiv($subticket, '1', 2), 2, '.', ',')." </span>
+        </li>";
 
         if ($sumador_descuentos > 0) {
-            $datos .= "<tr class='align-middle'>
-            <th colspan='3'></th>
-            <th class='text-end' colspan='2'>DESCUENTO:</th>
-            <th class='text-start'>$ " . number_format(bcdiv($sumador_descuentos, '1', 2), 2, '.', ',') . "</th>
-        </tr>
-        <tr class='align-middle'>
-            <th colspan='3'></th>
-            <th class='text-end' colspan='2'>SUBTOTAL - DESCUENTO:</th>
-            <th class='text-start'>$ " . number_format(bcdiv(($subticket - $sumador_descuentos), '1', 2), 2, '.', ',') . "</th>
-        </tr>";
+            $datos .= "<li class='list-group-item d-flex justify-content-between lh-sm'>
+            <div>
+                <h6 class='my-0 titulo-lista fs-6 fw-bold'>DESCUENTO:</h6>
+            </div>
+            <span class='titulo-lista fw-bold fs-5'>$".number_format(bcdiv($sumador_descuentos, '1', 2), 2, '.', ',')." </span>
+            </li>
+            <li class='list-group-item d-flex justify-content-between lh-sm'>
+            <div>
+                <h6 class='my-0 titulo-lista fs-6 fw-bold'>SUBTOTAL - DESCUENTO:</h6>
+            </div>
+            <span class='titulo-lista fw-bold fs-5'>$".number_format(bcdiv(($subticket - $sumador_descuentos), '1', 2), 2, '.', ',')." </span>
+            </li>";
         }
 
         if ($sumador_iva > 0) {
-            $datos .= "<tr class='align-middle'>
-            <th colspan='3'></th>
-            <th class='text-end' colspan='2'>TRASLADOS:</th>
-            <th class='text-start'>$ " . number_format(bcdiv($sumador_iva, '1', 2), 2, '.', ',') . "</th>
-        </tr>";
+            $datos .= "<li class='list-group-item d-flex justify-content-between lh-sm'>
+            <div>
+                <h6 class='my-0 titulo-lista fs-6 fw-bold'>TRASLADOS:</h6>
+            </div>
+            <span class='titulo-lista fw-bold fs-5'>$".number_format(bcdiv($sumador_iva, '1', 2), 2, '.', ',')." </span>
+            </li>";
         }
 
         if ($sumador_ret > 0) {
-            $datos .= "<tr class='align-middle'>
-            <th colspan='3'></th>
-            <th class='text-end' colspan='2'>RETENCIONES:</th>
-            <th class='text-start'>$ " . number_format(bcdiv($sumador_ret, '1', 2), 2, '.', ',') . "</th>
-        </tr>";
+            $datos .= "<li class='list-group-item d-flex justify-content-between lh-sm'>
+            <div>
+                <h6 class='my-0 titulo-lista fs-6 fw-bold'>RETENCIONES:</h6>
+            </div>
+            <span class='titulo-lista fw-bold fs-5'>$".number_format(bcdiv($sumador_ret, '1', 2), 2, '.', ',')." </span>
+            </li>";
         }
 
-        $datos .= "<tr class='align-middle'>
-        <th colspan='3'></th>
-        <th class='text-end' colspan='2'>GRAN TOTAL:</th>
-        <th class='text-start'>$ " . number_format(bcdiv($totalticket, '1', 2), 2, '.', ',') . "</th>
-    </tr></tfoot>";
+        $datos .= "<li class='list-group-item d-flex justify-content-between'>
+            <span class='titulo-lista fs-6 fw-bold'>GRAN TOTAL (MXN)</span>
+            <strong class='titulo-lista fw-bold fs-5'>$".number_format(bcdiv($totalticket, '1', 2), 2, '.', ',')."</strong>
+            </li>
+            </ul></th>
+            </tr>";
 
+        }
         return $datos;
     }
 
-    private function generarOpcionesImpuestos($impuestos, $check, $tid)
-    {
-        $opciones = "";
-        foreach ($impuestos as $actual) {
-            $icon = "glyphicon-unchecked";
-            $checked = "";
-            $divcheck = explode("<imp>", $check);
-            foreach ($divcheck as $chk) {
-                if ($chk == $actual['porcentaje'] . "-" . $actual['impuesto']) {
-                    $icon = "far fa-check-square";
-                    $checked = "checked";
-                    break;
-                }
+    private function generarOpcionesImpuestos($impuestos, $check, $tid, $tipo)
+{
+    $opciones = "";
+    foreach ($impuestos as $actual) {
+        $icon = "far fa-square";
+        $checked = "";
+
+        $divcheck = explode("<imp>", $check);
+        foreach ($divcheck as $chk) {
+            if ($chk == $actual['porcentaje'] . "-" . $actual['impuesto']) {
+                $icon = "far fa-check-square";
+                $checked = "checked";
+                break;
             }
-            $opciones .= "<li class='ps-3' data-location='tabla' data-id='$tid'>
-            <label class='dropdown-menu-item checkbox'>
-            <input type='checkbox' $checked value='" . $actual['porcentaje'] . "' name='chtrastabla$tid' data-impuesto='" . $actual['impuesto'] . "' data-tipo='" . $actual['tipoimpuesto'] . "'/>
-            <span class='$icon me-2' id='chuso1span'></span>" . $actual['nombre'] . " (" . $actual['porcentaje'] . "%)" . "</label></li>";
         }
-        return $opciones;
+        $nombre = $actual['nombre'];
+        $porcentaje = $actual['porcentaje'];
+        $impuesto = $actual['impuesto'];
+
+        $opciones .= "<li data-location='tabla' data-id='$tid'>
+            <label class='dropdown-menu-item checkbox ps-3'>
+                <input type='checkbox' $checked value='$porcentaje' name='ch{$tipo}tabla$tid' data-impuesto='$impuesto' data-tipo='$tipo' />
+                <span class='$icon me-2' id='chuso1span'></span>$nombre ($porcentaje%)
+            </label>
+        </li>";
     }
 
-    public function insertarmovEfectivo($v)
-    {
-        $insertado = false;
-        $hoy = date("Y-m-d");
-        $hora = date("H:i");
-        $uid = $_SESSION[sha1("idusuario")];
-        $consulta = "INSERT INTO movefectivo VALUES (:id, :tipo, :fecha, :hora, :monto, :concepto, :uid);";
-        $val = array(
-            "id" => null,
-            "tipo" => $v->getTipomov(),
-            "fecha" => $hoy,
-            "hora" => $hora,
-            "monto" => $v->getMontomov(),
-            "concepto" => $v->getConceptomov(),
-            "uid" => $uid
-        );
-        $insertado = $this->consultas->execute($consulta, $val);
-        return $insertado;
-    }
+    return $opciones;
+}
+
 
     private function getTotalTicketAux($tag, $sid)
     {
@@ -461,6 +482,7 @@ class ControladorVenta
         return $datos;
     }
 
+    //-------------------------------TICKET FINAL
     private function getTotalArticulos($tag, $sid)
     {
         $datos = false;
@@ -513,7 +535,7 @@ class ControladorVenta
         return $suma;
     }
 
-    private function checkProductoTMPAux($idtmp) {
+    private function checarTicketTmpById($idtmp) {
         $consultado = false;
         $consulta = "SELECT * FROM tmpticket WHERE idtmpticket=:id;";
         $val = array("id" => $idtmp);
@@ -537,8 +559,94 @@ class ControladorVenta
         return $rearray;
     }
 
+    public function modificarChIva($idtmp, $chiva, $chret) {
+        $check = $this->checarTicketTmpById($idtmp);
+        foreach ($check as $actual) {
+            $canttmp = $actual['tmpcant'];
+            $precio_tmp = $actual['tmpprecio'];
+        }
+        $importe = $canttmp * $precio_tmp;
+        $rebuildT = $this->reBuildArray2($importe, $chiva);
+        $rebuildR = $this->reBuildArray2($importe, $chret);
+
+        $consulta = "UPDATE `tmpticket` SET tmptraslados=:chiva, tmpretenciones=:chret, tmpimporte=:totun WHERE idtmpticket=:idtmp;";
+        $val = array("chiva" => $rebuildT,
+            "chret" => $rebuildR,
+            "totun" => $importe,
+            "idtmp" => $idtmp);
+        $datos = $this->consultas->execute($consulta, $val);
+        return $datos;
+    }
+
+    //---------------------------------------------INVENTARIO
+    private function restaurarInvCant($idproducto, $cantidad) {
+        $consultado = false;
+        $consulta = "UPDATE `productos_servicios` set cantinv=:cantidad where idproser=:idproducto;";
+        $valores = array("idproducto" => $idproducto, "cantidad" => $cantidad);
+        $consultado = $this->consultas->getResults($consulta, $valores);
+        return $consultado;
+    }
+
+    public function restaurarInventario($idproducto, $cantidad) {
+        $consultado = false;
+        $consulta = "UPDATE `productos_servicios` set cantinv=cantinv+:cantidad where idproser=:idproducto;";
+        $valores = array("idproducto" => $idproducto, "cantidad" => $cantidad);
+        $consultado = $this->consultas->getResults($consulta, $valores);
+        return $consultado;
+    }
+
+    private function checkProductoAux($idtmp) {
+        $consultado = false;
+        $consulta = "SELECT cantinv, chinventario FROM productos_servicios WHERE idproser=:id;";
+        $val = array("id" => $idtmp);
+        $consultado = $this->consultas->getResults($consulta, $val);
+        return $consultado;
+    }
+    
+    public function modificarCantidad($idtmp, $cant, $precio) {
+        $check = $this->checarTicketTmpById($idtmp);
+        $canttmp = $check[0]['tmpcant'];
+        $precio_tmp = $check[0]['tmpprecio'];
+        $trasladotmp = $check[0]['tmptraslados'];
+        $rettmp = $check[0]['tmpretenciones'];
+        $idproducto = $check[0]['tmpidprod'];
+    
+        $chinv = 0;
+        $cantidad = 0;
+
+        $prod = $this->checkProductoAux($idproducto);
+        foreach ($prod as $pactual) {
+            $chinv = $pactual['chinventario'];
+            $cantidad = $pactual['cantinv'];
+        }
+    
+        $importe = $cant * $precio_tmp;
+        $traslado = $trasladotmp != "" ? $this->reBuildArray2($importe, $trasladotmp) : "";
+        $retencion = $rettmp != "" ? $this->reBuildArray2($importe, $rettmp) : "";
+
+        $restante = ($cantidad + $canttmp) - $cant;
+    
+        if ($chinv == '1' && $restante < 0) {
+            $datos = "0El inventario no es suficiente para agregar más producto. Hay " . $cantidad + $canttmp . " productos en existencia.";
+        } else {
+            $consulta = "UPDATE `tmpticket` SET tmpcant=:cant, tmpimporte=:totuni, tmptraslados=:traslados, tmpretenciones=:retenciones  WHERE idtmpticket=:id;";
+            $valores = array(
+                "id" => $idtmp,
+                "cant" => $cant,
+                "totuni" => bcdiv($importe, '1', 2),
+                "traslados" => $traslado,
+                "retenciones" => $retencion
+            );
+            $datos = $this->consultas->execute($consulta, $valores);
+            if ($chinv == '1') {
+                $this->restaurarInvCant($idproducto, $restante);
+            }
+        }
+        return $datos;
+    }
+    
     public function incrementarProducto($idtmp) {
-        $check = $this->checkProductoTMPAux($idtmp);
+        $check = $this->checarTicketTmpById($idtmp);
         $codprod = '';
         $precio_tmp = 0;
         $canttmp = 0;
@@ -590,7 +698,7 @@ class ControladorVenta
         );
     
         if ($chinv == '1' && $cantidad <= 0) {
-            return "0El inventario no es suficiente para agregar más producto. Hay " . $cantidad . " productos en existencia.";
+            return "0El inventario no es suficiente para agregar más producto. Hay " . $canttmp . " productos en existencia.";
         }
         if ($chinv == '1') {
             $inv = $this->restaurarInvCant($idproducto, $restante);
@@ -600,7 +708,7 @@ class ControladorVenta
     }
 
     public function reducirProducto($idtmp) {
-        $check = $this->checkProductoTMPAux($idtmp);
+        $check = $this->checarTicketTmpById($idtmp);
         foreach ($check as $actual) {
             $codprod = $actual['tmpcod'];
             $precio_tmp = $actual['tmpprecio'];
@@ -609,14 +717,10 @@ class ControladorVenta
             $rettmp = $actual['tmpretenciones'];
             $descuento = $actual['descuento'];
         }
-
         $chinv = 0;
-        $cantidad = 0;
-
         $prod = $this->getProductobyCodAux($codprod);
         foreach ($prod as $pactual) {
             $chinv = $pactual['chinventario'];
-            $cantidad = $pactual['cantinv'];
             $idproducto = $pactual['idproser'];
         }
 
@@ -624,7 +728,6 @@ class ControladorVenta
         $importe = $cant * $precio_tmp;
         $descuento = ($descuento * $importe)/100;
         $importe_descuento = ($importe - $descuento);
-
         $traslado = $this->reBuildArray2($importe_descuento, $trasladotmp);
         $retencion = $this->reBuildArray2($importe_descuento, $rettmp);
 
@@ -636,25 +739,29 @@ class ControladorVenta
             "ret" => $retencion);
         $datos = $this->consultas->execute($consulta, $valores);
         if ($chinv == '1') {
-            $restante = $cantidad + 1;
-            $inv = $this->restaurarInvCant($idproducto, $restante);
+            $inv = $this->restaurarInventario($idproducto, '1');
         }
         return $datos;
     }
 
+    
+    private function obtenerProductosByTag($tag, $sid) {
+        $consulta = "SELECT tmpidprod, tmpcant FROM tmpticket WHERE tagtab= :tag AND sid = :sid";
+        $valores = array(
+            "tag" => $tag,
+            "sid" => $sid
+        );
+        return $this->consultas->getResults($consulta, $valores);
+    }
+
     public function eliminarProducto($tid) {
         $eliminado = false;
-        $resultados = $this->checkProductoTMPAux($tid);
+        $resultados = $this->checarTicketTmpById($tid);
         if ($resultados && count($resultados) > 0) {
             foreach ($resultados as $resultado) {
                 $idproducto = $resultado['tmpidprod'];
                 $cantidad = $resultado['tmpcant'];
-                $consultaRestaurar = "UPDATE productos_servicios SET cantinv = cantinv + :cantidad WHERE idproser = :idproducto";
-                $valoresRestaurar = array(
-                    "idproducto" => $idproducto,
-                    "cantidad" => $cantidad
-                );
-                $this->consultas->execute($consultaRestaurar, $valoresRestaurar);
+                $this->restaurarInventario($idproducto,$cantidad);
             }
         }
         $consultaEliminar = "DELETE FROM tmpticket WHERE idtmpticket=:tid";
@@ -663,69 +770,6 @@ class ControladorVenta
         return $eliminado;
     }
 
-    private function checkProductoAux($idtmp) {
-        $consultado = false;
-        $consulta = "SELECT cantinv, chinventario FROM productos_servicios WHERE idproser=:id;";
-        $val = array("id" => $idtmp);
-        $consultado = $this->consultas->getResults($consulta, $val);
-        return $consultado;
-    }
-
-    public function modificarCantidad($idtmp, $cant, $precio) {
-        $check = $this->checkProductoTMPAux($idtmp);
-        $canttmp = $check[0]['tmpcant'];
-        $precio_tmp = $check[0]['tmpprecio'];
-        $trasladotmp = $check[0]['tmptraslados'];
-        $rettmp = $check[0]['tmpretenciones'];
-        $idproducto = $check[0]['tmpidprod'];
-    
-        $chinv = 0;
-        $cantidad = 0;
-
-        $prod = $this->checkProductoAux($idproducto);
-        foreach ($prod as $pactual) {
-            $chinv = $pactual['chinventario'];
-            $cantidad = $pactual['cantinv'];
-        }
-    
-        $importe = $cant * $precio_tmp;
-        $traslado = $trasladotmp != "" ? $this->reBuildArray2($importe, $trasladotmp) : "";
-        $retencion = $rettmp != "" ? $this->reBuildArray2($importe, $rettmp) : "";
-
-        //5+5-
-        $restante = ($cantidad + $canttmp) - $cant;
-    
-        if ($chinv == '1' && $restante < 0) {
-            $datos = "0El inventario no es suficiente para agregar más producto. Hay " . $cantidad + $canttmp . " productos en existencia.";
-        } else {
-            $consulta = "UPDATE `tmpticket` SET tmpcant=:cant, tmpimporte=:totuni, tmptraslados=:traslados, tmpretenciones=:retenciones  WHERE idtmpticket=:id;";
-            $valores = array(
-                "id" => $idtmp,
-                "cant" => $cant,
-                "totuni" => bcdiv($importe, '1', 2),
-                "traslados" => $traslado,
-                "retenciones" => $retencion
-            );
-            $datos = $this->consultas->execute($consulta, $valores);
-            if ($chinv == '1') {
-                $this->restaurarInvCant($idproducto, $restante);
-            }
-        }
-        return $datos;
-    }
-
-    public function restaurarInvCant($idproducto, $restante)
-    {
-        $insertado = false;
-        $consulta = "UPDATE `productos_servicios` SET cantinv=:cantidad WHERE idproser=:idproducto;";
-        $valores = array(
-            "idproducto" => $idproducto,
-            "cantidad" =>  $restante
-        );
-        $insertado = $this->consultas->execute($consulta, $valores);
-        return $insertado;
-    }
-    
     public function validaProductos($tag){
         $consulta = "SELECT COUNT(*) AS maximo FROM tmpticket WHERE tagtab = :tag";
         $val = array("tag" => $tag);
@@ -738,6 +782,7 @@ class ControladorVenta
         return $json;
     }
 
+    //---------------------------------GUARDAR TICKET
     private function getFoliobyID() {
         $consultado = false;
         $consulta = "SELECT * FROM folio WHERE usofolio LIKE '%7%';";
@@ -772,15 +817,6 @@ class ControladorVenta
             $this->updateFolioConsecutivo($id);
         }
         return $datos;
-    }
-
-    private function deleteTicket($tag, $sid) {
-        $borrar = false;
-        $consulta = "DELETE FROM tmpticket WHERE tagtab=:tag AND sid=:sid;";
-        $val = array("tag" => $tag,
-            "sid" => $sid);
-        $borrar = $this->consultas->execute($consulta, $val);
-        return $borrar;
     }
 
     private function detalleVenta($tag, $sid) {
@@ -866,6 +902,49 @@ class ControladorVenta
         $insertar = $this->consultas->execute($consulta, $val);
         $this->detalleVenta($v->getTagventa(), $v->getSid());
         return $insertar;
+    }
+
+    private function deleteTicket($tag, $sid) {
+        $borrar = false;
+        $consulta = "DELETE FROM tmpticket WHERE tagtab=:tag AND sid=:sid;";
+        $val = array("tag" => $tag,
+            "sid" => $sid);
+        $borrar = $this->consultas->execute($consulta, $val);
+        return $borrar;
+    }
+
+    public function cerrarTicket($tag, $sid) {
+        $actualizado = false;
+        $productos = $this->obtenerProductosByTag($tag, $sid);
+            foreach ($productos as $producto) {
+                $idproducto = $producto['tmpidprod'];
+                $cantidad = $producto['tmpcant'];
+                $this->restaurarInventario($idproducto, $cantidad);
+            }
+            $actualizado = $this->deleteTicket($tag, $sid);
+        return $actualizado;
+    }
+
+    private function getTmpTicketBySID($sid) {
+        $consultado = false;
+        $consulta = "SELECT * FROM tmpticket WHERE sid=:sid ORDER by idtmpticket";
+        $val = array("sid" => $sid);
+        $consultado = $this->consultas->getResults($consulta, $val);
+        return $consultado;
+    }
+
+    public function cancelar($sessionid){
+        $tmp = $this->getTmpTicketBySID($sessionid);
+        foreach ($tmp as $actual) {
+            $idprod = $actual['tmpidprod'];
+            $cantidad = $actual['tmpcant'];
+            $this->restaurarInventario($idprod, $cantidad);
+        }
+        $eliminado = false;
+        $consulta = "DELETE FROM `tmpticket` WHERE sid=:id;";
+        $valores = array("id" => $sessionid);
+        $eliminado = $this->consultas->execute($consulta, $valores);
+        return $eliminado;
     }
 
     //-------------------------------------TICKETS ANTIGUOS
@@ -993,7 +1072,7 @@ class ControladorVenta
             $fecha = $actual['fecha_venta'];
             $hora = $actual['hora_venta'];
             $formapago = $actual['formapago'];
-            ($formapago == "cash") ? "Efectivo" : $formapago;
+            $formapago = ($formapago == "cash") ? "Efectivo" : $formapago;
             $totalventa = $actual['totalventa'];
             $status = $actual['status_venta'];
             $cve_usu = $actual['uid_venta'];

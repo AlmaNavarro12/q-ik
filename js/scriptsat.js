@@ -67,3 +67,4 @@ function loadOpcionesBanco(id, selectValue = "") {
         }
     });
 }
+

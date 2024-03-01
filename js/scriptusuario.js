@@ -338,7 +338,8 @@ function setValoresAsignarPermisos(datos) {
         "usuarios", "crearusuario", "listausuario", "eliminarusuario", "asignarpermiso",
         "reporte", "reportefactura", "reportepago", "reportegrafica", "reporteiva", "datosiva", "reporteventas",
         "configuracion", "addfolio", "listafolio", "editarfolio", "eliminarfolio", "addcomision", "encabezados", "confcorreo", "importar", 
-        "ventas", "crearventa", "cancelarventa", "exportarventa", "listaventa", "accion", "idlogin"
+        "ventas", "crearventa", "cancelarventa", "exportarventa", "listaventa", "registrarentrada", "registrarsalida", "cortedecaja",
+        "accion", "idlogin"
     ];
 
     var permisosMapa = {};
@@ -391,7 +392,7 @@ function actualizarPermisos(idusuario) {
         usuarios: ["crearusuario", "listausuario", "eliminarusuario", "asignarpermiso"],
         reporte: ["reportefactura", "reportepago", "reportegrafica", "reporteiva", "datosiva", "reporteventas"],
         configuracion: ["addfolio", "listafolio", "editarfolio", "eliminarfolio", "addcomision", "encabezados", "confcorreo", "importar"],
-        ventas: ["crearventa", "cancelarventa", "exportarventa", "listaventa"],
+        ventas: ["crearventa", "cancelarventa", "exportarventa", "listaventa", "registrarentrada", "registrarsalida", "cortedecaja"],
     };
 
     var datos = {

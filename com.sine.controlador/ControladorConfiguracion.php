@@ -257,7 +257,7 @@ class ControladorConfiguracion
 
     private function getUsoFolio($iduso)
     {
-        $usos = ["Facturas", "Notas de crédito", "Pagos", "Cartas porte", "Cotizaciones"];
+        $usos = ["Facturas", "Notas de crédito", "Pagos", "Cartas porte", "Cotizaciones", "Nóminas", "Punto de venta"];
         $divuso = explode("-", $iduso);
         $usofolio = implode(", ", array_map(function ($uso) use ($usos) {
             return isset($usos[$uso - 1]) ? $usos[$uso - 1] : "No disponible";

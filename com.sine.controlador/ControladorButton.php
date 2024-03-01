@@ -25,7 +25,7 @@ class ControladorButton{
     public function loadButton($view)
     {
         $permisos = $this->getPermisoById();
-        //
+        //$VIEW => PERMISO, VISTA, TEXTO DEL BOTON
         $botones = [
             'factura' => ['crearfactura', 'factura', 'Crear Factura'],
             'pago' => ['crearpago', 'pago', 'Crear Pago'],
@@ -40,10 +40,14 @@ class ControladorButton{
             'usuario' => ['crearusuario', 'nuevousuario', 'Crear usuario'],
             'config' => [
                 ['addfolio', 'folio', 'Crear Folio'],
-                ['addcomision', 'comisión', 'Agregar Comisión'],
+                ['addcomision', 'comision', 'Agregar Comisión'],
                 ['encabezados', 'encabezados', 'Configurar Encabezados'],
                 ['confcorreo', 'correo', 'Configurar Correo'],
                 ['importar', 'importar', 'Importar Datos']
+            ],
+            'puntodeventa' => [
+                ['registrarentrada', 'puntodeventa', 'Registrar Entrada'],
+                ['registrarsalida', 'puntodeventa', 'Registrar Salida'],
             ],
             'folio' => ['addfolio', 'folio', 'Crear Folio'],
             'empleado' => ['crearempleado', 'empleado', 'Registrar Empleado'],
@@ -58,7 +62,7 @@ class ControladorButton{
     
         $btn = "";
         if (array_key_exists($view, $botones)) {
-            list($permiso, $accion, $texto) = $botones[$view];
+            $permiso = $botones[$view][0];
             if ($view == 'config') {
                 $configBotones = '';
                 foreach ($botones['config'] as $configActual) {
@@ -72,7 +76,21 @@ class ControladorButton{
                     }
                 }
                 $btn = $configBotones;            
+            } else if ($view == 'puntodeventa') {
+                $mostrarBotones = "";
+                    foreach ($botones['puntodeventa'] as $configActual) {
+                        list($configPermiso) = $configActual;
+                        foreach ($permisos as $usuarioactual) {
+                            if (isset($usuarioactual[$configPermiso])) {
+                                $valorPermiso = $usuarioactual[$configPermiso];
+                                $mostrarBotones .= "$valorPermiso</tr>";
+                                break;
+                            }
+                        }
+                    }
+                $btn = $mostrarBotones;            
             } else {
+                list($permiso, $accion, $texto) = $botones[$view];
                 if ($accion == 'folio') {
                     foreach ($permisos as $usuarioactual) {
                         if ($usuarioactual[$permiso] == '1') {

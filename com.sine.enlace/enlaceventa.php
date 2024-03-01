@@ -57,20 +57,23 @@ if (isset($_POST['transaccion'])) {
         case 'listaventa':
             $insertado = $cv->listaServiciosHistorial($_POST['pag'], $_POST['REF'], $_POST['numreg'], $_POST['usuario']);
             break;
-            /*
-        case 'agregarproductobusqueda':
-            $insertado = $cv->agregarProductoBusqueda($_POST['producto'], $_POST['tab'], session_id(), $_POST['cantidad']);
+        case 'borrarticket':
+            $insertado = $cv->cerrarTicket($_POST['tab'], session_id());
             break;
         case 'chivatmp':
             $insertado = $cv->modificarChIva($_POST['idtmp'], $_POST['traslados'], $_POST['retenciones']);
             break;
-        case 'cancelar':
-            $insertado = $cv->delAllTickets(session_id()); //MNDAR ALERTA DE ELIMINADO EN EL JS
+        case 'cancelarTicket':
+            $insertado = $cv->cancelar(session_id());
             break;
-        case 'borrarticket':
-            $insertado = $cv->cerrarTicket($_POST['tab'], session_id());
+            /*
+        case 'agregarproductobusqueda':
+            $insertado = $cv->agregarProductoBusqueda($_POST['producto'], $_POST['tab'], session_id(), $_POST['cantidad']);
             break;
         
+        case 'cancelar':
+            $insertado = $cv->delAllTickets(session_id()); //MNDAR ALERTA DE ELIMINADO EN EL JS es IGUAL A CANCELARTICKET
+            break;
         case 'exportarticket':
             $insertado = $cv->exportarProductos($_POST['id'], session_id());
             break;

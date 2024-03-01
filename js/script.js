@@ -211,6 +211,42 @@ $(document).ready(function () {
                     }
                     return false;
             }
+        }  else if (venta === '1' && crearventa === '0') {
+            switch (event.which) {
+                case 118: // TECLA F7 cobrar ticket
+                    if (!$('#punto-venta').hasClass('menu-active')) {
+                        $('.list-element').removeClass("menu-active");
+                        $('.marker').removeClass("marker-active");
+                        $('#punto-venta').addClass("menu-active");
+                        $('#punto-venta').children('div.marker').addClass("marker-active");
+                        loadView('puntodeventa');
+                        window.setTimeout(function () {
+                            setValoresCobrar();
+                            $('#modal-cobrar').modal('show');
+                            window.setTimeout(() => {
+                                $("#monto-pagado").select();
+                            }, 500);
+                        }, 900);
+                    } else {
+                        if ($('#buscar-producto').length > 0) {
+                            setValoresCobrar();
+                            $('#modal-cobrar').modal('show');
+                            window.setTimeout(() => {
+                                $("#monto-pagado").select();
+                            }, 500);
+                        } else {
+                            loadView('puntodeventa');
+                            window.setTimeout(function () {
+                                setValoresCobrar();
+                                $('#modal-cobrar').modal('show');
+                                window.setTimeout(() => {
+                                    $("#monto-pagado").select();
+                                }, 500);
+                            }, 900);
+                        }
+                    }
+                    return false;
+            }
         }
     }
 
@@ -687,7 +723,7 @@ function loadView(vista) {
         'categoria': [],
         'listacategoria': ["loadBtnCrear('categoria')", 360, "loadListaCategorias()", 500],
         'nuevoproducto': ["truncateTmp()", 300, "truncateTmpCot()", 350, "loadOpcionesProveedor()", 350, "getOptionsTaxes()", 300,],
-        'listaproductoaltas': ["truncateTmp()", 300, "truncateTmpCot()", 350, "loadBtnCrear('producto')", 370, "loadListaProductosaltas()", 400],
+        'listaproductoaltas': ["truncateTmp()", 300, "truncateTmpCot()", 350, "loadBtnCrear('producto')", 370, "loadListaProductosaltas()", 400,],
         'valrfc': [],
         'nuevocliente': ["truncateTmpCot()", 350, "truncateTmp()", 400, "loadOpcionesEstado()", 420, "loadOpcionesBanco('contenedor-banco')", 450],
         'listaclientealtas': ["truncateTmp()", 300, "truncateTmpCot()", 350, "loadBtnCrear('cliente')", 370, "loadListaClientesAltas()", 400],
@@ -712,7 +748,7 @@ function loadView(vista) {
         'listaempresa': ["truncateTmp()", 300, "truncateTmpCot()", 350, "loadBtnCrear('datos')", 370, "loadListaEmpresa()", 400],
         'listacfdi': ["truncateTmp()", 300, "truncateTmpCot()", 350, "loadListaCFDI()", 400],
         'nuevoproveedor': ["truncateTmp()", 300, "truncateTmpCot()", 350, "loadOpcionesBanco('contenedor-banco')", 400],
-        'listaproveedor': ["truncateTmp()", 300, "truncateTmpCot()", 350, "loadBtnCrear('proveedor')", 370, "loadListaProveedor()", 400],
+        'listaproveedor': ["truncateTickets()", 300, "truncateTmp()", 300, "truncateTmpCot()", 350, "loadBtnCrear('proveedor')", 370, "loadListaProveedor()", 400],
         'forminventario': ["truncateTmp()", 300, "truncateTmpCot()", 350, "loadOpcionesProducto()", 400],
         'listainventario': ["truncateTmp()", 300, "truncateTmpCot()", 350, "loadListaInventario()", 400],
         'reportefactura': ["truncateTmp()", 300, "truncateTmpCot()", 350, "loadOpcionesCliente()", 400, "loadOpcionesFacturacion()", 450, "loadOpcionesMoneda()", 470],
@@ -745,7 +781,7 @@ function loadView(vista) {
         'listaoperador': ["loadBtnCrear('operador')", 300, "filtrarOperador()", 320],
         'carta': ["truncateTmpCarta()", 300, "truncateTmpIMG()", 320, "loadOpcionesFolios('4')", 350, "loadFecha()", 370, "loadOpcionesEstado()", 400, "filtrarProducto()", 420, "loadOpcionesFormaPago()", 450, "loadOpcionesMetodoPago()", 470, "loadOpcionesMoneda()", 500, "loadOpcionesUsoCFDI()", 520, "loadOpcionesComprobante()", 550, "loadOpcionesFacturacion()", 570, "loadOpcionesProveedor()", 600, "opcionesPeriodoGlobal()", 620, "opcionesMeses()", 650, "opcionesAnoGlobal()", 670],
         'listacarta': ["truncateTmpCarta()", 300, "truncateTmpIMG()", 300, "loadBtnCrear('carta')", 300, "filtrarCarta()", 320, "opcionesMotivoCancelar()", 350],
-        'puntodeventa': ["newVenta()", 300, "checkFondo()", 300],
+        'puntodeventa': ["newVenta()", 300, "checkFondo()", 300, "loadBtnVentas('puntodeventa')", 300, "truncateTickets()", 300],
         'listaticket': ["loadBtnCrear('ventas')", 300, "loadOpcionesUsuario()", 300, "filtrarVentas()", 300],
         'cortecaja': ["loadOpcionesUsuario()", 300]
     };
@@ -756,6 +792,33 @@ function loadView(vista) {
             window.setTimeout(timeouts[i], timeouts[i + 1]);
         }
     }
+}
+
+function loadBtnVentas(view) {
+    cargandoShow();
+    $.ajax({
+        url: "com.sine.enlace/enlacepermiso.php",
+        type: "POST",
+        data: { transaccion: "loadbtn", view: view },
+        success: function (datos) {
+            var array = datos.split("</tr>");
+
+            var elements = [
+                { key: 'registrarentrada', divId: 'div-entradas', btnId: 'btn-entrada'},
+                { key: 'registrarsalida', divId: 'div-salidas', btnId: 'btn-salida'},
+            ];
+
+            elements.forEach(function (element, index) {
+                if (array[index] == '1') {
+                    $("#" + element.divId).removeAttr('hidden');
+                    $("#" + element.btnId).click(function() {
+                        $("#modal-entradas").modal("show");
+                    });
+                }
+            });
+            cargandoHide();
+        }
+    });
 }
 
 function loadBtnCrear(view) {
@@ -1237,4 +1300,22 @@ function validarRFC() {
     cargandoShow();
     VentanaCentrada('https://www.sat.gob.mx/aplicacion/operacion/79615/valida-en-linea-rfc%C2%B4s-uno-a-uno-o-de-manera-masiva-hasta-5-mil-registros', 'SAT', '', '1024', '768', 'true');
     cargandoHide();
+}
+
+function truncateTickets(){ 
+    console.log('Si entra pero no es success.');
+    $.ajax({
+        url: "com.sine.enlace/enlaceventa.php",
+        type: "POST",
+        data: {transaccion: "cancelarTicket"},
+        success: function (datos) {
+            console.log('Elimina tmp: ' +datos);
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 1000);
+            if (bandera == '0') {
+                alertify.error(res);
+            } 
+        }
+    });
 }

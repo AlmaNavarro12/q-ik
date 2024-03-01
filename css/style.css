@@ -1076,6 +1076,26 @@ table.table-row tr td {
     color: #17177C;
 }
 
+.button-ventas{
+    outline:none !important;
+    background: none;
+    padding: 10px;
+    border: 2px solid #CECEE2;
+    box-sizing: border-box;
+    border-radius: 5px;
+    font-family: sans-serif;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 17px;
+    text-align: center;
+    color: #17177C;
+}
+
+.button-ventas:hover{
+    background: #EDEDF4;
+    color: #17177C;
+}
+
 /*---------------------IMPORTAR TABlAS - CONFIGURACION PHP----------------------------*/
 .list-unstyled ul {
     list-style-type: none;

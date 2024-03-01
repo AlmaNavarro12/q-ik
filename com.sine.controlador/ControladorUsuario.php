@@ -22,7 +22,7 @@ class ControladorUsuario
         "usuario", "crearusuario", "listausuario", "eliminarusuario", "asignarpermiso",
         "reporte", "reportefactura", "reportepago", "reportegrafica", "reporteiva", "datosiva", "reporteventa",
         "configuracion", "addfolio", "listafolio", "editarfolio", "eliminarfolio", "addcomision", "encabezados", "confcorreo", "importar", 
-        "ventas", "crearventa", "cancelarventa", "exportarventa", "listaventa"
+        "ventas", "crearventa", "cancelarventa", "exportarventa", "listaventa", "registrarentrada", "registrarsalida", "cortedecaja"
     ];
 
     function __construct()
