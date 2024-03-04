@@ -218,14 +218,6 @@ function setValoresEditarCliente(datos) {
     $("#num_interior").val(array[13]);
     $("#num_exterior").val(array[14]);
 
-    if (array[15] != '0') {
-        loadOpcionesEstado(array[15]);
-    }
-
-    if (array[16] != '0') {
-        loadOpcionesMunicipio(array[16], array[15]);
-    }
-
     if (array[19] !== '0') {
         loadOpcionesBanco("id-banco", array[19]);
         $("#cuenta").val(array[20]);
@@ -234,6 +226,8 @@ function setValoresEditarCliente(datos) {
 
     $("#localidad").val(array[17]);
     $("#codigo_postal").val(array[18]);
+    $("#id-estado").val(array[15]);
+    $(".contenedor-municipio").val(array[16]);
     $("#correo_alt1").val(array[31]);
     $("#correo_alt2").val(array[32]);
     $("#correo_alt3").val(array[33]);
