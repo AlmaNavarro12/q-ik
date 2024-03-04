@@ -66,39 +66,30 @@ if (isset($_POST['transaccion'])) {
         case 'cancelarTicket':
             $insertado = $cv->cancelar(session_id());
             break;
-            /*
-        case 'agregarproductobusqueda':
-            $insertado = $cv->agregarProductoBusqueda($_POST['producto'], $_POST['tab'], session_id(), $_POST['cantidad']);
-            break;
-        
-        case 'cancelar':
-            $insertado = $cv->delAllTickets(session_id()); //MNDAR ALERTA DE ELIMINADO EN EL JS es IGUAL A CANCELARTICKET
-            break;
-        case 'exportarticket':
-            $insertado = $cv->exportarProductos($_POST['id'], session_id());
-            break;
-        case 'cortecaja':
-            $insertado = $cv->getCorteCaja($_POST['user'], $_POST['fecha']);
-            break;
-        case 'asignatagcotizacion':
-            $insertado = $cv->asignarTAG($_POST['tab'], $_POST['sid']);
-            break;
         case 'cancelarTicked':
             $insertado = $cv->cancelarTicked($_POST['id']);
-            break;
-        case 'checkPersisionNewProduct':
-            $bandera = $cv->verificarF5();
-            echo $bandera == 1 ? "1Permiso concedido" : "0No tienes los permisos";
             break;
         case 'checkPrecio':
             $datos = $cv->checkPrecio($_POST['producto']);
             header('Content-Type: application/json');
             echo json_encode($datos, JSON_FORCE_OBJECT);
             break;
-        case 'validaproductos':
-            $datos = $cv->validaProductos($_POST['tab']);
-            header('Content-Type: application/json');
-            echo json_encode($datos, JSON_FORCE_OBJECT);
+        case 'agregarproductobusqueda':
+            $insertado = $cv->agregarProducto($_POST['producto'], $_POST['tab'], session_id(), $_POST['cantidad']);
+            break;
+        case 'cortecaja':
+            $insertado = $cv->getCorteCaja($_POST['user'], $_POST['fecha']);
+            break;
+        case 'checkPersisionNewProduct':
+            $bandera = $cv->verificarF5();
+            echo $bandera == 1 ? "1Permiso concedido" : "0No tienes los permisos";
+            break;
+            /*
+        case 'exportarticket':
+            $insertado = $cv->exportarProductos($_POST['id'], session_id());
+            break;
+        case 'asignatagcotizacion':
+            $insertado = $cv->asignarTAG($_POST['tab'], $_POST['sid']);
             break;*/
     }
 

@@ -67,7 +67,8 @@ class ControladorVenta
         return $tab;
     }
 
-    private function newbuildArray($tipo, $precio, $taxes) { 
+    private function newbuildArray($tipo, $precio, $taxes)
+    {
         $row = array();
         $consulta = "SELECT * FROM impuesto WHERE tipoimpuesto = :tipo AND porcentaje IN ($taxes)";
         $val = array("tipo" => $tipo);
@@ -75,8 +76,8 @@ class ControladorVenta
         foreach ($imptraslados as $tactual) {
             $impuesto = $tactual['impuesto'];
             $porcentaje = $tactual['porcentaje'];
-                $imp = $precio * $porcentaje;
-                $row[] = bcdiv($imp, '1', 2) . '-' . $porcentaje . '-' . $impuesto;
+            $imp = $precio * $porcentaje;
+            $row[] = bcdiv($imp, '1', 2) . '-' . $porcentaje . '-' . $impuesto;
         }
 
         $trasarray = implode("<impuesto>", $row);
@@ -109,65 +110,74 @@ class ControladorVenta
         return $datos;
     }
 
-    public function agregarProducto($cod, $tab, $sid) { //YA
+    public function agregarProducto($cod, $tab, $sid, $cantidad = 1)
+    {
         $taxes_traslados = "''";
         $taxes_retencion = "''";
 
         $div = explode("-", $cod);
         $cod = $div[0];
         $prod = $this->getProductobyCod($cod);
+
         if ($prod) {
             $div = explode("</tr>", $prod);
-            
+            $id_prod = $div[0];
+            $cfiscal = $div[1];
+            $cunidad = $div[2];
+            $product = $div[3];
+            $precio = $div[4];
+            $importe = bcdiv(($precio * $cantidad), '1', 2);
+
             $taxes = $div[5];
             $array_taxes = explode("<tr>", $taxes);
 
-            for($i = 0; $i < sizeof($array_taxes); $i++) {
-                
+            for ($i = 0; $i < sizeof($array_taxes); $i++) {
                 $div_tipo = explode("-", $array_taxes[$i]);
-                if($div_tipo[0] != ""){
+                if ($div_tipo[0] != "") {
                     $percen_tax = $div_tipo[0];
-                    $tipo = $div_tipo[1];                              
-                
-                    if($tipo == 1){
-                        $taxes_traslados .= ",'".$percen_tax."'";
+                    $tipo = $div_tipo[1];
+
+                    if ($tipo == 1) {
+                        $taxes_traslados .= ",'" . $percen_tax . "'";
                     } else {
-                        $taxes_retencion .= ",'".$percen_tax."'";
+                        $taxes_retencion .= ",'" . $percen_tax . "'";
                     }
                 }
             }
-            $traslados   = $this->newbuildArray('1', $div[4], $taxes_traslados);
-            $retenciones = $this->newbuildArray('2', $div[4], $taxes_retencion);
+
+            $traslados = $this->newbuildArray('1', $importe, $taxes_traslados);
+            $retenciones = $this->newbuildArray('2', $importe, $taxes_retencion);
 
             $insertar = false;
-            
             $consulta = "INSERT INTO `tmpticket` VALUES (:id, :idprod, :cod, :cfiscal, :cunidad, :prod, :precio, :cant, :descuento, :impdescuento, :importe, :totaldescuento, :traslados, :retenciones, :tab, :sid);";
-            $val = array("id" => null,
-                "idprod" => $div[0],
+            $val = array(
+                "id" => null,
+                "idprod" => $id_prod,
                 "cod" => $cod,
-                "cfiscal" => $div[1],
-                "cunidad" => $div[2],
-                "prod" => $div[3],
-                "precio" => $div[4],
-                "cant" => '1',
+                "cfiscal" => $cfiscal,
+                "cunidad" => $cunidad,
+                "prod" => $product,
+                "precio" => $precio,
+                "cant" => $cantidad,
                 "descuento" => '0',
                 "impdescuento" => '0',
-                "importe" => $div[4],
+                "importe" => $importe,
                 "totaldescuento" => '0',
                 "traslados" => $traslados,
                 "retenciones" => $retenciones,
                 "tab" => $tab,
-                "sid" => $sid);
-            
+                "sid" => $sid
+            );
             $insertar = $this->consultas->execute($consulta, $val);
-            $restante = $div[6] - 1;
+            $restante = $div[6] - $cantidad;
             $this->restaurarInvCant($div[0], $restante);
         } else {
-            $insertar = "0No se encontro el producto";
+            $insertar = "0No se encontró el producto";
         }
 
         return $insertar;
     }
+
 
     private function getTmpTicket($tab, $sid)
     {
@@ -183,32 +193,39 @@ class ControladorVenta
 
     //-------------------------------CAJA
 
-    private function getDineroCajaAux() {
+    private function getDineroCajaAux()
+    {
         $hoy = date("Y-m-d");
         $uid = $_SESSION[sha1("idusuario")];
         $datos = false;
         $consulta = "SELECT * FROM fondocaja WHERE fechaingreso=:fecha AND uidfondo=:uid";
-        $val = array("fecha" => $hoy,
-            "uid" => $uid);
+        $val = array(
+            "fecha" => $hoy,
+            "uid" => $uid
+        );
         $datos = $this->consultas->getResults($consulta, $val);
         return $datos;
     }
 
-    public function checkDineroCaja() {
+    public function checkDineroCaja()
+    {
         $datos = $this->getDineroCajaAux();
         return empty($datos);
     }
 
-    public function insertarMontoInicial($monto) {
+    public function insertarMontoInicial($monto)
+    {
         $hoy = date("Y-m-d");
         $hora = date("H:i");
         $insertado = false;
         $consulta = "INSERT INTO fondocaja VALUES (:id, :fecha, :hora, :fondo, :uid);";
-        $val = array("id" => null,
+        $val = array(
+            "id" => null,
             "fecha" => $hoy,
             "hora" => $hora,
             "fondo" => $monto,
-            "uid" => $_SESSION[sha1("idusuario")]);
+            "uid" => $_SESSION[sha1("idusuario")]
+        );
         $insertado = $this->consultas->execute($consulta, $val);
         return $insertado;
     }
@@ -316,19 +333,19 @@ class ControladorVenta
             $sumador_ret += bcdiv($ret, '1', 2);
             $sumador_descuentos += bcdiv($impdescuentos, '1', 2);
 
-            
+
             $optraslados = "";
             $opretencion = "";
             $imptraslados = $this->getImpuestos('1');
             $impretenciones = $this->getImpuestos('2');
 
-            if($imptraslados != ""){
+            if ($imptraslados != "") {
                 $optraslados = $this->generarOpcionesImpuestos($imptraslados, $checktraslado, $tid, 'tras');
             } else {
                 $optraslados = "No hay impuestos de traslado.";
             }
-            
-            if($impretenciones != ""){
+
+            if ($impretenciones != "") {
                 $opretencion = $this->generarOpcionesImpuestos($impretenciones, $checkretencion, $tid, 'ret');
             } else {
                 $opretencion = "No hay impuestos de retención.";
@@ -383,93 +400,90 @@ class ControladorVenta
 
         $totalticket = ((($subticket + $sumador_iva) - $sumador_ret) - $sumador_descuentos);
 
-        if($totalticket != 0){
+        if ($totalticket != 0) {
             $datos .= "
         <tfoot class=''>
         <tr>
-        <th colspan='4'><ul class='list-group mb-3 mt-3'>
+        <th colspan='6'><ul class='list-group mb-3 mt-3 pe-0'>
         <li class='list-group-item d-flex justify-content-between lh-sm'>
             <div>
                 <h6 class='my-0 titulo-lista fs-6 fw-bold'>SUBTOTAL:</h6>
             </div>
-            <span class='titulo-lista fw-bold fs-5'>$".number_format(bcdiv($subticket, '1', 2), 2, '.', ',')." </span>
+            <span class='titulo-lista fw-bold fs-5'>$" . number_format(bcdiv($subticket, '1', 2), 2, '.', ',') . " </span>
         </li>";
 
-        if ($sumador_descuentos > 0) {
-            $datos .= "<li class='list-group-item d-flex justify-content-between lh-sm'>
+            if ($sumador_descuentos > 0) {
+                $datos .= "<li class='list-group-item d-flex justify-content-between lh-sm'>
             <div>
                 <h6 class='my-0 titulo-lista fs-6 fw-bold'>DESCUENTO:</h6>
             </div>
-            <span class='titulo-lista fw-bold fs-5'>$".number_format(bcdiv($sumador_descuentos, '1', 2), 2, '.', ',')." </span>
+            <span class='titulo-lista fw-bold fs-5'>$" . number_format(bcdiv($sumador_descuentos, '1', 2), 2, '.', ',') . " </span>
             </li>
             <li class='list-group-item d-flex justify-content-between lh-sm'>
             <div>
                 <h6 class='my-0 titulo-lista fs-6 fw-bold'>SUBTOTAL - DESCUENTO:</h6>
             </div>
-            <span class='titulo-lista fw-bold fs-5'>$".number_format(bcdiv(($subticket - $sumador_descuentos), '1', 2), 2, '.', ',')." </span>
+            <span class='titulo-lista fw-bold fs-5'>$" . number_format(bcdiv(($subticket - $sumador_descuentos), '1', 2), 2, '.', ',') . " </span>
             </li>";
-        }
+            }
 
-        if ($sumador_iva > 0) {
-            $datos .= "<li class='list-group-item d-flex justify-content-between lh-sm'>
+            if ($sumador_iva > 0) {
+                $datos .= "<li class='list-group-item d-flex justify-content-between lh-sm'>
             <div>
                 <h6 class='my-0 titulo-lista fs-6 fw-bold'>TRASLADOS:</h6>
             </div>
-            <span class='titulo-lista fw-bold fs-5'>$".number_format(bcdiv($sumador_iva, '1', 2), 2, '.', ',')." </span>
+            <span class='titulo-lista fw-bold fs-5'>$" . number_format(bcdiv($sumador_iva, '1', 2), 2, '.', ',') . " </span>
             </li>";
-        }
+            }
 
-        if ($sumador_ret > 0) {
-            $datos .= "<li class='list-group-item d-flex justify-content-between lh-sm'>
+            if ($sumador_ret > 0) {
+                $datos .= "<li class='list-group-item d-flex justify-content-between lh-sm'>
             <div>
                 <h6 class='my-0 titulo-lista fs-6 fw-bold'>RETENCIONES:</h6>
             </div>
-            <span class='titulo-lista fw-bold fs-5'>$".number_format(bcdiv($sumador_ret, '1', 2), 2, '.', ',')." </span>
+            <span class='titulo-lista fw-bold fs-5'>$" . number_format(bcdiv($sumador_ret, '1', 2), 2, '.', ',') . " </span>
             </li>";
-        }
+            }
 
-        $datos .= "<li class='list-group-item d-flex justify-content-between'>
+            $datos .= "<li class='list-group-item d-flex justify-content-between'>
             <span class='titulo-lista fs-6 fw-bold'>GRAN TOTAL (MXN)</span>
-            <strong class='titulo-lista fw-bold fs-5'>$".number_format(bcdiv($totalticket, '1', 2), 2, '.', ',')."</strong>
+            <strong class='titulo-lista fw-bold fs-5'>$" . number_format(bcdiv($totalticket, '1', 2), 2, '.', ',') . "</strong>
             </li>
             </ul></th>
             </tr>";
-
         }
         return $datos;
     }
 
     private function generarOpcionesImpuestos($impuestos, $check, $tid, $tipo)
-{
-    $opciones = "";
-    foreach ($impuestos as $actual) {
-        $icon = "far fa-square";
-        $checked = "";
+    {
+        $opciones = "";
+        foreach ($impuestos as $actual) {
+            $icon = "far fa-square";
+            $checked = "";
 
-        $divcheck = explode("<imp>", $check);
-        foreach ($divcheck as $chk) {
-            if ($chk == $actual['porcentaje'] . "-" . $actual['impuesto']) {
-                $icon = "far fa-check-square";
-                $checked = "checked";
-                break;
+            $divcheck = explode("<imp>", $check);
+            foreach ($divcheck as $chk) {
+                if ($chk == $actual['porcentaje'] . "-" . $actual['impuesto']) {
+                    $icon = "far fa-check-square";
+                    $checked = "checked";
+                    break;
+                }
             }
-        }
-        $nombre = $actual['nombre'];
-        $porcentaje = $actual['porcentaje'];
-        $impuesto = $actual['impuesto'];
+            $nombre = $actual['nombre'];
+            $porcentaje = $actual['porcentaje'];
+            $impuesto = $actual['impuesto'];
 
-        $opciones .= "<li data-location='tabla' data-id='$tid'>
+            $opciones .= "<li data-location='tabla' data-id='$tid'>
             <label class='dropdown-menu-item checkbox ps-3'>
                 <input type='checkbox' $checked value='$porcentaje' name='ch{$tipo}tabla$tid' data-impuesto='$impuesto' data-tipo='$tipo' />
                 <span class='$icon me-2' id='chuso1span'></span>$nombre ($porcentaje%)
             </label>
         </li>";
+        }
+
+        return $opciones;
     }
-
-    return $opciones;
-}
-
-
     private function getTotalTicketAux($tag, $sid)
     {
         $datos = false;
@@ -535,7 +549,8 @@ class ControladorVenta
         return $suma;
     }
 
-    private function checarTicketTmpById($idtmp) {
+    private function checarTicketTmpById($idtmp)
+    {
         $consultado = false;
         $consulta = "SELECT * FROM tmpticket WHERE idtmpticket=:id;";
         $val = array("id" => $idtmp);
@@ -543,7 +558,8 @@ class ControladorVenta
         return $consultado;
     }
 
-    private function reBuildArray2($importe, $array) {
+    private function reBuildArray2($importe, $array)
+    {
         $div = explode("<impuesto>", $array);
         $row = array();
         $Timp = 0;
@@ -559,7 +575,8 @@ class ControladorVenta
         return $rearray;
     }
 
-    public function modificarChIva($idtmp, $chiva, $chret) {
+    public function modificarChIva($idtmp, $chiva, $chret)
+    {
         $check = $this->checarTicketTmpById($idtmp);
         foreach ($check as $actual) {
             $canttmp = $actual['tmpcant'];
@@ -570,16 +587,19 @@ class ControladorVenta
         $rebuildR = $this->reBuildArray2($importe, $chret);
 
         $consulta = "UPDATE `tmpticket` SET tmptraslados=:chiva, tmpretenciones=:chret, tmpimporte=:totun WHERE idtmpticket=:idtmp;";
-        $val = array("chiva" => $rebuildT,
+        $val = array(
+            "chiva" => $rebuildT,
             "chret" => $rebuildR,
             "totun" => $importe,
-            "idtmp" => $idtmp);
+            "idtmp" => $idtmp
+        );
         $datos = $this->consultas->execute($consulta, $val);
         return $datos;
     }
 
     //---------------------------------------------INVENTARIO
-    private function restaurarInvCant($idproducto, $cantidad) {
+    private function restaurarInvCant($idproducto, $cantidad)
+    {
         $consultado = false;
         $consulta = "UPDATE `productos_servicios` set cantinv=:cantidad where idproser=:idproducto;";
         $valores = array("idproducto" => $idproducto, "cantidad" => $cantidad);
@@ -587,7 +607,8 @@ class ControladorVenta
         return $consultado;
     }
 
-    public function restaurarInventario($idproducto, $cantidad) {
+    public function restaurarInventario($idproducto, $cantidad)
+    {
         $consultado = false;
         $consulta = "UPDATE `productos_servicios` set cantinv=cantinv+:cantidad where idproser=:idproducto;";
         $valores = array("idproducto" => $idproducto, "cantidad" => $cantidad);
@@ -595,22 +616,24 @@ class ControladorVenta
         return $consultado;
     }
 
-    private function checkProductoAux($idtmp) {
+    private function checkProductoAux($idtmp)
+    {
         $consultado = false;
         $consulta = "SELECT cantinv, chinventario FROM productos_servicios WHERE idproser=:id;";
         $val = array("id" => $idtmp);
         $consultado = $this->consultas->getResults($consulta, $val);
         return $consultado;
     }
-    
-    public function modificarCantidad($idtmp, $cant, $precio) {
+
+    public function modificarCantidad($idtmp, $cant, $precio)
+    {
         $check = $this->checarTicketTmpById($idtmp);
         $canttmp = $check[0]['tmpcant'];
         $precio_tmp = $check[0]['tmpprecio'];
         $trasladotmp = $check[0]['tmptraslados'];
         $rettmp = $check[0]['tmpretenciones'];
         $idproducto = $check[0]['tmpidprod'];
-    
+
         $chinv = 0;
         $cantidad = 0;
 
@@ -619,13 +642,13 @@ class ControladorVenta
             $chinv = $pactual['chinventario'];
             $cantidad = $pactual['cantinv'];
         }
-    
+
         $importe = $cant * $precio_tmp;
         $traslado = $trasladotmp != "" ? $this->reBuildArray2($importe, $trasladotmp) : "";
         $retencion = $rettmp != "" ? $this->reBuildArray2($importe, $rettmp) : "";
 
         $restante = ($cantidad + $canttmp) - $cant;
-    
+
         if ($chinv == '1' && $restante < 0) {
             $datos = "0El inventario no es suficiente para agregar más producto. Hay " . $cantidad + $canttmp . " productos en existencia.";
         } else {
@@ -644,8 +667,9 @@ class ControladorVenta
         }
         return $datos;
     }
-    
-    public function incrementarProducto($idtmp) {
+
+    public function incrementarProducto($idtmp)
+    {
         $check = $this->checarTicketTmpById($idtmp);
         $codprod = '';
         $precio_tmp = 0;
@@ -653,7 +677,7 @@ class ControladorVenta
         $trasladotmp = '';
         $rettmp = '';
         $descuento = 0;
-    
+
         foreach ($check as $actual) {
             $codprod = $actual['tmpcod'];
             $precio_tmp = $actual['tmpprecio'];
@@ -662,11 +686,11 @@ class ControladorVenta
             $rettmp = $actual['tmpretenciones'];
             $descuento = $actual['descuento'];
         }
-    
+
         $chinv = 0;
         $cantidad = 0;
-    
-        $prod = $this->getProductobyCodAux($codprod); 
+
+        $prod = $this->getProductobyCodAux($codprod);
         foreach ($prod as $pactual) {
             $chinv = $pactual['chinventario'];
             $cantidad = $pactual['cantinv'];
@@ -677,17 +701,17 @@ class ControladorVenta
         $descuento = ($descuento * $importe) / 100;
         $importe_descuento = $importe - $descuento;
         $restante = $cantidad - 1;
-    
+
         $traslado = '';
         if ($trasladotmp != "") {
             $traslado = $this->reBuildArray2($importe_descuento, $trasladotmp);
         }
-    
+
         $retencion = '';
         if ($rettmp != "") {
             $retencion = $this->reBuildArray2($importe_descuento, $rettmp);
         }
-    
+
         $consulta = "UPDATE `tmpticket` SET tmpcant=:cant, tmpimporte=:importe, tmptraslados=:tras, tmpretenciones=:ret WHERE idtmpticket=:id;";
         $valores = array(
             "id" => $idtmp,
@@ -696,7 +720,7 @@ class ControladorVenta
             "tras" => $traslado,
             "ret" => $retencion
         );
-    
+
         if ($chinv == '1' && $cantidad <= 0) {
             return "0El inventario no es suficiente para agregar más producto. Hay " . $canttmp . " productos en existencia.";
         }
@@ -707,7 +731,8 @@ class ControladorVenta
         return $datos;
     }
 
-    public function reducirProducto($idtmp) {
+    public function reducirProducto($idtmp)
+    {
         $check = $this->checarTicketTmpById($idtmp);
         foreach ($check as $actual) {
             $codprod = $actual['tmpcod'];
@@ -726,17 +751,19 @@ class ControladorVenta
 
         $cant = $canttmp - 1;
         $importe = $cant * $precio_tmp;
-        $descuento = ($descuento * $importe)/100;
+        $descuento = ($descuento * $importe) / 100;
         $importe_descuento = ($importe - $descuento);
         $traslado = $this->reBuildArray2($importe_descuento, $trasladotmp);
         $retencion = $this->reBuildArray2($importe_descuento, $rettmp);
 
         $consulta = "UPDATE `tmpticket` SET tmpcant=:cant, tmpimporte=:importe, tmptraslados=:tras, tmpretenciones=:ret WHERE idtmpticket=:id;";
-        $valores = array("id" => $idtmp,
+        $valores = array(
+            "id" => $idtmp,
             "cant" => $cant,
             "importe" => bcdiv($importe, '1', 2),
             "tras" => $traslado,
-            "ret" => $retencion);
+            "ret" => $retencion
+        );
         $datos = $this->consultas->execute($consulta, $valores);
         if ($chinv == '1') {
             $inv = $this->restaurarInventario($idproducto, '1');
@@ -744,8 +771,9 @@ class ControladorVenta
         return $datos;
     }
 
-    
-    private function obtenerProductosByTag($tag, $sid) {
+
+    private function obtenerProductosByTag($tag, $sid)
+    {
         $consulta = "SELECT tmpidprod, tmpcant FROM tmpticket WHERE tagtab= :tag AND sid = :sid";
         $valores = array(
             "tag" => $tag,
@@ -754,14 +782,15 @@ class ControladorVenta
         return $this->consultas->getResults($consulta, $valores);
     }
 
-    public function eliminarProducto($tid) {
+    public function eliminarProducto($tid)
+    {
         $eliminado = false;
         $resultados = $this->checarTicketTmpById($tid);
         if ($resultados && count($resultados) > 0) {
             foreach ($resultados as $resultado) {
                 $idproducto = $resultado['tmpidprod'];
                 $cantidad = $resultado['tmpcant'];
-                $this->restaurarInventario($idproducto,$cantidad);
+                $this->restaurarInventario($idproducto, $cantidad);
             }
         }
         $consultaEliminar = "DELETE FROM tmpticket WHERE idtmpticket=:tid";
@@ -770,11 +799,12 @@ class ControladorVenta
         return $eliminado;
     }
 
-    public function validaProductos($tag){
+    public function validaProductos($tag)
+    {
         $consulta = "SELECT COUNT(*) AS maximo FROM tmpticket WHERE tagtab = :tag";
         $val = array("tag" => $tag);
         $stmt = $this->consultas->getResults($consulta, $val);
-        foreach($stmt as $row) {
+        foreach ($stmt as $row) {
             $maximo = $row['maximo'];
         }
         $json = array();
@@ -783,14 +813,16 @@ class ControladorVenta
     }
 
     //---------------------------------GUARDAR TICKET
-    private function getFoliobyID() {
+    private function getFoliobyID()
+    {
         $consultado = false;
         $consulta = "SELECT * FROM folio WHERE usofolio LIKE '%7%';";
         $consultado = $this->consultas->getResults($consulta, null);
         return $consultado;
     }
 
-    private function updateFolioConsecutivo($id) {
+    private function updateFolioConsecutivo($id)
+    {
         $consultado = false;
         $consulta = "UPDATE folio SET consecutivo=(consecutivo+1) WHERE idfolio=:id;";
         $val = array("id" => $id);
@@ -798,7 +830,8 @@ class ControladorVenta
         return $consultado;
     }
 
-    private function getFolio() {
+    private function getFolio()
+    {
         $datos = "";
         $folios = $this->getFoliobyID();
         foreach ($folios as $actual) {
@@ -819,7 +852,8 @@ class ControladorVenta
         return $datos;
     }
 
-    private function detalleVenta($tag, $sid) {
+    private function detalleVenta($tag, $sid)
+    {
         $insertado = false;
         $detalle = $this->getTmpTicket($tag, $sid);
         foreach ($detalle as $actual) {
@@ -840,7 +874,8 @@ class ControladorVenta
             $totaldescuento = $actual['totaldescuento'];
 
             $consulta = "INSERT INTO detalle_venta VALUES (:id, :tag, :idprod, :cod, :clv, :cunidad, :prod, :precio, :cant, :descuento, :impdescuento, :totaldescuento, :importe, :tras, :ret);";
-            $val = array("id" => null,
+            $val = array(
+                "id" => null,
                 "tag" => $tag,
                 "idprod" => $idprod,
                 "cod" => $cod,
@@ -854,15 +889,16 @@ class ControladorVenta
                 "totaldescuento" => $totaldescuento,
                 "importe" => $importe,
                 "tras" => $traslados,
-                "ret" => $retenciones);
+                "ret" => $retenciones
+            );
             $insertado = $this->consultas->execute($consulta, $val);
-            
         }
         $this->deleteTicket($tag, $sid);
         return $insertado;
     }
 
-    public function insertarTicket($v) {
+    public function insertarTicket($v)
+    {
         $insertar = false;
         $hoy = date("Y-m-d");
         $hora = date("H:i");
@@ -882,9 +918,10 @@ class ControladorVenta
         }
 
         $consulta = "INSERT INTO datos_venta VALUES (:id, :serie, :letra, :folio, :tag, :fecha, :hora, :percentDescuento, :descuento, :total, :fmpago, :pago, :cambio, :refventa, :uid, :status);";
-        $val = array("id" => null,
+        $val = array(
+            "id" => null,
             "serie" => $serie,
-            "letra" => $letra, 
+            "letra" => $letra,
             "folio" => $nfolio,
             "tag" => $v->getTagventa(),
             "fecha" => $hoy,
@@ -904,28 +941,33 @@ class ControladorVenta
         return $insertar;
     }
 
-    private function deleteTicket($tag, $sid) {
+    private function deleteTicket($tag, $sid)
+    {
         $borrar = false;
         $consulta = "DELETE FROM tmpticket WHERE tagtab=:tag AND sid=:sid;";
-        $val = array("tag" => $tag,
-            "sid" => $sid);
+        $val = array(
+            "tag" => $tag,
+            "sid" => $sid
+        );
         $borrar = $this->consultas->execute($consulta, $val);
         return $borrar;
     }
 
-    public function cerrarTicket($tag, $sid) {
+    public function cerrarTicket($tag, $sid)
+    {
         $actualizado = false;
         $productos = $this->obtenerProductosByTag($tag, $sid);
-            foreach ($productos as $producto) {
-                $idproducto = $producto['tmpidprod'];
-                $cantidad = $producto['tmpcant'];
-                $this->restaurarInventario($idproducto, $cantidad);
-            }
-            $actualizado = $this->deleteTicket($tag, $sid);
+        foreach ($productos as $producto) {
+            $idproducto = $producto['tmpidprod'];
+            $cantidad = $producto['tmpcant'];
+            $this->restaurarInventario($idproducto, $cantidad);
+        }
+        $actualizado = $this->deleteTicket($tag, $sid);
         return $actualizado;
     }
 
-    private function getTmpTicketBySID($sid) {
+    private function getTmpTicketBySID($sid)
+    {
         $consultado = false;
         $consulta = "SELECT * FROM tmpticket WHERE sid=:sid ORDER by idtmpticket";
         $val = array("sid" => $sid);
@@ -933,7 +975,8 @@ class ControladorVenta
         return $consultado;
     }
 
-    public function cancelar($sessionid){
+    public function cancelar($sessionid)
+    {
         $tmp = $this->getTmpTicketBySID($sessionid);
         foreach ($tmp as $actual) {
             $idprod = $actual['tmpidprod'];
@@ -948,14 +991,16 @@ class ControladorVenta
     }
 
     //-------------------------------------TICKETS ANTIGUOS
-    private function getNumrowsAux($condicion) {
+    private function getNumrowsAux($condicion)
+    {
         $consultado = false;
         $consulta = "SELECT count(iddatos_venta) numrows FROM datos_venta $condicion;";
         $consultado = $this->consultas->getResults($consulta, null);
         return $consultado;
     }
 
-    private function getNumrows($condicion) {
+    private function getNumrows($condicion)
+    {
         $numrows = 0;
         $rows = $this->getNumrowsAux($condicion);
         foreach ($rows as $actual) {
@@ -964,7 +1009,8 @@ class ControladorVenta
         return $numrows;
     }
 
-    private function getPermisoById($idusuario) {
+    private function getPermisoById($idusuario)
+    {
         $consultado = false;
         $consulta = "SELECT p.crearventa, p.listaventa, p.cancelarventa, p.exportarventa FROM usuariopermiso p WHERE permiso_idusuario=:idusuario;";
         $valores = array("idusuario" => $idusuario);
@@ -972,7 +1018,8 @@ class ControladorVenta
         return $consultado;
     }
 
-    private function getPermisos($idusuario) {
+    private function getPermisos($idusuario)
+    {
         $datos = "";
         $permisos = $this->getPermisoById($idusuario);
         foreach ($permisos as $actual) {
@@ -984,15 +1031,16 @@ class ControladorVenta
         return $datos;
     }
 
-    private function getSevicios($condicion) {
+    private function getSevicios($condicion)
+    {
         $consultado = false;
         $consulta = "SELECT * FROM datos_venta $condicion;";
-        echo $consulta;
         $consultado = $this->consultas->getResults($consulta, null);
         return $consultado;
     }
 
-    public function getNameUser($id){
+    public function getNameUser($id)
+    {
         $nombre = "";
         $consulta = "SELECT CONCAT(nombre,' ',apellido_paterno,' ',apellido_materno) AS nombre FROM usuario WHERE idusuario = :id";
         $val = array("id" => $id);
@@ -1003,7 +1051,8 @@ class ControladorVenta
         return $nombre;
     }
 
-    public function translateMonth($m) {
+    public function translateMonth($m)
+    {
         return [
             '01' => 'Ene',
             '02' => 'Feb',
@@ -1020,13 +1069,14 @@ class ControladorVenta
         ][$m] ?? '';
     }
 
-    public function listaServiciosHistorial($pag, $REF, $numreg, $user) {
+    public function listaServiciosHistorial($pag, $REF, $numreg, $user)
+    {
         require_once '../com.sine.common/pagination.php';
         $idlogin = $_SESSION[sha1("idusuario")];
 
         $datos = "<thead class='sin-paddding'>
                     <tr>
-                        <th class='text-center col-md-2'>Id Venta </th>
+                        <th class='text-center col-md-2'>Id. Venta </th>
                         <th class='text-center col-md-3'>Persona Realizó </th>
                         <th class='text-center'>Fecha de venta </th>
                         <th class='text-center'>Forma de Pago </th>
@@ -1039,13 +1089,13 @@ class ControladorVenta
 
         $condicion = "";
         if ($REF == "") {
-            if( $user == 0){
+            if ($user == 0) {
                 $condicion = "ORDER BY iddatos_venta DESC";
             } else {
                 $condicion = "WHERE uid_venta = $user ORDER BY iddatos_venta DESC";
-            }            
+            }
         } else {
-            if( $user == 0){
+            if ($user == 0) {
                 $condicion = "WHERE (concat(letra,folio) LIKE '%$REF%')";
             } else {
                 $condicion = "WHERE uid_venta = $user AND (concat(letra,folio) LIKE '%$REF%')";
@@ -1055,53 +1105,59 @@ class ControladorVenta
         $div = explode("</tr>", $permisos);
 
         if ($div[0] == '1') {
-        $numrows = $this->getNumrows($condicion);
-        $page = (isset($pag) && !empty($pag)) ? $pag : 1;
-        $per_page = $numreg;
-        $adjacents = 4;
-        $offset = ($page - 1) * $per_page;
-        $total_pages = ceil($numrows / $per_page);
-        $con = $condicion . " LIMIT $offset,$per_page ";
-        $finales = 0;
-        $lista = $this->getSevicios($con);
-        foreach ($lista as $actual) {
-            
-            $idventa = $actual['iddatos_venta'];
-            $folio = $actual['letra'].$actual['folio'];
-            $tagventa = $actual['tagventa'];
-            $fecha = $actual['fecha_venta'];
-            $hora = $actual['hora_venta'];
-            $formapago = $actual['formapago'];
-            $formapago = ($formapago == "cash") ? "Efectivo" : $formapago;
-            $totalventa = $actual['totalventa'];
-            $status = $actual['status_venta'];
-            $cve_usu = $actual['uid_venta'];
-            $nombre_user = $this->getNameUser($cve_usu);
-            $color = "#1E7457";
-            $estado = "Entregado";
-            if ($div[1] == '1') {
-                $cancelar = "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' onclick='cancelarTicket($idventa);'>Cancelar Ticket <i class='text-muted fas fa-times'></i></a></li>";
-            }
-            
-            if ($div[2] == '1') {
-                $exportar = "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' onclick='exportarTicket($idventa);'>Exportar a factura <span class='fas fa-edit text-muted small'></span></a></li>";
-            }
+            $numrows = $this->getNumrows($condicion);
+            $page = (isset($pag) && !empty($pag)) ? $pag : 1;
+            $per_page = $numreg;
+            $adjacents = 4;
+            $offset = ($page - 1) * $per_page;
+            $total_pages = ceil($numrows / $per_page);
+            $con = $condicion . " LIMIT $offset,$per_page ";
+            $finales = 0;
+            $lista = $this->getSevicios($con);
+            foreach ($lista as $actual) {
 
-            if ($status == 0){
-                $color = "#910024";
-                $estado = "Cancelado";
-                $cancelar = "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' onclick='#'>Cancelar Ticket <i class='text-muted fas fa-times'></i></a></li>";
-            }
+                $idventa = $actual['iddatos_venta'];
+                $folio = $actual['letra'] . $actual['folio'];
+                $tagventa = $actual['tagventa'];
+                $fecha = $actual['fecha_venta'];
+                $hora = $actual['hora_venta'];
+                $formapago = $actual['formapago'];
+                $formapago = ($formapago == "cash") ? "Efectivo" : $formapago;
+                $totalventa = $actual['totalventa'];
+                $status = $actual['status_venta'];
+                $cve_usu = $actual['uid_venta'];
+                $nombre_user = $this->getNameUser($cve_usu);
+                $color = "#1E7457";
+                $estado = "Entregado";
+                $cancelar = "";
+                $exportar = "";
+                if ($div[1] == '1') {
+                    $cancelar = "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' onclick='cancelarTicket($idventa);'>Cancelar ticket <i class='text-muted fas fa-times'></i></a></li>";
+                }
 
-            $divF = explode("-", $fecha);
-            $mes = $this->translateMonth($divF[1]);
+                if ($div[2] == '1') {
+                    $exportar = "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' onclick='exportarTicket($idventa);'>Exportar a factura <span class='fas fa-edit text-muted small'></span></a></li>";
+                }
 
-            $fecha = $divF[2] . ' - ' . $mes;
+                $sello = "";
 
-            $datos .= "<tr class='table-row'>
+                if ($status == 0) {
+                    $color = "#910024";
+                    $estado = "Cancelado";
+                    $cancelar = "";
+                    $exportar = "";
+                    $sello = "../img/TicketCancelado.png";
+                }
+
+                $divF = explode("-", $fecha);
+                $mes = $this->translateMonth($divF[1]);
+
+                $fecha = $divF[2] . ' - ' . $mes;
+
+                $datos .= "<tr class='table-row'>
                            <td class='fw-semibold text-center'>$folio</td>
                            <td class='fw-semibold text-center'>$nombre_user</td>
-                           <td class='fw-semibold text-center'>$fecha $hora</td>
+                           <td class='fw-semibold text-center'>$fecha / $hora</td>
                            <td class='fw-semibold text-center'>$formapago</td>
                            <td class='fw-semibold text-center'><font style='color: $color'><b>$estado</b></font></td>
                            <td class='fw-semibold text-center'>$ " . number_format($totalventa, 2, '.', ',') . "</td>
@@ -1111,27 +1167,478 @@ class ControladorVenta
                                 <span class='caret'></span></button>
                                 <ul class='dropdown-menu dropdown-menu-right'>
                                 $exportar
-                                <li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' onclick=\"imprimirTicket('$tagventa');\">Imprimir Ticket <span class='text-muted small fas fa-file'></span></a></li>
+                                <li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' onclick=\"imprimirTicket('$tagventa', '$sello');\">Imprimir ticket <span class='text-muted small fas fa-file'></span></a></li>
                                 $cancelar
                                 </ul>
                               </div>
-                              
                            </td>
                        </tr>";
-            $finales++;
-        }
+                $finales++;
+            }
 
-        $inicios = $offset + 1;
-        $finales += $inicios - 1;
-        $function = "buscarVentas";
+            $inicios = $offset + 1;
+            $finales += $inicios - 1;
+            $function = "buscarVentas";
 
-        if ($finales == 0) {
-            $datos .= "<tr><td colspan='11'>No se encontraron registros</td></tr>";
-        }
+            if ($finales == 0) {
+                $datos .= "<tr><td colspan='11'>No se encontraron registros</td></tr>";
+            }
 
-        $datos .= "</tbody><tfoot><tr><th colspan='3' class='align-top'>Mostrando $inicios al $finales de $numrows registros</th>";
-        $datos .= "<th colspan='4'>" . paginate($page, $total_pages, $adjacents, $function) . "</th></tr></tfoot>";
+            $datos .= "</tbody><tfoot><tr><th colspan='3' class='align-top'>Mostrando $inicios al $finales de $numrows registros</th>";
+            $datos .= "<th colspan='4'>" . paginate($page, $total_pages, $adjacents, $function) . "</th></tr></tfoot>";
         }
         return $datos;
+    }
+
+    function checkPrecio($producto)
+    {
+        $id_prod = "";
+        $cod_prod = "";
+        $nom_prod = "";
+        $taxes = "";
+        $prec_prod = 0;
+        $impuesto = 0;
+
+        $div = explode('-', $producto);
+        $producto = $div[0];
+        $consulta = "SELECT idproser, codproducto, nombre_producto, precio_venta, impuestos_aplicables FROM productos_servicios WHERE codproducto = :prod";
+        $val = array("prod" => $producto);
+        $stmt = $this->consultas->getResults($consulta, $val);
+        foreach ($stmt as $row) {
+            $id_prod = $row['idproser'];
+            $cod_prod = $row['codproducto'];
+            $nom_prod = $row['nombre_producto'];
+            $prec_prod = $row['precio_venta'];
+            $taxes = $row['impuestos_aplicables'];
+        }
+
+        $html = '<div class="col-12 col-md">
+                     <font style="color: #17177C; font-weight: bold;">PRECIO:</font>
+                     <h4 class="text-primary-emphasis" style="margin: 0;">$<span id="SpnPrec">' . $prec_prod . '</span></h4>
+                 </div>';
+        $total = bcdiv($prec_prod, '1', 2);
+        $div_taxes = explode('<tr>', $taxes);
+        for ($i = 0; $i < sizeof($div_taxes); $i++) {
+            $div = explode("-", $div_taxes[$i]);
+            if ($div[0] != "") {
+                $percent = $div[0];
+                $tipo = $div[1];
+                $nom_tax = $this->getNameTax($tipo, $percent);
+                $impuesto = bcdiv(($prec_prod * $percent), '1', 2);
+                if ($tipo == 1) {
+                    $total += bcdiv($impuesto, '1', 2);
+                } else if ($tipo == 2) {
+                    $total -= bcdiv($impuesto, '1', 2);
+                }
+                $html .= '<div class="col-12 col-md text-center">
+                              <font style="color: #17177C; font-weight: bold;">' . $nom_tax . ':</font>
+                              <h4 class="text-primary-emphasis" style="margin: 0;">$<span id="SpnIva">' . $impuesto . '</span></h4>
+                          </div>';
+            }
+        }
+
+        $total .= '<div class="col-md-4">
+                     <font style="color: #17177C; font-weight: bold;">TOTAL:</font>
+                     <h2 class="text-primary-emphasis" style="margin: 0;">$<span id="SpnTotal">' . $total . '</span></h2>
+                 </div>';
+
+        $json = array();
+        $json['id_prod']   = $id_prod;
+        $json['cod_prod']  = $cod_prod;
+        $json['nom_prod']  = $nom_prod;
+        $json['html']      = $html;
+        $json['total']     = $total;
+        return $json;
+    }
+
+    public function getNameTax($tipo, $percent)
+    {
+        $nombre = "";
+        $consultas = "SELECT CASE 
+                        WHEN impuesto = 1 THEN 'ISR'
+                        WHEN impuesto = 2 THEN 'IVA'
+                        WHEN impuesto = 3 THEN 'IEPS'
+                    END AS impuesto
+                    FROM impuesto 
+                    WHERE tipoimpuesto = $tipo AND porcentaje = '$percent'";
+        $result = $this->consultas->getResults($consultas, null);
+        foreach ($result as $rs) {
+            $nombre = $rs['impuesto'];
+        }
+        return $nombre;
+    }
+
+    //--------------------------------IMPRIMIR TICKET
+    public function getDatosTicket($tag)
+    {
+        $datos = false;
+        $consulta = "SELECT * FROM datos_venta WHERE tagventa=:tag;";
+        $val = array("tag" => $tag);
+        $datos = $this->consultas->getResults($consulta, $val);
+        return $datos;
+    }
+
+    public function obtenerLargoTicket($tag)
+    {
+        $altofila = 0;
+        $consulta = "SELECT LENGTH(CONCAT(venta_codprod,' ',venta_producto)) AS strlen FROM detalle_venta WHERE tagdetallev = :tag";
+        $val = array("tag" => $tag);
+        $stmt = $this->consultas->getResults($consulta, $val);
+        foreach ($stmt as $row) {
+            $n = $row['strlen'];
+
+            if ($n <= 19) {
+                $altofila += 8;
+            } else if ($n <= 34) {
+                $altofila += 13;
+            } else {
+                $altofila += 18;
+            }
+        }
+        return $altofila;
+    }
+
+    public function getDetalleTicket($tag)
+    {
+        $datos = false;
+        $consulta = "SELECT * FROM detalle_venta WHERE tagdetallev=:tag;";
+        $val = array("tag" => $tag);
+        $datos = $this->consultas->getResults($consulta, $val);
+        return $datos;
+    }
+
+    public function cancelarTicked($id)
+    {
+        $cancelado = false;
+        $consulta = "UPDATE datos_venta SET status_venta = '0' WHERE (iddatos_venta = :id)";
+        $val = array("id" => $id);
+        $cancelado = $this->consultas->execute($consulta, $val);
+        $this->retornarInventario($id);
+        return $cancelado;
+    }
+
+    public function retornarInventario($id)
+    {
+        $tag = "";
+        $id_prod = 0;
+        $cantidad = 0;
+        $bandera_inv = 0;
+        $cantidad_inv = 0;
+        $consulta = "SELECT tagventa FROM datos_venta WHERE iddatos_venta = :id";
+        $val = array("id" => $id);
+        $stmt = $this->consultas->getResults($consulta, $val);
+        foreach ($stmt as $row) {
+            $tag = $row['tagventa'];
+        }
+
+        $consulta = "SELECT venta_idprod, venta_cant, chinventario, cantinv 
+                    FROM detalle_venta AS dv
+                    INNER JOIN productos_servicios AS ps ON ps.idproser = dv.venta_idprod
+                    WHERE dv.tagdetallev = :tag";
+
+        $val = array("tag" => $tag);
+        $stmt = $this->consultas->getResults($consulta, $val);
+
+        foreach ($stmt as $row) {
+            $id_prod = $row['venta_idprod'];
+            $cantidad = $row['venta_cant'];
+            $bandera_inv = $row['chinventario'];
+            $cantidad_inv = $row['cantinv'];
+
+            if ($bandera_inv == 1) {
+
+                $cantidad_inv = $cantidad_inv + $cantidad;
+                $consulta = "UPDATE productos_servicios SET cantinv = :cantidad_inv WHERE idproser = :id_prod";
+                $val = array(
+                    "cantidad_inv" => $cantidad_inv,
+                    "id_prod" => $id_prod
+                );
+                $this->consultas->execute($consulta, $val);
+            }
+        }
+    }
+
+    //-------------------------------------CORTE DE CAJA
+
+    private function getTotalVentas($fecha, $user = "")
+    {
+        $datos = false;
+        $condicion = "";
+        if ($user != '0') {
+            $condicion = " AND (uid_venta=:uid)";
+        }
+        $consulta = "SELECT * FROM datos_venta WHERE (fecha_venta=:fecha)$condicion;";
+        $val = array(
+            "fecha" => $fecha,
+            "uid" => $user
+        );
+        $datos = $this->consultas->getResults($consulta, $val);
+        return $datos;
+    }
+
+    private function getGanancias($fecha, $user)
+    {
+        $datos = false;
+        $condicion = "";
+        if ($user != '0') {
+            $condicion = " AND (uid_venta=:uid)";
+        }
+        $consulta = "SELECT d.venta_importe, d.venta_cant, p.precio_compra FROM detalle_venta d INNER JOIN productos_servicios p ON (d.venta_idprod=p.idproser) INNER JOIN datos_venta v ON (d.tagdetallev=v.tagventa) WHERE (fecha_venta=:fecha)$condicion;";
+        $val = array(
+            "fecha" => $fecha,
+            "uid" => $user
+        );
+        $datos = $this->consultas->getResults($consulta, $val);
+        return $datos;
+    }
+
+    public function getFondoCaja($uid, $fecha)
+    {
+        $user = "";
+        if ($uid != '0') {
+            $user = " AND uidfondo=:uid";
+        }
+        $datos = false;
+        $consulta = "SELECT * FROM fondocaja WHERE fechaingreso=:fecha$user;";
+        $val = array(
+            "fecha" => $fecha,
+            "uid" => $uid
+        );
+        $datos = $this->consultas->getResults($consulta, $val);
+        return $datos;
+    }
+
+    public function getMovEfectivo($t, $fecha, $uid)
+    {
+        $user = "";
+        $user_tkt = "";
+        if ($uid != '0') {
+            $user = ' AND uid=:uid';
+            $user_tkt = ' AND uid_venta = :uid';
+        }
+        $datos = false;
+        if ($t == 2) {
+            $consulta = "SELECT conceptomov, montomov FROM movefectivo WHERE tipomov=:tipo AND fechamov=:fecha$user
+                        UNION ALL
+                        SELECT CONCAT('Cancelacion ',letra,folio) AS conceptomov, totalventa AS montomov
+                        FROM datos_venta
+                        WHERE fecha_venta = :fecha AND status_venta = 0$user_tkt";
+        } else {
+            $consulta = "SELECT conceptomov, montomov FROM movefectivo WHERE tipomov=:tipo AND fechamov=:fecha$user";
+        }
+
+        $val = array(
+            "tipo" => $t,
+            "fecha" => $fecha,
+            "uid" => $uid
+        );
+        $datos = $this->consultas->getResults($consulta, $val);
+        return $datos;
+    }
+
+    private function getEntradasEfectivo($uid, $fecha)
+    {
+        $fondo = 0;
+        $total = 0;
+        $datf = $this->getFondoCaja($uid, $fecha);
+        foreach ($datf as $actual) {
+            $total += $actual['fondo'];
+            $fondo += $actual['fondo'];
+        }
+
+        $datos = "<ul class='list-group mb-3'>
+                        <li class='list-group-item d-flex justify-content-between lh-sm'>
+                            <div>
+                            <h6 class='my-0 text-success'><i class='fas fa-arrow-up text-success me-1 small'></i>Dinero en caja</h6>
+                            </div>
+                            <span class='text-secondary fw-semibold'>$ " . number_format($fondo, 2, '.', ',') . "</span>
+                        </li>";
+        $entradas = $this->getMovEfectivo('1', $fecha, $uid);
+        foreach ($entradas as $actual) {
+            $concepto = iconv("utf-8", "windows-1252", $actual['conceptomov']);
+            $monto = number_format($actual['montomov'], 2, '.', ',');
+            $total += $actual['montomov'];
+            $datos .= "<li class='list-group-item d-flex justify-content-between lh-sm'>
+                        <div>
+                        <h6 class='my-0 text-success'><i class='fas fa-arrow-up text-success me-1 small'></i>
+                         $concepto</h6>
+                        </div>
+                        <span class='text-success fw-semibold'>$ $monto</span>
+                    </li>";
+        }
+        $datos .= "<li class='list-group-item d-flex justify-content-between'>
+        <span class='fw-bold text-muted'>Total (MXN)</span>
+        <strong>$ " . number_format($total, 2, '.', ',') . "</strong>
+      </li></ul>";
+        return $datos;
+    }
+
+    private function getSalidaEfectivo($uid, $fecha)
+    {
+        $total = 0;
+        $datos = "<ul class='list-group mb-3'>";
+        $entradas = $this->getMovEfectivo('2', $fecha, $uid);
+        foreach ($entradas as $actual) {
+            $concepto = iconv("utf-8", "windows-1252", $actual['conceptomov']);
+            $monto = number_format($actual['montomov'], 2, '.', ',');
+            $total += $actual['montomov'];
+            $datos .= "<li class='list-group-item d-flex justify-content-between lh-sm'>
+            <div>
+            <h6 class='my-0 text-danger'><i class='fas fa-arrow-down text-danger me-1 small'></i> $concepto</h6>
+            </div>
+            <span class='text-danger fw-semibold'>$ $monto</span>
+        </li>";
+        }
+        $datos .= "<li class='list-group-item d-flex justify-content-between'>
+        <span class='fw-bold text-muted'>Total (MXN)</span>
+        <strong>$ " . number_format($total, 2, '.', ',') . "</strong>
+      </li></ul>";
+        return $datos;
+    }
+
+    public function getVentasByTipo($fecha, $forma, $uid)
+    {
+        $user = "";
+        if ($uid != '') {
+            $user = " AND (uid_venta=:uid)";
+        }
+        $datos = false;
+        $consulta = "SELECT * FROM datos_venta WHERE (fecha_venta=:fecha) AND (formapago=:fp)$user;";
+        $val = array(
+            "fecha" => $fecha,
+            "fp" => $forma,
+            "uid" => $uid
+        );
+        $datos = $this->consultas->getResults($consulta, $val);
+        return $datos;
+    }
+
+    private function getDineroCaja($uid, $fecha)
+    {
+        $efectivo = 0;
+        $tarjeta = 0;
+        $vales = 0;
+        $entradas = 0;
+        $salidas = 0;
+        $total = 0;
+
+        $datf = $this->getFondoCaja($uid, $fecha);
+        foreach ($datf as $actual) {
+            $total += $actual['fondo'];
+            $entradas += $actual['fondo'];
+        }
+
+        $datf = $this->getVentasByTipo($fecha, 'cash', $uid);
+        foreach ($datf as $actual) {
+            $total += $actual['totalventa'];
+            $efectivo += $actual['totalventa'];
+        }
+
+        $datcd = $this->getVentasByTipo($fecha, 'card', $uid);
+        foreach ($datcd as $actual) {
+            $total += $actual['totalventa'];
+            $tarjeta += $actual['totalventa'];
+        }
+
+        $datvl = $this->getVentasByTipo($fecha, 'val', $uid);
+        foreach ($datvl as $actual) {
+            $total += $actual['totalventa'];
+            $vales += $actual['totalventa'];
+        }
+
+        $ent = $this->getMovEfectivo('1', $fecha, $uid);
+        foreach ($ent as $actual) {
+            $entradas += $actual['montomov'];
+            $total += $actual['montomov'];
+        }
+
+        $out = $this->getMovEfectivo('2', $fecha, $uid);
+        foreach ($out as $actual) {
+            $salidas += $actual['montomov'];
+            $total -= $actual['montomov'];
+        }
+
+        $datos = "<ul class='list-group mb-3 h-100'>
+        <li class='list-group-item d-flex justify-content-between lh-sm'>
+            <div>
+            <h6 class='my-0 text-success'><i class='fas fa-arrow-up text-success me-1 small'></i>Ventas en efectivo </h6>
+            </div>
+            <span class='text-success fw-semibold'>$ " . number_format($efectivo, 2, '.', ',') . "</span>
+        </li>";
+
+        if ($tarjeta > 0) {
+            $datos .= "<li class='list-group-item d-flex justify-content-between lh-sm'>
+            <div>
+            <h6 class='my-0 text-success'><i class='fas fa-arrow-up text-success me-1 small'></i>Ventas en tarjeta </h6>
+            </div>
+            <span class='text-success fw-semibold'>$ " . number_format($tarjeta, 2, '.', ',') . "</span>
+        </li>";
+        }
+
+        if ($vales > 0) {
+            $datos .= "<li class='list-group-item d-flex justify-content-between lh-sm'>
+            <div>
+            <h6 class='my-0 text-success'><i class='fas fa-arrow-up text-success me-1 small'></i>Ventas en vales </h6>
+            </div>
+            <span class='text-success fw-semibold'>$ " . number_format($vales, 2, '.', ',') . "</span>
+        </li>";
+        }
+
+        $datos .= "
+            <li class='list-group-item d-flex justify-content-between lh-sm'>
+                <div>
+                <h6 class='my-0 text-success'><i class='fas fa-arrow-up text-success me-1 small'></i>Entradas </h6>
+                </div>
+                <span class='text-success fw-semibold'>$ " . number_format($entradas, 2, '.', ',') . "</span>
+            </li>
+            <li class='list-group-item d-flex justify-content-between lh-sm'>
+                <div>
+                <h6 class='my-0 text-danger'><i class='fas fa-arrow-down text-danger me-1 small'></i>Salidas </h6>
+                </div>
+                <span class='text-danger fw-semibold'>$ " . number_format($salidas, 2, '.', ',') . "</span>
+            </li>
+            <li class='list-group-item d-flex justify-content-between'>
+            <span class='fw-bold text-muted'>Total (MXN)</span>
+            <strong>$ " . number_format($total, 2, '.', ',') . "</strong>
+            </li></ul>";
+        return $datos;
+    }
+
+    public function getCorteCaja($user, $fecha)
+    {
+        $totventas = 0;
+        $totganancia = 0;
+
+        $ventas = $this->getTotalVentas($fecha, $user);
+        foreach ($ventas as $actual) {
+            $totventas += $actual['totalventa'];
+        }
+
+        $ganancias = $this->getGanancias($fecha, $user);
+        foreach ($ganancias as $actual) {
+            $pcompra = $actual['precio_compra'];
+            $cant = $actual['venta_cant'];
+            $importe = $actual['venta_importe'];
+            $impcompra = floatval($cant) * floatval($pcompra);
+            $totganancia += $importe - $impcompra;
+        }
+        $entefec = $this->getEntradasEfectivo($user, $fecha);
+        $dinerocaja = $this->getDineroCaja($user, $fecha);
+        $salidaefectivo = $this->getSalidaEfectivo($user, $fecha);
+        $datos = "$totventas<cut>$totganancia<cut>$entefec<cut>$dinerocaja<cut>$salidaefectivo";
+        return $datos;
+    }
+
+    public function verificarF5()
+    {
+        $bandera = "";
+        $uid = $_SESSION[sha1("idusuario")];
+        $consulta = "SELECT crearproducto FROM usuariopermiso WHERE permiso_idusuario = :id_usuario";
+        $val = array("id_usuario" => $uid);
+        $stmt = $this->consultas->getResults($consulta, $val);
+        foreach ($stmt as $row) {
+            $bandera = $row['crearproducto'];
+        }
+        return $bandera;
     }
 }

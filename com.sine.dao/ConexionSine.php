@@ -22,7 +22,7 @@ abstract class ConexionSine {
         try{
             return $this->datahost=new PDO("mysql:host=$servidor;port=$puerto;dbname=$basedatos",$usuario,$password,array(PDO::MYSQL_ATTR_INIT_COMMAND=>"SET NAMES utf8"));
         } catch (PDOException $ex) {
-            echo 'No se puede conectar a la bd '.$ex->getMessage();
+            echo 'No se puede conectar a la bd SineAcceso '.$ex->getMessage();
         }
     }
 }

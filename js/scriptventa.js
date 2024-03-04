@@ -24,6 +24,12 @@ $(function () {
         }
     });
 
+    $(document).keyup(function (event) {
+        if (event.keyCode == 46) { 
+            cerrarTicket();
+        }
+    });
+
     $("#buscar-producto-precio").keyup(function (event) {
         if (event.keyCode == 13) {
             buscarPrecioProducto();
@@ -79,6 +85,39 @@ $(function () {
 		}
     });
 });
+
+function aucompletarBuscarProducto() {
+    $('#buscar-producto-precio').autocomplete({
+        source: "com.sine.enlace/enlaceautocompletar.php?transaccion=producto",
+        select: function (event, ui) {
+            var a = ui.item.value;
+            var id = ui.item.id;
+        }
+    });
+}
+
+function buscarPrecioProducto(){
+    var producto = $("#buscar-producto-precio").val();
+    if(isnEmpty(producto, "buscar-producto-precio")) {
+        $.ajax({
+            url: "com.sine.enlace/enlaceventa.php",
+            type: "POST",
+            data: {transaccion: "checkPrecio", producto: producto},
+            dataType: "JSON",
+            success: function (datos) {
+                $("#buscar-producto-precio").val("");
+                $('#CollapsePrecio').collapse('show');
+                $('#SpnCodigo').html(datos.cod_prod);
+                $('#SpnProd').html(datos.nom_prod);
+                $('#impuestos_modal').html(datos.html);
+                $('#impuestos_modal').html(total.html);
+                window.setTimeout(()=>{ aucompletarBuscarProducto(); }, 500);
+                $('#cantidad-producto-precio').select();
+            }
+        });
+    }
+
+}
 
 function registrarDineroInicial() {
     var monto = $("#monto-inicial").val();
@@ -216,6 +255,29 @@ function agregarProducto() {
     }
 }
 
+function agregarProductoTicket(){ 
+    cargandoShow();
+    var tab = $("#tabs").find('.sub-tab-active').attr("data-tab");
+    var producto = $("#SpnCodigo").text()+'-'+$('#SpnProd').text();
+    $.ajax({
+        url: "com.sine.enlace/enlaceventa.php",
+        type: "POST",
+        data: {transaccion: "agregarproductobusqueda", producto: producto, tab: tab, cantidad: $('#cantidad-producto-precio').val()},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 1000);
+            if (bandera == '0') {
+                alertify.error(res);
+            } else {
+                tablaProducto();
+                $('#modal-consulta-precios').modal('hide');
+            }
+        }
+    });
+    cargandoHide();
+}
+
 function tablaProducto() {
     var tab = $("#tabs").find('.sub-tab-active').attr("data-tab");
     $.ajax({
@@ -320,10 +382,11 @@ function checkFondo() {
         type: "POST",
         data: {transaccion: "checkfondo"},
         success: function (datos) {
+            console.log(datos);
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
             var res = texto.substring(1, 1000);
-            if (datos == false) {
+            if (bandera != '0') {
                 $("#modal-dincaja").modal('show');
             }
             cargandoHide();
@@ -456,6 +519,40 @@ function setValoresCobrar() {
     });
 }
 
+function imprimirTicket(tab = "", cancelado = "") {
+    cargandoHide();
+    cargandoShow();
+    //VentanaCentrada('./com.sine.imprimir/imprimirticket.php?t=' + tab, 'Ticket', '', '400', '768', 'true');
+    var myLeft = (screen.width - 400) / 2;
+    var myTop = (screen.height - 768) / 2;
+    var features = 'left=' + myLeft + ',top=' + myTop;
+    var mywindow = window.open('./com.sine.imprimir/imprimirticket.php?imagen='+cancelado+'&t=' + tab, 'Ticket', features+',width=400,height=768');
+    window.setTimeout(()=>{ mywindow.print(); },900);
+    //window.setTimeout(()=>{ mywindow.close();},1400); 
+
+    cargandoHide();
+}
+
+function cancelarTicket(id) {
+    alertify.confirm("¿Estás seguro que deseas cancelar este ticket?", function () {
+        $.ajax({
+            url: 'com.sine.enlace/enlaceventa.php',
+            type: 'POST',
+            data: {transaccion: 'cancelarTicked', id: id},
+            success: function (datos) {
+                var texto = datos.toString();
+                var bandera = texto.substring(0, 1);
+                var res = texto.substring(1, 5000);
+                if (bandera == '0') {
+                    alertify.error(res);
+                } else {
+                    alertify.success("Ticket cancelado. Inventario restaurado.");
+                    filtrarVentas();
+                }
+            }
+        });
+    }).set({title: "Q-ik"});
+}
 
 function habilitarDescuento(){
     if( $('#ChkDescuento').is(':checked') ){
@@ -643,4 +740,74 @@ function selectedPercepciones() {
         }
     });
     calcularTotalPercepciones();
+}
+
+function corteCaja() {
+    cargandoHide();
+    cargandoShow();
+    var hoy = new Date().toISOString().slice(0, 10);
+    var user = $("#usuario-corte").val() || '0';
+    var fecha = $("#fecha-corte").val() || hoy;
+
+    $.ajax({
+        url: 'com.sine.enlace/enlaceventa.php',
+        type: 'POST',
+        data: {transaccion: 'cortecaja', user: user, fecha: fecha},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 5000);
+            if (bandera == '') {
+                alertify.error(res);
+            } else {
+                var array = datos.split("<cut>");
+                var ventas = array[0];
+                var ganancias = array[1];
+                var entradas = array[2];
+                var caja = array[3];
+                var salidas = array[4];
+
+                $("#lbl-ventas").text("$" + ventas);
+                $("#lbl-ganancia").text("$" + ganancias);
+                $("#tab-entradas").html(entradas);
+                $("#tab-caja").html(caja);
+                $("#tab-salidas").html(salidas);
+                cargandoHide();
+            }
+        }
+    });
+}
+
+function getPermisoNewProducto() {
+    $bandera = false;
+    $.ajax({
+        url: "com.sine.enlace/enlaceventa.php",
+        type: "POST",
+        data: { transaccion: 'checkPersisionNewProduct'},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            if (bandera == 1) {
+                $('.marker').removeClass("marker-active");
+                $('.list-element').removeClass("menu-active");
+                $('#alta-productos').addClass("menu-active");
+                $('#alta-productos').children('div.marker').addClass("marker-active");
+                loadView('nuevoproducto');
+                window.setTimeout(function () {
+                    $('#codigo-producto').focus();
+                }, 900);
+            } else {
+                alertify.error("No tienes los permisos para crear nuevos productos");
+            }
+        }
+    });
+}
+
+function imprimirCorteCaja() {
+    cargandoHide();
+    cargandoShow();
+    var user = $("#usuario-corte").val() || '0';
+    var fecha = $("#fecha-corte").val();
+    VentanaCentrada('./com.sine.imprimir/imprimircortecaja.php?u=' + user + '&&f=' + fecha, 'Corte Caja', '', '1024', '768', 'true');
+    cargandoHide();
 }

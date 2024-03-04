@@ -152,7 +152,7 @@
                                 <td class="text-center">
                                     <div class="div-forma">
                                         <label class="label-form text-center">Descuento:</label>
-                                        <label id="label-descuento" class="label-articulos text-center"></label>
+                                        <label id="label-descuento" class="titulo-lista fs-4 fw-semibold text-center"></label>
                                     </div>
                                     <input type="hidden" id="input-descuento" value="0" />
                                     <input type="hidden" id="input-descuento-original" value="0" />
@@ -174,7 +174,6 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title fs-5" id="label-ingresos">Registrar cantidad inicial</h4>
-                <button type="button" id="btn-close-modal" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form id="form-cobrar" onsubmit="return false;">
@@ -208,7 +207,7 @@
                 <label class="label-sub">Código del producto</label>
                 <div class="col-12">
                     <div class="row">
-                        <div class="col-md-8 text-start">
+                        <div class="col-md-8 py-1 text-start">
                             <input type="text" class="form-control text-center input-form col-12" id="buscar-producto-precio" placeholder="Buscar codigo" oninput="aucompletarBuscarProducto();" />
                         </div>
                         <div class="col-md-4 py-1 text-end">
@@ -219,21 +218,18 @@
                         </div>
                     </div>
                 </div>
-
                 <div id="CollapsePrecio" class="collapse">
-
                     <div class="row text-center" style="margin-top: 2rem;">
                         <div class="col-md-6">
                             <font style="color: #17177C; font-weight: bold;">CÓDIGO:</font>
-                            <h4 style="margin: 0;"><span id="SpnCodigo">086</span></h4>
+                            <h4 class="text-primary-emphasis" style="margin: 0;"><span id="SpnCodigo">086</span></h4>
                         </div>
                         <div class="col-md-6">
                             <font style="color: #17177C; font-weight: bold;">PRODUCTO:</font>
-                            <h4 style="margin: 0;"><span id="SpnProd">Cueritos Grandes</span></h4>
+                            <h4 class="text-primary-emphasis" style="margin: 0;"><span id="SpnProd">XX0X0X0X</span></h4>
                         </div>
                     </div>
-
-                    <div class="row text-center" style="margin-top: 2rem;" id="impuestos_modal">
+                    <div class="row text-center col-12 mx-0 mt-3" id="impuestos_modal">
                         <div class="col-md-4">
                             <font style="color: #17177C; font-weight: bold;">PRECIO:</font>
                             <h4 style="margin: 0;">$<span id="SpnPrec">86.16</span></h4>
@@ -242,28 +238,26 @@
                             <font style="color: #17177C; font-weight: bold;">IVA:</font>
                             <h4 style="margin: 0;">$<span id="SpnIva">23.04</span></h4>
                         </div>
-                        <div class="col-md-4">
+                    </div>
+                    <div class="row col-12" id="total">
+                    <div class="col-md-12 text-center mt-3">
                             <font style="color: #17177C; font-weight: bold;">TOTAL:</font>
-                            <h1 style="margin: 0;">$<span id="SpnTotal">110.00</span></h1>
+                            <h1 class="text-primary-emphasis" style="margin: 0;">$<span id="total">110.00</span></h1>
                         </div>
                     </div>
-
-                    <div class="row" style="margin-top: 2rem;">
-                        <div class="col-md-4"></div>
-                        <div class="col-md-4">
+                    <div class="row mt-3">
+                        <div class="col-md-6">
                             <label class="label-sub">Cantidad</label>
                             <input type="number" class="form-control text-center input-form" id="cantidad-producto-precio" value="1" />
                         </div>
-                        <div class="col-md-4 text-center">
-                            <div class="space-div"></div>
-                            <button type="button" class="button-file" onclick="agregarProductoTicket()">
-                                <i class="glyphicon glyphicon-file"></i>Pasar a ticket
+                        <div class="col-md-6 text-center">
+                            <label class="label-sub">&nbsp;</label>
+                            <button type="button" class="button-file col-12" onclick="agregarProductoTicket()">
+                                <i class="fas fa-file me-2"></i>Pasar a ticket
                             </button>
                         </div>
                     </div>
-
                 </div>
-
             </div>
         </div>
     </div>

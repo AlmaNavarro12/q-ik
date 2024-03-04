@@ -3,7 +3,7 @@ $(document).ready(function () {
     valPeriodoPrueba();
 
     document.onkeydown = function (event) {
-        if (puntoventa === '1' && crearventa == '1') {
+        if ((puntoventa === '1' && crearventa == '1')) {
             switch (event.which) {
                 case 112://TECLA F1 crear nueva venta
                     if (!$('#punto-venta').hasClass('menu-active')) {
@@ -23,29 +23,12 @@ $(document).ready(function () {
                     }
                     return false;
                 case 113://TECLA F2 crear nueva entrada de dinero a la caja
-                    if (!$('#punto-venta').hasClass('menu-active')) {
-                        $('.list-element').removeClass("menu-active");
-                        $('.marker').removeClass("marker-active");
-                        $('#punto-venta').addClass("menu-active");
-                        $('#punto-venta').children('div.marker').addClass("marker-active");
-                        loadView('puntodeventa');
-                        window.setTimeout(() => {
-                            $("#monto-entrada").val('');
-                            $("#concepto-entrada").val('');
-                            $('#label-ingresos').text('Registrar entrada de efectivo');
-                            $("#type-movimiento").val('1');
-                            $('#modal-entradas').modal('show');
-                            window.setTimeout(() => { $('#monto-entrada').select(); }, 500);
-                        }, 500);
-                    } else {
-                        if ($('#buscar-producto').length > 0) {
-                            $("#monto-entrada").val('');
-                            $("#concepto-entrada").val('');
-                            $('#label-ingresos').text('Registrar entrada de efectivo');
-                            $("#type-movimiento").val('1');
-                            $('#modal-entradas').modal('show');
-                            window.setTimeout(() => { $('#monto-entrada').select(); }, 500);
-                        } else {
+                    if(registrarentrada == '1'){
+                        if (!$('#punto-venta').hasClass('menu-active')) {
+                            $('.list-element').removeClass("menu-active");
+                            $('.marker').removeClass("marker-active");
+                            $('#punto-venta').addClass("menu-active");
+                            $('#punto-venta').children('div.marker').addClass("marker-active");
                             loadView('puntodeventa');
                             window.setTimeout(() => {
                                 $("#monto-entrada").val('');
@@ -55,33 +38,35 @@ $(document).ready(function () {
                                 $('#modal-entradas').modal('show');
                                 window.setTimeout(() => { $('#monto-entrada').select(); }, 500);
                             }, 500);
+                        } else {
+                            if ($('#buscar-producto').length > 0) {
+                                $("#monto-entrada").val('');
+                                $("#concepto-entrada").val('');
+                                $('#label-ingresos').text('Registrar entrada de efectivo');
+                                $("#type-movimiento").val('1');
+                                $('#modal-entradas').modal('show');
+                                window.setTimeout(() => { $('#monto-entrada').select(); }, 500);
+                            } else {
+                                loadView('puntodeventa');
+                                window.setTimeout(() => {
+                                    $("#monto-entrada").val('');
+                                    $("#concepto-entrada").val('');
+                                    $('#label-ingresos').text('Registrar entrada de efectivo');
+                                    $("#type-movimiento").val('1');
+                                    $('#modal-entradas').modal('show');
+                                    window.setTimeout(() => { $('#monto-entrada').select(); }, 500);
+                                }, 500);
+                            }
                         }
                     }
                     return false;
                 case 114://TECLA F3 crear nueva salida de dinero de la caja
-                    if (!$('#punto-venta').hasClass('menu-active')) {
-                        $('.list-element').removeClass("menu-active");
-                        $('.marker').removeClass("marker-active");
-                        $('#punto-venta').addClass("menu-active");
-                        $('#punto-venta').children('div.marker').addClass("marker-active");
-                        loadView('puntodeventa');
-                        window.setTimeout(() => {
-                            $("#monto-entrada").val('');
-                            $("#concepto-entrada").val('');
-                            $('#label-ingresos').text('Registrar salida de efectivo');
-                            $("#type-movimiento").val('2');
-                            $('#modal-entradas').modal('show');
-                            window.setTimeout(() => { $('#monto-entrada').select(); }, 500);
-                        }, 500);
-                    } else {
-                        if ($('#buscar-producto').length > 0) {
-                            $("#monto-entrada").val('');
-                            $("#concepto-entrada").val('');
-                            $('#label-ingresos').text('Registrar salida de efectivo');
-                            $("#type-movimiento").val('2');
-                            $('#modal-entradas').modal('show');
-                            window.setTimeout(() => { $('#monto-entrada').select(); }, 500);
-                        } else {
+                    if(registrarsalida == '1'){
+                        if (!$('#punto-venta').hasClass('menu-active')) {
+                            $('.list-element').removeClass("menu-active");
+                            $('.marker').removeClass("marker-active");
+                            $('#punto-venta').addClass("menu-active");
+                            $('#punto-venta').children('div.marker').addClass("marker-active");
                             loadView('puntodeventa');
                             window.setTimeout(() => {
                                 $("#monto-entrada").val('');
@@ -91,6 +76,25 @@ $(document).ready(function () {
                                 $('#modal-entradas').modal('show');
                                 window.setTimeout(() => { $('#monto-entrada').select(); }, 500);
                             }, 500);
+                        } else {
+                            if ($('#buscar-producto').length > 0) {
+                                $("#monto-entrada").val('');
+                                $("#concepto-entrada").val('');
+                                $('#label-ingresos').text('Registrar salida de efectivo');
+                                $("#type-movimiento").val('2');
+                                $('#modal-entradas').modal('show');
+                                window.setTimeout(() => { $('#monto-entrada').select(); }, 500);
+                            } else {
+                                loadView('puntodeventa');
+                                window.setTimeout(() => {
+                                    $("#monto-entrada").val('');
+                                    $("#concepto-entrada").val('');
+                                    $('#label-ingresos').text('Registrar salida de efectivo');
+                                    $("#type-movimiento").val('2');
+                                    $('#modal-entradas').modal('show');
+                                    window.setTimeout(() => { $('#monto-entrada').select(); }, 500);
+                                }, 500);
+                            }
                         }
                     }
                     return false;
@@ -105,8 +109,8 @@ $(document).ready(function () {
                         loadView('listaticket');
                     }
                     return false;
-                case 116://TECLA F5 crear nuevo porducto
-                    getPermisoNewProducto();
+                case 116://TECLA 117 F6 crear nuevo porducto
+                    getPermisoNewProducto(); //FUNCION PENDIENTE
                     return false;
                 case 118://TECLA F7 cobrar ticket
                     if (!$('#punto-venta').hasClass('menu-active')) {
@@ -213,37 +217,15 @@ $(document).ready(function () {
             }
         }  else if (venta === '1' && crearventa === '0') {
             switch (event.which) {
-                case 118: // TECLA F7 cobrar ticket
+                case 115://TECLA F4 ir a los tickets antiguos
                     if (!$('#punto-venta').hasClass('menu-active')) {
                         $('.list-element').removeClass("menu-active");
                         $('.marker').removeClass("marker-active");
                         $('#punto-venta').addClass("menu-active");
                         $('#punto-venta').children('div.marker').addClass("marker-active");
-                        loadView('puntodeventa');
-                        window.setTimeout(function () {
-                            setValoresCobrar();
-                            $('#modal-cobrar').modal('show');
-                            window.setTimeout(() => {
-                                $("#monto-pagado").select();
-                            }, 500);
-                        }, 900);
+                        loadView('listaticket');
                     } else {
-                        if ($('#buscar-producto').length > 0) {
-                            setValoresCobrar();
-                            $('#modal-cobrar').modal('show');
-                            window.setTimeout(() => {
-                                $("#monto-pagado").select();
-                            }, 500);
-                        } else {
-                            loadView('puntodeventa');
-                            window.setTimeout(function () {
-                                setValoresCobrar();
-                                $('#modal-cobrar').modal('show');
-                                window.setTimeout(() => {
-                                    $("#monto-pagado").select();
-                                }, 500);
-                            }, 900);
-                        }
+                        loadView('listaticket');
                     }
                     return false;
             }

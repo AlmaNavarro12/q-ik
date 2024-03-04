@@ -1925,8 +1925,6 @@ switch ($idencabezado) {
         break;
     
     case 12:
-
-        
         $pdf->SetY(34.3);
         $pdf->SetX($pdf->margen);
         $pdf->SetWidths(Array($pdf->body));
@@ -1941,7 +1939,7 @@ switch ($idencabezado) {
             $pdf->SetLineHeight(4);
         }
         $pdf->SetAligns('C');
-        $pdf->Row(Array(iconv("utf-8","windows-1252",$titulo)));
+        $pdf->Row(Array(iconv("utf-8","windows-1252", $titulo)));
         $pdf->Ln(3);
 
         $pdf->SetX($pdf->margen);
