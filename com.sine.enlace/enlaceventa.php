@@ -84,6 +84,10 @@ if (isset($_POST['transaccion'])) {
             $bandera = $cv->verificarF5();
             echo $bandera == 1 ? "1Permiso concedido" : "0No tienes los permisos";
             break;
+        case 'validarsupervisor':
+            $bandera = $cv->validarSupervisor($_POST['usuario'], $_POST['contrasena']);
+            echo $bandera == 1 ? "1Permiso concedido" : "0No tienes los permisos para registrar un corte de caja.";
+            break;
             /*
         case 'exportarticket':
             $insertado = $cv->exportarProductos($_POST['id'], session_id());

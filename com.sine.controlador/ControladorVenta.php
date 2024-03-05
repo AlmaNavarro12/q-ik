@@ -1359,6 +1359,43 @@ class ControladorVenta
     }
 
     //-------------------------------------CORTE DE CAJA
+    public function printCorteCaja($user, $fecha) {
+        $totventas = 0;
+        $totganancia = 0;
+
+        $ventas = $this->getTotalVentas($fecha, $user);
+        foreach ($ventas as $actual) {
+            $totventas += $actual['totalventa'];
+        }
+
+        $ganancias = $this->getGanancias($fecha, $user);
+        foreach ($ganancias as $actual) {
+            $pcompra = $actual['precio_compra'];
+            $cant = $actual['venta_cant'];
+            $importe = $actual['venta_importe'];
+            $impcompra = floatval($cant) * floatval($pcompra);
+            $totganancia += $importe - $impcompra;
+        }
+        $datos = "$totventas<cut>$totganancia";
+        return $datos;
+    }
+
+    public function getUserbyID($uid) {
+        $nombre = "";
+        $usuarios = $this->getUserbyIDAux($uid);
+        foreach ($usuarios as $actual) {
+            $nombre = $actual['nombre'] . " " . $actual['apellido_paterno'] . " " . $actual['apellido_materno'];
+        }
+        return $nombre;
+    }
+
+    private function getUserbyIDAux($uid) {
+        $datos = false;
+        $consulta = "SELECT * FROM usuario WHERE idusuario=:uid;";
+        $val = array("uid" => $uid);
+        $datos = $this->consultas->getResults($consulta, $val);
+        return $datos;
+    }
 
     private function getTotalVentas($fecha, $user = "")
     {
@@ -1451,6 +1488,7 @@ class ControladorVenta
                             <div>
                             <h6 class='my-0 text-success'><i class='fas fa-arrow-up text-success me-1 small'></i>Dinero en caja</h6>
                             </div>
+                            <input type='hidden' name='fondo_inicio' id='fondo_inicio' value=" . number_format($fondo, 2, '.', ',') . ">
                             <span class='text-secondary fw-semibold'>$ " . number_format($fondo, 2, '.', ',') . "</span>
                         </li>";
         $entradas = $this->getMovEfectivo('1', $fecha, $uid);
@@ -1468,6 +1506,7 @@ class ControladorVenta
         }
         $datos .= "<li class='list-group-item d-flex justify-content-between'>
         <span class='fw-bold text-muted'>Total (MXN)</span>
+        <input type='hidden' name='total_entradas' id='total_entradas' value=" . number_format($total, 2, '.', ',') . ">
         <strong>$ " . number_format($total, 2, '.', ',') . "</strong>
       </li></ul>";
         return $datos;
@@ -1491,6 +1530,7 @@ class ControladorVenta
         }
         $datos .= "<li class='list-group-item d-flex justify-content-between'>
         <span class='fw-bold text-muted'>Total (MXN)</span>
+        <input type='hidden' name='total_salidas' id='total_salidas' value=" . number_format($total, 2, '.', ',') . ">
         <strong>$ " . number_format($total, 2, '.', ',') . "</strong>
       </li></ul>";
         return $datos;
@@ -1638,6 +1678,28 @@ class ControladorVenta
         $stmt = $this->consultas->getResults($consulta, $val);
         foreach ($stmt as $row) {
             $bandera = $row['crearproducto'];
+        }
+        return $bandera;
+    }
+
+    public function validarSupervisor($usuario, $contrasena)
+    {
+        $bandera = "";
+        $uid = $_SESSION[sha1("idusuario")];
+        $contrasenaencriptada= sha1($contrasena);
+        $consulta = "SELECT u.*, p.cortedecaja 
+                 FROM usuario u 
+                 INNER JOIN usuariopermiso p ON u.idusuario = p.permiso_idusuario 
+                 WHERE u.usuario = :usuario AND u.password = :contrasena 
+                 LIMIT 1";
+
+        $valores = array(
+            "usuario" => $usuario,
+            "contrasena" => $contrasenaencriptada
+        );
+        $stmt = $this->consultas->getResults($consulta, $valores);
+        foreach ($stmt as $row) {
+            $bandera = $row['cortedecaja'];
         }
         return $bandera;
     }

@@ -522,14 +522,11 @@ function setValoresCobrar() {
 function imprimirTicket(tab = "", cancelado = "") {
     cargandoHide();
     cargandoShow();
-    //VentanaCentrada('./com.sine.imprimir/imprimirticket.php?t=' + tab, 'Ticket', '', '400', '768', 'true');
     var myLeft = (screen.width - 400) / 2;
     var myTop = (screen.height - 768) / 2;
     var features = 'left=' + myLeft + ',top=' + myTop;
     var mywindow = window.open('./com.sine.imprimir/imprimirticket.php?imagen='+cancelado+'&t=' + tab, 'Ticket', features+',width=400,height=768');
     window.setTimeout(()=>{ mywindow.print(); },900);
-    //window.setTimeout(()=>{ mywindow.close();},1400); 
-
     cargandoHide();
 }
 
@@ -768,7 +765,9 @@ function corteCaja() {
                 var salidas = array[4];
 
                 $("#lbl-ventas").text("$" + ventas);
+                $("#ventas_totales").val(ventas);
                 $("#lbl-ganancia").text("$" + ganancias);
+                $("#ganancias_totales").val(ganancias);
                 $("#tab-entradas").html(entradas);
                 $("#tab-caja").html(caja);
                 $("#tab-salidas").html(salidas);
@@ -810,4 +809,34 @@ function imprimirCorteCaja() {
     var fecha = $("#fecha-corte").val();
     VentanaCentrada('./com.sine.imprimir/imprimircortecaja.php?u=' + user + '&&f=' + fecha, 'Corte Caja', '', '1024', '768', 'true');
     cargandoHide();
+}
+
+function modalSupervisor(){
+    var usuario = $("#usuario-corte").val();
+    var fecha = $("#fecha-corte").val();
+    if(isnEmpty(usuario, "usuario-corte") && isnEmpty(fecha, "fecha-corte")){
+        $("#modal-supervisor").modal('show');
+    }
+}
+
+function validarSupervisor() {
+    var usuario = $("#usuario").val();
+    var contrasena = $("#contrasena").val();
+    if (isnEmpty(usuario, "usuario") && isnEmpty(contrasena, "contrasena")) {
+        $.ajax({
+            url: "com.sine.enlace/enlaceventa.php",
+            type: "POST",
+            data: {transaccion: "validarsupervisor", usuario: usuario, contrasena: contrasena},
+            success: function (datos) {
+                var texto = datos.toString();
+                var bandera = texto.substring(0, 1);
+                var res = texto.substring(1, 1000);
+                if (bandera == '0') {
+                    alertify.error(res);
+                } else {
+                    insertarCorte();
+                }
+            }
+        });
+    }
 }

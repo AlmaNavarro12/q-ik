@@ -773,7 +773,7 @@ class ControladorPago{
         if (!$check) {
             $datos = $this->checkParcialidadAux($t->getParcialidadtmp(), $t->getIdfacturatmp(), $t->getType());
             foreach ($datos as $actual) {
-                echo "00Ya esta registrado este número de parcialidad.";
+                echo "00Ya está registrado este número de parcialidad.";
                 $check = true;
                 break;
             }
@@ -782,7 +782,7 @@ class ControladorPago{
         if (!$check) {
             $datos = $this->checkParcialidadTmp($t->getParcialidadtmp(), $t->getIdfacturatmp(), $t->getType());
             foreach ($datos as $actual) {
-                echo "01Ya esta registrado este número de parcialidad";
+                echo "01Ya está registrado este número de parcialidad.";
                 $check = true;
                 break;
             }

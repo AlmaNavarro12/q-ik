@@ -14,7 +14,7 @@ include("modals.php");
             <div class="col-md-4 py-1" id="div-usuario">
                 <label class="label-form text-right" for="usuario-corte">Usuario</label> <label class="mark-required text-danger fw-bold">*</label>
                 <div class="form-group">
-                    <select class="form-control text-center input-form" id="usuario-corte" name="usuario-corte" onchange="corteCaja();">
+                    <select class="form-select text-center input-form" id="usuario-corte" name="usuario-corte" onchange="corteCaja();">
                         <option value="" id="option-default-usuario">- - - -</option>
                         <optgroup id="usuarios" class="contenedor-usuarios text-start"> </optgroup>
                     </select>
@@ -40,9 +40,11 @@ include("modals.php");
         <div class="row">
             <div class="col-6 text-center">
                 <label class="label-sub-tit fw-semibold fs-5 mt-4">VENTAS TOTALES: </label> <label class="label-sub-tit fw-semibold fs-5 mt-4" id="lbl-ventas">$0.00</label>
+                <input type="hidden" name="ventas_totales" id="ventas_totales">
             </div>
             <div class="col-6 text-center">
                 <label class="label-sub-tit fw-semibold fs-5 mt-4">GANANCIAS: </label> <label class="label-sub-tit fw-semibold fs-5 mt-4" id="lbl-ganancia">$0.00</label>
+                <input type="hidden" name="ganancias_totales" id="ganancias_totales">
             </div>
         </div>
         <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3 mh-100">
@@ -76,7 +78,7 @@ include("modals.php");
         </div>
         <div class="row mt-4">
             <div class="col-md-12 text-end" id="btns">
-                <button class="button-modal" onclick="">
+                <button class="button-modal" onclick="modalSupervisor();">
                     <i class="fas fa-save"></i>
                     Guardar registro
                 </button>

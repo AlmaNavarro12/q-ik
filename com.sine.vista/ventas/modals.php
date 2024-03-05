@@ -132,14 +132,14 @@
                                     </div>
                                 </td>
                                 <td class="text-center">
-                                        <label for="ChkDescuento" class="fw-bold text-center mb-2 text-uppercase" style="color: #17177C;">
-                                            Descuento: <span id="Spndescuento" class="far fa-square fs-5"></span>
-                                            <input id="ChkDescuento" type="checkbox" value="1" onclick="habilitarDescuento()" style="display: none;">
-                                        </label>
-                                        <div id="groupDesc" class="input-group" style="display: none;">
-                                            <input type="number" class="input-form text-center form-control" id="PercentDescuento" min="0" max="100" value="5">
-                                            <div class="input-group-text">%</div>
-                                        </div>
+                                    <label for="ChkDescuento" class="fw-bold text-center mb-2 text-uppercase" style="color: #17177C;">
+                                        Descuento: <span id="Spndescuento" class="far fa-square fs-5"></span>
+                                        <input id="ChkDescuento" type="checkbox" value="1" onclick="habilitarDescuento()" style="display: none;">
+                                    </label>
+                                    <div id="groupDesc" class="input-group" style="display: none;">
+                                        <input type="number" class="input-form text-center form-control" id="PercentDescuento" min="0" max="100" value="5">
+                                        <div class="input-group-text">%</div>
+                                    </div>
                                 </td>
                             </tr>
                             <tr class="border border-light">
@@ -166,7 +166,6 @@
         </div>
     </div>
 </div>
-
 
 <!--REGISTRAR DINERO INCIAL EN CAJA-->
 <div class="modal fade shadow-lg rounded rounded-5" id="modal-dincaja" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
@@ -240,7 +239,7 @@
                         </div>
                     </div>
                     <div class="row col-12" id="total">
-                    <div class="col-md-12 text-center mt-3">
+                        <div class="col-md-12 text-center mt-3">
                             <font style="color: #17177C; font-weight: bold;">TOTAL:</font>
                             <h1 class="text-primary-emphasis" style="margin: 0;">$<span id="total">110.00</span></h1>
                         </div>
@@ -258,6 +257,49 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--MODAL PARA VERIFICAR SUPERVISOR-->
+<div class="modal fade shadow-lg rounded rounded-5" id="modal-supervisor" tabindex="-1" aria-labelledby="exampleModalLabel" data-bs-backdrop="static" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title fs-5" id="label-ingresos">Verificación de supervisor</h4>
+                <button type="button" id="btn-close-modal" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="form-supervisor" onsubmit="return false;">
+                    <div class="row">
+                        <div class="input-block">
+                            <label class="label-login pull-login" style="color: #17177C;" for="usuario">Usuario</label>
+                            <div class="input-icons">
+                                <i class="lnr lnr-user icon-login"></i>
+                                <input class="input-login" type="text" id="usuario" name="usuario" placeholder="Nombre de usuario">
+                                <div id="usuario-errors">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="input-block">
+                            <label class="label-login pull-login" style="color: #17177C;" for="contrasena">Contraseña</label>
+                            <div class="input-icons">
+                                <i class="lnr lnr-lock icon-login"></i>
+                                <input class="input-login" type="password" id="contrasena" name="contrasena" placeholder="Nombre de contraseña">
+                                <div id="contrasena-errors">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row py-2">
+                        <div class="text-end" id="btns">
+                            <button class="button-file text-uppercase fw-semibold" onclick="validarSupervisor()" id="btn-form-entrada">Registrar <span class="fas fa-dollar-sign"></span></button>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
