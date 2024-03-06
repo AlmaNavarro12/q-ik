@@ -109,7 +109,7 @@ $(document).ready(function () {
                         loadView('listaticket');
                     }
                     return false;
-                case 116://TECLA 117 F6 crear nuevo porducto
+                case 117://TECLA 117 F6 crear nuevo porducto
                     getPermisoNewProducto(); //FUNCION PENDIENTE
                     return false;
                 case 118://TECLA F7 cobrar ticket
@@ -765,7 +765,8 @@ function loadView(vista) {
         'listacarta': ["truncateTmpCarta()", 300, "truncateTmpIMG()", 300, "loadBtnCrear('carta')", 300, "filtrarCarta()", 320, "opcionesMotivoCancelar()", 350],
         'puntodeventa': ["newVenta()", 300, "checkFondo()", 300, "loadBtnVentas('puntodeventa')", 300, "truncateTickets()", 300],
         'listaticket': ["loadBtnCrear('ventas')", 300, "loadOpcionesUsuario()", 300, "filtrarVentas()", 300],
-        'cortecaja': ["loadOpcionesUsuario()", 300]
+        'cortecaja': ["loadOpcionesUsuario()", 300, "loadFecha()", 300],
+        'listacortes': ["loadListaCorte()", 300],
     };
 
     if (actions[vista]) {
@@ -1181,6 +1182,7 @@ function loadOpcionesUsuario() {
             if (bandera == 0) {
                 alertify.error(res);
             } else {
+            console.log(datos);
                 $(".contenedor-usuarios").html(datos);
             }
         }

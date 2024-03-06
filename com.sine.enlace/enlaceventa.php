@@ -1,5 +1,6 @@
 <?php
 require_once '../com.sine.modelo/Venta.php';
+require_once '../com.sine.modelo/CorteCaja.php';
 require_once '../com.sine.controlador/ControladorVenta.php';
 require_once '../com.sine.modelo/Session.php';
 Session::start();
@@ -44,7 +45,7 @@ if (isset($_POST['transaccion'])) {
             $insertado = $cv->insertarMontoInicial($_POST['monto']);
             break;
         case 'totalticket':
-            $insertado = $cv->getTotalTicket($_POST['tab'], session_id()); //MANDAR ALERTA DE XTOTAL
+            $insertado = $cv->getTotalTicket($_POST['tab'], session_id()); 
             break;
         case 'validaproductos':
             $datos = $cv->validaProductos($_POST['tab']);
@@ -78,7 +79,7 @@ if (isset($_POST['transaccion'])) {
             $insertado = $cv->agregarProducto($_POST['producto'], $_POST['tab'], session_id(), $_POST['cantidad']);
             break;
         case 'cortecaja':
-            $insertado = $cv->getCorteCaja($_POST['user'], $_POST['fecha']);
+            $insertado = $cv->getCorteCaja($_POST['user']);
             break;
         case 'checkPersisionNewProduct':
             $bandera = $cv->verificarF5();
@@ -86,7 +87,14 @@ if (isset($_POST['transaccion'])) {
             break;
         case 'validarsupervisor':
             $bandera = $cv->validarSupervisor($_POST['usuario'], $_POST['contrasena']);
-            echo $bandera == 1 ? "1Permiso concedido" : "0No tienes los permisos para registrar un corte de caja.";
+            echo $bandera ? $bandera : "0Ha occurrido un error.";
+            break;
+        case 'insertarcorte':
+            $insertado = $cv->insertarCorte(obtenerDatosCorte());
+            break;
+        case 'filtrarcorte':
+            $datos = $cv->listaCortesHistorial($_POST['REF'], $_POST['pag'], $_POST['numreg']);
+            echo $datos != "" ? $datos : "0Ha ocurrido un error.";
             break;
             /*
         case 'exportarticket':
@@ -114,4 +122,19 @@ function obtenerDatosTicket()
     $v->setDescuento($_POST['descuento']);
     $v->setPercentDescuento($_POST['percent_descuento']);
     return $v;
+}
+
+function obtenerDatosCorte(){
+    $cc = new CorteCaja();
+    $cc->setTotalventas($_POST["totalventas"]);
+    $cc->setTotalentradas($_POST["totalentradas"]);
+    $cc->setTotalsalidas($_POST["totalsalidas"]);
+    $cc->setFondoinicio($_POST["fondoinicio"]);
+    $cc->setUsuario($_POST["usuario"]);
+    $cc->setTotalganancias($_POST["totalganancias"]);
+    $cc->setIdsupervisor($_POST["idsupervisor"]); 
+    $cc->setComentarios($_POST["comentarios"]); 
+    $cc->setSobrantes($_POST["totalsobrantes"]); 
+    $cc->setFaltantes($_POST["totalfaltantes"]); 
+    return $cc;
 }

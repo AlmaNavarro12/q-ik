@@ -81,6 +81,7 @@ if (isset($_POST['transaccion'], $_POST['view'])) {
             case 'puntodeventa':
             case 'listaticket':
             case 'cortecaja':
+            case 'listacortes':
                 $datos = $e->cargarVista($vista);
                 break;
             default:

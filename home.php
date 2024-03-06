@@ -200,7 +200,7 @@ require_once 'Enrutador.php';
                                         <a href="#colcartaporte" class="text-white" style="text-decoration: none;" data-bs-toggle="collapse" data-bs-target="#colcartaporte" href="#colreporte" role="button" aria-expanded="false">
                                             <li class="list-element mt-1 ps-5">
                                                 <div class="marker"></div>
-                                                <div class="pad"></div><label> Carta Porte</label>
+                                                <div class="pad"></div><label> Carta porte</label>
                                             </li>
                                         </a>
                                         <div id='colcartaporte' class='panel-collapse collapse'>
@@ -302,7 +302,7 @@ require_once 'Enrutador.php';
                                     ?>
                                         <li class='list-element mt-1 list-menu ps-5' data-submenu='listaempresa'>
                                             <div class='marker'></div>
-                                            <div class='pad'></div><label> Datos Facturación</label>
+                                            <div class='pad'></div><label> Datos facturación</label>
                                         </li>
                                     <?php
                                     }
@@ -312,7 +312,7 @@ require_once 'Enrutador.php';
                                     ?>
                                         <li class="list-element mt-1 list-menu ps-5" data-submenu='listacontratos'>
                                             <div class="marker"></div>
-                                            <div class="pad"></div><label> Factura Automatica</label>
+                                            <div class="pad"></div><label>Factura automatica</label>
                                         </li>
                                     <?php
                                     }
@@ -382,7 +382,7 @@ require_once 'Enrutador.php';
                         ?>
                         <li data-bs-toggle='modal' data-bs-target='#modal-contacto' class='list-element mt-1 ps-5' onclick='getNombreUsuario();'>
                             <div class='marker'></div>
-                            <div class='pad'></div><label> Soporte Técnico</label>
+                            <div class='pad'></div><label> Soporte técnico</label>
                         </li>
                         <br />
                     </div>

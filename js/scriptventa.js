@@ -742,14 +742,12 @@ function selectedPercepciones() {
 function corteCaja() {
     cargandoHide();
     cargandoShow();
-    var hoy = new Date().toISOString().slice(0, 10);
     var user = $("#usuario-corte").val() || '0';
-    var fecha = $("#fecha-corte").val() || hoy;
 
     $.ajax({
         url: 'com.sine.enlace/enlaceventa.php',
         type: 'POST',
-        data: {transaccion: 'cortecaja', user: user, fecha: fecha},
+        data: {transaccion: 'cortecaja', user: user},
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -802,12 +800,13 @@ function getPermisoNewProducto() {
     });
 }
 
-function imprimirCorteCaja() {
+function imprimirCorteCaja(user, fecha, hora, tag) {
+    console.log(tag);
     cargandoHide();
     cargandoShow();
-    var user = $("#usuario-corte").val() || '0';
-    var fecha = $("#fecha-corte").val();
-    VentanaCentrada('./com.sine.imprimir/imprimircortecaja.php?u=' + user + '&&f=' + fecha, 'Corte Caja', '', '1024', '768', 'true');
+    //var user = $("#usuario-corte").val() || '0';
+    //var fecha = $("#fecha-corte").val();
+    VentanaCentrada('./com.sine.imprimir/imprimircortecaja.php?u=' + user + '&&f=' + fecha + '&&h=' + hora +'&&t=' + tag, 'Corte Caja', '', '1024', '768', 'true');
     cargandoHide();
 }
 
@@ -819,8 +818,26 @@ function modalSupervisor(){
     }
 }
 
+function loadFecha() {
+    $.ajax({
+        url: 'com.sine.enlace/enlacefactura.php',
+        type: 'POST',
+        data: { transaccion: 'fecha' },
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 5000);
+            if (bandera == '') {
+                alertify.error(res);
+            } else {
+                $("#fecha-creacion").val(datos);
+            }
+        }
+    });
+}
+
 function validarSupervisor() {
-    var usuario = $("#usuario").val();
+    var usuario = $("#supervisor").val();
     var contrasena = $("#contrasena").val();
     if (isnEmpty(usuario, "usuario") && isnEmpty(contrasena, "contrasena")) {
         $.ajax({
@@ -828,15 +845,97 @@ function validarSupervisor() {
             type: "POST",
             data: {transaccion: "validarsupervisor", usuario: usuario, contrasena: contrasena},
             success: function (datos) {
+                var array = datos.split("<tr>");
                 var texto = datos.toString();
                 var bandera = texto.substring(0, 1);
                 var res = texto.substring(1, 1000);
                 if (bandera == '0') {
                     alertify.error(res);
                 } else {
-                    insertarCorte();
+                    insertarCorte(array[1]);
                 }
             }
         });
     }
+}
+
+$('#comentarios-extras').on('click', function () { 
+    if ($('#comentarios-extras').prop('checked')) {
+        $("#complemento-corte").show('slow');
+    } else {
+        $("#supervisor").val("");
+        $("#contrasena").val("");
+        $("#complemento-corte").hide('slow');
+    }
+});
+
+function insertarCorte(idsupervisor = ""){
+    var totalventas = $("#ventas_totales").val();
+    var totalentradas = $("#total_entradas").val();
+    var totalsalidas = $("#total_salidas").val();
+    var fondoinicio = $("#fondo_inicio").val();
+    var usuario = $("#usuario-corte").val();
+    var fechaventa = $("#fecha-corte").val();
+    var totalganancias = $("#ganancias_totales").val();
+    var comentarios = $("#comentarios").val();
+    var totalfaltantes = $("#total_faltantes").val();
+    var totalsobrantes = $("#total_sobrantes").val();
+
+    $.ajax({
+        url: "com.sine.enlace/enlaceventa.php",
+        type: "POST",
+        data: {transaccion: "insertarcorte", totalventas: totalventas, totalentradas: totalentradas, totalsalidas: totalsalidas, fondoinicio: fondoinicio, usuario: usuario, fechaventa: fechaventa, totalganancias: totalganancias, idsupervisor: idsupervisor, comentarios: comentarios, totalsobrantes: totalsobrantes, totalfaltantes: totalfaltantes},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 1000);
+            if (bandera == '0') {
+                alertify.error(res);
+            } else {
+                $("#modal-supervisor").modal('hide');
+                alertify.success('Corte de caja registrado satisfactoriamente.');
+
+            }
+        }
+    });
+}
+
+function buscarCorte(pag = ""){
+    $.ajax({
+        url: "com.sine.enlace/enlaceventa.php",
+        type: "POST",
+        data: {transaccion: "filtrarcorte", REF: $("#buscar-corte").val(), numreg: $("#num-reg").val(), pag:pag},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 1000);
+            if (bandera == '0') {
+                alertify.error(res);
+            } else {
+                $("#body-lista-cortes").html(datos);
+            }
+        }
+    });
+}
+
+function loadListaCorte(pag = ""){
+    cargandoHide();
+    cargandoShow();
+    $.ajax({
+        url: "com.sine.enlace/enlaceventa.php",
+        type: "POST",
+        data: {transaccion: "filtrarcorte", REF: $("#buscar-corte").val(), numreg: $("#num-reg").val(), pag:pag},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 1000);
+            if (bandera == '0') {
+                alertify.error(res);
+                cargandoHide();
+            } else {
+                $("#body-lista-cortes").html(datos);
+                cargandoHide();
+            }
+        }
+    });
 }

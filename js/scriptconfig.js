@@ -519,7 +519,7 @@ function actualizarCorreo() {
                 if (bandera == '0') {
                     alertify.error(res);
                 } else {
-                    alertify.success('Datos Guardados');
+                    alertify.success('Datos guardados');
                     loadViewConfig('correo');
                 }
                 cargandoHide();
@@ -1145,7 +1145,7 @@ function actualizarEncabezado() {
                 } else {
                     cargandoHide();
                     
-                    alertify.success('Datos Guardados');
+                    alertify.success('Datos guardados');
                     loadViewConfig('encabezado');
                 }
             }

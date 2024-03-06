@@ -11,7 +11,7 @@ include("modals.php");
         <div class="row" id="not-timbre">
         </div>
         <div class="row">
-            <div class="col-md-4 py-1" id="div-usuario">
+            <div class="col-md-6 py-1" id="div-usuario">
                 <label class="label-form text-right" for="usuario-corte">Usuario</label> <label class="mark-required text-danger fw-bold">*</label>
                 <div class="form-group">
                     <select class="form-select text-center input-form" id="usuario-corte" name="usuario-corte" onchange="corteCaja();">
@@ -21,13 +21,14 @@ include("modals.php");
                     <div id="usuario-corte-errors"></div>
                 </div>
             </div>
-            <div class="col-md-4 py-1" id="div-fecha">
-                <label class="label-form text-right" for="fecha-corte">Fecha</label> <label class="mark-required text-danger fw-bold">*</label>
+            <div class="col-md-6 py-1" id="div-fecha">
+                <label class="label-form text-right" for="fecha-creacion">Fecha</label> <label class="mark-required text-danger fw-bold">*</label>
                 <div class="form-group">
-                    <input class="form-control input-form text-center" id="fecha-corte" name="fecha-corte" type="date" onchange="corteCaja();" />
-                    <div id="fecha-corte-errors"></div>
+                    <input class="form-control input-form text-center" id="fecha-creacion" name="fecha-creacion" type="text" disabled/>
+                    <div id="fecha-creacion-errors"></div>
                 </div>
             </div>
+            <!--
             <div class="col-md-4 py-1">
                 <label class="label-space"></label>
                 <div class="form-group">
@@ -36,6 +37,7 @@ include("modals.php");
                     </button>
                 </div>
             </div>
+            -->
         </div>
         <div class="row">
             <div class="col-6 text-center">
@@ -76,8 +78,14 @@ include("modals.php");
                 </div>
             </div>
         </div>
-        <div class="row mt-4">
-            <div class="col-md-12 text-end" id="btns">
+        <div class="row mt-4 d-flex justify-content-end">
+        <div class="col-auto text-end" id="btns">
+                <button class="button-modal" onclick="loadView('listacortes');">
+                    <i class="fas fa-save"></i>
+                    Visualizar registros
+                </button>
+            </div>
+            <div class="col-auto text-end" id="btns">
                 <button class="button-modal" onclick="modalSupervisor();">
                     <i class="fas fa-save"></i>
                     Guardar registro

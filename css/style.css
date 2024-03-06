@@ -1558,3 +1558,23 @@ a.state-link{
     max-width: 50px;
     content:url(../img/vales.icon.png);
 }
+
+.button-image{
+    outline:none !important;
+    background: none;
+    padding: 5px;
+    border: 2px solid #CECEE2;
+    box-sizing: border-box;
+    border-radius: 5px;
+    font-family: sans-serif;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 14px;
+    line-height: 250.7%;
+    text-align: center;
+    color: #17177C;
+}
+
+.button-image:hover{
+    background: #EDEDF4;
+}

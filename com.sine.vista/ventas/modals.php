@@ -264,42 +264,59 @@
 
 <!--MODAL PARA VERIFICAR SUPERVISOR-->
 <div class="modal fade shadow-lg rounded rounded-5" id="modal-supervisor" tabindex="-1" aria-labelledby="exampleModalLabel" data-bs-backdrop="static" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title fs-5" id="label-ingresos">Verificación de supervisor</h4>
                 <button type="button" id="btn-close-modal" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form id="form-supervisor" onsubmit="return false;">
+                
+                <div class="row py-2">
+                    <div class="col-md-6">
+                        <label class="label-form text-right" for="supervisor">Nombre de supervisor</label> <label class="mark-required text-danger fw-bold">*</label>
+                        <div class="input-group mb-3">
+                            <span class="input-group-text" id="basic-addon1"><i class="text-muted fas fa-user"></i></span>
+                            <input type="text" class="form-control input-form" id="supervisor" name="supervisor" placeholder="Nombre de usuario" autocomplete="new-text">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="label-form text-right" for="contrasena">Contraseña de supervisor</label> <label class="mark-required text-danger fw-bold">*</label>
+                        <div class="input-group mb-3">
+                            <span class="input-group-text" id="basic-addon2"><i class="text-muted fas fa-envelope"></i></span>
+                            <input type="password" class="form-control input-form" id="contrasena" name="contrasena" placeholder="Contraseña de usuario" autocomplete="new-password">
+                        </div>
+                    </div>
+                </div>
+                <div id="complemento-corte" style="display: none;">
+                    <div class="mb-3">
+                        <label for="comentarios" class="form-label">Comentarios</label>
+                        <textarea class="form-control input-form" id="comentarios" placeholder="Comentarios..." rows="3" style="height: 100px;"></textarea>
+                    </div>
                     <div class="row">
-                        <div class="input-block">
-                            <label class="label-login pull-login" style="color: #17177C;" for="usuario">Usuario</label>
-                            <div class="input-icons">
-                                <i class="lnr lnr-user icon-login"></i>
-                                <input class="input-login" type="text" id="usuario" name="usuario" placeholder="Nombre de usuario">
-                                <div id="usuario-errors">
-                                </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="total_sobrantes" class="form-label">Sobrantes</label>
+                            <input type="number" class="form-control input-form" id="total_sobrantes" placeholder="0">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="total_faltantes" class="form-label">Faltantes</label>
+                            <input type="number" class="form-control input-form" id="total_faltantes" placeholder="0">
+                        </div>
+                    </div>
+                </div>
+                <div class="row py-1 justify-content-between">
+                    <div class="col-md-6">
+                        <div class="form-group d-flex aling-items-center">
+                            <input class="input-check" id="comentarios-extras" name="datosfiscales" type="checkbox">
+                            <label class="label-form ms-3" for="comentarios-extras">¿Deseas ingresar algún comentario?</label>
+                            <div id="comentarios-extras-errors">
                             </div>
                         </div>
                     </div>
-                    <div class="row mt-3">
-                        <div class="input-block">
-                            <label class="label-login pull-login" style="color: #17177C;" for="contrasena">Contraseña</label>
-                            <div class="input-icons">
-                                <i class="lnr lnr-lock icon-login"></i>
-                                <input class="input-login" type="password" id="contrasena" name="contrasena" placeholder="Nombre de contraseña">
-                                <div id="contrasena-errors">
-                                </div>
-                            </div>
-                        </div>
+                    <div class="col-md-4" id="btns">
+                        <button class="button-file text-uppercase fw-bold col-12" onclick="validarSupervisor()" id="btn-form-entrada">Registrar corte <span class="fas fa-save"></span></button>
                     </div>
-                    <div class="row py-2">
-                        <div class="text-end" id="btns">
-                            <button class="button-file text-uppercase fw-semibold" onclick="validarSupervisor()" id="btn-form-entrada">Registrar <span class="fas fa-dollar-sign"></span></button>
-                        </div>
-                    </div>
-                </form>
+                </div>
             </div>
         </div>
     </div>

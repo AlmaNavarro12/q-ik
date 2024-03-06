@@ -1359,7 +1359,8 @@ class ControladorVenta
     }
 
     //-------------------------------------CORTE DE CAJA
-    public function printCorteCaja($user, $fecha) {
+    public function printCorteCaja($user, $fecha)
+    {
         $totventas = 0;
         $totganancia = 0;
 
@@ -1380,7 +1381,8 @@ class ControladorVenta
         return $datos;
     }
 
-    public function getUserbyID($uid) {
+    public function getUserbyID($uid)
+    {
         $nombre = "";
         $usuarios = $this->getUserbyIDAux($uid);
         foreach ($usuarios as $actual) {
@@ -1389,7 +1391,8 @@ class ControladorVenta
         return $nombre;
     }
 
-    private function getUserbyIDAux($uid) {
+    private function getUserbyIDAux($uid)
+    {
         $datos = false;
         $consulta = "SELECT * FROM usuario WHERE idusuario=:uid;";
         $val = array("uid" => $uid);
@@ -1479,8 +1482,8 @@ class ControladorVenta
         $total = 0;
         $datf = $this->getFondoCaja($uid, $fecha);
         foreach ($datf as $actual) {
-            $total += $actual['fondo'];
             $fondo += $actual['fondo'];
+            $total += $actual['fondo'];
         }
 
         $datos = "<ul class='list-group mb-3'>
@@ -1497,7 +1500,7 @@ class ControladorVenta
             $monto = number_format($actual['montomov'], 2, '.', ',');
             $total += $actual['montomov'];
             $datos .= "<li class='list-group-item d-flex justify-content-between lh-sm'>
-                        <div>
+                        <div class='col-8 px-0 text-start'>
                         <h6 class='my-0 text-success'><i class='fas fa-arrow-up text-success me-1 small'></i>
                          $concepto</h6>
                         </div>
@@ -1522,7 +1525,7 @@ class ControladorVenta
             $monto = number_format($actual['montomov'], 2, '.', ',');
             $total += $actual['montomov'];
             $datos .= "<li class='list-group-item d-flex justify-content-between lh-sm'>
-            <div>
+            <div class='col-8 px-0 text-start'>
             <h6 class='my-0 text-danger'><i class='fas fa-arrow-down text-danger me-1 small'></i> $concepto</h6>
             </div>
             <span class='text-danger fw-semibold'>$ $monto</span>
@@ -1600,7 +1603,7 @@ class ControladorVenta
 
         $datos = "<ul class='list-group mb-3 h-100'>
         <li class='list-group-item d-flex justify-content-between lh-sm'>
-            <div>
+            <div class='col-8 px-0 text-start'>
             <h6 class='my-0 text-success'><i class='fas fa-arrow-up text-success me-1 small'></i>Ventas en efectivo </h6>
             </div>
             <span class='text-success fw-semibold'>$ " . number_format($efectivo, 2, '.', ',') . "</span>
@@ -1608,7 +1611,7 @@ class ControladorVenta
 
         if ($tarjeta > 0) {
             $datos .= "<li class='list-group-item d-flex justify-content-between lh-sm'>
-            <div>
+            <div class='col-8 px-0 text-start'>
             <h6 class='my-0 text-success'><i class='fas fa-arrow-up text-success me-1 small'></i>Ventas en tarjeta </h6>
             </div>
             <span class='text-success fw-semibold'>$ " . number_format($tarjeta, 2, '.', ',') . "</span>
@@ -1617,7 +1620,7 @@ class ControladorVenta
 
         if ($vales > 0) {
             $datos .= "<li class='list-group-item d-flex justify-content-between lh-sm'>
-            <div>
+            <div class='col-8 px-0 text-start'>
             <h6 class='my-0 text-success'><i class='fas fa-arrow-up text-success me-1 small'></i>Ventas en vales </h6>
             </div>
             <span class='text-success fw-semibold'>$ " . number_format($vales, 2, '.', ',') . "</span>
@@ -1626,13 +1629,13 @@ class ControladorVenta
 
         $datos .= "
             <li class='list-group-item d-flex justify-content-between lh-sm'>
-                <div>
+                <div class='col-8 px-0 text-start'>
                 <h6 class='my-0 text-success'><i class='fas fa-arrow-up text-success me-1 small'></i>Entradas </h6>
                 </div>
                 <span class='text-success fw-semibold'>$ " . number_format($entradas, 2, '.', ',') . "</span>
             </li>
             <li class='list-group-item d-flex justify-content-between lh-sm'>
-                <div>
+                <div class='col-8 px-0 text-start'>
                 <h6 class='my-0 text-danger'><i class='fas fa-arrow-down text-danger me-1 small'></i>Salidas </h6>
                 </div>
                 <span class='text-danger fw-semibold'>$ " . number_format($salidas, 2, '.', ',') . "</span>
@@ -1644,10 +1647,11 @@ class ControladorVenta
         return $datos;
     }
 
-    public function getCorteCaja($user, $fecha)
+    public function getCorteCaja($user)
     {
         $totventas = 0;
         $totganancia = 0;
+        $fecha = date('Y-m-d');
 
         $ventas = $this->getTotalVentas($fecha, $user);
         foreach ($ventas as $actual) {
@@ -1685,8 +1689,7 @@ class ControladorVenta
     public function validarSupervisor($usuario, $contrasena)
     {
         $bandera = "";
-        $uid = $_SESSION[sha1("idusuario")];
-        $contrasenaencriptada= sha1($contrasena);
+        $contrasenaencriptada = sha1($contrasena);
         $consulta = "SELECT u.*, p.cortedecaja 
                  FROM usuario u 
                  INNER JOIN usuariopermiso p ON u.idusuario = p.permiso_idusuario 
@@ -1697,10 +1700,337 @@ class ControladorVenta
             "usuario" => $usuario,
             "contrasena" => $contrasenaencriptada
         );
-        $stmt = $this->consultas->getResults($consulta, $valores);
-        foreach ($stmt as $row) {
-            $bandera = $row['cortedecaja'];
+
+        $resultados = $this->consultas->getResults($consulta, $valores);
+
+        if (empty($resultados)) {
+            $bandera = "0Credenciales incorrectas";
+        } else {
+            foreach ($resultados as $resultado) {
+                if ($resultado['cortedecaja'] == 1) {
+                    $bandera .= $resultado['cortedecaja'] . "<tr>" . $resultado['idusuario'];
+                } else {
+                    $bandera = "0No tiene permiso para registrar un corte de caja.";
+                }
+            }
         }
+
         return $bandera;
+    }
+
+    public function insertarCorte($c)
+    {
+        $insertado = false;
+        $insertado = $this->gestionarCorte($c);
+        return $insertado;
+    }
+
+    private function gestionarCorte($c)
+    {
+        $insertado = false;
+        $hoy = date('Y-m-d');
+        $hora = date('H:i');
+        $tag =  $this->genTag();
+        $consulta = "INSERT INTO `cortecaja` VALUES(NULL, :fecha_corte, :hora_corte, :total_ventas, :total_entradas, :total_salidas, :fondo_inicio, :usuario_cargo, :comentarios, :total_ganancias, :total_faltantes, :total_sobrantes, :id_supervisor, :tagcorte);";
+        $valores = array(
+            "fecha_corte" => $hoy,
+            "hora_corte" => $hora,
+            "total_ventas" => $c->getTotalVentas(),
+            "total_entradas" => $c->getTotalentradas(),
+            "total_salidas" => $c->getTotalsalidas(),
+            "fondo_inicio" => $c->getFondoinicio(),
+            "usuario_cargo" => $c->getUsuario(),
+            "comentarios" => $c->getComentarios(),
+            "total_ganancias" => $c->getTotalganancias(),
+            "total_faltantes" => $c->getFaltantes(),
+            "total_sobrantes" => $c->getSobrantes(),
+            "id_supervisor" => $c->getIdSupervisor(),
+            "tagcorte" => $tag,
+        );
+        $insertado = $this->consultas->execute($consulta, $valores);
+        if ($insertado) {
+            $this->registrarDetallesCorte($hoy, $hora, $tag);
+        }
+        return $insertado;
+    }
+
+    private function obtenerIdDatosVenta($fecha_corte, $hora_corte)
+    {
+        $consultado = false;
+        $consulta = "SELECT iddatos_venta FROM datos_venta WHERE fecha_venta = :fecha_venta AND TIME(hora_venta) < :hora_corte";
+        $valores = array(
+            "fecha_venta" => $fecha_corte,
+            "hora_corte" => $hora_corte
+        );
+        $consultado = $this->consultas->getResults($consulta, $valores);
+        return $consultado;
+    }
+
+    private function obtenerIdFondoInicio($fecha_corte, $hora_corte)
+    {
+        $consultado = false;
+        $consulta = "SELECT idfondo FROM fondocaja WHERE fechaingreso = :fecha_corte AND TIME(horaingreso) < :hora_corte";
+        $valores = array(
+            "fecha_corte" => $fecha_corte,
+            "hora_corte" => $hora_corte
+        );
+        $consultado = $this->consultas->getResults($consulta, $valores);
+        return $consultado;
+    }
+
+    private function obtenerIdMovEfectivo($fecha_corte, $hora_corte)
+    {
+        $consultado = false;
+        $consulta = "SELECT idmovefectivo FROM movefectivo WHERE fechamov = :fecha_corte AND TIME(horamov) < :hora_corte";
+        $valores = array(
+            "fecha_corte" => $fecha_corte,
+            "hora_corte" => $hora_corte
+        );
+        $consultado = $this->consultas->getResults($consulta, $valores);
+        return $consultado;
+    }
+
+    private function registrarDetallesCorte($fecha_corte, $hora_corte, $tag)
+    {
+        $idsDatosVenta = $this->obtenerIdDatosVenta($fecha_corte, $hora_corte);
+        $idsFondo = $this->obtenerIdFondoInicio($fecha_corte, $hora_corte);
+        $idsMovefectivo = $this->obtenerIdMovEfectivo($fecha_corte, $hora_corte);
+
+        $consultaInsert = "INSERT INTO detalle_corte (id_datosventa, idfondo, idmovefectivo, tagcorte)
+                       VALUES (:id_datosventa, :idfondo, :idmovefectivo, :tagcorte)";
+
+        foreach ($idsDatosVenta as $idDatosVenta) {
+            $valoresInsert = array(
+                "id_datosventa" => $idDatosVenta["iddatos_venta"],
+                "idfondo" => null,
+                "idmovefectivo" => null,
+                "tagcorte" => $tag,
+            );
+
+            $this->consultas->execute($consultaInsert, $valoresInsert);
+        }
+
+        foreach ($idsFondo as $idfondo) {
+            $valoresInsert = array(
+                "id_datosventa" => null,
+                "idfondo" => $idfondo["idfondo"],
+                "idmovefectivo" => null,
+                "tagcorte" => $tag,
+            );
+
+            $this->consultas->execute($consultaInsert, $valoresInsert);
+        }
+
+        foreach ($idsMovefectivo as $idmovefectivo) {
+            $valoresInsert = array(
+                "id_datosventa" => null,
+                "idfondo" => null,
+                "idmovefectivo" => $idmovefectivo["idmovefectivo"],
+                "tagcorte" => $tag,
+            );
+
+            $this->consultas->execute($consultaInsert, $valoresInsert);
+        }
+    }
+
+
+    private function getCortes($condicion)
+    {
+        $consultado = false;
+        $consulta = "SELECT * FROM cortecaja $condicion;";
+        $consultado = $this->consultas->getResults($consulta, null);
+        return $consultado;
+    }
+
+    private function getNumrowsCortesAux($condicion)
+    {
+        $consultado = false;
+        $consulta = "SELECT count(idcorte_caja) numrows FROM cortecaja $condicion;";
+        $consultado = $this->consultas->getResults($consulta, null);
+        return $consultado;
+    }
+
+    private function getNumCortesrows($condicion)
+    {
+        $numrows = 0;
+        $rows = $this->getNumrowsCortesAux($condicion);
+        foreach ($rows as $actual) {
+            $numrows = $actual['numrows'];
+        }
+        return $numrows;
+    }
+
+    public function listaCortesHistorial($US, $pag, $numreg)
+    {
+        require_once '../com.sine.common/pagination.php';
+
+        $datos = "<thead class='p-0'>
+        <tr class='align-middle'>
+        <th class='text-center'>Fecha / Hora </th>
+        <th class='text-center'>Usuario </th>
+        <th class='text-center'>Supervisor </th>
+        <th class='text-center'>Fondo inicio </th>
+        <th class='text-center'>Entradas </th>
+        <th class='text-center'>Salidas </th>
+        <th class='text-center'>Ganancias</th>
+        <th class='text-center'>Opción</th>
+        </tr>
+    </thead>
+    <tbody>";
+
+        $condicion = empty($US) ? " ORDER BY idcorte_caja" : "WHERE (fecha_corte LIKE '%$US%') OR (hora_corte LIKE '%$US%') ORDER BY idcorte_caja";
+
+        $numrows = $this->getNumCortesrows($condicion);
+        $page = isset($pag) && !empty($pag) ? $pag : 1;
+        $per_page = $numreg;
+        $adjacents = 4;
+        $offset = ($page - 1) * $per_page;
+        $total_pages = ceil($numrows / $per_page);
+        $con = $condicion . " LIMIT $offset,$per_page ";
+        $cortes = $this->getCortes($con);
+
+        $inicios = $offset + 1;
+        $finales = $inicios + count($cortes) - 1;
+        if (empty($cortes)) {
+            $datos .= "<tr><td colspan='8'>No se encontraron registros.</td></tr>";
+        } else {
+            foreach ($cortes as $corte) {
+                $fecha = $corte['fecha_corte'];
+                $hora = $corte['hora_corte'];
+                $usuario = $corte['usuario_cargo'];
+                $supervisor = $corte['id_supervisor'];
+                $fondoinicio = $corte['fondo_inicio'];
+                $entradas = $corte['total_entradas'];
+                $salidas = $corte['total_salidas'];
+                $ganancias = $corte['total_ganancias'];
+                $tag = $corte['tag_corte'];
+                $nombreUsuario = $this->getUserbyID($usuario);
+                $nombreSupervisor = $this->getUserbyID($supervisor);
+                $horaFormateada = date('H:i', strtotime($hora));
+                $datos .= "<tr>
+                <td class='text-center'> " . date('d/m/Y', strtotime($fecha)) . " a " . $horaFormateada . " hrs</td>
+                <td class='text-center'>$nombreUsuario</td>
+                <td class='text-center'>$nombreSupervisor</td>
+                <td class='text-center'>$fondoinicio</td>
+                <td class='text-center text-secondary fw-semibold'><i class='fas fa-arrow-up text-success me-1 small'></i> $entradas</td>
+                <td class='text-center text-danger fw-semibold'> <i class='fas fa-arrow-down text-danger me-1 small'></i> $salidas</td>
+                <td class='text-center'>$ganancias</td>
+                <td class='text-center'>
+                    <div class='dropdown'>
+                        <button class='button-list dropdown-toggle' title='Opciones' type='button' data-bs-toggle='dropdown' aria-expanded='false'>
+                            <span class='fas fa-ellipsis-v text-muted'></span>
+                            <span class='caret'></span>
+                        </button>
+                        <ul class='dropdown-menu dropdown-menu-right'>
+                            <li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' onclick='imprimirCorteCaja(\"$usuario\", \"$fecha\", \"$horaFormateada\", \"$tag\")'>Imprimir corte <span class='text-muted fas fa-edit small'></span></a></li>";
+                $datos .= "</ul>
+                    </div>
+                </td> 
+            </tr>";
+            }
+        }
+
+        $function = "buscarCorte";
+        $datos .= "</tbody><tfoot><tr><th colspan='3' class='align-top'>Mostrando $inicios al $finales de $numrows registros</th>";
+        $datos .= "<th colspan='5'>" . paginate($page, $total_pages, $adjacents, $function) . "</th></tr></tfoot>";
+
+        return $datos;
+    }
+
+    private function obtenerIdVentaByTag($tag)
+    {
+        $consultado = false;
+        $consulta = "SELECT id_datosventa FROM detalle_corte WHERE tagcorte = :tag AND id_datosventa IS NOT NULL;";
+        $valores = array(
+            "tag" => $tag
+        );
+        $consultado = $this->consultas->getResults($consulta, $valores);
+        return $consultado;
+    }
+
+    private function obtenerTagsVentas($tag)
+    {
+        $idsDatosVenta = $this->obtenerIdVentaByTag($tag);
+        $tagsVenta = array();
+        $consulta = "SELECT tagventa FROM datos_venta WHERE iddatos_venta = :iddatos_venta";
+        foreach ($idsDatosVenta as $idactual) {
+            $valores = array(
+                "iddatos_venta" => $idactual["id_datosventa"]
+            );
+            $resultado = $this->consultas->getResults($consulta, $valores);
+
+            foreach ($resultado as $resultado) {
+                $tagsVenta[] = $resultado['tagventa'];
+            }
+        }
+        return $tagsVenta;
+    }
+
+    public function obtenerDetallesProductosVendidos($tag)
+    {
+        $tagsVenta = $this->obtenerTagsVentas($tag);
+        $detallesProductos = array();
+
+        $consulta = "SELECT venta_codprod, venta_producto, venta_cant, venta_precio FROM detalle_venta WHERE tagdetallev= :tagventa";
+
+        foreach ($tagsVenta as $tagVenta) {
+            $valores = array(
+                "tagventa" => $tagVenta
+            );
+            $resultadosDetalles = $this->consultas->getResults($consulta, $valores);
+
+            foreach ($resultadosDetalles as $resultado) {
+                $codproducto = $resultado['venta_codprod'];
+                $nombreProducto = $resultado['venta_producto'];
+                $cantidad = $resultado['venta_cant'];
+                $precioUnitario = $resultado['venta_precio'];
+                $detallesProductos[] = array($codproducto, $nombreProducto, $cantidad, $precioUnitario);
+            }
+        }
+
+        return $detallesProductos;
+    }
+
+    private function obtenerTagsVentasCancelados($tag)
+    {
+        $idsDatosVenta = $this->obtenerIdVentaByTag($tag);
+        $tagsVenta = array();
+        $consulta = "SELECT tagventa FROM datos_venta WHERE iddatos_venta = :iddatos_venta AND status_venta = 0;";
+        foreach ($idsDatosVenta as $idactual) {
+            $valores = array(
+                "iddatos_venta" => $idactual["id_datosventa"]
+            );
+            $resultado = $this->consultas->getResults($consulta, $valores);
+
+            foreach ($resultado as $resultado) {
+                $tagsVenta[] = $resultado['tagventa'];
+            }
+        }
+        return $tagsVenta;
+    }
+
+    public function obtenerDetallesProductosCancelados($tag)
+    {
+        $tagsVenta = $this->obtenerTagsVentasCancelados($tag);
+        $detallesProductos = array();
+
+        $consulta = "SELECT venta_codprod, venta_producto, venta_cant, venta_precio FROM detalle_venta WHERE tagdetallev= :tagventa";
+
+        foreach ($tagsVenta as $tagVenta) {
+            $valores = array(
+                "tagventa" => $tagVenta
+            );
+            $resultadosDetalles = $this->consultas->getResults($consulta, $valores);
+
+            foreach ($resultadosDetalles as $resultado) {
+                $codproducto = $resultado['venta_codprod'];
+                $nombreProducto = $resultado['venta_producto'];
+                $cantidad = $resultado['venta_cant'];
+                $precioUnitario = $resultado['venta_precio'];
+                $detallesProductos[] = array($codproducto, $nombreProducto, $cantidad, $precioUnitario);
+            }
+        }
+
+        return $detallesProductos;
     }
 }

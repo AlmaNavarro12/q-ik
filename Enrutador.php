@@ -226,6 +226,9 @@ class Enrutador
                 case 'cortecaja':
                     include_once '../com.sine.vista/ventas/cortecaja.php';
                     break;
+                case 'listacortes':
+                    include_once '../com.sine.vista/ventas/listacortecaja.php';
+                    break;
                 default:
                     echo "El recurso solicitado no esta disponible<br/>Error 404: $vista Not Found";
                     break;
