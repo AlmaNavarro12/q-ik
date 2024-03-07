@@ -58,6 +58,7 @@ class ControladorButton{
             'operador' => ['crearoperador', 'operador', 'Crear Operador'],
             'carta' => ['crearcarta', 'carta', 'Crear Carta'],
             'ventas' => ['crearventa', 'puntodeventa', 'Nueva venta'],
+            'listacortes' => ['cortedecaja', 'listacortes', 'Visualizar registros'],
         ];
     
         $btn = "";
@@ -89,7 +90,14 @@ class ControladorButton{
                         }
                     }
                 $btn = $mostrarBotones;            
-            } else {
+            } else if ($view == 'listacortes') {
+                foreach ($permisos as $usuarioactual) {
+                    if ($usuarioactual[$permiso] == '1') {
+                        $btn = "<button class='button-modal' onclick=\"loadView('$view');\"><i class='fas fa-save'></i> Visualizar registros </button>";
+                        break;
+                    }
+                }
+            }else {
                 list($permiso, $accion, $texto) = $botones[$view];
                 if ($accion == 'folio') {
                     foreach ($permisos as $usuarioactual) {

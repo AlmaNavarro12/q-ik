@@ -1578,3 +1578,14 @@ a.state-link{
 .button-image:hover{
     background: #EDEDF4;
 }
+
+.sign-canvas{
+    left: 0;
+    top: 0;
+    width: 100%;
+    height:220px;
+    background-color: white;
+    border: 2px solid #D6D6DF;
+    box-sizing: border-box;
+    border-radius: 5px;
+}

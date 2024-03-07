@@ -12,7 +12,7 @@
                     <div class="row py-2">
                         <div class="form-group">
                             <label class="label-form text-start" for="monto-entrada">Cantidad</label> <label class="mark-required text-danger fw-bold">*</label>
-                            <input class="input-form text-center form-control" type="text" placeholder="Monto" id="monto-entrada" />
+                            <input class="input-form text-center form-control" type="text" placeholder="Monto" id="monto-entrada" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"/>
                             <div id="monto-entrada-errors"></div>
                         </div>
                     </div>
@@ -179,7 +179,7 @@
                     <div class="row">
                         <label class="label-form text-start mb-1" for="monto-inicial">Dinero en caja <label class="mark-required text-danger fw-bold">*</label></label>
                         <div class="form-group">
-                            <input class="input-form text-center form-control" type="text" placeholder="Monto" id="monto-inicial" name="monto-inicial" />
+                            <input class="input-form text-center form-control" type="text" placeholder="Monto" id="monto-inicial" name="monto-inicial" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"/>
                             <div id="monto-inicial-errors"></div>
                         </div>
                     </div>
@@ -278,13 +278,15 @@
                         <div class="input-group mb-3">
                             <span class="input-group-text" id="basic-addon1"><i class="text-muted fas fa-user"></i></span>
                             <input type="text" class="form-control input-form" id="supervisor" name="supervisor" placeholder="Nombre de usuario" autocomplete="new-text">
+                            <div id="supervisor-errors"></div>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <label class="label-form text-right" for="contrasena">Contraseña de supervisor</label> <label class="mark-required text-danger fw-bold">*</label>
                         <div class="input-group mb-3">
-                            <span class="input-group-text" id="basic-addon2"><i class="text-muted fas fa-envelope"></i></span>
+                            <span class="input-group-text" id="basic-addon2"><i class="text-muted fas fa-lock"></i></span>
                             <input type="password" class="form-control input-form" id="contrasena" name="contrasena" placeholder="Contraseña de usuario" autocomplete="new-password">
+                            <div id="contrasena-errors"></div>
                         </div>
                     </div>
                 </div>

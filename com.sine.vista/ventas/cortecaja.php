@@ -2,7 +2,7 @@
 include("modals.php");
 ?>
 <div id="form-factura" class="mb-3" >
-    <div class="col-md-12">
+    <div class="col-md-12 fijo zn-1">
         <div class="titulo-lista" id="contenedor-titulo-form-factura">Corte de caja </div>
     </div>
     <div id="div-space">
@@ -78,12 +78,8 @@ include("modals.php");
                 </div>
             </div>
         </div>
-        <div class="row mt-4 d-flex justify-content-end">
-        <div class="col-auto text-end" id="btns">
-                <button class="button-modal" onclick="loadView('listacortes');">
-                    <i class="fas fa-save"></i>
-                    Visualizar registros
-                </button>
+        <div class="row mt-5 d-flex justify-content-end">
+        <div class="col-auto text-end" id="btn-crear">
             </div>
             <div class="col-auto text-end" id="btns">
                 <button class="button-modal" onclick="modalSupervisor();">

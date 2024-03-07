@@ -83,7 +83,7 @@ if (isset($_POST['transaccion'])) {
             break;
         case 'checkPersisionNewProduct':
             $bandera = $cv->verificarF5();
-            echo $bandera == 1 ? "1Permiso concedido" : "0No tienes los permisos";
+            echo $bandera == 1 ? "1Permiso concedido." : "0No tienes los permisos.";
             break;
         case 'validarsupervisor':
             $bandera = $cv->validarSupervisor($_POST['usuario'], $_POST['contrasena']);
@@ -91,6 +91,7 @@ if (isset($_POST['transaccion'])) {
             break;
         case 'insertarcorte':
             $insertado = $cv->insertarCorte(obtenerDatosCorte());
+            echo $insertado != "" ? $insertado : "0Error: No se pudo realizar la operacion.";
             break;
         case 'filtrarcorte':
             $datos = $cv->listaCortesHistorial($_POST['REF'], $_POST['pag'], $_POST['numreg']);
@@ -106,7 +107,7 @@ if (isset($_POST['transaccion'])) {
     }
 
     if (isset($insertado)) {
-        echo $insertado ? $insertado : "0Error: No se pudo realizar la operacion";
+        echo $insertado ? $insertado : "0Error: No se pudo realizar la operacion.";
     }
 }
 

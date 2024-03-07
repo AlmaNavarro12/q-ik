@@ -664,7 +664,7 @@ function guardarVenta(p, nprod) {
                         if (p == '1') {
                             imprimirTicket(tab);
                         }
-                        alertify.success("Venta Registrada");
+                        alertify.success("Venta registrada correctamente.");
                         ResetDescuento();
                     }
                 }
@@ -739,7 +739,7 @@ function selectedPercepciones() {
     calcularTotalPercepciones();
 }
 
-function corteCaja() {
+function corteCaja(user = "") {
     cargandoHide();
     cargandoShow();
     var user = $("#usuario-corte").val() || '0';
@@ -800,20 +800,17 @@ function getPermisoNewProducto() {
     });
 }
 
-function imprimirCorteCaja(user, fecha, hora, tag) {
-    console.log(tag);
+function imprimirCorteCaja(user, fecha, hora, tag, id, supervisor) {
+    console.log(id);
     cargandoHide();
     cargandoShow();
-    //var user = $("#usuario-corte").val() || '0';
-    //var fecha = $("#fecha-corte").val();
-    VentanaCentrada('./com.sine.imprimir/imprimircortecaja.php?u=' + user + '&&f=' + fecha + '&&h=' + hora +'&&t=' + tag, 'Corte Caja', '', '1024', '768', 'true');
+    VentanaCentrada('./com.sine.imprimir/imprimircortecaja.php?u=' + user + '&&f=' + fecha + '&&h=' + hora +'&&t=' + tag +'&&i=' + id +'&&s=' + supervisor, 'Corte Caja', '', '1024', '768', 'true');
     cargandoHide();
 }
 
 function modalSupervisor(){
     var usuario = $("#usuario-corte").val();
-    var fecha = $("#fecha-corte").val();
-    if(isnEmpty(usuario, "usuario-corte") && isnEmpty(fecha, "fecha-corte")){
+    if(isnEmpty(usuario, "usuario-corte")){
         $("#modal-supervisor").modal('show');
     }
 }
@@ -839,7 +836,7 @@ function loadFecha() {
 function validarSupervisor() {
     var usuario = $("#supervisor").val();
     var contrasena = $("#contrasena").val();
-    if (isnEmpty(usuario, "usuario") && isnEmpty(contrasena, "contrasena")) {
+    if (isnEmpty(usuario, "supervisor") && isnEmpty(contrasena, "contrasena")) {
         $.ajax({
             url: "com.sine.enlace/enlaceventa.php",
             type: "POST",
@@ -892,9 +889,15 @@ function insertarCorte(idsupervisor = ""){
             if (bandera == '0') {
                 alertify.error(res);
             } else {
+                var array = datos.split("<tr>");
                 $("#modal-supervisor").modal('hide');
-                alertify.success('Corte de caja registrado satisfactoriamente.');
-
+                loadView('listacortes');
+                alertify.success('Corte de caja registrado, espere un momento para visualizar cambios.');
+                cargandoHide();
+                setTimeout(function() {
+                    var nuevaVentana = imprimirCorteCaja(array[0], array[1], array[2], array[3], array[4], array[5]);
+                    nuevaVentana.focus();
+                }, 2000);
             }
         }
     });

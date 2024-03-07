@@ -3,7 +3,7 @@ include("modals.php");
 ?>
 <div class="form-horizontal ps-3 fijo z-1">
     <div class="col-md-12">
-        <div class="titulo-lista">Tickets de Venta</div>
+        <div class="titulo-lista">Tickets de venta</div>
     </div>
     <div class="row col-12 p-0">
         <div class="col-sm-2 py-1 text-center">

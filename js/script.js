@@ -765,7 +765,7 @@ function loadView(vista) {
         'listacarta': ["truncateTmpCarta()", 300, "truncateTmpIMG()", 300, "loadBtnCrear('carta')", 300, "filtrarCarta()", 320, "opcionesMotivoCancelar()", 350],
         'puntodeventa': ["newVenta()", 300, "checkFondo()", 300, "loadBtnVentas('puntodeventa')", 300, "truncateTickets()", 300],
         'listaticket': ["loadBtnCrear('ventas')", 300, "loadOpcionesUsuario()", 300, "filtrarVentas()", 300],
-        'cortecaja': ["loadOpcionesUsuario()", 300, "loadFecha()", 300],
+        'cortecaja': ["loadOpcionesUsuario()", 300, "loadFecha()", 300, "loadBtnCrear('listacortes')"],
         'listacortes': ["loadListaCorte()", 300],
     };
 

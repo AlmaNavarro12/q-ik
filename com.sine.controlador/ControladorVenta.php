@@ -178,7 +178,6 @@ class ControladorVenta
         return $insertar;
     }
 
-
     private function getTmpTicket($tab, $sid)
     {
         $consultado = false;
@@ -192,17 +191,29 @@ class ControladorVenta
     }
 
     //-------------------------------CAJA
-
     private function getDineroCajaAux()
     {
         $hoy = date("Y-m-d");
         $uid = $_SESSION[sha1("idusuario")];
+        $ultimoCorte = $this->getUltimoCorteCajaHoy($uid);
         $datos = false;
-        $consulta = "SELECT * FROM fondocaja WHERE fechaingreso=:fecha AND uidfondo=:uid";
-        $val = array(
-            "fecha" => $hoy,
-            "uid" => $uid
-        );
+
+        if ($ultimoCorte !== null) {
+            $horaCorte = $ultimoCorte['hora_formato'];
+            $consulta = "SELECT * FROM fondocaja WHERE fechaingreso=:fecha AND horaingreso >= :hora AND uidfondo=:uid";
+            $val = array(
+                "fecha" => $hoy,
+                "hora" => $horaCorte,
+                "uid" => $uid
+            );
+        } else {
+            $consulta = "SELECT * FROM fondocaja WHERE fechaingreso=:fecha AND uidfondo=:uid";
+            $val = array(
+                "fecha" => $hoy,
+                "uid" => $uid
+            );
+        }
+
         $datos = $this->consultas->getResults($consulta, $val);
         return $datos;
     }
@@ -216,7 +227,7 @@ class ControladorVenta
     public function insertarMontoInicial($monto)
     {
         $hoy = date("Y-m-d");
-        $hora = date("H:i");
+        $hora = date("H:i:s");
         $insertado = false;
         $consulta = "INSERT INTO fondocaja VALUES (:id, :fecha, :hora, :fondo, :uid);";
         $val = array(
@@ -234,7 +245,7 @@ class ControladorVenta
     {
         $insertado = false;
         $hoy = date("Y-m-d");
-        $hora = date("H:i");
+        $hora = date("H:i:s");
         $uid = $_SESSION[sha1("idusuario")];
         $consulta = "INSERT INTO movefectivo VALUES (:id, :tipo, :fecha, :hora, :monto, :concepto, :uid);";
         $val = array(
@@ -771,7 +782,6 @@ class ControladorVenta
         return $datos;
     }
 
-
     private function obtenerProductosByTag($tag, $sid)
     {
         $consulta = "SELECT tmpidprod, tmpcant FROM tmpticket WHERE tagtab= :tag AND sid = :sid";
@@ -841,9 +851,9 @@ class ControladorVenta
             $consecutivo = $actual['consecutivo'];
             if ($consecutivo < 10) {
                 $consecutivo = "000$consecutivo";
-            } else if ($consecutivo >= 10 && $consecutivo < 100) {
+            } else if ($consecutivo > 10 && $consecutivo < 100) {
                 $consecutivo = "00$consecutivo";
-            } else if ($consecutivo >= 100 && $consecutivo < 1000) {
+            } else if ($consecutivo > 100 && $consecutivo < 1000) {
                 $consecutivo = "0$consecutivo";
             }
             $datos = "$serie</tr>$letra</tr>$consecutivo";
@@ -1076,9 +1086,10 @@ class ControladorVenta
 
         $datos = "<thead class='sin-paddding'>
                     <tr>
-                        <th class='text-center col-md-2'>Id. Venta </th>
+                        <th class='text-center'>Id. Venta </th>
                         <th class='text-center col-md-3'>Persona Realizó </th>
                         <th class='text-center'>Fecha de venta </th>
+                        <th class='text-center'>Hora de venta </th>
                         <th class='text-center'>Forma de Pago </th>
                         <th class='text-center'>Estado </th>
                         <th class='text-center'>Total </th>
@@ -1140,6 +1151,8 @@ class ControladorVenta
                 }
 
                 $sello = "";
+                $horaFormateada = date('h:i A', strtotime($hora));
+
 
                 if ($status == 0) {
                     $color = "#910024";
@@ -1152,12 +1165,13 @@ class ControladorVenta
                 $divF = explode("-", $fecha);
                 $mes = $this->translateMonth($divF[1]);
 
-                $fecha = $divF[2] . ' - ' . $mes;
+                $fecha = $divF[2] . ' / ' . $mes;
 
                 $datos .= "<tr class='table-row'>
                            <td class='fw-semibold text-center'>$folio</td>
                            <td class='fw-semibold text-center'>$nombre_user</td>
-                           <td class='fw-semibold text-center'>$fecha / $hora</td>
+                           <td class='fw-semibold text-center'>$fecha </td>
+                           <td class='fw-semibold text-center'>$horaFormateada</td>
                            <td class='fw-semibold text-center'>$formapago</td>
                            <td class='fw-semibold text-center'><font style='color: $color'><b>$estado</b></font></td>
                            <td class='fw-semibold text-center'>$ " . number_format($totalventa, 2, '.', ',') . "</td>
@@ -1185,7 +1199,7 @@ class ControladorVenta
             }
 
             $datos .= "</tbody><tfoot><tr><th colspan='3' class='align-top'>Mostrando $inicios al $finales de $numrows registros</th>";
-            $datos .= "<th colspan='4'>" . paginate($page, $total_pages, $adjacents, $function) . "</th></tr></tfoot>";
+            $datos .= "<th colspan='5'>" . paginate($page, $total_pages, $adjacents, $function) . "</th></tr></tfoot>";
         }
         return $datos;
     }
@@ -1359,25 +1373,54 @@ class ControladorVenta
     }
 
     //-------------------------------------CORTE DE CAJA
-    public function printCorteCaja($user, $fecha)
+    public function getUltimoCorteCajaHoy($idusuario)
     {
-        $totventas = 0;
-        $totganancia = 0;
+        $ultimoCorte = null;
+        $fechaHoy = date("Y-m-d");
+        $horaActual = date("H:i:s");
 
-        $ventas = $this->getTotalVentas($fecha, $user);
-        foreach ($ventas as $actual) {
-            $totventas += $actual['totalventa'];
+        $cortes = $this->getUltimosCortesCaja($idusuario);
+
+        foreach ($cortes as $corte) {
+            if ($corte['fecha_formato'] == $fechaHoy && strtotime($corte['hora_formato']) < strtotime($horaActual)) {
+                $ultimoCorte = $corte;
+                break;
+            }
+        }
+        return $ultimoCorte;
+    }
+
+    private function getUltimosCortesCaja($idusuario)
+    {
+        $cortes = array();
+        $consulta = "SELECT *, DATE_FORMAT(fecha_corte, '%Y-%m-%d') AS fecha_formato, hora_corte AS hora_formato  FROM cortecaja  WHERE usuario_cargo = :usuario_cargo ORDER BY fecha_corte DESC, hora_corte DESC;";
+        $valores = array("usuario_cargo" => $idusuario);
+        $cortes = $this->consultas->getResults($consulta, $valores);
+        return $cortes;
+    }
+
+    private function getTotalVentas($fecha, $user = "", $hora = "")
+    {
+        $datos = false;
+        $condicion = "";
+        if ($user != '0') {
+            $condicion = " AND (uid_venta=:uid)";
+        }
+        $consulta = "SELECT * FROM datos_venta WHERE (fecha_venta=:fecha)";
+
+        if (!empty($hora)) {
+            $consulta .= " AND (hora_venta >= :hora)";
         }
 
-        $ganancias = $this->getGanancias($fecha, $user);
-        foreach ($ganancias as $actual) {
-            $pcompra = $actual['precio_compra'];
-            $cant = $actual['venta_cant'];
-            $importe = $actual['venta_importe'];
-            $impcompra = floatval($cant) * floatval($pcompra);
-            $totganancia += $importe - $impcompra;
-        }
-        $datos = "$totventas<cut>$totganancia";
+        $consulta .= $condicion . ";";
+
+        $val = array(
+            "fecha" => $fecha,
+            "uid" => $user,
+            "hora" => $hora
+        );
+
+        $datos = $this->consultas->getResults($consulta, $val);
         return $datos;
     }
 
@@ -1400,55 +1443,58 @@ class ControladorVenta
         return $datos;
     }
 
-    private function getTotalVentas($fecha, $user = "")
+    private function getGanancias($fecha, $user, $hora = "")
     {
         $datos = false;
         $condicion = "";
         if ($user != '0') {
             $condicion = " AND (uid_venta=:uid)";
         }
-        $consulta = "SELECT * FROM datos_venta WHERE (fecha_venta=:fecha)$condicion;";
-        $val = array(
-            "fecha" => $fecha,
-            "uid" => $user
-        );
-        $datos = $this->consultas->getResults($consulta, $val);
-        return $datos;
-    }
 
-    private function getGanancias($fecha, $user)
-    {
-        $datos = false;
-        $condicion = "";
-        if ($user != '0') {
-            $condicion = " AND (uid_venta=:uid)";
+        $consulta = "SELECT d.venta_importe, d.venta_cant, p.precio_compra
+                FROM detalle_venta d
+                INNER JOIN productos_servicios p ON (d.venta_idprod=p.idproser)
+                INNER JOIN datos_venta v ON (d.tagdetallev=v.tagventa)
+                WHERE (fecha_venta=:fecha)";
+
+        if (!empty($hora)) {
+            $consulta .= " AND (hora_venta >= :hora)";
         }
-        $consulta = "SELECT d.venta_importe, d.venta_cant, p.precio_compra FROM detalle_venta d INNER JOIN productos_servicios p ON (d.venta_idprod=p.idproser) INNER JOIN datos_venta v ON (d.tagdetallev=v.tagventa) WHERE (fecha_venta=:fecha)$condicion;";
+
+        $consulta .= $condicion . ";";
+
         $val = array(
             "fecha" => $fecha,
-            "uid" => $user
+            "uid" => $user,
+            "hora" => $hora
         );
+
         $datos = $this->consultas->getResults($consulta, $val);
         return $datos;
     }
 
-    public function getFondoCaja($uid, $fecha)
+    public function getFondoCaja($uid, $fecha, $hora = "")
     {
         $user = "";
         if ($uid != '0') {
             $user = " AND uidfondo=:uid";
         }
-        $datos = false;
-        $consulta = "SELECT * FROM fondocaja WHERE fechaingreso=:fecha$user;";
+        $consulta = "SELECT * FROM fondocaja WHERE fechaingreso=:fecha";
+
+        if (!empty($hora)) {
+            $consulta .= " AND (horaingreso >= :hora)";
+        }
+        $consulta .= $user . ";";
         $val = array(
             "fecha" => $fecha,
-            "uid" => $uid
+            "uid" => $uid,
+            "hora" => $hora
         );
         $datos = $this->consultas->getResults($consulta, $val);
         return $datos;
     }
 
-    public function getMovEfectivo($t, $fecha, $uid)
+    public function getMovEfectivo($t, $fecha, $uid, $hora = "")
     {
         $user = "";
         $user_tkt = "";
@@ -1456,13 +1502,18 @@ class ControladorVenta
             $user = ' AND uid=:uid';
             $user_tkt = ' AND uid_venta = :uid';
         }
+        if (!empty($hora)) {
+            $user .= ' AND horamov > :hora';
+            $user_tkt .= ' AND hora_venta >= :hora';
+        }
+
         $datos = false;
         if ($t == 2) {
             $consulta = "SELECT conceptomov, montomov FROM movefectivo WHERE tipomov=:tipo AND fechamov=:fecha$user
-                        UNION ALL
-                        SELECT CONCAT('Cancelacion ',letra,folio) AS conceptomov, totalventa AS montomov
-                        FROM datos_venta
-                        WHERE fecha_venta = :fecha AND status_venta = 0$user_tkt";
+                    UNION ALL
+                    SELECT CONCAT('Cancelacion ',letra,folio) AS conceptomov, totalventa AS montomov
+                    FROM datos_venta
+                    WHERE fecha_venta = :fecha AND status_venta = 0$user_tkt";
         } else {
             $consulta = "SELECT conceptomov, montomov FROM movefectivo WHERE tipomov=:tipo AND fechamov=:fecha$user";
         }
@@ -1470,31 +1521,32 @@ class ControladorVenta
         $val = array(
             "tipo" => $t,
             "fecha" => $fecha,
-            "uid" => $uid
+            "uid" => $uid,
+            "hora" => $hora
         );
         $datos = $this->consultas->getResults($consulta, $val);
         return $datos;
     }
 
-    private function getEntradasEfectivo($uid, $fecha)
+    private function getEntradasEfectivo($uid, $fecha, $hora = "")
     {
         $fondo = 0;
         $total = 0;
-        $datf = $this->getFondoCaja($uid, $fecha);
+        $datf = $this->getFondoCaja($uid, $fecha, $hora);
         foreach ($datf as $actual) {
             $fondo += $actual['fondo'];
             $total += $actual['fondo'];
         }
 
         $datos = "<ul class='list-group mb-3'>
+                    <input type='hidden' name='fondo_inicio' id='fondo_inicio' value=" . number_format($fondo, 2, '.', ',') . ">
                         <li class='list-group-item d-flex justify-content-between lh-sm'>
                             <div>
-                            <h6 class='my-0 text-success'><i class='fas fa-arrow-up text-success me-1 small'></i>Dinero en caja</h6>
+                            <h6 class='my-0 text-success'><i class='fas fa-arrow-up text-success me-1 small'></i>Inicio en caja</h6>
                             </div>
-                            <input type='hidden' name='fondo_inicio' id='fondo_inicio' value=" . number_format($fondo, 2, '.', ',') . ">
                             <span class='text-secondary fw-semibold'>$ " . number_format($fondo, 2, '.', ',') . "</span>
                         </li>";
-        $entradas = $this->getMovEfectivo('1', $fecha, $uid);
+        $entradas = $this->getMovEfectivo('1', $fecha, $uid, $hora);
         foreach ($entradas as $actual) {
             $concepto = iconv("utf-8", "windows-1252", $actual['conceptomov']);
             $monto = number_format($actual['montomov'], 2, '.', ',');
@@ -1508,18 +1560,18 @@ class ControladorVenta
                     </li>";
         }
         $datos .= "<li class='list-group-item d-flex justify-content-between'>
-        <span class='fw-bold text-muted'>Total (MXN)</span>
         <input type='hidden' name='total_entradas' id='total_entradas' value=" . number_format($total, 2, '.', ',') . ">
+        <span class='fw-bold text-muted'>Total (MXN)</span>
         <strong>$ " . number_format($total, 2, '.', ',') . "</strong>
       </li></ul>";
         return $datos;
     }
 
-    private function getSalidaEfectivo($uid, $fecha)
+    private function getSalidaEfectivo($uid, $fecha, $hora = "")
     {
         $total = 0;
         $datos = "<ul class='list-group mb-3'>";
-        $entradas = $this->getMovEfectivo('2', $fecha, $uid);
+        $entradas = $this->getMovEfectivo('2', $fecha, $uid, $hora);
         foreach ($entradas as $actual) {
             $concepto = iconv("utf-8", "windows-1252", $actual['conceptomov']);
             $monto = number_format($actual['montomov'], 2, '.', ',');
@@ -1539,24 +1591,30 @@ class ControladorVenta
         return $datos;
     }
 
-    public function getVentasByTipo($fecha, $forma, $uid)
+    public function getVentasByTipo($fecha, $forma, $uid, $hora = "")
     {
         $user = "";
         if ($uid != '') {
             $user = " AND (uid_venta=:uid)";
         }
+
+        if (!empty($hora)) {
+            $user .= ' AND hora_venta >= :hora';
+        }
+
         $datos = false;
         $consulta = "SELECT * FROM datos_venta WHERE (fecha_venta=:fecha) AND (formapago=:fp)$user;";
         $val = array(
             "fecha" => $fecha,
             "fp" => $forma,
-            "uid" => $uid
+            "uid" => $uid,
+            "hora" => $hora
         );
         $datos = $this->consultas->getResults($consulta, $val);
         return $datos;
     }
 
-    private function getDineroCaja($uid, $fecha)
+    private function getDineroCaja($uid, $fecha, $hora = "")
     {
         $efectivo = 0;
         $tarjeta = 0;
@@ -1565,37 +1623,37 @@ class ControladorVenta
         $salidas = 0;
         $total = 0;
 
-        $datf = $this->getFondoCaja($uid, $fecha);
+        $datf = $this->getFondoCaja($uid, $fecha, $hora);
         foreach ($datf as $actual) {
             $total += $actual['fondo'];
             $entradas += $actual['fondo'];
         }
 
-        $datf = $this->getVentasByTipo($fecha, 'cash', $uid);
+        $datf = $this->getVentasByTipo($fecha, 'cash', $uid, $hora);
         foreach ($datf as $actual) {
             $total += $actual['totalventa'];
             $efectivo += $actual['totalventa'];
         }
 
-        $datcd = $this->getVentasByTipo($fecha, 'card', $uid);
+        $datcd = $this->getVentasByTipo($fecha, 'card', $uid, $hora);
         foreach ($datcd as $actual) {
             $total += $actual['totalventa'];
             $tarjeta += $actual['totalventa'];
         }
 
-        $datvl = $this->getVentasByTipo($fecha, 'val', $uid);
+        $datvl = $this->getVentasByTipo($fecha, 'val', $uid, $hora);
         foreach ($datvl as $actual) {
             $total += $actual['totalventa'];
             $vales += $actual['totalventa'];
         }
 
-        $ent = $this->getMovEfectivo('1', $fecha, $uid);
+        $ent = $this->getMovEfectivo('1', $fecha, $uid, $hora);
         foreach ($ent as $actual) {
             $entradas += $actual['montomov'];
             $total += $actual['montomov'];
         }
 
-        $out = $this->getMovEfectivo('2', $fecha, $uid);
+        $out = $this->getMovEfectivo('2', $fecha, $uid, $hora);
         foreach ($out as $actual) {
             $salidas += $actual['montomov'];
             $total -= $actual['montomov'];
@@ -1651,24 +1709,62 @@ class ControladorVenta
     {
         $totventas = 0;
         $totganancia = 0;
-        $fecha = date('Y-m-d');
+        $entefec = 0;
+        $dinerocaja = 0;
+        $salidaefectivo = 0;
+        $ultimoCorte = $this->getUltimoCorteCajaHoy($user);
 
-        $ventas = $this->getTotalVentas($fecha, $user);
-        foreach ($ventas as $actual) {
-            $totventas += $actual['totalventa'];
+        if ($ultimoCorte !== null) {
+            $fechaCorte = $ultimoCorte['fecha_corte'];
+            $horaCorte = $ultimoCorte['hora_formato'];
+
+            if ($fechaCorte == date('Y-m-d')) {
+                $horaActual = date('H:i:s');
+
+                if ($horaCorte <= $horaActual) {
+                    $fecha = date('Y-m-d');
+
+                    $ventas = $this->getTotalVentas($fecha, $user, $horaCorte);
+                    foreach ($ventas as $actual) {
+                        $totventas += $actual['totalventa'];
+                    }
+
+                    $ganancias = $this->getGanancias($fecha, $user, $horaCorte);
+                    foreach ($ganancias as $actual) {
+                        $pcompra = $actual['precio_compra'];
+                        $cant = $actual['venta_cant'];
+                        $importe = $actual['venta_importe'];
+                        $impcompra = floatval($cant) * floatval($pcompra);
+                        $totganancia += $importe - $impcompra;
+                    }
+
+                    $entefec = $this->getEntradasEfectivo($user, $fecha, $horaCorte);
+                    $dinerocaja = $this->getDineroCaja($user, $fecha, $horaCorte);
+                    $salidaefectivo = $this->getSalidaEfectivo($user, $fecha, $horaCorte);
+                }
+            }
+        } else {
+            $fecha = date('Y-m-d');
+
+            $ventas = $this->getTotalVentas($fecha, $user);
+            foreach ($ventas as $actual) {
+                $totventas += $actual['totalventa'];
+            }
+
+            $ganancias = $this->getGanancias($fecha, $user);
+            foreach ($ganancias as $actual) {
+                $pcompra = $actual['precio_compra'];
+                $cant = $actual['venta_cant'];
+                $importe = $actual['venta_importe'];
+                $impcompra = floatval($cant) * floatval($pcompra);
+                $totganancia += $importe - $impcompra;
+            }
+
+            $entefec = $this->getEntradasEfectivo($user, $fecha);
+            $dinerocaja = $this->getDineroCaja($user, $fecha);
+            $salidaefectivo = $this->getSalidaEfectivo($user, $fecha);
         }
 
-        $ganancias = $this->getGanancias($fecha, $user);
-        foreach ($ganancias as $actual) {
-            $pcompra = $actual['precio_compra'];
-            $cant = $actual['venta_cant'];
-            $importe = $actual['venta_importe'];
-            $impcompra = floatval($cant) * floatval($pcompra);
-            $totganancia += $importe - $impcompra;
-        }
-        $entefec = $this->getEntradasEfectivo($user, $fecha);
-        $dinerocaja = $this->getDineroCaja($user, $fecha);
-        $salidaefectivo = $this->getSalidaEfectivo($user, $fecha);
         $datos = "$totventas<cut>$totganancia<cut>$entefec<cut>$dinerocaja<cut>$salidaefectivo";
         return $datos;
     }
@@ -1729,7 +1825,7 @@ class ControladorVenta
     {
         $insertado = false;
         $hoy = date('Y-m-d');
-        $hora = date('H:i');
+        $hora = date('H:i:s');
         $tag =  $this->genTag();
         $consulta = "INSERT INTO `cortecaja` VALUES(NULL, :fecha_corte, :hora_corte, :total_ventas, :total_entradas, :total_salidas, :fondo_inicio, :usuario_cargo, :comentarios, :total_ganancias, :total_faltantes, :total_sobrantes, :id_supervisor, :tagcorte);";
         $valores = array(
@@ -1748,16 +1844,29 @@ class ControladorVenta
             "tagcorte" => $tag,
         );
         $insertado = $this->consultas->execute($consulta, $valores);
+
+        $datos = "";
         if ($insertado) {
-            $this->registrarDetallesCorte($hoy, $hora, $tag);
+            $consultaID = "SELECT id_cortecaja FROM cortecaja WHERE fecha_corte = :fecha_corte AND tagcorte = :tagcorte;";
+            $valoresID = array(
+                "fecha_corte" => $hoy,
+                "tagcorte" => $tag
+            );
+            $idResultado = $this->consultas->getResults($consultaID, $valoresID);
+
+            if (!empty($idResultado)) {
+                $ultimoID = $idResultado[0]['id_cortecaja'];
+                $datos =  $c->getUsuario() . "<tr>" . $hoy . "<tr>" . $hora . "<tr>" . $tag . "<tr>" . $ultimoID . "<tr>" .  $c->getIdSupervisor() . "<tr>";
+                $this->registrarDetallesCorte($hoy, $hora, $tag);
+            }
         }
-        return $insertado;
+        return $datos;
     }
 
     private function obtenerIdDatosVenta($fecha_corte, $hora_corte)
     {
         $consultado = false;
-        $consulta = "SELECT iddatos_venta FROM datos_venta WHERE fecha_venta = :fecha_venta AND TIME(hora_venta) < :hora_corte";
+        $consulta = "SELECT iddatos_venta FROM datos_venta WHERE fecha_venta = :fecha_venta AND hora_venta < :hora_corte";
         $valores = array(
             "fecha_venta" => $fecha_corte,
             "hora_corte" => $hora_corte
@@ -1781,7 +1890,7 @@ class ControladorVenta
     private function obtenerIdMovEfectivo($fecha_corte, $hora_corte)
     {
         $consultado = false;
-        $consulta = "SELECT idmovefectivo FROM movefectivo WHERE fechamov = :fecha_corte AND TIME(horamov) < :hora_corte";
+        $consulta = "SELECT idmovefectivo FROM movefectivo WHERE fechamov = :fecha_corte AND horamov < :hora_corte";
         $valores = array(
             "fecha_corte" => $fecha_corte,
             "hora_corte" => $hora_corte
@@ -1833,7 +1942,7 @@ class ControladorVenta
         }
     }
 
-
+    //-------------------------------LISTADO DE CORTES DE CAJA
     private function getCortes($condicion)
     {
         $consultado = false;
@@ -1866,7 +1975,8 @@ class ControladorVenta
 
         $datos = "<thead class='p-0'>
         <tr class='align-middle'>
-        <th class='text-center'>Fecha / Hora </th>
+        <th class='text-center'>Fecha </th>
+        <th class='text-center'>Hora </th>
         <th class='text-center'>Usuario </th>
         <th class='text-center'>Supervisor </th>
         <th class='text-center'>Fondo inicio </th>
@@ -1878,7 +1988,7 @@ class ControladorVenta
     </thead>
     <tbody>";
 
-        $condicion = empty($US) ? " ORDER BY idcorte_caja" : "WHERE (fecha_corte LIKE '%$US%') OR (hora_corte LIKE '%$US%') ORDER BY idcorte_caja";
+        $condicion = empty($US) ? " ORDER BY fecha_corte DESC, hora_corte DESC" : "WHERE (fecha_corte LIKE '%$US%') OR (hora_corte LIKE '%$US%') ORDER BY fecha_corte DESC, hora_corte DESC";
 
         $numrows = $this->getNumCortesrows($condicion);
         $page = isset($pag) && !empty($pag) ? $pag : 1;
@@ -1895,6 +2005,7 @@ class ControladorVenta
             $datos .= "<tr><td colspan='8'>No se encontraron registros.</td></tr>";
         } else {
             foreach ($cortes as $corte) {
+                $id = $corte['idcorte_caja'];
                 $fecha = $corte['fecha_corte'];
                 $hora = $corte['hora_corte'];
                 $usuario = $corte['usuario_cargo'];
@@ -1906,15 +2017,16 @@ class ControladorVenta
                 $tag = $corte['tag_corte'];
                 $nombreUsuario = $this->getUserbyID($usuario);
                 $nombreSupervisor = $this->getUserbyID($supervisor);
-                $horaFormateada = date('H:i', strtotime($hora));
+                $horaFormateada = date('h:i A', strtotime($hora));
                 $datos .= "<tr>
-                <td class='text-center'> " . date('d/m/Y', strtotime($fecha)) . " a " . $horaFormateada . " hrs</td>
+                <td class='text-center lh-base'> " . date('d / m / Y', strtotime($fecha)) . "</td>
+                <td class='text-center'>$horaFormateada</td>
                 <td class='text-center'>$nombreUsuario</td>
                 <td class='text-center'>$nombreSupervisor</td>
-                <td class='text-center'>$fondoinicio</td>
-                <td class='text-center text-secondary fw-semibold'><i class='fas fa-arrow-up text-success me-1 small'></i> $entradas</td>
-                <td class='text-center text-danger fw-semibold'> <i class='fas fa-arrow-down text-danger me-1 small'></i> $salidas</td>
-                <td class='text-center'>$ganancias</td>
+                <td class='text-center'>$ $fondoinicio</td>
+                <td class='text-center text-success fw-semibold'><i class='fas fa-arrow-up text-success me-1 small'></i> $ $entradas</td>
+                <td class='text-center text-danger fw-semibold'> <i class='fas fa-arrow-down text-danger me-1 small'></i> $ $salidas</td>
+                <td class='text-center'>$ $ganancias</td>
                 <td class='text-center'>
                     <div class='dropdown'>
                         <button class='button-list dropdown-toggle' title='Opciones' type='button' data-bs-toggle='dropdown' aria-expanded='false'>
@@ -1922,7 +2034,7 @@ class ControladorVenta
                             <span class='caret'></span>
                         </button>
                         <ul class='dropdown-menu dropdown-menu-right'>
-                            <li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' onclick='imprimirCorteCaja(\"$usuario\", \"$fecha\", \"$horaFormateada\", \"$tag\")'>Imprimir corte <span class='text-muted fas fa-edit small'></span></a></li>";
+                            <li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' onclick='imprimirCorteCaja(\"$usuario\", \"$fecha\", \"$horaFormateada\", \"$tag\", \"$id\", \"$supervisor\")'>Imprimir corte <span class='text-muted fas fa-edit small'></span></a></li>";
                 $datos .= "</ul>
                     </div>
                 </td> 
@@ -1932,10 +2044,156 @@ class ControladorVenta
 
         $function = "buscarCorte";
         $datos .= "</tbody><tfoot><tr><th colspan='3' class='align-top'>Mostrando $inicios al $finales de $numrows registros</th>";
-        $datos .= "<th colspan='5'>" . paginate($page, $total_pages, $adjacents, $function) . "</th></tr></tfoot>";
+        $datos .= "<th colspan='6'>" . paginate($page, $total_pages, $adjacents, $function) . "</th></tr></tfoot>";
 
         return $datos;
     }
+
+    //-------------------------------------IMPRIMIR CORTE DE CAJAS
+
+    /**public function printCorteCaja($tag, $fecha, $hora)
+    {
+        $totventas = 0;
+        $totganancia = 0;
+        echo $user . $fecha . $hora;
+        $ventas = $this->getTotalVentasCercanas($fecha, $hora, $user);
+        foreach ($ventas as $actual) {
+            $totventas += $actual['totalventa'];
+        }
+
+        $ganancias = $this->getGananciasCercanas($fecha, $hora, $user);
+        foreach ($ganancias as $actual) {
+            $pcompra = $actual['precio_compra'];
+            $cant = $actual['venta_cant'];
+            $importe = $actual['venta_importe'];
+            $impcompra = floatval($cant) * floatval($pcompra);
+            $totganancia += $importe - $impcompra;
+        }
+        $datos = "$totventas<cut>$totganancia";
+        return $datos;
+    } */
+
+
+    public function printCorteCaja($tag, $fecha)
+    {
+        $totventas = 0;
+        $totganancia = 0;
+        $idsVentas = $this->obtenerIdVentaByTag($tag);
+        foreach ($idsVentas as $idVenta) {
+            $ventas = $this->getVentaPorId($idVenta['id_datosventa']);
+            foreach ($ventas as $venta) {
+                $totventas += $venta['totalventa'];
+            }
+        }
+        $totganancia = $this->obtenerGananciasPorTag($tag, $fecha);
+        $datos = $totventas . "<cut>" . $totganancia . "<cut>";
+        return $datos;
+    }
+
+    public function obtenerGananciasPorTag($tag, $fecha)
+    {
+        $tagsVentas = $this->obtenerTagsVentas($tag);
+
+        $totganancia = 0;
+
+        foreach ($tagsVentas as $tagVenta) {
+            $consulta = "SELECT d.venta_importe, d.venta_cant, p.precio_compra
+                    FROM detalle_venta d
+                    INNER JOIN productos_servicios p ON d.venta_idprod=p.idproser
+                    INNER JOIN datos_venta v ON d.tagdetallev=v.tagventa
+                    WHERE v.tagventa = :tagventa
+                    AND v.fecha_venta = :fecha";
+
+            $valores = array(
+                "tagventa" => $tagVenta,
+                "fecha" => $fecha
+            );
+
+            $ventas = $this->consultas->getResults($consulta, $valores);
+
+            foreach ($ventas as $actual) {
+                $pcompra = $actual['precio_compra'];
+                $cant = $actual['venta_cant'];
+                $importe = $actual['venta_importe'];
+                $impcompra = floatval($cant) * floatval($pcompra);
+                $totganancia += $importe - $impcompra;
+            }
+        }
+
+        return $totganancia;
+    }
+
+    private function getVentaPorId($idVenta)
+    {
+        $consulta = "SELECT * FROM datos_venta WHERE iddatos_venta = :idVenta;";
+        $valores = array(
+            "idVenta" => $idVenta
+        );
+        $venta = $this->consultas->getResults($consulta, $valores);
+        return $venta;
+    }
+
+    public function getFondoCajaByTag($tag)
+    {
+        $consulta = "SELECT fc.*
+                 FROM fondocaja fc
+                 INNER JOIN detalle_corte dc ON fc.idfondo = dc.idfondo
+                 WHERE dc.tagcorte = :tag";
+
+        $val = array(
+            "tag" => $tag
+        );
+
+        $datos = $this->consultas->getResults($consulta, $val);
+        return $datos;
+    }
+
+    public function getMovEfectivoByTag($t, $tag)
+    {
+        $datos = false;
+        $user = "";
+        $user_tkt = "";
+
+        if ($t == 2) {
+            $consulta = "SELECT conceptomov, montomov 
+                     FROM movefectivo 
+                     WHERE tipomov = :tipo 
+                     AND EXISTS (
+                         SELECT 1 
+                         FROM detalle_corte 
+                         WHERE movefectivo.id_mov = detalle_corte.id_mov 
+                         AND detalle_corte.tagcorte = :tag
+                     )
+                     UNION ALL
+                     SELECT CONCAT('Cancelacion ', letra, folio) AS conceptomov, totalventa AS montomov
+                     FROM datos_venta
+                     WHERE EXISTS (
+                         SELECT 1 
+                         FROM detalle_corte 
+                         WHERE datos_venta.uid_venta = detalle_corte.uid_venta 
+                         AND detalle_corte.tagcorte = :tag
+                     )";
+        } else {
+            $consulta = "SELECT conceptomov, montomov 
+                     FROM movefectivo 
+                     WHERE tipomov = :tipo 
+                     AND EXISTS (
+                         SELECT 1 
+                         FROM detalle_corte 
+                         WHERE movefectivo.idmovefectivo = detalle_corte.idmovefectivo 
+                         AND detalle_corte.tagcorte = :tag
+                     )";
+        }
+
+        $val = array(
+            "tipo" => $t,
+            "tag" => $tag
+        );
+
+        $datos = $this->consultas->getResults($consulta, $val);
+        return $datos;
+    }
+
 
     private function obtenerIdVentaByTag($tag)
     {
@@ -1966,7 +2224,7 @@ class ControladorVenta
         return $tagsVenta;
     }
 
-    public function obtenerDetallesProductosVendidos($tag)
+    public function obtenerDetallesProductosVendidos($tag, $fecha, $hora)
     {
         $tagsVenta = $this->obtenerTagsVentas($tag);
         $detallesProductos = array();
@@ -1991,14 +2249,16 @@ class ControladorVenta
         return $detallesProductos;
     }
 
-    private function obtenerTagsVentasCancelados($tag)
+    private function obtenerTagsVentasCancelados($tag, $fecha, $hora)
     {
         $idsDatosVenta = $this->obtenerIdVentaByTag($tag);
         $tagsVenta = array();
-        $consulta = "SELECT tagventa FROM datos_venta WHERE iddatos_venta = :iddatos_venta AND status_venta = 0;";
+        $consulta = "SELECT tagventa FROM datos_venta WHERE iddatos_venta = :iddatos_venta AND fecha_venta=:fecha AND (hora_venta >= :hora) AND status_venta = 0;";
         foreach ($idsDatosVenta as $idactual) {
             $valores = array(
-                "iddatos_venta" => $idactual["id_datosventa"]
+                "iddatos_venta" => $idactual["id_datosventa"],
+                "fecha" => $fecha,
+                "hora" => $hora
             );
             $resultado = $this->consultas->getResults($consulta, $valores);
 
@@ -2009,9 +2269,9 @@ class ControladorVenta
         return $tagsVenta;
     }
 
-    public function obtenerDetallesProductosCancelados($tag)
+    public function obtenerDetallesProductosCancelados($tag, $fecha, $hora)
     {
-        $tagsVenta = $this->obtenerTagsVentasCancelados($tag);
+        $tagsVenta = $this->obtenerTagsVentasCancelados($tag, $fecha, $hora);
         $detallesProductos = array();
 
         $consulta = "SELECT venta_codprod, venta_producto, venta_cant, venta_precio FROM detalle_venta WHERE tagdetallev= :tagventa";

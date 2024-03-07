@@ -32,6 +32,9 @@
     <!--<script src="chart/chart-plugin-datalabels.min.js"></script>-->
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
 
+    <!--CANVA Signature-->
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@2.3.2/dist/signature_pad.min.js"></script>
+
     <!-- Scripts adicionales -->
     <script src="js/alertify.min.js"></script>
     <script type="text/javascript" src="js/validator.min.js" charset="UTF-8"></script>
