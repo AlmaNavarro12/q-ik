@@ -97,13 +97,12 @@ if (isset($_POST['transaccion'])) {
             $datos = $cv->listaCortesHistorial($_POST['REF'], $_POST['pag'], $_POST['numreg']);
             echo $datos != "" ? $datos : "0Ha ocurrido un error.";
             break;
-            /*
         case 'exportarticket':
             $insertado = $cv->exportarProductos($_POST['id'], session_id());
             break;
         case 'asignatagcotizacion':
             $insertado = $cv->asignarTAG($_POST['tab'], $_POST['sid']);
-            break;*/
+            break;
     }
 
     if (isset($insertado)) {

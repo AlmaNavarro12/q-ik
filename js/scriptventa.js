@@ -942,3 +942,54 @@ function loadListaCorte(pag = ""){
         }
     });
 }
+
+function exportarTicket(id) {
+    $('.list-element').removeClass("menu-active");
+    $('.marker').removeClass("marker-active");
+    $('#factura-menu').addClass("menu-active");
+    $('#factura-menu').children('div.marker').addClass("marker-active");
+    loadView('factura');
+    cargandoHide();
+    cargandoShow();
+    window.setTimeout("prodTickets('" + id + "')", 700);
+}
+
+function prodTickets(id) {
+    $.ajax({
+        url: 'com.sine.enlace/enlaceventa.php',
+        type: 'POST',
+        data: {transaccion: 'exportarticket', id: id},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 5000);
+            if (bandera == '') {
+                alertify.error(res);
+            } else {
+                tablaProductos();
+            }
+            cargandoHide();
+        }
+    });
+}
+
+function cobrarCotizacion(sid){
+    cargandoHide();
+    cargandoShow();
+    var tab = $("#tabs").find('.sub-tab-active').attr("data-tab");
+
+    $.ajax({
+        url:  "com.sine.enlace/enlaceventa.php",
+        type:"POST",
+        data: {'transaccion' : "asignatagcotizacion", 'tab' : tab, 'sid' : sid },
+        success: function (datos) {
+            tablaProducto();
+            setValoresCobrar();
+            $('#modal-cobrar').modal('show');
+            window.setTimeout(() => {
+                $("#monto-pagado").select();
+            }, 500);
+        }
+    });
+    cargandoHide();
+}

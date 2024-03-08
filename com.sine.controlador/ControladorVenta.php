@@ -2334,4 +2334,56 @@ class ControladorVenta
 
         return $detallesProductos;
     }
+
+    //--------------------------------MODULOS EXTERNOS
+    private function getTagbyIDAux($id) {
+        $datos = false;
+        $consulta = "SELECT tagventa FROM datos_venta WHERE iddatos_venta=:id";
+        $val = array("id" => $id);
+        $datos = $this->consultas->getResults($consulta, $val);
+        return $datos;
+    }
+
+    private function getTagbyID($id) {
+        $tag = "";
+        $datos = $this->getTagbyIDAux($id);
+        foreach ($datos as $actual) {
+            $tag = $actual['tagventa'];
+        }
+        return $tag;
+    }
+
+    public function exportarProductos($id, $sid) {
+        $datos = false;
+        $tag = $this->getTagbyID($id);
+        $detalle = $this->getDetalleTicket($tag);
+        foreach ($detalle as $actual) {
+            $consulta = "INSERT INTO tmp VALUES (:id, :idprod, :nm, :cant, :precio, :totun, :desc, :impdesc, :imptotal, :tras, :ret, :observaciones, :chinv, :clvfiscal, :clvunit, :sid);";
+            $val = array("id" => null,
+                "idprod" => $actual['venta_idprod'],
+                "nm" => $actual['venta_producto'],
+                "cant" => $actual['venta_cant'],
+                "precio" => $actual['venta_precio'],
+                "totun" => $actual['venta_importe'],
+                "desc" => '0',
+                "impdesc" => '0',
+                "imptotal" => $actual['venta_importe'],
+                "tras" => $actual['venta_traslados'],
+                "ret" => $actual['venta_retencion'],
+                "observaciones" => '',
+                "chinv" => '0',
+                "clvfiscal" => $actual['venta_clvfiscal'],
+                "clvunit" => $actual['venta_cunidad'],
+                "sid" => $sid);
+            $datos = $this->consultas->execute($consulta, $val);
+        }
+        return $datos;
+    }
+
+    public function asignarTAG($tag, $sid){
+        $consulta =  "UPDATE tmpticket SET tagtab = :tag WHERE sid = :sid AND tagtab IS NULL";
+        $val = array("tag" => $tag, "sid" => $sid);
+        $insertado = $this->consultas->execute($consulta, $val);
+        return $insertado;
+    }
 }
