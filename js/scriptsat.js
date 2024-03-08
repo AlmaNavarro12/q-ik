@@ -53,7 +53,7 @@ function loadOpcionesFormaPago2() {
 
 //------------------------------------BANCO
 //Parametros: Dato a seleccionar, el id del select
-function loadOpcionesBanco(id, selectValue = "") {
+function loadOpcionesBanco(contenedor, id = "", selectValue = "") {
     $.ajax({
         data: { transaccion: 'getOptions' },
         url: rutaPrincipal + 'com.sine.enlace/enlaceBanco.php',
@@ -61,7 +61,7 @@ function loadOpcionesBanco(id, selectValue = "") {
         dataType: 'JSON',
         success: function (res) {
             if (res.status > 0) {
-                $('.' + id).html(res.datos);
+                $('.' + contenedor).html(res.datos);
                 $('#' + id).val(selectValue);
             }
         }
@@ -103,15 +103,15 @@ function getEstadoMunicipioByCodP() {
 }
 
 //------------------------------------ESTADO
-function loadOpcionesEstado(id, selectValue = "") {
+function loadOpcionesEstado(contenedor, id = "", selectValue = "") {
     $.ajax({
         data: { transaccion: 'getOptions' },
-        url: rutaPrincipal + 'com.sine.enlace/enlaceBanco.php',
+        url: rutaPrincipal + 'com.sine.enlace/enlaceEstado.php',
         type: 'POST',
         dataType: 'JSON',
         success: function (res) {
             if (res.status > 0) {
-                $('.' + id).html(res.datos);
+                $('.' + contenedor).html(res.datos);
                 $('#' + id).val(selectValue);
             }
         }
@@ -119,17 +119,21 @@ function loadOpcionesEstado(id, selectValue = "") {
 }
 
 //------------------------------------MUNICIPIO
-function loadOpcionesMunicipio(id, selectValue = "") {
+function loadOpcionesMunicipio(idmun = "", idestado = "") {
+    cargandoHide();
+    cargandoShow();
+    if(idestado == ''){
+        idestado = $("#id-estado").val();
+    }
     $.ajax({
-        data: { transaccion: 'getOptions' },
-        url: rutaPrincipal + 'com.sine.enlace/enlaceBanco.php',
+        url: rutaPrincipal + "com.sine.enlace/enlaceCodigopostal.php",
         type: 'POST',
         dataType: 'JSON',
-        success: function (res) {
-            if (res.status > 0) {
-                $('.' + id).html(res.datos);
-                $('#' + id).val(selectValue);
-            }
+        data: {transaccion: 'opcionesmunicipio', idestado: idestado, idmunicipio:idmun},
+        success: function (datos) {
+            $(".contenedor-municipio").html(datos.datos);
+            cargandoHide();
         }
+       
     });
 }

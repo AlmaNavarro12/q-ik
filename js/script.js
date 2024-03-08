@@ -707,7 +707,7 @@ function loadView(vista) {
         'nuevoproducto': ["truncateTmp()", 300, "truncateTmpCot()", 350, "loadOpcionesProveedor()", 350, "getOptionsTaxes()", 300,],
         'listaproductoaltas': ["truncateTmp()", 300, "truncateTmpCot()", 350, "loadBtnCrear('producto')", 370, "loadListaProductosaltas()", 400,],
         'valrfc': [],
-        'nuevocliente': ["truncateTmpCot()", 350, "truncateTmp()", 400, "loadOpcionesBanco('contenedor-banco')", 450],
+        'nuevocliente': ["truncateTmpCot()", 350, "truncateTmp()", 400, "loadOpcionesBanco('contenedor-banco')", 450, "loadOpcionesEstado('contenedor-estado')", 300],
         'listaclientealtas': ["truncateTmp()", 300, "truncateTmpCot()", 350, "loadBtnCrear('cliente')", 370, "loadListaClientesAltas()", 400],
         'comunicado': ["truncateTmpIMG()", 300, "loadFecha()", 350, "loadOpcionesFacturacion()", 400, "loadContactos()", 420],
         'listacomunicado': ["truncateTmpIMG()", 300, "loadBtnCrear('comunicado')", 350, "listaComunicados()", 400],
