@@ -14,7 +14,7 @@ include("modals.php");
         </div>
         <div class="col-sm-4 py-1">
             <input type="text" class="form-control input-search text-secondary-emphasis" id="buscar-ticket"
-                placeholder="Buscar ticket (Folio, emisor o cliente)" oninput="buscarVentas()">
+                placeholder="Buscar ticket (Folio o emisor)" oninput="buscarVentas()">
         </div>
         <div class="col-sm-2 py-1">
             <select class="form-select input-search text-start col-12" id="num-reg" name="num-reg" onchange="buscarVentas()">

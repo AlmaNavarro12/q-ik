@@ -133,7 +133,7 @@
                                 </td>
                                 <td class="text-center">
                                     <label for="ChkDescuento" class="fw-bold text-center mb-2 text-uppercase" style="color: #17177C;">
-                                        Descuento: <span id="Spndescuento" class="far fa-square fs-5"></span>
+                                        Descuento: <span id="Spndescuento" class="far fa-square fs-6"></span>
                                         <input id="ChkDescuento" type="checkbox" value="1" onclick="habilitarDescuento()" style="display: none;">
                                     </label>
                                     <div id="groupDesc" class="input-group" style="display: none;">
