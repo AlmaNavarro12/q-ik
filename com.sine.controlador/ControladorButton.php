@@ -93,7 +93,7 @@ class ControladorButton{
             } else if ($view == 'listacortes') {
                 foreach ($permisos as $usuarioactual) {
                     if ($usuarioactual[$permiso] == '1') {
-                        $btn = "<button class='button-modal' onclick=\"loadView('$view');\"><i class='fas fa-save'></i> Visualizar registros </button>";
+                        $btn = "<button class='button-modal col-12' onclick=\"loadView('$view');\"><i class='fas fa-save'></i> Visualizar registros </button>";
                         break;
                     }
                 }

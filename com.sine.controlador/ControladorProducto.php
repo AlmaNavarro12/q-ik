@@ -266,15 +266,15 @@ class ControladorProducto
             }
 
             $impuestos .= "<div class='col-auto mt-2'><label class='radio-inline d-flex align-items-center' style='padding: 0px;'>
-                                <input type='checkbox' class='input-check' id='imp$imp' name='taxes' value='$var_taxes' onclick='habilitaImp(`$value`)' $var_check>
-                                <label for='imp$imp' class='label-form ms-2'>$imp</label>
+                                <input type='checkbox' class='input-check' id='imp$id' name='taxes' value='$var_taxes' onclick='habilitaImp(`$value`)' $var_check>
+                                <label for='imp$id' class='label-form ms-2'>$imp</label>
                             </label></div>";
 
-            $inputs .= "<div id='CalcImp$imp' class='col-auto' $var_hidden>
+            $inputs .= "<div id='CalcImp$id' class='col-auto' $var_hidden>
                             <label class='label-form text-right' for='piva'><b>$imp " . ($per * 100) . "%</b><small>$strTipo</small></label>
                             <label class='mark-required text-danger fw-bold'></label>
                             <div class='form-group'>
-                                <input class='form-control text-center input-form' id='pimp$imp' name='p$imp' value='0' type='text' disabled/>
+                                <input class='form-control text-center input-form col-12' id='pimp$id' name='p$id' value='0' type='text' disabled/>
                             </div>
                         </div>";
         }

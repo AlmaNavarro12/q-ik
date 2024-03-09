@@ -55,9 +55,6 @@ function guardarImpuesto(idimpuesto = null) {
         tasa = $("#tasa-impuesto").val();
         id = "tasa-impuesto";
     }
-
-    console.log('tipotasa: ' + tipotasa);
-    console.log('tasa: '+ tasa);
     var chuso = ($("#chuso").prop('checked')) ? "1" : "0";
     
     if (isnEmpty(nombre, "descripcion-impuesto") && isnEmpty(tipo, "tipo-impuesto") && isnEmpty(impuesto, "impuesto-aplicado") && isnEmpty(factor, "tipo-factor") && isnEmpty(tasa, id)) {

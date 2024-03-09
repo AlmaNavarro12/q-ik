@@ -191,7 +191,6 @@ function editarFolio(idfolio) {
             } else {
                 loadViewConfig('folio');
                 window.setTimeout("setValoresEditarFolio('" + datos + "')", 500);
-                console.log(datos);
             }
         }
     });
@@ -1217,7 +1216,6 @@ function eliminarImgTpm() {
             dataType: 'JSON',
             success: function (datos) {
                 cargandoHide();
-                console.log(datos);
             }
         });
     }

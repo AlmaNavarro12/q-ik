@@ -219,12 +219,11 @@ function setValoresEditarCliente(datos) {
     $("#num_exterior").val(array[14]);
 
     if (array[19] !== '0') {
-        loadOpcionesBanco("contenedor-banco", "id-banco", array[19]);
+        loadOpcionesBanco("id-banco", array[19]);
         $("#cuenta").val(array[20]);
         $("#clabe").val(array[21]);
     }
 
-    console.log(array[15]);
     $("#localidad").val(array[17]);
     $("#codigo_postal").val(array[18]);
     loadOpcionesEstado('contenedor-estado', 'id-estado', array[15])
@@ -296,7 +295,6 @@ function nuevoCampo() {
     // Si el campo está oculto, mostrarlo
     if ($(campoActual).is(":hidden")) {
         $(campoActual).attr("hidden", false);
-        console.log(renglon);
         loadOpcionesBanco("contenedor-banco"+renglon, "");
     }
 }

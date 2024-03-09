@@ -382,7 +382,6 @@ function checkFondo() {
         type: "POST",
         data: {transaccion: "checkfondo"},
         success: function (datos) {
-            console.log(datos);
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
             var res = texto.substring(1, 1000);
@@ -396,7 +395,6 @@ function checkFondo() {
 
 function actualizarCantidad() {
     var idtmp = $("#idcant").val();
-    console.log(idtmp);
     var cant = $("#cantidad-producto").val();
     var precioprod = $("#precio-prod").val();
     $.ajax({
@@ -801,7 +799,6 @@ function getPermisoNewProducto() {
 }
 
 function imprimirCorteCaja(user, fecha, hora, tag, id, supervisor) {
-    console.log(id);
     cargandoHide();
     cargandoShow();
     VentanaCentrada('./com.sine.imprimir/imprimircortecaja.php?u=' + user + '&&f=' + fecha + '&&h=' + hora +'&&t=' + tag +'&&i=' + id +'&&s=' + supervisor, 'Corte Caja', '', '1024', '768', 'true');

@@ -970,7 +970,6 @@ function eliminarImgTpm() {
             dataType: 'JSON',
             success: function (datos) {
                 cargandoHide();
-                console.log(datos);
             }
         });
     }
@@ -1182,7 +1181,6 @@ function loadOpcionesUsuario() {
             if (bandera == 0) {
                 alertify.error(res);
             } else {
-            console.log(datos);
                 $(".contenedor-usuarios").html(datos);
             }
         }
@@ -1287,13 +1285,11 @@ function validarRFC() {
 }
 
 function truncateTickets(){ 
-    console.log('Si entra pero no es success.');
     $.ajax({
         url: "com.sine.enlace/enlaceventa.php",
         type: "POST",
         data: {transaccion: "cancelarTicket"},
         success: function (datos) {
-            console.log('Elimina tmp: ' +datos);
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
             var res = texto.substring(1, 1000);

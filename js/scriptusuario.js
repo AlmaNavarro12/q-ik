@@ -353,7 +353,6 @@ function setValoresAsignarPermisos(datos) {
     for (var permiso in permisosMapa) {
         if (permisosMapa[permiso] == '1' && permiso !== 'idusuario' && permiso !== 'accion' && permiso !== 'idlogin') {
             $("#" + permiso).attr('checked', true);
-            console.log(permiso);
             tienePermisos = true;
         }
     }
@@ -422,8 +421,6 @@ function actualizarPermisos(idusuario) {
         }
     }
     
-    
-    console.log(datos);
     $.ajax({
         url: "com.sine.enlace/enlaceusuario.php",
         type: "POST",
@@ -459,4 +456,3 @@ function resposiveButton() {
         $("#bdos > div").removeClass('col-12 mb-3').addClass('col-md-6 mb-3');
     }
 }
-

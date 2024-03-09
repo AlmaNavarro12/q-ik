@@ -140,9 +140,9 @@
             <label class="label-form text-right" for="id-banco">Banco</label><label
                 class="mark-required text-danger fw-bold">&nbsp;</label>
             <div class="form-group">
-                <select class="form-select text-center input-form id-banco" id="id-banco" name="id-banco">
+                <select class="form-select text-center input-form" id="id-banco" name="id-banco">
                     <option value="" id="option-default-banco">- - - -</option>
-                    <optgroup id="banco" class="contenedor-banco text-left"> </optgroup>
+                    <optgroup class="id-banco contenedor-banco text-start"> </optgroup>
                 </select>
                 <div id="id-banco-errors"></div>
             </div>
@@ -185,9 +185,9 @@
             <label class="label-form text-right" for="id-banco1">Banco 2</label><label
                 class="mark-required text-danger fw-bold">&nbsp;</label>
             <div class="form-group">
-                <select class="form-select text-center input-form id-banco1" id="id-banco1" name="id-banco">
+                <select class="form-select text-center input-form id-banco1" id="id-banco1" name="id-banco1">
                     <option value="" id="option-default-banco1">- - - -</option>
-                    <optgroup id="banco1" class="contenedor-banco1 contenedor-banco"> </optgroup>
+                    <optgroup class="id-banco1 contenedor-banco"> </optgroup>
                 </select>
                 <div id="id-banco1-errors"></div>
             </div>
@@ -224,7 +224,7 @@
             <div class="form-group">
                 <select class="form-select text-center input-form id-banco2" id="id-banco2" name="id-banco2">
                     <option value="" id="option-default-banco2">- - - -</option>
-                    <optgroup id="banco2" class="contenedor-banco2 contenedor-banco"> </optgroup>
+                    <optgroup class="id-banco2 contenedor-banco"> </optgroup>
                 </select>
                 <div id="id-banco2-errors"></div>
             </div>
@@ -264,7 +264,7 @@
             <div class="form-group">
                 <select class="form-select text-center input-form id-banco3" id="id-banco3" name="id-banco3">
                     <option value="" id="option-default-banco3">- - - -</option>
-                    <optgroup id="banco3" class="contenedor-banco3 contenedor-banco"> </optgroup>
+                    <optgroup class="id-banco3 contenedor-banco"> </optgroup>
                 </select>
                 <div id="id-banco3-errors"></div>
             </div>
@@ -394,8 +394,13 @@
                 </div>
             </div>
             <div class="col-md-4 py-2">
+                <div class="new-tooltip icon tip me-2">
+                    <span class="fas fa-question-circle small text-primary-emphasis"></span>
+                    <span class="tiptext">Al ingresar el código postal se selecciona el estado y municipio correspondiente. Si no es tu estado o municipio puedes seleccionarlos del listado manualmente.</span>
+                </div>
                 <label class="label-form text-right" for="codigo_postal">Código Postal </label> <label
-                    class="mark-required text-danger fw-bold">*</label>
+                    class="mark-required text-danger fw-bold">*</label> 
+                    
                 <div class="form-group">
                     <input class="form-control text-center input-form" id="codigo_postal" name="codigo_postal"
                         placeholder="Código postal" type="text" maxlength="5" minlength="5" onblur="getEstadoMunicipioByCodP();" oninput="validarNum(this)">

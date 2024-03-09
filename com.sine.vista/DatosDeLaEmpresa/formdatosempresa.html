@@ -11,14 +11,14 @@
         <div class="row">
             <div class="col-md-8">
             </div>
-            <div class="new-tooltip icon tip col-md-2">
+            <div class="new-tooltip icon tip col-md-2 text-center">
                 <label class="label-sub click-label" style="cursor: pointer;" onclick="validarRFC();">Validar RFC <span
                         class="fas fa-pencil-alt"></span></label>
                 <span class="tiptext">Se abrirá una ventana directamente a la herramienta de validación del SAT para
                     verificar el RFC de su cliente.</span>
             </div>
         </div>
-        <div class="row">
+        <div class="row py-1">
             <div class="col-md-6">
                 <label class="label-form text-right mb-2" for="nombre-empresa">Nombre</label> <label
                     class="mark-required text-danger fw-bold">*</label>
@@ -39,7 +39,7 @@
             </div>
         </div>
 
-        <div class="row">
+        <div class="row py-1">
             <div class="col-md-6">
                 <label class="label-form text-right mb-2" for="razon-social">Razón Social</label> <label
                     class="mark-required text-danger fw-bold">*</label>
@@ -60,7 +60,7 @@
             </div>
         </div>
 
-        <div class="row">
+        <div class="row py-1">
             <div class="col-md-6">
                 <label class="label-form text-right mb-2" for="calle-empresa">Calle</label> <label
                     class="mark-required text-danger fw-bold">*</label>
@@ -81,7 +81,7 @@
             </div>
         </div>
 
-        <div class="row">
+        <div class="row py-1">
             <div class="col-md-6">
                 <label class="label-form text-right mb-2" for="num-ext-empresa">Número exterior</label> <label
                     class="mark-required text-danger fw-bold">*</label>
@@ -102,14 +102,18 @@
             </div>
         </div>
 
-        <div class="row">
+        <div class="row py-1">
             <div class="col-md-6">
-                <label class="label-form text-right mb-2" for="cp-empresa">Código Postal</label> <label
+                <div class="new-tooltip icon tip me-2">
+                    <span class="fas fa-question-circle small text-primary-emphasis"></span>
+                    <span class="tiptext">Al ingresar el código postal se selecciona el estado y municipio correspondiente. Si no es tu estado o municipio puedes seleccionarlos del listado manualmente.</span>
+                </div>
+                <label class="label-form text-right mb-2" for="codigo_postal">Código postal</label> <label
                     class="mark-required text-danger fw-bold">*</label>
                 <div class="form-group">
-                    <input class="form-control text-center input-form mb-3" id="cp-empresa" name="cp-empresa"
-                        placeholder="Código Postal" type="number" onblur="getEstadoMunicipioByCodP()();" />
-                    <div id="cp-empresa-errors"></div>
+                    <input class="form-control text-center input-form mb-3" id="codigo_postal" name="codigo_postal"
+                        placeholder="Código Postal" type="number" onblur="getEstadoMunicipioByCodP();" />
+                    <div id="codigo_postal-errors"></div>
 
                 </div>
             </div>
@@ -129,7 +133,7 @@
             </div>
         </div>
 
-        <div class="row">
+        <div class="row py-1">
             <div class="col-md-6">
                 <label class="label-form text-right mb-2" for="id-municipio">Municipio</label> <label
                     class="mark-required text-danger fw-bold">*</label>
@@ -154,19 +158,19 @@
             </div>
         </div>
 
-        <div class="row">
+        <div class="row py-1">
             <div class="col-md-6">
-                <label class="label-form text-right mb-2" for="regimen-empresa">Régimen fiscal</label> <label
-                    class="mark-required text-danger fw-bold">*</label>
-                <div class="form-group">
-                    <input class="form-control text-center input-form mb-3" id="regimen-empresa" name="regimen-empresa"
-                        placeholder="Regimen Fiscal (Clave-Regimen Fiscal)" type="text" maxlength="100"
-                        oninput="aucompletarRegimen()" />
-                    <div id="regimen-empresa-errors"></div>
+                <label class="label-form text-right" for="regimen-fiscal">Régimen fiscal</label> <label
+                class="mark-required text-danger fw-bold">*</label>
+            <div class="form-group">
+                <input class="form-control text-center input-form" id="regimen-fiscal" name="regimen-fiscal"
+                    placeholder="Régimen fiscal" type="text" maxlength="100" oninput="aucompletarRegimen()" />
+                <div id="regimen-fiscal-errors">
                 </div>
             </div>
+            </div>
         </div>
-        <div class="row">
+        <div class="row mt-3">
             <div class="col-md-6">
                 <label class="label-form text-right mb-2" for="correo-electronico">Correo electrónico </label> <label
                     class="mark-required text-danger fw-bold">*</label>
@@ -186,13 +190,13 @@
                 </div>
             </div>
         </div>
-        <div class="row">
+        <div class="row py-1">
             <div class="col-md-6">
                 <label class="label-form text-right mb-2" for="id-banco">Banco</label>
                 <div class="form-group">
-                    <select class="form-control text-center input-form mb-3" id="id-banco" name="id-banco">
+                    <select class="form-select text-center input-form mb-3" id="id-banco" name="id-banco">
                         <option value="" id="option-default-banco">- - - -</option>
-                        <optgroup id="banco" class="contenedor-banco text-left"> </optgroup>
+                        <optgroup id="banco" class="contenedor-banco text-start"> </optgroup>
                     </select>
                     <div id="id-banco-errors"></div>
                 </div>
@@ -207,7 +211,7 @@
                 </div>
             </div>
         </div>
-        <div class="row">
+        <div class="row py-1">
             <div class="col-md-6">
                 <label class="label-form text-right mb-2" for="cuenta"> Cuenta </label>
                 <div class="form-group">
@@ -226,7 +230,7 @@
                 </div>
             </div>
         </div>
-        <div class="row">
+        <div class="row py-1">
             <div class="col-md-6">
                 <label class="label-form text-right mb-2" for="tarjeta-oxxo"> Número de tarjeta </label>
                 <div class="form-group">
@@ -249,16 +253,16 @@
                 <div class="col-md-6">
                     <label class="label-form text-right mb-2" for="id-banco1">Banco 2</label>
                     <div class="form-group">
-                        <select class="form-control text-center input-form mb-3 id-banco1" id="id-banco1"
+                        <select class="form-select text-center input-form mb-3 id-banco1" id="id-banco1"
                             name="id-banco">
                             <option value="" id="option-default-banco1">- - - -</option>
-                            <optgroup id="banco1" class="contenedor-banco1 text-left"> </optgroup>
+                            <optgroup id="banco1" class="contenedor-banco text-start"> </optgroup>
                         </select>
                         <div id="id-banco1-errors"></div>
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <label class="label-form text-right mb-2 " for="sucursal1"> N° Sucursal 2 </label>
+                    <label class="label-form text-right mb-2 " for="sucursal1"> No. Sucursal 2 </label>
                     <div class="form-group">
                         <input class="form-control text-center input-form" id="sucursal1" name="sucursal1"
                             placeholder="Numero de sucursal bancaria" maxlength="20" type="text" />
@@ -303,15 +307,15 @@
                 <div class="col-md-6">
                     <label class="label-form text-right mb-2" for="id-banco2">Banco 3</label>
                     <div class="form-group">
-                        <select class="form-control text-center input-form mb-3" id="id-banco2" name="id-banco2">
+                        <select class="form-select text-center input-form mb-3" id="id-banco2" name="id-banco2">
                             <option value="" id="option-default-banco2">- - - -</option>
-                            <optgroup id="banco2" class="contenedor-banco2 text-left"> </optgroup>
+                            <optgroup id="banco2" class="contenedor-banco text-start"> </optgroup>
                         </select>
                         <div id="id-banco2-errors"></div>
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <label class="label-form text-right mb-2" for="sucursal2"> N° Sucursal 3 </label>
+                    <label class="label-form text-right mb-2" for="sucursal2"> No. Sucursal 3 </label>
                     <div class="form-group">
                         <input class="form-control text-center input-form" id="sucursal2" name="sucursal2"
                             placeholder="Numero de sucursal bancaria" maxlength="20" type="text" />
@@ -355,16 +359,16 @@
                 <div class="col-md-6">
                     <label class="label-form text-right mb-2" for="id-banco3">Banco 4</label>
                     <div class="form-group">
-                        <select class="form-control text-center input-form mb-3" id="id-banco3" name="id-banco3">
+                        <select class="form-select text-center input-form mb-3" id="id-banco3" name="id-banco3">
                             <option value="" id="option-default-banco3">- - - -</option>
-                            <optgroup id="banco3" class="contenedor-banco3 text-left"> </optgroup>
+                            <optgroup id="banco3" class="contenedor-banco text-start"> </optgroup>
                         </select>
                         <div id="id-banco3-errors"></div>
                     </div>
                 </div>
 
                 <div class="col-md-6">
-                    <label class="label-form text-right mb-2" for="sucursal3"> N° Sucursal 4 </label>
+                    <label class="label-form text-right mb-2" for="sucursal3"> No. Sucursal 4 </label>
                     <div class="form-group">
                         <input class="form-control text-center input-form" id="sucursal3" name="sucursal3"
                             placeholder="Numero de sucursal bancaria" maxlength="20" type="text" />
@@ -424,7 +428,7 @@
                 </div>
             </div>
         </div>
-        <div class="row">
+        <div class="row py-1">
             <div class="col-md-6">
                 <label class="label-form text-right mb-2" for="password-key">Contraseña Key</label> <label
                     class="mark-required text-danger fw-bold">*</label>

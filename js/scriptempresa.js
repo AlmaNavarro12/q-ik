@@ -79,15 +79,6 @@ function quitarCampo() {
     }
 }
 
-function aucompletarRegimen() {
-    $('#regimen-empresa').autocomplete({
-        source: "com.sine.enlace/enlaceautocompletar.php?transaccion=regimenfiscal",
-        select: function (event, ui) {
-            var a = ui.item.value;
-        }
-    });
-}
-
 function insertarDatos() {
     var nombre = $("#nombre-empresa").val();
     var rfc = $("#rfc-empresa").val();
@@ -621,7 +612,6 @@ function nuevoCampo() {
     // Si el campo está oculto, mostrarlo
     if ($(campoActual).is(":hidden")) {
         $(campoActual).attr("hidden", false);
-        console.log(renglon);
         loadOpcionesBanco("contenedor-banco"+renglon, "");
     }
 }

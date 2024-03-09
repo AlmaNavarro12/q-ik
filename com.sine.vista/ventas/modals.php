@@ -1,4 +1,4 @@
-<!--F2 RGEISTRAR CANTIDAD INICIAL DEN CAJA-->
+<!--F2 RGEISTRAR CANTIDAD DE ENTRADAS Y SALIDAS-->
 <div class="modal fade shadow-lg rounded rounded-5" id="modal-entradas" tabindex="-1" aria-labelledby="exampleModalLabel" data-bs-backdrop="static" aria-hidden="true">
     <div class="modal-dialog modal-sm">
         <div class="modal-content">
@@ -202,7 +202,7 @@
                 <h4 class="modal-title fs-5" id="label-ingresos">Consulta precio</h4>
                 <button type="button" id="btn-close-modal" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body pb-5">
                 <label class="label-sub">Código del producto</label>
                 <div class="col-12">
                     <div class="row">

@@ -70,13 +70,9 @@ function calcularGanancia() {
     var preciocompra = $("#pcompra").val() || '0';
     var porcentaje = $("#porganancia").val() || '0';
     var importeganancia = (parseFloat(preciocompra) * parseFloat(porcentaje)) / 100;
-    console.log("Ganancia: " + importeganancia);
-    console.log("Ganancia redondeado: " + myRound(importeganancia, 2));
     $("#ganancia").val(myRound(importeganancia, 2));
     var precioventa = parseFloat(preciocompra) + parseFloat(importeganancia);
-    console.log("costo: " + precioventa);
     var total = myRound(precioventa, 2)
-    console.log("costo redondeado: " + total);
     $("#pventa").val(total);
     calcularImpuestosTotal();
 }
@@ -112,9 +108,7 @@ function calcularImpuestosTotal() {
         }
         $('#p' + id).val(impuesto);
     });
-    console.log("Total a publico: " + total);
     var preciopub = myRound(total, 2);
-    console.log("Total a publico redondeado " + preciopub);
     $("#ptotiva").val(preciopub);
 }
 
@@ -147,7 +141,7 @@ function calcularImpuestosTotalReverse() {
         }
         $('#p' + id).val(impuesto);
     });
-    $("#pventa").val(total);
+    $("#pventa").val(myRound(total, 2));
 }
 
 function cargarImgProducto() {
@@ -193,7 +187,6 @@ function eliminarImgTpm() {
             dataType: 'JSON',
             success: function (datos) {
                 cargandoHide();
-                console.log(datos);
             }
         });
     }
@@ -289,7 +282,6 @@ function getOptionsTaxes(taxes = "") {
         type: 'POST',
         dataType: 'JSON',
         success: function (response) {
-            console.log(response);
             if (response.bandera > 0) {
                 $('#imp-apli').html(response.impuestos);
                 $('#input-imp-apli').html(response.inputs);
@@ -306,10 +298,10 @@ function habilitaImp(val) {
     var porcentaje = div[0];
     var impuesto = div[1];
     var id = div[2];
-    if ($('#imp' + impuesto).is(':checked')) {
-        $('#CalcImp' + impuesto).show(1500, "easeOutQuint");
+    if ($('#imp' + id).is(':checked')) {
+        $('#CalcImp' + id).show(1500, "easeOutQuint");
     } else {
-        $('#CalcImp' + impuesto).hide(1500, "easeOutQuint");
+        $('#CalcImp' + id).hide(1500, "easeOutQuint");
     }
     if ($('#pventa').val() != "") {
         calcularImpuestosTotal();
@@ -429,7 +421,6 @@ function setValoresEditarProducto(datos) {
     var imagen = array[14];
     var chinventario = array[15];
     var img = array[17];
-    console.log(array[18]);
 
     if (tipo == "1") {
         $("#inventario").show('slow');
