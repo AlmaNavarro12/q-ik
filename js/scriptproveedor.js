@@ -135,7 +135,7 @@ function editarProveedor(idproveedor) {
 }
 
 function setValoresEditarProveedor(datos) {
-    changeText("#contenedor-titulo-form-proveedor", "Editar Proveedor");
+    changeText("#contenedor-titulo-form-proveedor", "Editar proveedor");
     changeText("#btn-form-proveedor", "Guardar cambios <span class='fas fa-save'></span></a>");
 
     var [idproveedor, empresa, representante, telefono, correo, cuenta, clabe, idbanco, sucursal, rfc, razon, banco] = datos.split("</tr>", 20);

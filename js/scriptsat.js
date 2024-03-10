@@ -61,12 +61,8 @@ function loadOpcionesBanco(id = "", selectValue = "") {
         dataType: 'JSON',
         success: function (res) {
             if (res.status > 0) {
-                if (id != "" && selectValue != "") {
-                    $('.' + id).html(res.datos);
-                    $('#' + id).val(selectValue);
-                } else {
-                    $('.contenedor-banco').html(res.datos);
-                }
+                $('.' + id).html(res.datos);
+                $('#' + id).val(selectValue);
             }
         }
     });
@@ -114,8 +110,12 @@ function loadOpcionesEstado(contenedor, id = "", selectValue = "") {
         dataType: 'JSON',
         success: function (res) {
             if (res.status > 0) {
-                $('.' + contenedor).html(res.datos);
-                $('#' + id).val(selectValue);
+                if (id != "" && selectValue != "") {
+                    $('.' + contenedor).html(res.datos);
+                    $('#' + id).val(selectValue);
+                } else {
+                    $('.contenedor-estado').html(res.datos);
+                }
             }
         }
     });

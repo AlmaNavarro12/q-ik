@@ -125,7 +125,7 @@ class ControladorPago{
                         </td>
                         <td class='text-center'>$ " . number_format($totalpagado, 2, '.', ',') . "</td>
                         <td class='text-center'>
-                        <div class='dropdown'>
+                        <div class='dropdown dropend'>
                         <button class='button-list dropdown-toggle' title='Opciones' type='button' data-bs-toggle='dropdown' aria-expanded='false'>
                         <span class='fas fa-ellipsis-v'></span>
                         <span class='caret'></span></button>

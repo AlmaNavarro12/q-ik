@@ -55,31 +55,45 @@ class ControladorOpcion {
     }
 
     public function opcionesFolios($id, $serie, $folio) {
-        $datos = $this->getFoliosAux();
+        $datos = $this->getFoliosAux($id);
         $op = "";
-        $check = false;
-    
+    	$check = false;
         foreach ($datos as $actual) {
-            $consecutivo = str_pad($actual['consecutivo'], 4, '0', STR_PAD_LEFT);
-            $selected = ($id == $actual['usofolio'] || in_array($id, explode("-", $actual['usofolio']))) ? "selected" : "";
-            $op .= "<option class='option-folio text-start ps-5' id='folio{$actual['idfolio']}' value='{$actual['idfolio']}' $selected> Serie {$actual['serie']}-{$actual['letra']}$consecutivo</option>";
-    
-            if ($selected) {
-                $check = true;
+            $idfolio = $actual['idfolio'];
+            $consecutivo = $actual['consecutivo'];
+            $iduso = $actual['usofolio'];
+
+            if ($consecutivo < 10) {
+                $consecutivo = "000$consecutivo";
+            } else if ($consecutivo < 100 && $consecutivo >= 10) {
+                $consecutivo = "00$consecutivo";
+            } else if ($consecutivo < 1000 && $consecutivo >= 100) {
+                $consecutivo = "0$consecutivo";
             }
+
+            $divuso = explode("-", $iduso);
+            $selected = "";
+            foreach ($divuso as $uso) {
+                if ($id == $uso) {
+                    $selected = "selected";
+                	$check = true;
+                    break;
+                }
+            }
+
+            $op .= "<option class='option-folio' id='folio" . $idfolio . "' value='" . $idfolio . "' $selected> Serie " . $actual['serie'] . "-" . $actual['letra'] . $consecutivo . "</option>";
         }
-    
-        if ($id == "0" && !$check) {
-            $op .= "<option selected id='folio{$id}' value='{$id}'> Serie {$serie}-{$folio}</option>";
+    	if ($id == "0" && !$check) {
+            $op .= "<option selected id='folio" . $id . "' value='" . $id . "'> Serie " . $serie . "-" . $folio . "</option>";
         }
-    
         return $op;
     }
 
-    private function getFoliosAux() {
+    private function getFoliosAux($id) {
         $consultado = false;
-        $consulta = "SELECT * FROM folio ORDER BY serie;";
-        $consultado = $this->consultas->getResults($consulta, null);
+        $consulta = "SELECT * FROM folio WHERE usofolio =:uso ORDER BY serie;";
+        $valores = array("uso" => $id);
+        $consultado = $this->consultas->getResults($consulta, $valores);
         return $consultado;
     }
 

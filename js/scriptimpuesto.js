@@ -178,7 +178,7 @@ function editarImpuesto(idimpuesto) {
 }
 
 function setValoresEditarImpuesto(datos) {
-    changeText("#contenedor-titulo-form-impuesto", "Editar Impuesto");
+    changeText("#contenedor-titulo-form-impuesto", "Editar impuesto");
     changeText("#btn-form-impuesto", "Guardar cambios <span class='fas fa-save'></span></a>");
 
     var array = datos.split("</tr>");

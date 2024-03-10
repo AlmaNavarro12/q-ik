@@ -51,7 +51,7 @@ class ControladorEmpresa {
 
     private function getNumrowsAux($condicion) {
         $consultado = false;
-        $consulta = "select count(*) numrows from datos_facturacion as s inner join municipio as m on (s.idmunicipio=m.id_municipio) inner join estado as e on (s.idestado=e.id_estado) $condicion;";
+        $consulta = "select count(*) numrows from datos_facturacion as s $condicion;";
         $consultas = new Consultas();
         $consultado = $consultas->getResults($consulta, null);
         return $consultado;
@@ -104,12 +104,12 @@ class ControladorEmpresa {
         $datos = "<thead class='sin-paddding'>
             <tr >
                 <th></th>
-                <th class='col-md-2 text-start'>Contribuyente</th>
-                <th>RFC </th>
-                <th class='col-md-2'>Razón social</th>
-                <th>Dirección</th>
-                <th>Régimen fiscal</th>
-                <th>Opción</th>
+                <th class='col-md-2 text-center'>Contribuyente</th>
+                <th class='text-center'>RFC </th>
+                <th class='col-md-2 text-center'>Razón social</th>
+                <th class='text-center'>Dirección</th>
+                <th class='text-center'>Régimen fiscal</th>
+                <th class='text-center'>Opción</th>
             </tr>
         </thead>
         <tbody>";
@@ -153,8 +153,8 @@ class ControladorEmpresa {
                 $datos .= "<tr>
                          <td style='background-color: $color;'></td>
                          <td>$nombre</td>
-                         <td>$rfc</td>
-                         <td>$razonsocial</td>
+                         <td class='text-center'>$rfc</td>
+                         <td class='text-center'>$razonsocial</td>
                          <td>$direccion $codigo_postal, $municipio, $estado, $pais</td>
                          <td>$regimenfiscal</td>
                          <td align='center'>
@@ -162,14 +162,15 @@ class ControladorEmpresa {
                             <button class='button-list dropdown-bs-toggle' title='Opciones'  type='button' data-bs-toggle='dropdown'><span class='fas fa-ellipsis-v'></span>
                             <span class='caret'></span></button>
                             <ul class='dropdown-menu dropdown-menu-right'>";
-                if ($divp[3] == '1') {
-                    $datos .= "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' onclick=\"descargarArchivos($id);\">Desc. Archivos <span class='text-muted small fas fa-download'></span></a></li>";
-                }
+                
                 if ($divp[1] == '1') {
-                    $datos .= "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' onclick='editarEmpresa($id)'>Editar Datos <span class='text-muted small far fa-edit'></span></a></li>";
+                    $datos .= "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' onclick='editarEmpresa($id)'>Editar datos <span class='text-muted small fas fa-edit'></span></a></li>";
                 }
                 if ($divp[2] == '1') {
-                    $datos .= "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' onclick='eliminarEmpresa($id)'>Eliminar Datos <span class='text-muted small fas fa-trash-alt'></span></a></li>";
+                    $datos .= "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' onclick='eliminarEmpresa($id)'>Eliminar datos <span class='text-muted small fas fa-times'></span></a></li>";
+                }
+                if ($divp[3] == '1') {
+                    $datos .= "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' onclick=\"descargarArchivos($id);\">Descargar archivos <span class='text-muted small fas fa-download'></span></a></li>";
                 }
                 $datos .= "</ul>
                             </div>
@@ -295,7 +296,7 @@ class ControladorEmpresa {
         $datos = "";
         $check = $this->getError($c);
         if ($check != "") {
-            $datos = "0Error la contraseñaaaa es incorrecta " . $check;
+            $datos = "0Error la contraseña es incorrecta " . $check;
         } else {
             $datos = $this->insertarDatos($c);
         }
@@ -306,7 +307,7 @@ class ControladorEmpresa {
         $diferencias = $this->getZonaHoraria($c->getCp());
         $div = explode("</tr>", $diferencias);
         $insertado = false;
-        $consulta = "INSERT INTO `datos_facturacion` VALUES (:id, :nombre, :rfc, :razon, :color, :calle, :numint, :numext, :colonia, :idmunicipio, :idestado, :estado, :municipio, :pais, :cp, :clave, :regimen, :correo, :telefono, :keyb64, :csd, :numcsd, :passcsd, :idbanco, :sucursal, :cuenta, :clabe, :oxxo, :idbanco1, :sucursal1, :cuenta1, :clabe1, :oxxo1, :idbanco2, :sucursal2, :cuenta2, :clabe2, :oxxo2, :idbanco3, :sucursal3, :cuenta3, :clabe3, :oxxo3, :firma, :difhorarioverano, :difhorarioinvierno) ;";
+        $consulta = "INSERT INTO `datos_facturacion` VALUES (null, :nombre, :rfc, :razon, :color, :calle, :numint, :numext, :colonia, :idmunicipio, :idestado, :estado, :municipio, :pais, :cp, :clave, :regimen, :correo, :telefono, :keyb64, :csd, :numcsd, :passcsd, :idbanco, :sucursal, :cuenta, :clabe, :oxxo, :idbanco1, :sucursal1, :cuenta1, :clabe1, :oxxo1, :idbanco2, :sucursal2, :cuenta2, :clabe2, :oxxo2, :idbanco3, :sucursal3, :cuenta3, :clabe3, :oxxo3, :firma, :difhorarioverano, :difhorarioinvierno) ;";
         $valores = array("id" => null,
             "nombre" => $c->getNombreEmpresa(),
             "rfc" => $c->getRfc(),
@@ -431,7 +432,7 @@ class ControladorEmpresa {
         }
 
         $insertado = false;
-        $consulta = "UPDATE `datos_facturacion` SET nombre_contribuyente=:nombre, rfc=:rfc, razon_social=:razon, color=:color, calle=:calle, numero_interior=:numint, numero_exterior=:numext, colonia=:colonia, idmunicipio=:idmunicipio, idestado=:idestado, estado=:estado, municipio=:municipio, pais=:pais, codigo_postal=:cp, c_regimenfiscal=:folio, regimen_fiscal=:regimen, correodatos=:correo, telefono=:telefono, keyb64=:keyb64, csd=:csd, numcsd=:numcsd,$passcsd idbanco=:idbanco, sucursal=:sucursal, cuenta=:cuenta, clabe=:clabe, tarjetaoxxo=:oxxo, idbanco1=:idbanco1, sucursal1=:sucursal1, cuenta1=:cuenta1, clabe1=:clabe1, tarjetaoxxo1=:oxxo1, idbanco2=:idbanco2, sucursal2=:sucursal2, cuenta2=:cuenta2, clabe2=:clabe2, tarjetaoxxo2=:oxxo2, idbanco3=:idbanco3, sucursal3=:sucursal3, cuenta3=:cuenta3, clabe3=:clabe3, tarjetaoxxo3=:oxxo3, firma=:firma, difhorarioverano=:difverano, difhorarioinvierno=:difinvierno WHERE id_datos=:id;);";
+        $consulta = "UPDATE `datos_facturacion` SET nombre_contribuyente=:nombre, rfc=:rfc, razon_social=:razon, color=:color, calle=:calle, numero_interior=:numint, numero_exterior=:numext, colonia=:colonia, idmunicipio=:idmunicipio, idestado=:idestado, estado=:estado, municipio=:municipio, pais=:pais, codigo_postal=:cp, c_regimenfiscal=:folio, regimen_fiscal=:regimen, correodatos=:correo, telefono=:telefono, keyb64=:keyb64, csd=:csd, numcsd=:numcsd,$passcsd idbanco=:idbanco, sucursal=:sucursal, cuenta=:cuenta, clabe=:clabe, tarjetaoxxo=:oxxo, idbanco1=:idbanco1, sucursal1=:sucursal1, cuenta1=:cuenta1, clabe1=:clabe1, tarjetaoxxo1=:oxxo1, idbanco2=:idbanco2, sucursal2=:sucursal2, cuenta2=:cuenta2, clabe2=:clabe2, tarjetaoxxo2=:oxxo2, idbanco3=:idbanco3, sucursal3=:sucursal3, cuenta3=:cuenta3, clabe3=:clabe3, tarjetaoxxo3=:oxxo3, firma=:firma, difhorarioverano=:difverano, difhorarioinvierno=:difinvierno WHERE id_datos=:id;";
         $valores = array("nombre" => $c->getNombreEmpresa(),
             "rfc" => $c->getRfc(),
             "razon" => $c->getRazonSocial(),

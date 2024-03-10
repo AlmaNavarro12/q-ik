@@ -21,6 +21,6 @@ if (isset($_FILES["certificado-csd"])) {
         $exc = shell_exec($shellserial);
         echo '1'.$exc;
     } else {
-        echo '0El tipo de archivo no es valido';
+        echo '0El tipo de archivo no es válido.';
     }
 }

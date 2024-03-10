@@ -325,7 +325,7 @@ function editarPago(idpago) {
 }
 
 function setValoresEditarPago(datos) {
-    changeText("#contenedor-titulo-form-pago", "Editar Pago");
+    changeText("#contenedor-titulo-form-pago", "Editar pago");
     changeText("#btn-form-pago", "Guardar cambios <span class='glyphicon glyphicon-floppy-disk'></span>");
 
     var array = datos.split("</tr>");

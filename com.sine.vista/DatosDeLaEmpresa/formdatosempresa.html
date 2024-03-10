@@ -1,10 +1,10 @@
-<form action="com.sine.enlace/enlaceempresa.php" onsubmit="return false;" id="form-empresa" style="height: 100%;">
+<div id="form-empresa" style="height: 100%;">
     <div class="col-md-12">
-        <div class="titulo-lista" id="contenedor-titulo-form-empresa">Nuevos datos de facturacion </div>
+        <div class="titulo-lista" id="contenedor-titulo-form-empresa">Nuevos datos de facturaci&oacute;n </div>
     </div>
     <div class="div-form p-5 border border-secondary-subtle mb-4">
         <div class="row">
-            <div class="col-md-12 d-flex justify-content-end mb-2">
+            <div class="col-md-12 d-flex justify-content-end">
                 <label class="fw-bold text-danger small">* Campo obligatorio</label>
             </div>
         </div>
@@ -12,24 +12,27 @@
             <div class="col-md-8">
             </div>
             <div class="new-tooltip icon tip col-md-2 text-center">
+                <div class="new-tooltip icon tip me-2">
+                    <span class="fas fa-question-circle small text-primary-emphasis"></span>
+                    <span class="tiptext">Se abrirá una ventana directamente a la herramienta de validación del SAT para
+                        verificar el RFC de su cliente.</span>    </div>
                 <label class="label-sub click-label" style="cursor: pointer;" onclick="validarRFC();">Validar RFC <span
                         class="fas fa-pencil-alt"></span></label>
-                <span class="tiptext">Se abrirá una ventana directamente a la herramienta de validación del SAT para
-                    verificar el RFC de su cliente.</span>
+                
             </div>
         </div>
         <div class="row py-1">
-            <div class="col-md-6">
-                <label class="label-form text-right mb-2" for="nombre-empresa">Nombre</label> <label
+            <div class="col-md-6 py-2">
+                <label class="label-form text-right" for="nombre-empresa">Nombre</label> <label
                     class="mark-required text-danger fw-bold">*</label>
                 <div class="form-group">
-                    <input class="form-control text-center input-form mb-3" id="nombre-empresa" name="nombre-empresa"
+                    <input class="form-control text-center input-form" id="nombre-empresa" name="nombre-empresa"
                         placeholder="Nombre del contribuyente" type="text" maxlength="100" />
                     <div id="nombre-empresa-errors"></div>
                 </div>
             </div>
-            <div class="col-md-6">
-                <label class="label-form text-right mb-2" for="rfc-empresa">RFC</label> <label
+            <div class="col-md-6 py-2">
+                <label class="label-form text-right" for="rfc-empresa">RFC</label> <label
                     class="mark-required text-danger fw-bold">*</label>
                 <div class="form-group">
                     <input class="form-control text-center input-form" id="rfc-empresa" name="rfc-empresa"
@@ -38,20 +41,20 @@
                 </div>
             </div>
         </div>
-
         <div class="row py-1">
-            <div class="col-md-6">
-                <label class="label-form text-right mb-2" for="razon-social">Razón Social</label> <label
+            <div class="col-md-6 py-2">
+                <label class="label-form text-right" for="razon-social">Razón social</label> <label
                     class="mark-required text-danger fw-bold">*</label>
                 <div class="form-group">
-                    <input class="form-control text-center input-form mb-3" id="razon-social" name="razon-social"
+                    <input class="form-control text-center input-form" id="razon-social" name="razon-social"
                         placeholder="Razón social" type="text" maxlength="100" />
                     <div id="razon-social-errors"></div>
                 </div>
             </div>
 
-            <div class="col-md-6">
-                <label class="label-form text-right mb-2" for="color-datos">Color distintivo</label>
+            <div class="col-md-6 py-2">
+                <label class="label-form text-right" for="color-datos">Color distintivo</label><label
+                class="mark-required text-danger fw-bold">&nbsp;</label>
                 <div class="form-group">
                     <input class="form-control text-center input-form" id="color-datos" name="color-datos"
                         placeholder="Razon social" type="color" value="#17177C" />
@@ -61,18 +64,19 @@
         </div>
 
         <div class="row py-1">
-            <div class="col-md-6">
-                <label class="label-form text-right mb-2" for="calle-empresa">Calle</label> <label
+            <div class="col-md-6 py-2">
+                <label class="label-form text-right" for="calle-empresa">Calle</label> <label
                     class="mark-required text-danger fw-bold">*</label>
                 <div class="form-group">
-                    <input class="form-control text-center input-form mb-3" id="calle-empresa" name="calle-empresa"
+                    <input class="form-control text-center input-form" id="calle-empresa" name="calle-empresa"
                         placeholder="Calle" type="text" />
                     <div id="calle-empresa-errors"></div>
                 </div>
             </div>
 
-            <div class="col-md-6">
-                <label class="label-form text-right mb-2" for="num-int-empresa">Número interior</label>
+            <div class="col-md-6 py-2">
+                <label class="label-form text-right" for="num-int-empresa">Número interior</label><label
+                class="mark-required text-danger fw-bold">&nbsp;</label>
                 <div class="form-group">
                     <input class="form-control text-center input-form" id="num-int-empresa" name="num-int-empresa"
                         placeholder="Número interior" type="text" />
@@ -82,17 +86,17 @@
         </div>
 
         <div class="row py-1">
-            <div class="col-md-6">
-                <label class="label-form text-right mb-2" for="num-ext-empresa">Número exterior</label> <label
+            <div class="col-md-6 py-2">
+                <label class="label-form text-right" for="num-ext-empresa">Número exterior</label> <label
                     class="mark-required text-danger fw-bold">*</label>
                 <div class="form-group">
-                    <input class="form-control text-center input-form mb-3" id="num-ext-empresa" name="num-ext-empresa"
+                    <input class="form-control text-center input-form" id="num-ext-empresa" name="num-ext-empresa"
                         placeholder="Número exterior" type="text" />
                     <div id="num-ext-empresa-errors"></div>
                 </div>
             </div>
-            <div class="col-md-6">
-                <label class="label-form text-right mb-2" for="colonia-empresa">Colonia</label> <label
+            <div class="col-md-6 py-2">
+                <label class="label-form text-right" for="colonia-empresa">Colonia</label> <label
                     class="mark-required text-danger fw-bold">*</label>
                 <div class="form-group">
                     <input class="form-control text-center input-form" id="colonia-empresa" name="colonia-empresa"
@@ -103,26 +107,26 @@
         </div>
 
         <div class="row py-1">
-            <div class="col-md-6">
+            <div class="col-md-6 py-2">
                 <div class="new-tooltip icon tip me-2">
                     <span class="fas fa-question-circle small text-primary-emphasis"></span>
                     <span class="tiptext">Al ingresar el código postal se selecciona el estado y municipio correspondiente. Si no es tu estado o municipio puedes seleccionarlos del listado manualmente.</span>
                 </div>
-                <label class="label-form text-right mb-2" for="codigo_postal">Código postal</label> <label
+                <label class="label-form text-right" for="codigo_postal">Código postal</label> <label
                     class="mark-required text-danger fw-bold">*</label>
                 <div class="form-group">
-                    <input class="form-control text-center input-form mb-3" id="codigo_postal" name="codigo_postal"
+                    <input class="form-control text-center input-form" id="codigo_postal" name="codigo_postal"
                         placeholder="Código Postal" type="number" onblur="getEstadoMunicipioByCodP();" />
                     <div id="codigo_postal-errors"></div>
 
                 </div>
             </div>
 
-            <div class="col-md-6">
-                <label class="label-form text-right mb-2" for="id-estado">Estado</label> <label
+            <div class="col-md-6 py-2">
+                <label class="label-form text-right" for="id-estado">Estado</label> <label
                     class="mark-required text-danger fw-bold">*</label>
                 <div class="form-group">
-                    <select class="form-select input-form w-100 p-2 text-center mb-3" id="id-estado" name="id-estado"
+                    <select class="form-select input-form w-100 p-2 text-center" id="id-estado" name="id-estado"
                         onchange='loadOpcionesMunicipio();'>
                         <option value="" id="option-default-estado">- - - -</option>
                         <optgroup class="contenedor-estado text-start"> </optgroup>
@@ -134,11 +138,11 @@
         </div>
 
         <div class="row py-1">
-            <div class="col-md-6">
-                <label class="label-form text-right mb-2" for="id-municipio">Municipio</label> <label
+            <div class="col-md-6 py-2">
+                <label class="label-form text-right" for="id-municipio">Municipio</label> <label
                     class="mark-required text-danger fw-bold">*</label>
                 <div class="form-group">
-                    <select class="form-select input-form w-100 p-2 text-center mb-3" id="id-municipio"
+                    <select class="form-select input-form w-100 p-2 text-center" id="id-municipio"
                         name="id-municipio">
                         <option value="" id="option-default-municipio">- - - -</option>
                         <optgroup class="contenedor-municipio text-start"> </optgroup>
@@ -148,8 +152,9 @@
                 </div>
             </div>
 
-            <div class="col-md-6">
-                <label class="label-form text-right mb-2" for="pais-empresa">País</label>
+            <div class="col-md-6 py-2">
+                <label class="label-form text-right" for="pais-empresa">País</label><label
+                class="mark-required text-danger fw-bold">&nbsp;</label>
                 <div class="form-group">
                     <input class="form-control text-center input-form" id="pais-empresa" name="pais-empresa"
                         placeholder="País" type="text" maxlength="100" value="Mexico" />
@@ -159,7 +164,7 @@
         </div>
 
         <div class="row py-1">
-            <div class="col-md-6">
+            <div class="col-md-6 py-2">
                 <label class="label-form text-right" for="regimen-fiscal">Régimen fiscal</label> <label
                 class="mark-required text-danger fw-bold">*</label>
             <div class="form-group">
@@ -171,30 +176,32 @@
             </div>
         </div>
         <div class="row mt-3">
-            <div class="col-md-6">
-                <label class="label-form text-right mb-2" for="correo-electronico">Correo electrónico </label> <label
+            <div class="col-md-6 py-2">
+                <label class="label-form text-right" for="correo-electronico">Correo electrónico </label> <label
                     class="mark-required text-danger fw-bold">*</label>
                 <div class="form-group">
-                    <input class="form-control text-center input-form mb-3" id="correo-electronico"
+                    <input class="form-control text-center input-form" id="correo-electronico"
                         name="correo-electronico" placeholder="Correo Electronico" type="text" />
                     <div id="correo-electronico-errors"></div>
                 </div>
             </div>
-            <div class="col-md-6">
-                <label class="label-form text-right mb-2" for="telefono">Teléfono</label> <label
+            <div class="col-md-6 py-2">
+                <label class="label-form text-right" for="telefono">Teléfono</label> <label
                     class="mark-required text-danger fw-bold">*</label>
                 <div class="form-group">
                     <input class="form-control text-center input-form" id="telefono" name="telefono"
-                        placeholder="Telefono contacto" type="text" />
+                        placeholder="Telefono contacto" type="text" type="text" maxlength="10" minlength="10"
+                        oninput="validarNum(this)" />
                     <div id="telefono-errors"></div>
                 </div>
             </div>
         </div>
         <div class="row py-1">
-            <div class="col-md-6">
-                <label class="label-form text-right mb-2" for="id-banco">Banco</label>
+            <div class="col-md-6 py-2">
+                <label class="label-form text-right" for="id-banco">Banco</label><label
+                class="mark-required text-danger fw-bold">&nbsp;</label>
                 <div class="form-group">
-                    <select class="form-select text-center input-form mb-3" id="id-banco" name="id-banco">
+                    <select class="form-select text-center input-form" id="id-banco" name="id-banco">
                         <option value="" id="option-default-banco">- - - -</option>
                         <optgroup id="banco" class="contenedor-banco text-start"> </optgroup>
                     </select>
@@ -202,8 +209,9 @@
                 </div>
             </div>
 
-            <div class="col-md-6">
-                <label class="label-form text-right mb-2" for="sucursal"> No. Sucursal </label>
+            <div class="col-md-6 py-2">
+                <label class="label-form text-right" for="sucursal"> No. Sucursal </label> <label
+                class="mark-required text-danger fw-bold">&nbsp;</label>
                 <div class="form-group">
                     <input class="form-control text-center input-form" id="sucursal" name="sucursal"
                         placeholder="Numero de sucursal bancaria" maxlength="20" type="text" />
@@ -212,17 +220,19 @@
             </div>
         </div>
         <div class="row py-1">
-            <div class="col-md-6">
-                <label class="label-form text-right mb-2" for="cuenta"> Cuenta </label>
+            <div class="col-md-6 py-2">
+                <label class="label-form text-right" for="cuenta"> Cuenta </label><label
+                class="mark-required text-danger fw-bold">&nbsp;</label>
                 <div class="form-group">
-                    <input class="form-control text-center input-form mb-3" id="cuenta" name="cuenta"
+                    <input class="form-control text-center input-form" id="cuenta" name="cuenta"
                         placeholder="Numero de cuenta bancaria" maxlength="20" type="text" />
                     <div id="cuenta-errors"></div>
                 </div>
             </div>
 
-            <div class="col-md-6">
-                <label class="label-form text-right mb-2" for="clabe"> Clabe </label>
+            <div class="col-md-6 py-2">
+                <label class="label-form text-right" for="clabe"> Clabe </label><label
+                class="mark-required text-danger fw-bold">&nbsp;</label>
                 <div class="form-group">
                     <input class="form-control text-center input-form" id="clabe" name="clabe"
                         placeholder="Clabe Interbancaria" maxlength="18" type="text" />
@@ -231,15 +241,16 @@
             </div>
         </div>
         <div class="row py-1">
-            <div class="col-md-6">
-                <label class="label-form text-right mb-2" for="tarjeta-oxxo"> Número de tarjeta </label>
+            <div class="col-md-6 py-2">
+                <label class="label-form text-right" for="tarjeta-oxxo"> Número de tarjeta </label><label
+                class="mark-required text-danger fw-bold">&nbsp;</label>
                 <div class="form-group">
-                    <input class="form-control text-center input-form mb-3" id="tarjeta-oxxo" name="tarjeta-oxxo"
+                    <input class="form-control text-center input-form" id="tarjeta-oxxo" name="tarjeta-oxxo"
                         placeholder="Número de tarjeta" type="number" />
                     <div id="tarjeta-oxxo-errors"></div>
                 </div>
             </div>
-            <div class="col-md-6 py-2">
+            <div class="col-md-6 py-2 py-2">
                 <label class="label-form text-right">Añadir cuentas</label><label
                     class="mark-required text-danger fw-bold">&nbsp;</label>
                 <div class="form-group">
@@ -250,103 +261,113 @@
         </div>
         <div class="px-2 mt-3" id="addcuentas1" hidden>
             <div class="row border border-secondary-subtle rounded-1 p-3">
-                <div class="col-md-6">
-                    <label class="label-form text-right mb-2" for="id-banco1">Banco 2</label>
+                <div class="col-md-6 py-2">
+                    <label class="label-form text-right" for="id-banco1">Banco 2</label><label
+                    class="mark-required text-danger fw-bold">&nbsp;</label>
                     <div class="form-group">
-                        <select class="form-select text-center input-form mb-3 id-banco1" id="id-banco1"
+                        <select class="form-select text-center input-form id-banco1" id="id-banco1"
                             name="id-banco">
                             <option value="" id="option-default-banco1">- - - -</option>
-                            <optgroup id="banco1" class="contenedor-banco text-start"> </optgroup>
+                            <optgroup id="banco1" class="contenedor-banco1 text-start"> </optgroup>
                         </select>
                         <div id="id-banco1-errors"></div>
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <label class="label-form text-right mb-2 " for="sucursal1"> No. Sucursal 2 </label>
+                <div class="col-md-6 py-2">
+                    <label class="label-form text-right " for="sucursal1"> No. Sucursal 2 </label><label
+                    class="mark-required text-danger fw-bold">&nbsp;</label>
                     <div class="form-group">
                         <input class="form-control text-center input-form" id="sucursal1" name="sucursal1"
                             placeholder="Numero de sucursal bancaria" maxlength="20" type="text" />
                         <div id="sucursal1-errors"></div>
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <label class="label-form text-right mb-2" for="cuenta1">Cuenta 2</label>
+                <div class="col-md-6 py-2">
+                    <label class="label-form text-right" for="cuenta1">Cuenta 2</label><label
+                    class="mark-required text-danger fw-bold">&nbsp;</label>
                     <div class="form-group">
-                        <input class="form-control text-center input-form mb-3" id="cuenta1" name="cuenta1"
+                        <input class="form-control text-center input-form" id="cuenta1" name="cuenta1"
                             placeholder="Numero de cuenta bancaria" maxlength="20" type="text" />
                         <div id="cuenta1-errors"></div>
                     </div>
                 </div>
 
-                <div class="col-md-6">
-                    <label class="label-form text-right mb-2" for="clabe1"> Clabe 2</label>
+                <div class="col-md-6 py-2">
+                    <label class="label-form text-right" for="clabe1"> Clabe 2</label><label
+                    class="mark-required text-danger fw-bold">&nbsp;</label>
                     <div class="form-group">
                         <input class="form-control text-center input-form" id="clabe1" name="clabe1"
                             placeholder="Clabe Interbancaria" maxlength="18" type="text" />
                         <div id="clabe1-errors"></div>
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <label class="label-form text-right mb-2" for="tarjeta-oxxo1"> Número de tarjeta 2 </label>
+                <div class="col-md-6 py-2">
+                    <label class="label-form text-right" for="tarjeta-oxxo1"> Número de tarjeta 2 </label><label
+                    class="mark-required text-danger fw-bold">&nbsp;</label>
                     <div class="form-group">
-                        <input class="form-control text-center input-form mb-3" id="tarjeta-oxxo1" name="tarjeta-oxxo1"
+                        <input class="form-control text-center input-form" id="tarjeta-oxxo1" name="tarjeta-oxxo1"
                             placeholder="Número de tarjeta" maxlength="20" type="text" />
                         <div id="tarjeta-oxxo1-errors"></div>
                     </div>
                 </div>
-                <div class="col-md-6 py-2">
+                <div class="col-md-6 py-2 py-2">
                     <label class="label-form text-right" for="rmvcuentas1"> Borrar datos de cuenta 2</label><label
                         class="mark-required text-danger fw-bold">&nbsp;</label>
-                    <a class="btn button-list-add col-12" id="rmvcuentas1" title="Remover cuenta"
+                    <a class="btn button-list-add col-3" id="rmvcuentas1" title="Remover cuenta"
                         onclick="confirmarEliminacion(1);"><span class="fas fa-times mt-2"></span></a>
                 </div>
             </div>
         </div>
         <div class="px-2 mt-3" id="addcuentas2" hidden>
             <div class="row border border-secondary-subtle rounded-1 p-3">
-                <div class="col-md-6">
-                    <label class="label-form text-right mb-2" for="id-banco2">Banco 3</label>
+                <div class="col-md-6 py-2">
+                    <label class="label-form text-right" for="id-banco2">Banco 3</label><label
+                    class="mark-required text-danger fw-bold">&nbsp;</label>
                     <div class="form-group">
-                        <select class="form-select text-center input-form mb-3" id="id-banco2" name="id-banco2">
+                        <select class="form-select text-center input-form" id="id-banco2" name="id-banco2">
                             <option value="" id="option-default-banco2">- - - -</option>
-                            <optgroup id="banco2" class="contenedor-banco text-start"> </optgroup>
+                            <optgroup id="banco2" class="contenedor-banco2 text-start"> </optgroup>
                         </select>
                         <div id="id-banco2-errors"></div>
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <label class="label-form text-right mb-2" for="sucursal2"> No. Sucursal 3 </label>
+                <div class="col-md-6 py-2">
+                    <label class="label-form text-right" for="sucursal2"> No. Sucursal 3 </label><label
+                    class="mark-required text-danger fw-bold">&nbsp;</label>
                     <div class="form-group">
                         <input class="form-control text-center input-form" id="sucursal2" name="sucursal2"
                             placeholder="Numero de sucursal bancaria" maxlength="20" type="text" />
                         <div id="sucursal2-errors"></div>
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <label class="label-form text-right mb-2" for="cuenta2">Cuenta 3</label>
+                <div class="col-md-6 py-2">
+                    <label class="label-form text-right" for="cuenta2">Cuenta 3</label><label
+                    class="mark-required text-danger fw-bold">&nbsp;</label>
                     <div class="form-group">
-                        <input class="form-control text-center input-form mb-3" id="cuenta2" name="cuenta2"
+                        <input class="form-control text-center input-form" id="cuenta2" name="cuenta2"
                             placeholder="Numero de cuenta bancaria" maxlength="20" type="text" />
                         <div id="cuenta2-errors"></div>
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <label class="label-form text-right mb-2" for="clabe2"> Clabe 3</label>
+                <div class="col-md-6 py-2">
+                    <label class="label-form text-right" for="clabe2"> Clabe 3</label><label
+                    class="mark-required text-danger fw-bold">&nbsp;</label>
                     <div class="form-group">
                         <input class="form-control text-center input-form" id="clabe2" name="clabe2"
                             placeholder="Clabe Interbancaria" maxlength="18" type="text" />
                         <div id="clabe2-errors"></div>
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <label class="label-form text-right mb-2" for="tarjeta-oxxo2"> Número de tarjeta 3 </label>
+                <div class="col-md-6 py-2">
+                    <label class="label-form text-right" for="tarjeta-oxxo2"> Número de tarjeta 3 </label><label
+                    class="mark-required text-danger fw-bold">&nbsp;</label>
                     <div class="form-group">
-                        <input class="form-control text-center input-form mb-3" id="tarjeta-oxxo2" name="tarjeta-oxxo2"
+                        <input class="form-control text-center input-form" id="tarjeta-oxxo2" name="tarjeta-oxxo2"
                             placeholder="Número de tarjeta" maxlength="20" type="text" />
                         <div id="tarjeta-oxxo2-errors"></div>
                     </div>
                 </div>
-                <div class="col-md-6 py-2">
+                <div class="col-md-6 py-2 py-2">
                     <label class="label-form text-right" for="rmvcuentas1"> Borrar datos de cuenta 3</label><label
                         class="mark-required text-danger fw-bold">&nbsp;</label>
                     <a class="btn button-list-add col-12" id="rmvcuentas2" title="Remover cuenta"
@@ -356,51 +377,56 @@
         </div>
         <div class="px-2 mt-3" id="addcuentas3" hidden>
             <div class="row border border-secondary-subtle rounded-1 p-3">
-                <div class="col-md-6">
-                    <label class="label-form text-right mb-2" for="id-banco3">Banco 4</label>
+                <div class="col-md-6 py-2">
+                    <label class="label-form text-right" for="id-banco3">Banco 4</label><label
+                    class="mark-required text-danger fw-bold">&nbsp;</label>
                     <div class="form-group">
-                        <select class="form-select text-center input-form mb-3" id="id-banco3" name="id-banco3">
+                        <select class="form-select text-center input-form" id="id-banco3" name="id-banco3">
                             <option value="" id="option-default-banco3">- - - -</option>
-                            <optgroup id="banco3" class="contenedor-banco text-start"> </optgroup>
+                            <optgroup id="banco3" class="contenedor-banco3 text-start"> </optgroup>
                         </select>
                         <div id="id-banco3-errors"></div>
                     </div>
                 </div>
 
-                <div class="col-md-6">
-                    <label class="label-form text-right mb-2" for="sucursal3"> No. Sucursal 4 </label>
+                <div class="col-md-6 py-2">
+                    <label class="label-form text-right" for="sucursal3"> No. Sucursal 4 </label><label
+                    class="mark-required text-danger fw-bold">&nbsp;</label>
                     <div class="form-group">
                         <input class="form-control text-center input-form" id="sucursal3" name="sucursal3"
                             placeholder="Numero de sucursal bancaria" maxlength="20" type="text" />
                         <div id="sucursal3-errors"></div>
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <label class="label-form text-right mb-2" for="cuenta3">Cuenta 4</label>
+                <div class="col-md-6 py-2">
+                    <label class="label-form text-right" for="cuenta3">Cuenta 4</label><label
+                    class="mark-required text-danger fw-bold">&nbsp;</label>
                     <div class="form-group">
-                        <input class="form-control text-center input-form mb-3" id="cuenta3" name="cuenta"
+                        <input class="form-control text-center input-form" id="cuenta3" name="cuenta"
                             placeholder="Numero de cuenta bancaria" maxlength="20" type="text" />
                         <div id="cuenta3-errors"></div>
                     </div>
                 </div>
 
-                <div class="col-md-6">
-                    <label class="label-form text-right mb-2" for="clabe3"> Clabe 4</label>
+                <div class="col-md-6 py-2">
+                    <label class="label-form text-right" for="clabe3"> Clabe 4</label><label
+                    class="mark-required text-danger fw-bold">&nbsp;</label>
                     <div class="form-group">
                         <input class="form-control text-center input-form" id="clabe3" name="clabe3"
                             placeholder="Clabe Interbancaria" maxlength="18" type="text" />
                         <div id="clabe3-errors"></div>
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <label class="label-form text-right mb-2" for="tarjeta-oxxo3"> Número de tarjeta 4 </label>
+                <div class="col-md-6 py-2">
+                    <label class="label-form text-right" for="tarjeta-oxxo3"> Número de tarjeta 4 </label><label
+                    class="mark-required text-danger fw-bold">&nbsp;</label>
                     <div class="form-group">
-                        <input class="form-control text-center input-form mb-3" id="tarjeta-oxxo3" name="tarjeta-oxxo3"
+                        <input class="form-control text-center input-form" id="tarjeta-oxxo3" name="tarjeta-oxxo3"
                             placeholder="Número de tarjeta" maxlength="20" type="text" />
                         <div id="tarjeta-oxxo3-errors"></div>
                     </div>
                 </div>
-                <div class="col-md-6 py-2">
+                <div class="col-md-6 py-2 py-2">
                     <label class="label-form text-right" for="rmvcuentas3"> Borrar datos de cuenta 4</label><label
                         class="mark-required text-danger fw-bold">&nbsp;</label>
                     <a class="btn button-list-add" id="rmvcuentas3" title="Remover cuenta"
@@ -409,8 +435,8 @@
             </div>
         </div>
         <div class="row mt-4">
-            <div class="col-md-6">
-                <label class="button-file pt-3 pb-5 d-grid col-12 mx-auto mb-3" for="certificado-csd"
+            <div class="col-md-6 py-2">
+                <label class="button-file pt-3 pb-5 d-grid col-12 mx-auto" for="certificado-csd"
                     id="label-csd"><span class="fas fa-arrow-circle-up"></span> Certificado CSD </label>
                 <div class="form-group">
                     <input class="form-control text-center input-form " hidden id="certificado-csd"
@@ -418,8 +444,8 @@
                     <div id="certificado-csd-errors"></div>
                 </div>
             </div>
-            <div class="col-md-6">
-                <label class="button-file pt-3 pb-5 d-grid col-12 mx-auto mb-3" for="archivo-key" id="label-key"><span
+            <div class="col-md-6 py-2">
+                <label class="button-file pt-3 pb-5 d-grid col-12 mx-auto" for="archivo-key" id="label-key"><span
                         class="fas fa-arrow-circle-up"></span> Archivo KEY</label>
                 <div class="form-group">
                     <input class="form-control text-center input-form" hidden id="archivo-key" name="archivo-key"
@@ -429,8 +455,8 @@
             </div>
         </div>
         <div class="row py-1">
-            <div class="col-md-6">
-                <label class="label-form text-right mb-2" for="password-key">Contraseña Key</label> <label
+            <div class="col-md-6 py-2">
+                <label class="label-form text-right" for="password-key">Contraseña Key</label> <label
                     class="mark-required text-danger fw-bold">*</label>
                 <div class="form-group">
                     <input class="form-control text-center input-form" id="password-key" name="password-key"
@@ -441,12 +467,13 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-6">
-                <label class="label-form text-right mb-2" for="firma-canvas">Firma</label>
-                <div class="form-group mb-3" id="signature-pad">
-                    <canvas id="firma-canvas" class="sign-canvas "></canvas>
+            <div class="col-md-6 py-2">
+                <label class="label-form text-right" for="firma-canvas">Firma</label><label
+                class="mark-required text-danger fw-bold">&nbsp;</label>
+                <div class="form-group" id="signature-pad">
+                    <canvas id="firma-canvas" class="sign-canvas"></canvas>
                 </div>
-                <div class="row d-flex justify-content-around">
+                <div class="row mt-3 d-flex justify-content-around">
                     <button class="button-image col-md-5" id="clear">Limpiar <span
                             class="fas fa-eraser"></span></button>
                     <button class="button-image col-md-5" id="undo">Borrar trazo <span
@@ -457,14 +484,13 @@
 
         <br />
         <div class="d-flex justify-content-end mt-3">
-            <button class="btn btn-danger button-form me-2 " onclick="loadView('listaempresa');">Cancelar <span
+            <button class="btn btn-danger button-form me-2" onclick="loadView('listaempresa');">Cancelar <span
                     class="fas fa-times"></span></button>
-            <button class="btn btn-primary button-form" onclick="insertarDatos()" id="btn-form-empresa">Guardar <span
+            <button class="btn btn-primary button-form" onclick="insertarDatos();" id="btn-form-empresa">Guardar <span
                     class="fas fa-save"></span></button>
         </div>
     </div>
-    <br> <br>
-</form>
+</div>
 <script src="js/scriptempresa.js"></script>
 <script>
     var wrapper = document.getElementById("signature-pad");

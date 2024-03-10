@@ -10,18 +10,18 @@ function firmaCanvas() {
     document.getElementById('undo').addEventListener('click', function () {
         var data = signaturePad.toData();
         if (data) {
-            data.pop(); // remove the last dot or line
+            data.pop(); 
             signaturePad.fromData(data);
         }
     });
 
-    document.getElementById('save').addEventListener('click', function () {
+   document.getElementById('save').addEventListener('click', function () {
         if (signaturePad.isEmpty()) {
-            return alertify.error("Dibuje una firma valida");
+            return alertify.error("Dibuje una firma válida.");
         }
         var firma = canvas.toDataURL();
         var firmaanterior = $("#firma-actual").val();
-        alertify.confirm("Esta reemplazara la firma actual, ¿continuar?", function () {
+        alertify.confirm("Esta reemplazará la firma actual, ¿Desea continuar?", function () {
             cargandoHide();
             cargandoShow();
             $.ajax({
@@ -45,38 +45,8 @@ function firmaCanvas() {
                 }
             });
         }).set({title: "Q-ik"});
-
     });
-}
-
-    var a = 0;
-
-function nuevoCampo() {
-    a++;
-    $("#addcuentas" + a).attr("hidden", false);
-    if (a > 0) {
-        $("#rmvcuentas").removeAttr('disabled');
-    }
-    if (a == 3) {
-        $("#addcuentas").attr('disabled', true);
-    }
-    addloadOpcionesBanco(a);
-}
-
-function quitarCampo() {
-    $("#addcuentas" + a).attr("hidden", true);
-    $("#id-banco" + a).val("");
-    $("#sucursal" + a).val("");
-    $("#cuenta" + a).val("");
-    $("#clabe" + a).val("");
-    $("#tarjeta-oxxo" + a).val("");
-    a--;
-    if (a < 3) {
-        $("#addcuentas").removeAttr('disabled');
-    }
-    if (a == 0) {
-        $("#rmvcuentas").attr('disabled', true);
-    }
+ 
 }
 
 function insertarDatos() {
@@ -88,13 +58,13 @@ function insertarDatos() {
     var interior = $("#num-int-empresa").val();
     var exterior = $("#num-ext-empresa").val();
     var colonia = $("#colonia-empresa").val();
-    var cp = $("#cp-empresa").val();
+    var cp = $("#codigo_postal").val();
     var idestado = $("#id-estado").val();
     var idmunicipio = $("#id-municipio").val() || '0';
     var estado = $("#id-estado option:selected").text();
     var municipio = $("#id-municipio option:selected").text();
     var pais = $("#pais-empresa").val();
-    var regimen = $("#regimen-empresa").val();
+    var regimen = $("#regimen-fiscal").val();
     var correo = $("#correo-electronico").val();
     var telefono = $("#telefono").val();
     var idbanco = $("#id-banco").val() || '0';
@@ -124,7 +94,7 @@ function insertarDatos() {
     var firma = canvas.toDataURL();
     var firmaanterior = $("#firma-actual").val();
 
-    if (isnEmpty(nombre, "nombre-empresa") && isnEmpty(rfc, "rfc-empresa") && isnEmpty(razon, "razon-empresa") && isnEmpty(calle, "calle-empresa") && isnEmpty(exterior, "num-ext-empresa") && isnEmpty(colonia, "colonia-empresa") && isnEmpty(cp, "cp-empresa") && isnEmpty(estado, "id-estado") && isnEmpty(municipio, "id-municipio") && isnEmpty(pais, "pais-empresa") && isList(regimen, "regimen-empresa") && isEmail(correo, "correo-electronico") && isnEmpty(telefono, "telefono") && isnEmpty(csd, "certificado-csd") && isnEmpty(key, "archivo-key") && isnEmpty(passkey, "password-key")) {
+    if (isnEmpty(nombre, "nombre-empresa") && isnEmpty(rfc, "rfc-empresa") && isnEmpty(razon, "razon-social") && isnEmpty(calle, "calle-empresa") && isnEmpty(exterior, "num-ext-empresa") && isnEmpty(colonia, "colonia-empresa") && isnEmpty(cp, "cp-postal") && isnEmpty(estado, "id-estado") && isnEmpty(municipio, "id-municipio") && isnEmpty(pais, "pais-empresa") && isList(regimen, "regimen-fiscal") && isEmail(correo, "correo-electronico") && isnEmpty(telefono, "telefono") && isnEmpty(csd, "certificado-csd") && isnEmpty(key, "archivo-key") && isnEmpty(passkey, "password-key")) {
         cargandoHide();
         cargandoShow();
         $.ajax({
@@ -132,14 +102,13 @@ function insertarDatos() {
             type: "POST",
             data: {transaccion: "insertardatos", nombre: nombre, rfc: rfc, razon: razon, color: color, calle: calle, interior: interior, exterior: exterior, colonia: colonia, correo: correo, telefono: telefono, cp: cp, idestado: idestado, idmunicipio: idmunicipio, estado: estado, municipio: municipio, pais: pais, regimen: regimen, passkey: passkey, idbanco: idbanco, sucursal: sucursal, cuenta: cuenta, clabe: clabe, oxxo: oxxo, idbanco1: idbanco1, sucursal1: sucursal1, cuenta1: cuenta1, clabe1: clabe1, oxxo1: oxxo1, idbanco2: idbanco2, sucursal2: sucursal2, cuenta2: cuenta2, clabe2: clabe2, oxxo2: oxxo2, idbanco3: idbanco3, sucursal3: sucursal3, cuenta3: cuenta3, clabe3: clabe3, oxxo3: oxxo3, firma: firma, firmaanterior: firmaanterior},
             success: function (datos) {
-                //alert(datos);
                 var texto = datos.toString();
                 var bandera = texto.substring(0, 1);
                 var res = texto.substring(1, 1000);
                 if (bandera == '0') {
                     alertify.error(res);
                 } else {
-                    alertify.success('Datos de facturacion guardados');
+                    alertify.success('Datos de facturación guardados correctamente.');
                     loadView('listaempresa');
                 }
                 cargandoHide();
@@ -267,57 +236,31 @@ function setValoresEditarEmpresa(datos) {
     $("#num-int-empresa").val(interior);
     $("#num-ext-empresa").val(exterior);
     $("#colonia-empresa").val(colonia);
-    loadOpcionesEstado(idestado);
+    
+    loadOpcionesEstado('contenedor-estado', 'id-estado', idestado);
     loadOpcionesMunicipio(idmunicipio, idestado);
 
     $("#pais-empresa").val(pais);
-    $("#cp-empresa").val(cp);
-    $("#regimen-empresa").val(creg + "-" + regimen);
+    $("#codigo_postal").val(cp);
+    $("#regimen-fiscal").val(creg + "-" + regimen);
     $("#correo-electronico").val(correo);
     $("#telefono").val(telefono);
 
     if (idbanco != '0') {
-        loadOpcionesBanco(idbanco);
+        loadOpcionesBanco("id-banco", idbanco);
         $("#sucursal").val(sucursal);
         $("#cuenta").val(cuenta);
         $("#clabe").val(clabe);
         $("#tarjeta-oxxo").val(oxxo);
     }
 
-    if (idbanco1 != '0') {
-        $("#addcuentas1").removeAttr('hidden');
-        addloadOpcionesBanco('1', idbanco1);
-        $("#sucursal1").val(sucursal1);
-        $("#cuenta1").val(cuenta1);
-        $("#clabe1").val(clabe1);
-        $("#tarjeta-oxxo1").val(oxxo1);
-        a = 1;
-        $("#rmvcuentas").removeAttr('disabled');
-    }
+    inicializarCampos(idbanco1, cuenta1, clabe1, sucursal1, oxxo1,  1);
+    inicializarCampos(idbanco2, cuenta2, clabe2, sucursal2, oxxo2,  2);
+    inicializarCampos(idbanco3, cuenta3, clabe3, sucursal3, oxxo3,  3);
 
-    if (idbanco2 != '0') {
-        $("#addcuentas2").removeAttr('hidden');
-        addloadOpcionesBanco('3', idbanco2);
-        $("#sucursal2").val(sucursal2);
-        $("#cuenta2").val(cuenta2);
-        $("#clabe2").val(clabe2);
-        $("#tarjeta-oxxo2").val(oxxo2);
-        a = 2;
-    }
-
-    if (idbanco3 != '0') {
-        $("#addcuentas3").removeAttr('hidden');
-        addloadOpcionesBanco('3', idbanco3);
-        $("#sucursal3").val(sucursal3);
-        $("#cuenta3").val(cuenta3);
-        $("#clabe3").val(clabe3);
-        $("#tarjeta-oxxo3").val(oxxo3);
-        a = 3;
-        $("#addcuentas").attr('disabled', true);
-    }
 
     $("#firma-actual").val(firma);
-    $("#div-firma").html("<label class='label-sub text-right'>Firma Actual</label><img src='" + firma + "' width='200px' id='imgfirma'>");
+    $("#div-firma").html("<label class='label-sub text-right mt-3'>Firma Actual</label><img src='" + firma + "' width='200px' id='imgfirma'>");
     $("#btn-form-empresa").attr("onclick", "actualizarEmpresa(" + idEmpresa + ");");
 }
 
@@ -341,10 +284,12 @@ function errorKEY() {
 }
 
 function cargarCSD() {
-    var formData = new FormData(document.getElementById("form-empresa"));
     var rfc = $("#rfc-empresa").val();
-//    var formData = new FormData($("#form-img")[0]);
-    if (isnEmpty(rfc, 'rfc-empresa') && isnEmpty(formData, 'certificado-csd')) {
+    var formData = new FormData();
+    var certificado = $("#certificado-csd")[0].files[0];
+    formData.append('certificado-csd', certificado);
+    formData.append('rfc-empresa', rfc);
+    if (isnEmpty(rfc, 'rfc-empresa') && isnEmpty(certificado, 'certificado-csd')) {
         cargandoHide();
         cargandoShow();
         $.ajax({
@@ -364,6 +309,7 @@ function cargarCSD() {
                     $("#certificado-csd-errors").css("color", "red");
                 } else {
                     $("#label-csd").css("border-color", "green");
+                    alertify.success("Archivo CSD subido satisfactoriamente.")
                 }
                 cargandoHide();
             }
@@ -372,9 +318,12 @@ function cargarCSD() {
 }
 
 function cargarKEY() {
-    var formData = new FormData(document.getElementById("form-empresa"));
     var rfc = $("#rfc-empresa").val();
-    if (isnEmpty(rfc, 'rfc-empresa') && isnEmpty(formData, 'archivo-key')) {
+    var formData = new FormData();
+    var key = $("#archivo-key")[0].files[0];
+    formData.append('archivo-key', key);
+    formData.append('rfc-empresa', rfc);
+    if (isnEmpty(rfc, 'rfc-empresa') && isnEmpty(key, 'archivo-key')) {
         cargandoHide();
         cargandoShow();
         $.ajax({
@@ -394,6 +343,7 @@ function cargarKEY() {
                     $("#archivo-key-errors").css("color", "red");
                 } else {
                     $("#label-key").css("border-color", "green");
+                    alertify.success("Archivo KEY subido satisfactoriamente.")
                 }
                 cargandoHide();
             }
@@ -423,8 +373,8 @@ function actualizarEmpresa(idempresa) {
     var estado = $("#id-estado option:selected").text();
     var municipio = $("#id-municipio option:selected").text();
     var pais = $("#pais-empresa").val();
-    var cp = $("#cp-empresa").val();
-    var regimen = $("#regimen-empresa").val();
+    var cp = $("#codigo_postal").val();
+    var regimen = $("#regimen-fiscal").val();
     var correo = $("#correo-electronico").val();
     var telefono = $("#telefono").val();
     var idbanco = $("#id-banco").val();
@@ -476,7 +426,7 @@ function actualizarEmpresa(idempresa) {
         idbanco3 = '0';
     }
 
-    if (isnEmpty(nombre, "nombre-empresa") && isnEmpty(rfc, "rfc-empresa") && isnEmpty(razon, "razon-empresa") && isnEmpty(calle, "calle-empresa") && isnEmpty(exterior, "num-ext-empresa") && isnEmpty(colonia, "colonia-empresa") && isnEmpty(idestado, "id-estado") && isnEmpty(idmunicipio, "id-municipio") && isnEmpty(cp, "cp-empresa") && isnEmpty(pais, "pais-empresa") && isList(regimen, "regimen-empresa")) {
+    if (isnEmpty(nombre, "nombre-empresa") && isnEmpty(rfc, "rfc-empresa") && isnEmpty(razon, "razon-empresa") && isnEmpty(calle, "calle-empresa") && isnEmpty(exterior, "num-ext-empresa") && isnEmpty(colonia, "colonia-empresa") && isnEmpty(idestado, "id-estado") && isnEmpty(idmunicipio, "id-municipio") && isnEmpty(cp, "cp-postal") && isnEmpty(pais, "pais-empresa") && isList(regimen, "regimen-fiscal")) {
         $.ajax({
             url: "com.sine.enlace/enlaceempresa.php",
             type: "POST",
@@ -538,7 +488,7 @@ function descargarArchivos(id) {
 
 
 function eliminarEmpresa(did) {
-    alertify.confirm("Al realizar esta accion se borraran tambien los archivos CSD y KEY registrados, esta seguro que desea continuar?", function () {
+    alertify.confirm("Al realizar esta acción se borrarán también los archivos CSD y KEY registrados, ¿estás seguro que deseas continuar?", function () {
         cargandoHide();
         cargandoShow();
         $.ajax({
@@ -616,11 +566,13 @@ function nuevoCampo() {
     }
 }
 
-function inicializarCampos(idbanco, cuenta, clabe, i) {
+function inicializarCampos(idbanco, cuenta, clabe, sucursal, tarjeta, i) {
     if (idbanco !== '0') {
         $("#addcuentas" + i).attr('hidden', false);
         loadOpcionesBanco('id-banco'+i, idbanco);
         $("#cuenta" + i).val(cuenta);
+        $("#sucursal" + i).val(sucursal);
+        $("#tarjeta-oxxo" + i).val(tarjeta);
         $("#clabe" + i).val(clabe);
         renglon = i;
         $("#rmvcuentas").removeAttr('disabled');

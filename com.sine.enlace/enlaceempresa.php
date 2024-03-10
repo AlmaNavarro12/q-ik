@@ -4,9 +4,10 @@ require_once '../com.sine.controlador/ControladorEmpresa.php';
 
 if (isset($_POST['transaccion'])) {
     $transaccion = $_POST['transaccion'];
+    $cu = new ControladorEmpresa();
+
     switch ($transaccion) {
         case 'insertardatos':
-            $cu = new ControladorEmpresa();
             $datosEmpresa = obtenerdatosEmpresa();
             $actualizado = $cu->saveDatos($datosEmpresa);
             if ($actualizado != "") {
@@ -14,50 +15,6 @@ if (isset($_POST['transaccion'])) {
             } else {
                 echo "0Error: no se insertó el registro";
             }
-            break;
-            //$c = new Empresa();
-            $cu = new ControladorEmpresa();
-           /* $nombre = $_POST['nombre'];
-            $rfc = strtoupper($_POST['rfc']);
-            $razon = $_POST['razon'];
-            $color = $_POST['color'];
-            $calle = $_POST['calle'];
-            $numint = $_POST['interior'];
-            $numext = $_POST['exterior'];
-            $colonia = $_POST['colonia'];
-            $correo = $_POST['correo'];
-            $telefono = $_POST['telefono'];
-            $municipio = $_POST['idmunicipio'];
-            $estado = $_POST['idestado'];
-            $pais = $_POST['pais'];
-            $cp = $_POST['cp'];
-            $regfiscal = $_POST['regimen'];
-            $divr = explode("-", $regfiscal);
-            $folio = $divr[0];
-            $regimen = $divr[1];
-            $passkey = $_POST['passkey'];
-            $idbanco = $_POST['idbanco'];
-            $sucursal = $_POST['sucursal'];
-            $cuenta = $_POST['cuenta'];
-            $clabe = $_POST['clabe'];
-            $oxxo = $_POST['oxxo'];
-            $idbanco1 = $_POST['idbanco1'];
-            $sucursal1 = $_POST['sucursal1'];
-            $cuenta1 = $_POST['cuenta1'];
-            $clabe1 = $_POST['clabe1'];
-            $oxxo1 = $_POST['oxxo1'];
-            $idbanco2 = $_POST['idbanco2'];
-            $sucursal2 = $_POST['sucursal2'];
-            $cuenta2 = $_POST['cuenta2'];
-            $clabe2 = $_POST['clabe2'];
-            $oxxo2 = $_POST['oxxo2'];
-            $idbanco3 = $_POST['idbanco3'];
-            $sucursal3 = $_POST['sucursal3'];
-            $cuenta3 = $_POST['cuenta3'];
-            $clabe3 = $_POST['clabe3'];
-            $oxxo3 = $_POST['oxxo3'];
-            $firma = $_POST['firma'];
-            $firmaanterior = $_POST['firmaanterior']; */
 
             $carpeta = '../temporal/' . $rfc . '/';
             $csd = $carpeta . 'csd.cer';
@@ -76,63 +33,8 @@ if (isset($_POST['transaccion'])) {
             $result = implode(':', $par);
             $divide2 = explode(":", $result);
             $numcert = $divide2[1] . $divide2[3] . $divide2[5] . $divide2[7] . $divide2[9] . $divide2[11] . $divide2[13] . $divide2[15] . $divide2[17] . $divide2[19] . $divide2[21] . $divide2[23] . $divide2[25] . $divide2[27] . $divide2[29] . $divide2[31] . $divide2[33] . $divide2[35] . $divide2[37] . $divide2[39];
-       
-
-          
-            /*$c->setNombreEmpresa($nombre);
-            $c->setRfc($rfc);
-            $c->setRazonSocial($razon);
-            $c->setColor($color);
-            $c->setCalle($calle);
-            $c->setNumint($numint);
-            $c->setNumext($numext);
-            $c->setColonia($colonia);
-            $c->setCorreo($correo);
-            $c->setTelefono($telefono);
-            $c->setMunicipio($municipio);
-            $c->setEstado($estado);
-            $c->setMunicipio($municipio);
-            $c->setPais($pais);
-            $c->setCp($cp);
-            $c->setFolioFiscal($folio);
-            $c->setRegimenFiscal($regimen);
-            $c->setIdbanco($idbanco);
-            $c->setSucursal($sucursal);
-            $c->setCuenta($cuenta);
-            $c->setClabe($clabe);
-            $c->setOxxo($oxxo);
-            $c->setIdbanco1($idbanco1);
-            $c->setSucursal1($sucursal1);
-            $c->setCuenta1($cuenta1);
-            $c->setClabe1($clabe1);
-            $c->setOxxo1($oxxo1);
-            $c->setIdbanco2($idbanco2);
-            $c->setSucursal2($sucursal2);
-            $c->setCuenta2($cuenta2);
-            $c->setClabe2($clabe2);
-            $c->setOxxo2($oxxo2);
-            $c->setIdbanco3($idbanco3);
-            $c->setSucursal3($sucursal3);
-            $c->setCuenta3($cuenta3);
-            $c->setClabe3($clabe3);
-            $c->setOxxo3($oxxo3);
-            $c->setCsd($cerb64);
-            $c->setKeyB64($keyB64);
-            $c->setNumcert($numcert);
-            $c->setPasscsd($passkey);
-            $c->setFirma($firma);
-            $c->setFirmaanterior($firmaanterior);
-
-            $actualizado = $cu->saveDatos(obtenerdatosEmpresa());
-            if ($actualizado != "") {
-                echo print_r($actualizado);
-            } else {
-                echo "0Error: no guardo el registro ";
-            }
-            break;*/
-            
+            break;
         case 'listaempresa':
-            $cu = new ControladorEmpresa();
             $nom = $_POST['nom'];
             $numreg = $_POST['numreg'];
             $pag = $_POST['pag'];
@@ -144,7 +46,6 @@ if (isset($_POST['transaccion'])) {
             }
             break;
         case 'editarempresa':
-            $cu = new ControladorEmpresa();
             $idempresa = $_POST['idempresa'];
             $datos = $cu->getDatosEmpresa($idempresa);
             if ($datos != "") {
@@ -155,7 +56,6 @@ if (isset($_POST['transaccion'])) {
             break;
         case 'actualizarempresa':
             $c = new Empresa();
-            $cu = new ControladorEmpresa();
             $idempresa = $_POST['idempresa'];
             $nombre = $_POST['nombre'];
             $rfc = $_POST['rfc'];
@@ -291,10 +191,7 @@ if (isset($_POST['transaccion'])) {
                 echo "0Error: no guardo el registro ";
             }
             break;
-      
-
-            case 'execkey':
-            $cu = new ControladorEmpresa();
+        case 'execkey':
             $passkey = $_POST['passkey'];
             $datos = $cu->getError($passkey);
             if ($datos != "") {
@@ -304,7 +201,6 @@ if (isset($_POST['transaccion'])) {
             }
             break;
         case 'eliminarempresa':
-            $cu = new ControladorEmpresa();
             $did = $_POST['did'];
             $eliminado = $cu->quitarEmpresa($did);
             if ($eliminado) {
@@ -314,17 +210,16 @@ if (isset($_POST['transaccion'])) {
             }
             break;
         case 'validaPaquete':
-            $cu = new controladorEmpresa();
-            $datos= $cu->validaPaquete();
+            $datos = $cu->validaPaquete();
             echo $datos;
-        break;
+            break;
         default:
             break;
-            
     }
 }
 
-function obtenerdatosEmpresa(){
+function obtenerdatosEmpresa()
+{
     $c = new Empresa();
     $c->setNombreEmpresa($_POST['nombre']);
     $c->setRfc($_POST['rfc']);
@@ -340,7 +235,7 @@ function obtenerdatosEmpresa(){
     $c->setEstado($_POST['idestado']);
     //sss
     $c->setNombreEstado($_POST['estado']);
-    $c->setNombreMunicipio($_POST['municipio']);    
+    $c->setNombreMunicipio($_POST['municipio']);
     $c->setPais($_POST['pais']);
     $c->setCp($_POST['cp']);
 
@@ -373,7 +268,7 @@ function obtenerdatosEmpresa(){
     $c->setOxxo3($_POST['oxxo3']);
     $c->setPasscsd($_POST['passkey']);
     $c->setFirma($_POST['firma']);
-   
+
     //  lógica para obtener keyb64, csd y numcsd
     $rfc = $_POST['rfc'];
     $carpeta = '../temporal/' . $rfc . '/';
@@ -389,10 +284,9 @@ function obtenerdatosEmpresa(){
     $divide2 = explode(":", $result);
     $numcert = $divide2[1] . $divide2[3] . $divide2[5] . $divide2[7] . $divide2[9] . $divide2[11] . $divide2[13] . $divide2[15] . $divide2[17] . $divide2[19] . $divide2[21] . $divide2[23] . $divide2[25] . $divide2[27] . $divide2[29] . $divide2[31] . $divide2[33] . $divide2[35] . $divide2[37] . $divide2[39];
 
-   // Setear valores
     $c->setCsd($cerb64);
     $c->setKeyB64($keyB64);
     $c->setNumcert($numcert);
-   
+
     return $c;
 }

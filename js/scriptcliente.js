@@ -226,7 +226,7 @@ function setValoresEditarCliente(datos) {
 
     $("#localidad").val(array[17]);
     $("#codigo_postal").val(array[18]);
-    loadOpcionesEstado('contenedor-estado', 'id-estado', array[15])
+    loadOpcionesEstado('contenedor-estado', 'id-estado', array[15]);
     loadOpcionesMunicipio(array[16], array[15]);
     $("#correo_alt1").val(array[31]);
     $("#correo_alt2").val(array[32]);

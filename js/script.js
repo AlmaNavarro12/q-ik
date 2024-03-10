@@ -1233,7 +1233,7 @@ function loadOpcionesFacturacion(id = "") {
             var bandera = texto.substring(0, 1);
             var res = texto.substring(1, 5000);
             if (bandera == 0) {
-                alertify.error(res);
+                alertify.error('No tiene registros en Datos de facturación, por lo cual el campo Datos de facturación* estará vacío.');
             } else {
                 $(".contenedor-datos").html(datos);
             }
