@@ -1,7 +1,7 @@
 <?php
 include("modals.php");
 ?>
-<div class="form-horizontal ps-3 fijo z-1">
+<div class="form-horizontal ps-3 fijo z-3">
     <div class="col-md-12">
         <div class="titulo-lista">Tickets de venta</div>
     </div>

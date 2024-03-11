@@ -40,14 +40,20 @@ $(function () {
         $('.button-venta').removeClass("button-venta-active");
         $(this).addClass("button-venta-active");
         var tab = $(this).attr("pago-tab");
+        console.log("Valor de tab:", tab); 
         $(".div-forma").hide();
         if (tab == 'cash') {
             $("#cambio-label").show();
+            $("#cambio-descuento").show();
         } else if (tab == 'card' || tab == 'val') {
             tab = 'ref';
+            $("#cambio-descuento").show();
+            $("#cambio-label").hide();
         }
-        $("#" + tab + "-div").show('slow');
+        $("#" + tab + "-div").show();
     });
+    
+    
 
     $('#cantidad-producto').keypress(function(event){
 		if(event.which == 13) {
@@ -488,14 +494,26 @@ function registrarDineroInicial() {
     }
 }
 
+function cerrarValores(){
+    $("#label-cambio").html("$ 0.00");
+    $('#ChkDescuento').prop('checked', false);
+    $('#Spndescuento').removeClass('far fa-check-square');
+    $('#Spndescuento').addClass('far fa-square');
+    $('#groupDesc').hide('slow');
+    $('#label-descuento').val("$0.00");
+    $('#PercentDescuento').val("");
+}
+
 function setValoresCobrar() {
     var tab = $("#tabs").find('.sub-tab-active').attr("data-tab");
     $("#label-cambio").val("$0.00");
+    cerrarValores();
     $.ajax({
         url: 'com.sine.enlace/enlaceventa.php',
         type: 'POST',
         data: {transaccion: 'totalticket', tab: tab},
         success: function (datos) {
+            console.log(datos);
             var array = datos.split("</tr>");
             var total = array[0] || "0.00";
             var art = array[1] || "0";
@@ -506,9 +524,18 @@ function setValoresCobrar() {
             $("#total-original").val(total);
             $("#monto-pagado").val(total);
             $("#label-art").html(art);
-            $('#label-descuento').html("$ " + descuento);
-            $('#input-descuento').val(descuento);
-            $('#input-descuento-original').val(descuento);
+
+            if (descuento != "0.00") {
+                $('#ChkDescuento').prop('checked', true);
+                $('#label-descuento').html("$ " + descuento);
+                $('#input-descuento').val(descuento);
+                $('#input-descuento-original').val(descuento);
+            } else {
+                $('#ChkDescuento').prop('checked', false);
+                $('#label-descuento').html("");
+                $('#input-descuento').val("");
+                $('#input-descuento-original').val("");
+            }
 
             window.setTimeout(() => {
                 $("#monto-pagado").select();
@@ -562,9 +589,10 @@ function habilitarDescuento(){
 }
 
 function resetDescuento(){
+    $("#cambio-descuento").show();
     var total = $('#total-original').val();
     var descuento = $('#input-descuento-original').val();
-    $('#label-total').html(total);
+    $('#label-total').html("$" + total);
     $('#total-cobrar').val(total);
     $('#label-descuento').html("$ "+descuento);
     $('#input-descuento').val(descuento);
@@ -579,9 +607,8 @@ function calcularCambio() {
     var total = $("#total-cobrar").val() || '0';
     var monto = $("#monto-pagado").val() || '0';
     var cambio = parseFloat(monto) - parseFloat(total);
-    cambio = Math.floor(cambio * 100)/100;
     if(cambio > 0){
-        $("#label-cambio").html("$" + cambio);
+        $("#label-cambio").html("$" + cambio.toFixed(2));
     }else{
         $("#label-cambio").html("$ 0.00");
     }
@@ -597,7 +624,7 @@ function CalculaDescuentoTotal(){
     suma_descuentos = Math.floor(suma_descuentos*100)/100;
     var totalDescuento = total - monto;
     totalDescuento = Math.floor(totalDescuento * 100)/100;
-    $('#label-total').html(descuento == 0 ? total : totalDescuento);
+    $('#label-total').html(descuento == 0 ? "$" + total : "$" +totalDescuento);
     $('#total-cobrar').val(descuento == 0 ? total : totalDescuento);
     $('#label-descuento').html("$ " + (descuento == 0 ? descuento_original : suma_descuentos));
     $('#input-descuento').val(descuento == 0 ? descuento_original : suma_descuentos);
@@ -618,60 +645,75 @@ function validarProductosVenta(p){
 }
 
 function guardarVenta(p, nprod) {
-    $('#btn-print, #btn-form-reg').prop('disabled', true);
-    var tab = $("#tabs .sub-tab-active").attr("data-tab");
-    var total = parseFloat($("#total-cobrar").val());
+    $('#btn-print').prop('disabled', true);
+    $('#btn-form-reg').prop('disabled', true);
+
+    var tab = $("#tabs").find('.sub-tab-active').attr("data-tab");
+    var total = $("#total-cobrar").val();
     var descuento = $('#input-descuento').val();
-    var percent_descuento = $('#ChkDescuento').is(':checked') ? $('#PercentDescuento').val() : 0;
-    var fmpago = $("#btn-fmpago .button-venta-active").attr("pago-tab");
-    var referencia = (fmpago == 'cash') ? "null" : $("#referencia-pago").val();
-    var validado = (fmpago == 'cash' && parseFloat($("#monto-pagado").val()) >= total) ? 1 : 0;
-    var pagado = (fmpago == 'cash') ? parseFloat($("#monto-pagado").val()) : 1;
+    var percent_descuento = 0;
+    var fmpago = $("#btn-fmpago").find('.button-venta-active').attr("pago-tab");
+    var referencia = "null";
+    var validado = 0;
+    var pagado = $("#monto-pagado").val();
+
+    if (fmpago == 'cash') {
+        pagado = parseFloat(pagado);
+        total = parseFloat(total);
+        if (pagado >= total){
+            validado = 1;
+        }
+    } else {
+        var pagado = "1";
+        validado = 1;
+        referencia = $("#referencia-pago").val();
+    }
+
+    if( $('#ChkDescuento').is(':checked') ){
+        percent_descuento = $('#PercentDescuento').val();
+    }
 
     if (isnZero(pagado, "monto-pagado") && isnEmpty(referencia, "referencia-pago")) {
-        if (nprod > 0 && validado == 1) {
-            $.ajax({
-                url: 'com.sine.enlace/enlaceventa.php',
-                type: 'POST',
-                data: {
-                    transaccion: 'insertarticket',
-                    tab: tab,
-                    total: total,
-                    pagado: pagado,
-                    referencia: referencia,
-                    fmpago: fmpago,
-                    descuento: descuento,
-                    percent_descuento: percent_descuento
-                },
-                success: function (datos) {
-                    var texto = datos.toString();
-                    var bandera = texto.substring(0, 1);
-                    var res = texto.substring(1, 5000);
-                    if (bandera == '0') {
-                        alertify.error(res);
-                    } else {
-                        $("#tab-" + tab + ", #ticket-" + tab).remove();
-                        var first = $("#tabs .sm-tab:first").attr("data-tab");
-                        if (first) {
-                            $("#ticket-" + first).show();
-                            $("#tab-" + first).addClass("sub-tab-active");
+        if( nprod > 0 ){
+            if( validado == 1){    
+                $.ajax({
+                    url: 'com.sine.enlace/enlaceventa.php',
+                    type: 'POST',
+                    data: {transaccion: 'insertarticket', tab: tab, total: total, pagado: pagado, referencia: referencia, fmpago: fmpago, descuento: descuento, percent_descuento:percent_descuento},
+                    success: function (datos) {
+                        var texto = datos.toString();
+                        var bandera = texto.substring(0, 1);
+                        var res = texto.substring(1, 5000);
+                        if (bandera == '0') {
+                            alertify.error(res);
                         } else {
-                            newVenta();
+                            $("#tab-" + tab).remove();
+                            $("#ticket-" + tab).remove();
+                            var first = $("#tabs").find('.sm-tab:first').attr("data-tab");
+                            if (first) {
+                                $("#ticket-" + first).show();
+                                $("#tab-" + first).addClass("sub-tab-active");
+                            } else {
+                                newVenta();
+                            }
+                            $("#modal-cobrar").modal('hide');
+                            if (p == '1') {
+                                imprimirTicket(tab);
+                            }
+                            alertify.success("Venta registrada correctamente.");
+                            ResetDescuento();
                         }
-                        $("#modal-cobrar").modal('hide');
-                        if (p == '1') {
-                            imprimirTicket(tab);
-                        }
-                        alertify.success("Venta registrada correctamente.");
-                        ResetDescuento();
                     }
-                }
-            });
+                });
+            } else {
+                alertify.error("El monto pagado es menor que el total de la venta.");
+            }
         } else {
-            alertify.error((nprod == 0) ? "El ticket seleccionado no contiene productos." : "El monto pagado es menor que el total de la venta.");
+            alertify.error("El ticket seleccionado no contiene productos.");
         }
     }
-    $('#btn-print, #btn-form-reg').prop('disabled', false);
+    $('#btn-print').prop('disabled', false);
+    $('#btn-form-reg').prop('disabled', false);
 }
 
 function filtrarVentas(pag = "") {

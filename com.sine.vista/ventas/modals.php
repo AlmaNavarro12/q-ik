@@ -76,7 +76,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title fs-5 fw-bold" id="label-nuevo-producto">COBRAR</h4>
-                <button type="button" id="btn-close-modal" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" id="btn-close-modal" class="btn-close" data-bs-dismiss="modal" onclick="cerrarValores();" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="row">
@@ -136,21 +136,24 @@
                                         Descuento: <span id="Spndescuento" class="far fa-square fs-6"></span>
                                         <input id="ChkDescuento" type="checkbox" value="1" onclick="habilitarDescuento()" style="display: none;">
                                     </label>
-                                    <div id="groupDesc" class="input-group" style="display: none;">
-                                        <input type="number" class="input-form text-center form-control" id="PercentDescuento" min="0" max="100" value="5">
+                                   <div id="groupDesc" style="display: none;"> 
+                                   <div class="input-group" >
+                                        <input type="number" class="input-form text-center form-control" id="PercentDescuento" min="0" max="100" value="5 ">
                                         <div class="input-group-text">%</div>
                                     </div>
+                                    <div id="PercentDescuento-errors" class='text-start'></div>
+                                   </div>
                                 </td>
                             </tr>
                             <tr class="border border-light">
                                 <td class="text-center mt-2">
-                                    <div class="div-forma d-flex aling-items-center justify-content-center" id="cambio-label">
+                                    <div class="div-forma" id="cambio-label">
                                         <label class="label-form me-3">Cambio:</label>
                                         <label id="label-cambio" class="label-cambio text-center fw-bold">$0.00</label>
                                     </div>
                                 </td>
                                 <td class="text-center">
-                                    <div class="div-forma">
+                                    <div class="div-forma" id="cambio-descuento">
                                         <label class="label-form text-center">Descuento:</label>
                                         <label id="label-descuento" class="titulo-lista fs-4 fw-semibold text-center"></label>
                                     </div>

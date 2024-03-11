@@ -463,6 +463,28 @@ function isNumber(val, id) {
     }
 }
 
+function isNumberPositive(val, id) {
+        if (!isNaN(val)) {
+            if (val > 0) {
+                $("#" + id + "-errors").text("");
+                $("#" + id).css("border-color", "green");
+                return true;
+            } else {
+                $("#" + id).css("border-color", "red");
+                $("#" + id + "-errors").text("El número debe ser mayor a 0.");
+                $("#" + id + "-errors").css("color", "red");
+                $("#" + id).focus();
+                return false;
+            }
+        } else {
+            $("#" + id).css("border-color", "red");
+            $("#" + id + "-errors").text("Este campo debe contener solo números");
+            $("#" + id + "-errors").css("color", "red");
+            $("#" + id).focus();
+            return false;
+        }
+}
+
 function isPorcentaje(val, id) {
     if (val.trim() == "") {
         $("#" + id).css("border-color", "red");
