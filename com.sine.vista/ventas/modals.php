@@ -138,7 +138,7 @@
                                     </label>
                                    <div id="groupDesc" style="display: none;"> 
                                    <div class="input-group" >
-                                        <input type="number" class="input-form text-center form-control" id="PercentDescuento" min="0" max="100" value="5 ">
+                                        <input type="number" class="input-form text-center form-control" id="PercentDescuento" min="0" max="100" value="5">
                                         <div class="input-group-text">%</div>
                                     </div>
                                     <div id="PercentDescuento-errors" class='text-start'></div>
@@ -300,19 +300,19 @@
                     </div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label for="total_sobrantes" class="form-label">Sobrantes</label>
-                            <input type="number" class="form-control input-form" id="total_sobrantes" placeholder="0">
+                            <label for="total_sobrantes" class="form-label">Dinero sobrante </label>
+                            <input type="text" class="form-control input-form" id="total_sobrantes" placeholder="0" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');">
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label for="total_faltantes" class="form-label">Faltantes</label>
-                            <input type="number" class="form-control input-form" id="total_faltantes" placeholder="0">
+                            <label for="total_faltantes" class="form-label">Dinero faltante</label>
+                            <input type="text" class="form-control input-form" id="total_faltantes" placeholder="0" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');">
                         </div>
                     </div>
                 </div>
                 <div class="row py-1 justify-content-between">
                     <div class="col-md-6">
                         <div class="form-group d-flex aling-items-center">
-                            <input class="input-check" id="comentarios-extras" name="datosfiscales" type="checkbox">
+                            <input class="input-check" id="comentarios-extras" name="comentarios-extras" type="checkbox">
                             <label class="label-form ms-3" for="comentarios-extras">¿Deseas ingresar algún comentario?</label>
                             <div id="comentarios-extras-errors">
                             </div>

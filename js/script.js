@@ -327,7 +327,7 @@ function valPeriodoPrueba() {
     $.ajax({
         url: 'com.sine.enlace/enlaceinicio.php',
         type: 'POST',
-        data: { transaccion: 'valperiodo' },
+        data: { transaccion: 'valperiodo'},
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -1318,6 +1318,24 @@ function truncateTickets(){
             if (bandera == '0') {
                 alertify.error(res);
             } 
+        }
+    });
+}
+
+function truncateTmpIMG() {
+    $.ajax({
+        url: "com.sine.enlace/enlacecomunicado.php",
+        type: "POST",
+        data: {transaccion: "cancelar"},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 1000);
+            if (bandera == '0') {
+                alertify.error(res);
+            } else {
+
+            }
         }
     });
 }

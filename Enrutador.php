@@ -53,7 +53,7 @@ class Enrutador
                     include_once '../com.sine.vista/cliente/listaclientes.html';
                     break;
                 case "comunicado":
-                    include_once '../com.sine.vista/Comunicado/formcomunicado.html';
+                    include_once '../com.sine.vista/Comunicado/formcomunicado.php';
                     break;
                 case 'listacomunicado':
                     include_once '../com.sine.vista/Comunicado/listacomunicado.php';

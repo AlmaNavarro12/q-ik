@@ -638,6 +638,7 @@ $fecha = $_GET['f'];
 $hora = $_GET['h'];
 $tag = $_GET['t'];
 $id = $_GET['i'];
+$horacance = $_GET['h'];
 $super = $_GET['s'];
 
 if (!$fecha) {
@@ -670,7 +671,7 @@ $mon = $cv->translateMonth($divF[1]);
 $dateformat = $divF[2] . "/" . $mon . "/" . $divF[0];
 $usuario = "";
 
-$datos = $cv->printCorteCaja($tag, $fecha);
+$datos = $cv->printCorteCaja($tag, $fecha, $_GET['h'], $uid);
 $div = explode("<cut>", $datos);
 $totventas = $div[0];
 $totganancia = $div[1];
@@ -804,7 +805,7 @@ $tarjeta = 0;
 $vales = 0;
 $entradas = 0;
 $salidas = 0;
-$datf = $cv->getVentasByTipoTag($tag, 'cash', $uid);
+$datf = $cv->getVentasByTipoTag($tag, 'cash', $uid, $fecha, $_GET['h']);
 foreach ($datf as $actual) {
     $total += $actual;
     $efectivo += $actual;
@@ -814,10 +815,10 @@ $pdf->SetY($y);
 $pdf->SetX(110);
 $pdf->Row(array(iconv("utf-8", "windows-1252", 'Ventas en efectivo:'), "$ " . number_format($efectivo, 2, '.', ',')));
 
-$datcd = $cv->getVentasByTipoTag($tag, 'card', $uid);
+$datcd = $cv->getVentasByTipoTag($tag, 'card', $uid, $fecha, $_GET['h']);
 foreach ($datcd as $actual) {
     $total += $actual;
-    $efectivo += $actual;
+    $tarjeta += $actual;
 }
 
 if ($tarjeta > 0) {
@@ -825,10 +826,10 @@ if ($tarjeta > 0) {
     $pdf->Row(array(iconv("utf-8", "windows-1252", 'Ventas con tarjeta:'), "$ " . number_format($tarjeta, 2, '.', ',')));
 }
 
-$datvl = $cv->getVentasByTipoTag($tag, 'val', $uid);
+$datvl = $cv->getVentasByTipoTag($tag, 'val', $uid, $fecha, $_GET['h']);
 foreach ($datvl as $actual) {
     $total += $actual;
-    $efectivo += $actual;
+    $vales += $actual;
 }
 
 if ($vales > 0) {
@@ -913,7 +914,7 @@ $y1 = $pdf->GetY();
 $cancelaciones = 0;
 $pdf->SetY($y);
 $pdf->SetX(110);
-$can = $cv->getCancelacionesByTag($tag, $uid);
+$can = $cv->getCancelacionesByTag($tag, $uid, $hora);
 foreach ($can as $actual) {
     $concepto = $actual['concepto'];
     $monto = $actual['monto'];
@@ -1055,9 +1056,9 @@ if (!empty($entrada)) {
     foreach ($entrada as $actual) {
         $concepto =  iconv("utf-8", "windows-1252", $actual['concepto']);
         $monto = $actual['monto'];
-        $hora = $actual['hora'];
+        $horam = $actual['hora'];
         $total += $actual['monto'];
-        $pdf->Row(array(iconv("utf-8", "windows-1252", $concepto), iconv("utf-8", "windows-1252", date('h:i A', strtotime($hora))), "$ " . number_format($monto, 2, '.', ',')));
+        $pdf->Row(array(iconv("utf-8", "windows-1252", $concepto), iconv("utf-8", "windows-1252", date('h:i A', strtotime($horam))), "$ " . number_format($monto, 2, '.', ',')));
     }
     
     $pdf->Cell(145, 4.5, iconv("utf-8", "windows-1252", ""), 1, 0, 'R');
@@ -1087,9 +1088,9 @@ if (!empty($entrada)) {
     foreach ($entrada as $actual) {
         $concepto =  iconv("utf-8", "windows-1252", $actual['concepto']);
         $monto = $actual['monto'];
-        $hora = $actual['hora'];
+        $horam = $actual['hora'];
         $total += $actual['monto'];
-        $pdf->Row(array(iconv("utf-8", "windows-1252", $concepto), iconv("utf-8", "windows-1252", date('h:i A', strtotime($hora))), "$ " . number_format($monto, 2, '.', ',')));
+        $pdf->Row(array(iconv("utf-8", "windows-1252", $concepto), iconv("utf-8", "windows-1252", date('h:i A', strtotime($horam))), "$ " . number_format($monto, 2, '.', ',')));
     }
     $pdf->SetFont('Arial', 'B', 9);
     $pdf->Cell(145, 4.5, iconv("utf-8", "windows-1252", "Total"), 1, 0, 'L');
@@ -1107,15 +1108,15 @@ $pdf->SetAligns(array('L',));
 $pdf->Row(array('Detalle de ventas:'));
 $pdf->Ln(3);
 
-$pdf->SetAligns(array('L', 'C', 'C', 'C', 'C', 'C', 'C', 'C'));
-$pdf->SetWidths(array(25, 20, 25, 25, 25, 20, 25, 25));
-$pdf->SetSizes(array(10, 10, 10, 10, 10, 10, 10, 10));
-$pdf->SetStyles(array('B', 'B', 'B', 'B', 'B', 'B', 'B', 'B'));
-$pdf->setRowColorText(array($txtbold, $txtbold, $txtbold, $txtbold, $txtbold, $txtbold, $txtbold, $txtbold));
+$pdf->SetAligns(array('L', 'C', 'C','C', 'C', 'C', 'C', 'C', 'C'));
+$pdf->SetWidths(array(20, 20, 20,20, 20, 25, 20, 25, 20));
+$pdf->SetSizes(array(9, 9, 9, 9,9, 9, 9, 9, 9));
+$pdf->SetStyles(array('B', 'B', 'B', 'B','B', 'B', 'B', 'B', 'B'));
+$pdf->setRowColorText(array($txtbold, $txtbold, $txtbold, $txtbold, $txtbold, $txtbold, $txtbold, $txtbold, $txtbold));
 $pdf->SetLineHeight(5.5);
 $pdf->SetRowBorder('B');
 
-$ventas = $cv->obtenerDetallesVentas($tag);
+$ventas = $cv->obtenerDetallesVentas($tag, $fecha, $_GET['h'], $uid);
 
 if (empty($ventas)) {
     $pdf->SetAligns(array('C'));
@@ -1127,22 +1128,154 @@ if (empty($ventas)) {
     $sumaTotalTras = 0;
     $sumaTotalRet = 0;
     $totalSin = 0;
+    $descuento = 0;
+    $totalDes = 0;
 
     $pdf->Row(array(
         iconv("utf-8", "windows-1252", "Folio"),
         iconv("utf-8", "windows-1252", "Hora"),
         iconv("utf-8", "windows-1252", "Productos"),
-        iconv("utf-8", "windows-1252", "Forma pago"),
+        iconv("utf-8", "windows-1252", "Forma"),
         iconv("utf-8", "windows-1252", "Subtotal"),
-        iconv("utf-8", "windows-1252", "Traslados"),
-        iconv("utf-8", "windows-1252", "Retenciones"),
+        iconv("utf-8", "windows-1252", "Descuento"),
+        iconv("utf-8", "windows-1252", "Traslado"),
+        iconv("utf-8", "windows-1252", "Retención"),
         iconv("utf-8", "windows-1252", "Total")
     ));
     $pdf->SetStyles(array('', '', '', '', '', '', ''));
     foreach ($ventas as $detalles) {
         $folio = $detalles["letra"] . $detalles["folio"];
-        $hora = $detalles["hora_venta"];
+        $horav = $detalles["hora_venta"];
         $formapago = $detalles["formapago"];
+        $descuento = $detalles["descuento"];
+        switch ($formapago) {
+            case "cash":
+                $formapago = "Efectivo";
+                break;
+            case "card":
+                $formapago = "Tarjeta";
+                break;
+            case "val":
+                $formapago = "Vales";
+                break;
+            default:
+                $formapago = "Otro";
+        }
+        $tags = $detalles["tagventa"];
+        $total = $detalles["totalventa"];
+        $descuento = $detalles["descuento"];
+        $totalVentas += $total;
+        $totalDes += $descuento;
+
+        $detalles_venta = $cv->obtenerDetallesVentaPorTag($tags);
+        $cantidad = 0;
+        $subtotal = 0;
+        $sumatras = 0;
+        $sumaret = 0;
+
+        foreach ($detalles_venta as $resultado) {
+            $cantidad += $resultado['venta_cant'];
+            $subtotal += $resultado['venta_precio'];
+            $traslados = $resultado['venta_traslados'];
+            $partes = explode('<impuesto>', $traslados);
+            foreach ($partes as $parte) {
+                $valores = explode('-', $parte);
+                $tras = floatval($valores[0]);
+                $sumatras += $tras;
+            }
+
+            $retencion = $resultado['venta_retencion'];
+            $partesret = explode('<impuesto>', $retencion);
+            foreach ($partesret as $parteret) {
+                $valores = explode('-', $parteret);
+                $ret = floatval($valores[0]);
+                $sumaret += $ret;
+            }
+        }
+        
+        $totalSin += $subtotal;
+        $sumaTotalTras += $sumatras;
+        $sumaTotalRet += $sumaret;
+
+
+        $pdf->Row(array(
+            iconv("utf-8", "windows-1252", $folio),
+            iconv("utf-8", "windows-1252", date('h:i A', strtotime($horav))),
+            $cantidad,
+            iconv("utf-8", "windows-1252", $formapago),
+            "$ " . number_format($subtotal, 2, '.', ','),
+            "$ " . number_format($descuento, 2, '.', ','),
+            "$ " . number_format($sumatras, 2, '.', ','),
+            "$ " . number_format($sumaret, 2, '.', ','),
+            "$ " . number_format($total, 2, '.', ',')
+        ));
+    }
+    $pdf->SetFont('Arial', 'B', 9);
+    $anchoCelda1 = 80;
+    $anchoCelda2 = 20;
+    $anchoTotal = $anchoCelda1 + $anchoCelda2 * 3;
+    $pdf->Cell($anchoCelda1, 4.5, iconv("utf-8", "windows-1252", "Total"), 1, 0, 'L');
+    $pdf->Cell($anchoCelda2, 4.5, "$ " . number_format($totalSin, 2, '.', ','), 1, 0, 'C');
+    $pdf->Cell(25, 4.5, "$ " . number_format($totalDes, 2, '.', ','), 1, 0, 'C');
+    $pdf->Cell(20, 4.5, "$ " . number_format($sumaTotalTras, 2, '.', ','), 1, 0, 'C');
+    $pdf->Cell(25, 4.5, "$ " . number_format($sumaTotalRet, 2, '.', ','), 1, 0, 'C');
+    $pdf->Cell($anchoCelda2, 4.5, "$ " . number_format($totalVentas, 2, '.', ','), 1, 1, 'C');
+    $pdf->Cell($anchoTotal, 2, '', 0, 1, 'C');
+
+    }
+
+    
+$pdf->Ln(8);
+$pdf->SetRowBorder('NB');
+$pdf->SetLineHeight(4.5);
+$pdf->SetSizes(array(13));
+$pdf->SetStyles(array('B'));
+$pdf->setRowColorText(array($txtbold));
+$pdf->SetWidths(array(150));
+$pdf->SetAligns(array('L',));
+$pdf->Row(array('Detalle de ventas canceladas:'));
+$pdf->Ln(3);
+
+$pdf->SetAligns(array('L', 'C', 'C','C', 'C', 'C', 'C', 'C', 'C'));
+$pdf->SetWidths(array(20, 20, 20,20, 20, 25, 20, 25, 20));
+$pdf->SetSizes(array(9, 9, 9, 9,9, 9, 9, 9, 9));
+$pdf->SetStyles(array('B', 'B', 'B', 'B','B', 'B', 'B', 'B', 'B'));
+$pdf->setRowColorText(array($txtbold, $txtbold, $txtbold, $txtbold, $txtbold, $txtbold, $txtbold, $txtbold, $txtbold));
+$pdf->SetLineHeight(5.5);
+$pdf->SetRowBorder('B');
+
+$ventas = $cv->obtenerDetallesVentasCanceladas($tag, $fecha, $_GET['h'], $uid);
+
+if (empty($ventas)) {
+    $pdf->SetAligns(array('C'));
+    $pdf->SetWidths(array(190));
+    $pdf->Row(array(iconv("utf-8", "windows-1252", "No hay ventas canceladas.")));
+} else {
+    $totalVentas = 0;
+    
+    $sumaTotalTras = 0;
+    $sumaTotalRet = 0;
+    $totalSin = 0;
+    $totalFinDes = 0;
+    $desc = 0;
+
+    $pdf->Row(array(
+        iconv("utf-8", "windows-1252", "Folio"),
+        iconv("utf-8", "windows-1252", "Hora"),
+        iconv("utf-8", "windows-1252", "Productos"),
+        iconv("utf-8", "windows-1252", "Forma"),
+        iconv("utf-8", "windows-1252", "Subtotal"),
+        iconv("utf-8", "windows-1252", "Descuento"),
+        iconv("utf-8", "windows-1252", "Traslado"),
+        iconv("utf-8", "windows-1252", "Retención"),
+        iconv("utf-8", "windows-1252", "Total")
+    ));
+    $pdf->SetStyles(array('', '', '', '', '', '', ''));
+    foreach ($ventas as $detalles) {
+        $folio = $detalles["letra"] . $detalles["folio"];
+        $hora = $detalles["hora_cancelada"];
+        $formapago = $detalles["formapago"];
+        $desc = $detalles["descuento"];
         switch ($formapago) {
             case "cash":
                 $formapago = "Efectivo";
@@ -1159,6 +1292,7 @@ if (empty($ventas)) {
         $tags = $detalles["tagventa"];
         $total = $detalles["totalventa"];
         $totalVentas += $total;
+        $totalFinDes += $desc;
 
         $detalles_venta = $cv->obtenerDetallesVentaPorTag($tags);
         $cantidad = 0;
@@ -1197,138 +1331,28 @@ if (empty($ventas)) {
             $cantidad,
             iconv("utf-8", "windows-1252", $formapago),
             "$ " . number_format($subtotal, 2, '.', ','),
+            "$ " . number_format($desc, 2, '.', ','),
             "$ " . number_format($sumatras, 2, '.', ','),
             "$ " . number_format($sumaret, 2, '.', ','),
             "$ " . number_format($total, 2, '.', ',')
         ));
     }
     $pdf->SetFont('Arial', 'B', 9);
-    $anchoCelda1 = 95;
-    $anchoCelda2 = 25;
+    $anchoCelda1 = 80;
+    $anchoCelda2 = 20;
     $anchoTotal = $anchoCelda1 + $anchoCelda2 * 3;
     $pdf->Cell($anchoCelda1, 4.5, iconv("utf-8", "windows-1252", "Total"), 1, 0, 'L');
     $pdf->Cell($anchoCelda2, 4.5, "$ " . number_format($totalSin, 2, '.', ','), 1, 0, 'C');
+    $pdf->Cell(25, 4.5, "$ " . number_format($totalFinDes, 2, '.', ','), 1, 0, 'C');
     $pdf->Cell(20, 4.5, "$ " . number_format($sumaTotalTras, 2, '.', ','), 1, 0, 'C');
-    $pdf->Cell($anchoCelda2, 4.5, "$ " . number_format($sumaTotalRet, 2, '.', ','), 1, 0, 'C');
+    $pdf->Cell(25, 4.5, "$ " . number_format($sumaTotalRet, 2, '.', ','), 1, 0, 'C');
     $pdf->Cell($anchoCelda2, 4.5, "$ " . number_format($totalVentas, 2, '.', ','), 1, 1, 'C');
     $pdf->Cell($anchoTotal, 2, '', 0, 1, 'C');
 
     }
 
-$pdf->Ln(8);
-$pdf->SetRowBorder('NB');
-$pdf->SetLineHeight(4.5);
-$pdf->SetSizes(array(13));
-$pdf->SetStyles(array('B', '', '', 'B', ''));
-$pdf->setRowColorText(array($txtbold));
-$pdf->SetWidths(array(150));
-$pdf->SetAligns(array('L',));
-$pdf->Row(array('Detalle de ventas canceladas:'));
-$pdf->Ln(3);
+    
 
-$pdf->SetAligns(array('L', 'C', 'C', 'C', 'C', 'C', 'C'));
-$pdf->SetWidths(array(30, 25, 25, 30, 25, 30, 25));
-$pdf->SetSizes(array(10, 10, 10, 10, 10, 10, 10));
-$pdf->SetStyles(array('B', 'B', 'B', 'B', 'B', 'B', 'B'));
-$pdf->setRowColorText(array($txtbold, $txtbold, $txtbold, $txtbold, $txtbold, $txtbold, $txtbold));
-$pdf->SetLineHeight(5.5);
-$pdf->SetRowBorder('B');
-$totalVentasCanceladas = 0;
-$ventas = $cv->obtenerDetallesVentasCanceladas($tag);
-
-if (empty($ventas)) {
-    $pdf->SetAligns(array('C'));
-    $pdf->SetWidths(array(190));
-    $pdf->Row(array(iconv("utf-8", "windows-1252", "No hay ventas canceladas.")));
-} else {
-    // Encabezado de la tabla
-    $totalcan = 0;
-    $sumaTotalTras = 0;
-    $sumaTotalRet = 0;
-    $totalSin = 0;
-
-    $pdf->Row(array(
-        iconv("utf-8", "windows-1252", "Folio"),
-        iconv("utf-8", "windows-1252", "Hora"),
-        iconv("utf-8", "windows-1252", "Productos"),
-        iconv("utf-8", "windows-1252", "Forma pago"),
-        iconv("utf-8", "windows-1252", "Traslados"),
-        iconv("utf-8", "windows-1252", "Retenciones"),
-        iconv("utf-8", "windows-1252", "Total")
-    ));
-    $pdf->SetStyles(array('', '', '', '', '', '', ''));
-    foreach ($ventas as $detalles) {
-        $folio = $detalles["letra"] . $detalles["folio"];
-        $hora = $detalles["hora_venta"];
-        $formapago = $detalles["formapago"];
-        switch ($formapago) {
-            case "cash":
-                $formapago = "Efectivo";
-                break;
-            case "card":
-                $formapago = "Tarjeta";
-                break;
-            case "val":
-                $formapago = "Vales";
-                break;
-            default:
-                $formapago = "Otro";
-        }
-        $tags = $detalles["tagventa"];
-        $totalcan = $detalles["totalventa"];
-        $totalVentasCanceladas += $totalcan;
-
-        $detalles_venta = $cv->obtenerDetallesVentaPorTag($tags);
-        $cantidad = 0;
-        $subtotal = 0;
-        $sumatras = 0;
-        $sumaret = 0;
-
-        foreach ($detalles_venta as $resultado) {
-            $cantidad += $resultado['venta_cant'];
-            $subtotal += $resultado['venta_precio'];
-            $traslados = $resultado['venta_traslados'];
-            $partes = explode('<impuesto>', $traslados);
-            foreach ($partes as $parte) {
-                $valores = explode('-', $parte);
-                $tras = floatval($valores[0]);
-                $sumatras += $tras;
-            }
-
-            $retencion = $resultado['venta_retencion'];
-            $partesret = explode('<impuesto>', $retencion);
-            foreach ($partesret as $parteret) {
-                $valores = explode('-', $parteret);
-                $ret = floatval($valores[0]);
-                $sumaret += $ret;
-            }
-        }
-        $totalSin += $subtotal;
-        $sumaTotalTras += $sumatras;
-        $sumaTotalRet += $sumaret;
-
-        $pdf->Row(array(
-            iconv("utf-8", "windows-1252", $folio),
-            iconv("utf-8", "windows-1252", date('h:i A', strtotime($hora))),
-            $cantidad,
-            iconv("utf-8", "windows-1252", $formapago),
-            "$ " . number_format($subtotal, 2, '.', ','),
-            "$ " . number_format($sumatras, 2, '.', ','),
-            "$ " . number_format($sumaret, 2, '.', ','),
-            "$ " . number_format($total, 2, '.', ',')
-        ));
-    }
-    $pdf->SetFont('Arial', 'B', 9);
-    $anchoCelda1 = 95;
-    $anchoCelda2 = 25;
-    $anchoTotal = $anchoCelda1 + $anchoCelda2 * 3;
-    $pdf->Cell($anchoCelda1, 4.5, iconv("utf-8", "windows-1252", "Total"), 1, 0, 'L');
-    $pdf->Cell($anchoCelda2, 4.5, "$ " . number_format($totalSin, 2, '.', ','), 1, 0, 'C');
-    $pdf->Cell(20, 4.5, "$ " . number_format($sumaTotalTras, 2, '.', ','), 1, 0, 'C');
-    $pdf->Cell($anchoCelda2, 4.5, "$ " . number_format($sumaTotalRet, 2, '.', ','), 1, 0, 'C');
-    $pdf->Cell($anchoCelda2, 4.5, "$ " . number_format($totalVentas, 2, '.', ','), 1, 1, 'C');
-    $pdf->Cell($anchoTotal, 2, '', 0, 1, 'C');
-}
 
 $pdf->isFinished = true;
 

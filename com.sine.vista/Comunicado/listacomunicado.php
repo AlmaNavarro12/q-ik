@@ -1,46 +1,37 @@
 <?php
 include("modals.php");
 ?>
-<div class="col-md-12"><div class="titulo-lista">Comunicados </div> </div>
-<form class="form-inline" onsubmit="return false;">
-    <div class="row">
-        <div class="col-md-6">
-            <div class="form-group">
-                <input type="text" class="form-control input-search" id="buscar-comunicado" placeholder="Buscar comunicado (Asunto)" oninput="buscarComunicados()">
-            </div>
+<div class="form-horizontal ps-3 fijo z-1">
+<div><div class="titulo-lista">Comunicados </div> </div>
+    <div class="row col-12 p-0">
+        <div class="col-sm-6 py-1">
+            <input type="text" class="form-control input-search text-secondary-emphasis"  id="buscar-comunicado" placeholder="Buscar comunicado (Asunto)" oninput="buscarComunicados()">
         </div>
-        <div class="col-md-2">
-            <div class="form-group">
-                <select class="form-select input-search w-100 p-2" id="num-reg" name="num-reg" onchange="buscarComunicados()">
-                    <option value="10">--</option>
-                    <option value="2">2</option>
-                    <option value="20">20</option>
-                    <option value="30">30</option>
-                    <option value="50">50</option>
-                    <option value="100">100</option>
-                </select>
-            </div>
+        <div class="col-sm-2 py-1">
+            <select class="form-select input-search text-center" id="num-reg" name="num-reg" onchange="buscarComunicados()">
+                <option value="10"> 10</option>
+                <option value="15"> 15</option>
+                <option value="20"> 20</option>
+                <option value="30"> 30</option>
+                <option value="50"> 50</option>
+                <option value="100">100</option>
+            </select>
         </div>
-        <div class="col-md-4 text-right">
-            <div class="form-group">
-                <button type="button" class="btn btn-custom" id="btn-crear"></button>
-            </div>
+        <div class="col-sm-4 py-1 text-end px-1" id="btn-crear">
         </div>
     </div>
-</form>
-
-<div class="scrollX div-bordered">
-    <table class="table table-hover table-condensed table-responsive table-row table-head" id="body-lista-comunicado">
+</div>
+<div class="scrollX div-form mw-100 bg-light mx-3 border border-secondary-subtle">
+    <table class="table tab-hover table-condensed table-responsive table-row table-head" id="body-lista-comunicado">
         <thead class="sin-paddding" >
             <tr>
             <th></th>
-                <th >Fecha y Hora de Creacion</th>
+                <th >Fecha y Hora de Creación</th>
                 <th>Asunto </th>
                 <th class="col-md-2">Archivos Adjuntos</th>
-                <th><span class=" fas fa-ellipsis-v"></span></th>
+                <th>Opción</th>
             </tr>
         </thead>
     </table> 
 </div>
-<br/>
-<script type="text/javascript" src="js/scriptempresa.js"></script>
+<script type="text/javascript" src="js/scriptcomunicado.js"></script>

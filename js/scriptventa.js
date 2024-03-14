@@ -40,17 +40,18 @@ $(function () {
         $('.button-venta').removeClass("button-venta-active");
         $(this).addClass("button-venta-active");
         var tab = $(this).attr("pago-tab");
-        console.log("Valor de tab:", tab); 
         $(".div-forma").hide();
         if (tab == 'cash') {
             $("#cambio-label").show();
             $("#cambio-descuento").show();
+            $("#referencia-pago").val("");
         } else if (tab == 'card' || tab == 'val') {
             tab = 'ref';
             $("#cambio-descuento").show();
             $("#cambio-label").hide();
+            $("#referencia-pago").val("");
         }
-        $("#" + tab + "-div").show();
+        $("#" + tab + "-div").show('slow');
     });
     
     
@@ -501,10 +502,12 @@ function cerrarValores(){
     $('#Spndescuento').addClass('far fa-square');
     $('#groupDesc').hide('slow');
     $('#label-descuento').val("$0.00");
-    $('#PercentDescuento').val("");
+    $('#PercentDescuento').val(5);
+    $("#referencia-pago").val("");
 }
 
 function setValoresCobrar() {
+    $("#modal-cobrar").modal('show');
     var tab = $("#tabs").find('.sub-tab-active').attr("data-tab");
     $("#label-cambio").val("$0.00");
     cerrarValores();
@@ -513,30 +516,19 @@ function setValoresCobrar() {
         type: 'POST',
         data: {transaccion: 'totalticket', tab: tab},
         success: function (datos) {
-            console.log(datos);
             var array = datos.split("</tr>");
             var total = array[0] || "0.00";
-            var art = array[1] || "0";
+            var articulos = array[1] || "0";
             var descuento = array[2] || "0.00";
 
             $("#label-total").html("$" + total);
             $("#total-cobrar").val(total);
             $("#total-original").val(total);
             $("#monto-pagado").val(total);
-            $("#label-art").html(art);
-
-            if (descuento != "0.00") {
-                $('#ChkDescuento').prop('checked', true);
-                $('#label-descuento').html("$ " + descuento);
-                $('#input-descuento').val(descuento);
-                $('#input-descuento-original').val(descuento);
-            } else {
-                $('#ChkDescuento').prop('checked', false);
-                $('#label-descuento').html("");
-                $('#input-descuento').val("");
-                $('#input-descuento-original').val("");
-            }
-
+            $("#label-art").html(articulos);
+            $('#label-descuento').html("$ "+descuento);
+            $('#input-descuento').val(descuento);
+            $('#input-descuento-original').val(descuento);
             window.setTimeout(() => {
                 $("#monto-pagado").select();
             }, 500);
@@ -669,49 +661,90 @@ function guardarVenta(p, nprod) {
         referencia = $("#referencia-pago").val();
     }
 
-    if( $('#ChkDescuento').is(':checked') ){
+    if($('#ChkDescuento').is(':checked') ){
         percent_descuento = $('#PercentDescuento').val();
-    }
-
-    if (isnZero(pagado, "monto-pagado") && isnEmpty(referencia, "referencia-pago")) {
-        if( nprod > 0 ){
-            if( validado == 1){    
-                $.ajax({
-                    url: 'com.sine.enlace/enlaceventa.php',
-                    type: 'POST',
-                    data: {transaccion: 'insertarticket', tab: tab, total: total, pagado: pagado, referencia: referencia, fmpago: fmpago, descuento: descuento, percent_descuento:percent_descuento},
-                    success: function (datos) {
-                        var texto = datos.toString();
-                        var bandera = texto.substring(0, 1);
-                        var res = texto.substring(1, 5000);
-                        if (bandera == '0') {
-                            alertify.error(res);
-                        } else {
-                            $("#tab-" + tab).remove();
-                            $("#ticket-" + tab).remove();
-                            var first = $("#tabs").find('.sm-tab:first').attr("data-tab");
-                            if (first) {
-                                $("#ticket-" + first).show();
-                                $("#tab-" + first).addClass("sub-tab-active");
+        if (isnZero(pagado, "monto-pagado") && isnEmpty(referencia, "referencia-pago") && isNumberPositive(percent_descuento, "PercentDescuento")) {
+            if( nprod > 0 ){
+                if( validado == 1){    
+                    $.ajax({
+                        url: 'com.sine.enlace/enlaceventa.php',
+                        type: 'POST',
+                        data: {transaccion: 'insertarticket', tab: tab, total: total, pagado: pagado, referencia: referencia, fmpago: fmpago, descuento: descuento, percent_descuento:percent_descuento},
+                        success: function (datos) {
+                            var texto = datos.toString();
+                            var bandera = texto.substring(0, 1);
+                            var res = texto.substring(1, 5000);
+                            if (bandera == '0') {
+                                alertify.error(res);
                             } else {
-                                newVenta();
+                                $("#tab-" + tab).remove();
+                                $("#ticket-" + tab).remove();
+                                var first = $("#tabs").find('.sm-tab:first').attr("data-tab");
+                                if (first) {
+                                    $("#ticket-" + first).show();
+                                    $("#tab-" + first).addClass("sub-tab-active");
+                                } else {
+                                    newVenta();
+                                }
+                                $("#modal-cobrar").modal('hide');
+                                if (p == '1') {
+                                    imprimirTicket(tab);
+                                }
+                                alertify.success("Venta registrada correctamente.");
+                                ResetDescuento();
                             }
-                            $("#modal-cobrar").modal('hide');
-                            if (p == '1') {
-                                imprimirTicket(tab);
-                            }
-                            alertify.success("Venta registrada correctamente.");
-                            ResetDescuento();
                         }
-                    }
-                });
+                    });
+                } else {
+                    alertify.error("El monto pagado es menor que el total de la venta.");
+                }
             } else {
-                alertify.error("El monto pagado es menor que el total de la venta.");
+                alertify.error("El ticket seleccionado no contiene productos.");
             }
-        } else {
-            alertify.error("El ticket seleccionado no contiene productos.");
+        }
+    } else {
+        if (isnZero(pagado, "monto-pagado") && isnEmpty(referencia, "referencia-pago")) {
+            if( nprod > 0 ){
+                if( validado == 1){    
+                    $.ajax({
+                        url: 'com.sine.enlace/enlaceventa.php',
+                        type: 'POST',
+                        data: {transaccion: 'insertarticket', tab: tab, total: total, pagado: pagado, referencia: referencia, fmpago: fmpago, descuento: descuento, percent_descuento:percent_descuento},
+                        success: function (datos) {
+                            var texto = datos.toString();
+                            var bandera = texto.substring(0, 1);
+                            var res = texto.substring(1, 5000);
+                            if (bandera == '0') {
+                                alertify.error(res);
+                            } else {
+                                $("#tab-" + tab).remove();
+                                $("#ticket-" + tab).remove();
+                                var first = $("#tabs").find('.sm-tab:first').attr("data-tab");
+                                if (first) {
+                                    $("#ticket-" + first).show();
+                                    $("#tab-" + first).addClass("sub-tab-active");
+                                } else {
+                                    newVenta();
+                                }
+                                $("#modal-cobrar").modal('hide');
+                                if (p == '1') {
+                                    imprimirTicket(tab);
+                                }
+                                alertify.success("Venta registrada correctamente.");
+                                ResetDescuento();
+                            }
+                        }
+                    });
+                } else {
+                    alertify.error("El monto pagado es menor que el total de la venta.");
+                }
+            } else {
+                alertify.error("El ticket seleccionado no contiene productos.");
+            }
         }
     }
+
+    
     $('#btn-print').prop('disabled', false);
     $('#btn-form-reg').prop('disabled', false);
 }
@@ -899,8 +932,9 @@ $('#comentarios-extras').on('click', function () {
     if ($('#comentarios-extras').prop('checked')) {
         $("#complemento-corte").show('slow');
     } else {
-        $("#supervisor").val("");
-        $("#contrasena").val("");
+        $("#comentarios").val("");
+        $("#total_sobrantes").val("");
+        $("#total_faltantes").val("");
         $("#complemento-corte").hide('slow');
     }
 });

@@ -581,7 +581,7 @@ article {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: linear-gradient(to top, #17177C 85%, #fff 15%);
+    background: linear-gradient(to top, #17177C 85%, #383877 15%);
 }
 
 ::-webkit-scrollbar-horizontal {
@@ -862,6 +862,29 @@ article {
     height: 30px;
     background: #09096B;
     border-radius: 8px;
+}
+
+
+.input-check-sm{
+    outline:none !important;
+    appearance: none;
+    width: 15px;
+    height: 15px;
+    border: 2px solid #D6D6DF;
+    box-sizing: border-box;
+    border-radius: 3px;
+}
+
+.input-check-sm:active, .input-check-sm:checked:active {
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05), inset 0px 1px 3px rgba(0,0,0,0.1);
+}
+
+.input-check-sm:checked {
+    border: none;
+    width: 15px;
+    height: 15px;
+    background: #09096B;
+    border-radius: 3px;
 }
 
 .input-radio{

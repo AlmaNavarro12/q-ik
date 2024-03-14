@@ -131,7 +131,7 @@ function tablaIMG(d="") {
 }
 
 function eliminarIMG(idtmp) {
-    alertify.confirm("Esta seguro que desea eliminar este archivo?", function () {
+    alertify.confirm("¿Estás seguro que deseas eliminar este archivo?", function () {
         //cargandoHide();
         //cargandoShow();
         $.ajax({
@@ -416,7 +416,7 @@ function setValoresEditarComunicado(datos) {
 
 
 function eliminarComunicado(idcomunicado) {
-    alertify.confirm("Esta seguro que desea eliminar este comunicado?", function () {
+    alertify.confirm("¿Estás seguro que deseas eliminar este comunicado?", function () {
         //cargandoHide();
         //cargandoShow();
         $.ajax({
@@ -514,14 +514,12 @@ function canelarComunicado() {
 
 //funcio
 function tablamodal(tag) {
-    console.log(tag);
     $('#archivo').modal('show');
     $.ajax({
         url: "com.sine.enlace/enlacecomunicado.php", 
         type: "POST",
         data: { transaccion: "modaltabla", tag:tag }, 
         success: function (datos) {
-            console.log(datos);
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
             var res = texto.substring(1, 1000);
@@ -537,7 +535,42 @@ function tablamodal(tag) {
     });
 }
 
-function visutab(archivo) {
-    var ruta = "./comunicado/" + archivo;
-    $('#foto embed').attr('src', ruta);
+function visutab(archivo, ext) {
+    var ruta = "./comunicado/" + archivo ;
+    if(ext=="jpg" || ext=="png" || ext=="jpeg" || ext=="gif"){
+     $("#foto").html('<img src="'+ruta+'" width="100%"/>')
+    }else{  
+        $('#foto').html('<embed type="application/pdf" src="'+ruta+'"  width="100%" style="height: 32rem"/>');
+    }
+
+}
+
+function displayIMG(id) {
+    $.ajax({
+        url: "com.sine.imprimir/img.php",
+        type: "POST",
+        data: {img: id},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 1000);
+            if (bandera == '0') {
+                alertify.error(res);
+                cargandoHide();
+            } else {
+                var array = datos.split("<type>");
+                var t = array[0];
+                var data = array[1];
+                if (t == 'd') {
+                    
+                    var newTab = window.open('com.sine.imprimir/img.php?doc=' + id);
+                    newTab.document.body.innerHTML = data;    
+                } else {
+                    
+                    $('#tabla').modal('show');
+                    $('#fotito').html(data);
+                }
+            }
+        }
+    });
 }

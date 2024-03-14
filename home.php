@@ -372,7 +372,7 @@ require_once 'Enrutador.php';
                                     ?>
                                         <li id="punto-venta" class="list-element mt-1 list-menu ps-5" data-submenu='<?php echo $ventavista; ?>'>
                                             <div class="marker"></div>
-                                            <div class="pad"></div><label> Puntos de ventas</label>
+                                            <div class="pad"></div><label> Punto de venta</label>
                                         </li>
                                     <?php
                                     }

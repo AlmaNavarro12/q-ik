@@ -69,6 +69,7 @@ if (isset($_POST['transaccion'])) {
             break;
         case 'cancelarTicked':
             $insertado = $cv->cancelarTicked($_POST['id']);
+            echo $insertado;
             break;
         case 'checkPrecio':
             $datos = $cv->checkPrecio($_POST['producto']);

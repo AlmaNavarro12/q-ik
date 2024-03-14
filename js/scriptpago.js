@@ -1089,7 +1089,7 @@ function cancelarTimbrePago(idpago) {
         reemplazo = $("#uuid-reemplazo").val();
     }
     if (isnEmpty(motivo, "motivo-cancelacion") && isnEmpty(reemplazo, "uuid-reemplazo")) {
-        alertify.confirm("Esta seguro que desea cancelar este pago?", function () {
+        alertify.confirm("¿Estás seguro que deseas cancelar este pago?", function () {
             cargandoHide();
             cargandoShow();
             $.ajax({

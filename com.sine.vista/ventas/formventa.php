@@ -2,7 +2,7 @@
 include("modals.php");
 ?>
 <div class="col-md-12">
-    <div class="titulo-lista" id="contenedor-titulo-form-venta">Nueva Venta </div>
+    <div class="titulo-lista" id="contenedor-titulo-form-venta">Nueva venta </div>
 </div>
 <div id="div-space">
 </div>
@@ -12,7 +12,7 @@ include("modals.php");
     <label class="label-sub">C&oacute;digo del producto</label>
     <div class="row">
         <div class="col-md-8 py-1">
-            <input type="text" class="form-control input-search" id="buscar-producto" placeholder="Buscar producto (F10) Consultar Precio (F11)" oninput="aucompletarProducto();">
+            <input type="text" class="form-control input-search" id="buscar-producto" placeholder="Buscar producto (F10) Consultar precio (F11)" oninput="aucompletarProducto();">
             <div id="buscar-producto-errors"></div>
         </div>
         <div class="col-md-4 py-1">
@@ -53,7 +53,7 @@ include("modals.php");
             </button>
         </div>
         <div class="col-12 col-md py-1">
-            <button id="btn-form-factura" type="button" class="button-ventas col-12" style="background-color: #327AB7 !important; color: #fff !important;" data-bs-toggle="modal" data-bs-target="#modal-cobrar" onclick="setValoresCobrar();">
+            <button id="btn-form-factura" type="button" class="button-ventas col-12" style="background-color: #327AB7 !important; color: #fff !important;" onclick="setValoresCobrar();">
                 <span class="fas fa-save"></span> Cobrar <br> ticket (F7)
             </button>
         </div>
