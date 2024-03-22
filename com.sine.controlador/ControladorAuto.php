@@ -50,11 +50,12 @@ class ControladorAuto {
     public function getCoincidenciasFacturas($referencia, $iddatos) {
         $datos = [];
     
-        $consultaFactura = "SELECT * FROM datos_factura WHERE (concat(letra, folio_interno_fac) LIKE '%$referencia%') AND idcliente = '$iddatos' AND status_pago != '1' AND status_pago != '3' ORDER BY folio_interno_fac DESC LIMIT 15;";
-        $resultadosFactura = $this->consultas->getResults($consultaFactura, null);
+        $consultaFactura = "SELECT * FROM datos_factura WHERE (concat(letra, folio_interno_fac) LIKE '%$referencia%') AND idcliente = :datos AND status_pago != '1' AND status_pago != '3' ORDER BY folio_interno_fac DESC LIMIT 15;";
+        $valores = array("datos" => $iddatos);
+        $resultadosFactura = $this->consultas->getResults($consultaFactura, $valores);
         foreach ($resultadosFactura as $resultado) {
             $datos[] = [
-                "value" => "Factura - " . $resultado['letra'] . $resultado['folio_interno_fac'],
+                "value" => "Factura-" . $resultado['letra'] . $resultado['folio_interno_fac'],
                 "id" => $resultado["iddatos_factura"],
                 "type" => 'f'
             ];

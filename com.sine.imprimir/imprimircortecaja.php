@@ -914,7 +914,7 @@ $y1 = $pdf->GetY();
 $cancelaciones = 0;
 $pdf->SetY($y);
 $pdf->SetX(110);
-$can = $cv->getCancelacionesByTag($tag, $uid, $hora);
+$can = $cv->getCancelacionesByTag($tag, $uid, $fecha, $hora);
 foreach ($can as $actual) {
     $concepto = $actual['concepto'];
     $monto = $actual['monto'];

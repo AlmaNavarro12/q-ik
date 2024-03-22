@@ -45,6 +45,10 @@ class Empresa {
     private $firma;
     private $firmaanterior;
     private $keyB64;
+    private $nombrebanco1;
+    private $nombrebanco2;
+    private $nombrebanco3;
+    private $nombrebanco4;
     
     function __construct() {
         
@@ -194,6 +198,21 @@ class Empresa {
         return $this->clabe2;
     }
 
+    function getNombreBanco1() {
+        return $this->nombrebanco1;
+    }
+
+    function getNombreBanco2() {
+        return $this->nombrebanco2;
+    }
+
+    function getNombreBanco3() {
+        return $this->nombrebanco3;
+    }
+
+    function getNombreBanco4() {
+        return $this->nombrebanco4;
+    }
     function getOxxo2() {
         return $this->oxxo2;
     }
@@ -410,6 +429,22 @@ class Empresa {
 
     function setKeyB64($keyB64) {
         $this->keyB64 = $keyB64;
+    }
+
+    function setNombreBanco1($nombrebanco1) {
+        $this->nombrebanco1 = $nombrebanco1;
+    }
+
+    function setNombreBanco2($nombrebanco2) {
+        $this->nombrebanco2 = $nombrebanco2;
+    }
+
+    function setNombreBanco3($nombrebanco3) {
+        $this->nombrebanco3 = $nombrebanco3;
+    }
+
+    function setNombreBanco4($nombrebanco4) {
+        $this->nombrebanco4 = $nombrebanco4;
     }
     
 }

@@ -11,22 +11,17 @@ Session::start();
 class ControladorComunicado
 {
     private $consultas;
-    //private $conexion;
-
 
     function __construct()
     {
         $this->consultas = new Consultas();
-        //$this->conexion = new Consultas();
-
     }
 
     private function getClientesbyCategoria()
     {
         $consultado = false;
         $consulta = "SELECT * FROM cliente;";
-        $consultas = new Consultas();
-        $consultado = $consultas->getResults($consulta, null);
+        $consultado = $this->consultas->getResults($consulta, null);
         return $consultado;
     }
 
@@ -46,8 +41,7 @@ class ControladorComunicado
     {
         $consultado = false;
         $consulta = "select * from categoria where idcategoria='$idcategoria'";
-        $consultas = new Consultas();
-        $consultado = $consultas->getResults($consulta, null);
+        $consultado = $this->consultas->getResults($consulta, null);
         return $consultado;
     }
 
@@ -65,9 +59,8 @@ class ControladorComunicado
     {
         $consultado = false;
         $consulta = "SELECT * FROM correoenvio WHERE chuso4=:id;";
-        $consultas = new Consultas();
         $valores = array("id" => '1');
-        $consultado = $consultas->getResults($consulta, $valores);
+        $consultado = $this->consultas->getResults($consulta, $valores);
         return $consultado;
     }
 
@@ -90,10 +83,9 @@ class ControladorComunicado
     private function getClientesbyId($idcliente)
     {
         $consultado = false;
-        $consultas = new Consultas();
         $consulta = "SELECT * FROM cliente WHERE id_cliente=:id";
         $val = array("id" => $idcliente);
-        $consultado = $consultas->getResults($consulta, $val);
+        $consultado = $this->consultas->getResults($consulta, $val);
         return $consultado;
     }
 
@@ -119,7 +111,6 @@ class ControladorComunicado
             $seguridad = $div[5];
 
             $mail = new PHPMailer;
-            //$mail->isSMTP();
             $mail->Mailer = 'smtp';
             $mail->SMTPAuth = true;
             $mail->Host = $host;
@@ -173,14 +164,14 @@ class ControladorComunicado
                     echo '0No se ha podido mandar el mensaje';
                     echo '0Mailer Error: ' . $mail->ErrorInfo;
                 } else {
-                    echo 'Se envió el comunicado al correo del cliente.';
+                    echo 'Se envió el comunicado al correo correspondiente.';
                 }
 
                 $mail->clearAddresses();
                 $mail->clearAttachments();
             }
         } else {
-            return "0No se ha configurado un correo de envio para esta area";
+            return "0No se ha configurado un correo de envio para esta área";
         }
     }
 
@@ -272,8 +263,7 @@ class ControladorComunicado
             "iddatos" => $c->getIddatos(),
             "tag" => $tag
         );
-        $con = new Consultas();
-        $insertado = $con->execute($consulta, $valores);
+        $insertado = $this->consultas->execute($consulta, $valores);
         $imgs = $this->detalleFotos($c->getSid(), $tag);
         return $insertado;
     }
@@ -281,7 +271,6 @@ class ControladorComunicado
     private function detalleFotos($sid, $tag)
     {
         $insertado = false;
-        $con = new Consultas();
         $img = $this->getTmpImg($sid);
         foreach ($img as $actual) {
             $imgname = $actual['tmpname'];
@@ -295,25 +284,22 @@ class ControladorComunicado
                 "ext" => $ext,
                 "tag" => $tag
             );
-            $consul = new Consultas();
-            $insertado = $consul->execute($consulta, $valores);
+            $insertado = $this->consultas->execute($consulta, $valores);
             rename('../temporal/tmp/' . $imgtmp, '../comunicado/' . $imgtmp);
         }
 
         $borrar = "DELETE FROM `tmpimg` WHERE sessionid=:id;";
         $valores3 = array("id" => $sid);
-        $eliminado = $con->execute($borrar, $valores3);
+        $eliminado = $this->consultas->execute($borrar, $valores3);
         return $insertado;
     }
-    //angel
 
     private function getTmpImg($sid)
     {
         $consultado = false;
         $consulta = "SELECT * FROM tmpimg where sessionid=:sid;";
-        $consultas = new Consultas();
         $val = array("sid" => $sid);
-        $consultado = $consultas->getResults($consulta, $val);
+        $consultado = $this->consultas->getResults($consulta, $val);
         return $consultado;
     }
 
@@ -326,9 +312,8 @@ class ControladorComunicado
         }
         $consultado = false;
         $consulta = "DELETE FROM tmpimg where sessionid=:sid;";
-        $consultas = new Consultas();
         $val = array("sid" => $sid);
-        $consultado = $consultas->execute($consulta, $val);
+        $consultado = $this->consultas->execute($consulta, $val);
         return $consultado;
     }
 
@@ -346,14 +331,11 @@ class ControladorComunicado
             }
             $datos .= "
                 <tr>
-                    <td class='click-row' style='word-break: break-all;' data-bs-toggle='modal' data-bs-target='#tabla' onclick=\"displayIMG('$idtmp') \">$name </td>
+                    <td class='click-row' style='word-break: break-all;' onclick=\"displayIMG('$idtmp') \">$name </td>
                     $coldesc
                     <td><button class='btn btn-xs btn-danger' onclick='eliminarIMG($idtmp)' title='Eliminar imagen'><span class=' fas fa-times fa-sm'></span></button></td>
                 </tr>";
         }
-
-
-
         return $datos;
     }
 
@@ -363,9 +345,8 @@ class ControladorComunicado
         $img = $this->getNameImg($idtmp);
         $consultado = false;
         $consulta = "DELETE FROM tmpimg where idtmpimg=:id;";
-        $consultas = new Consultas();
         $val = array("id" => $idtmp);
-        $consultado = $consultas->execute($consulta, $val);
+        $consultado = $this->consultas->execute($consulta, $val);
         unlink("../temporal/tmp/$img");
         return $consultado;
     }
@@ -384,13 +365,10 @@ class ControladorComunicado
     {
         $consultado = false;
         $consulta = "SELECT * FROM tmpimg WHERE idtmpimg=:id;";
-        $consultas = new Consultas();
         $valores = array("id" => $idsession);
-        $consultado = $consultas->getResults($consulta, $valores);
+        $consultado = $this->consultas->getResults($consulta, $valores);
         return $consultado;
     }
-
-
 
     public function getFecha()
     {
@@ -425,8 +403,7 @@ class ControladorComunicado
     {
         $consultado = false;
         $consulta = "SELECT * FROM datos_facturacion where id_datos=$iddatos;";
-        $consultas = new Consultas();
-        $consultado = $consultas->getResults($consulta, null);
+        $consultado = $this->consultas->getResults($consulta, null);
         return $consultado;
     }
 
@@ -445,8 +422,7 @@ class ControladorComunicado
         $consultado = false;
         $consulta = "select * from comunicado c where idcomunicado=:id;";
         $val = array("id" => $idcomunicado);
-        $consultas = new Consultas();
-        $consultado = $consultas->getResults($consulta, $val);
+        $consultado = $this->consultas->getResults($consulta, $val);
         return $consultado;
     }
 
@@ -483,13 +459,12 @@ class ControladorComunicado
 
     public function getImgsComunicado($sid, $tag)
     {
-        $datos = "";
+        $insertado = false;
         $imgs = $this->getImgComAux($tag);
         foreach ($imgs as $actual) {
             $docnm = $actual['docname'];
             $file = $actual['docfile'];
             $ext = $actual['ext'];
-            $insertado = false;
             $consulta = "INSERT INTO `tmpimg` VALUES (:id, :tmpname, :imgtmp, :ext, :tmpdescripcion, :sid);";
             $valores = array(
                 "id" => null,
@@ -499,8 +474,7 @@ class ControladorComunicado
                 "tmpdescripcion" => null,
                 "sid" => $sid
             );
-            $con = new Consultas();
-            $insertado = $con->execute($consulta, $valores);
+            $insertado = $this->consultas->execute($consulta, $valores);
             copy("../comunicado/$file", "../temporal/tmp/$file");
         }
         return $insertado;
@@ -509,7 +483,6 @@ class ControladorComunicado
     public function actualizarComunicado($c)
     {
         $actualizado = false;
-        $con = new Consultas();
         $consulta = "UPDATE `comunicado` SET chcom=:chcom, idcontactos=:idcontactos, asunto=:asunto, lugaremision=:emision, color=:color, size=:size, mensaje=:mensaje, chsellar=:chsellar, chfirmar=:chfirmar, iddatos=:iddatos where idcomunicado=:id;";
         $valores = array(
             "id" => $c->getIdcomunicado(),
@@ -524,7 +497,7 @@ class ControladorComunicado
             "chfirmar" => $c->getFirma(),
             "iddatos" => $c->getIddatos()
         );
-        $actualizado = $con->execute($consulta, $valores);
+        $actualizado = $this->consultas->execute($consulta, $valores);
         $actualizarfotos = $this->actualizarFotos($c->getSid(), $c->getTag());
         return $actualizado;
     }
@@ -545,14 +518,12 @@ class ControladorComunicado
                 "ext" => $ext,
                 "tag" => $tag
             );
-            $con = new Consultas();
-            $insertado = $con->execute($consulta, $valores);
+            $insertado = $this->consultas->execute($consulta, $valores);
             rename('../temporal/tmp/' . $imgtmp, '../comunicado/' . $imgtmp);
         }
         $borrar = "DELETE FROM `tmpimg` WHERE sessionid=:id;";
         $valores3 = array("id" => $sid);
-        $consultas = new Consultas();
-        $eliminado = $consultas->execute($borrar, $valores3);
+        $eliminado = $this->consultas->execute($borrar, $valores3);
         return $eliminado;
     }
 
@@ -567,8 +538,7 @@ class ControladorComunicado
         $eliminado = false;
         $borrar = "DELETE FROM `doccomunicado` WHERE doc_tag=:tag;";
         $valores3 = array("tag" => $tag);
-        $consultas = new Consultas();
-        $eliminado = $consultas->execute($borrar, $valores3);
+        $eliminado = $this->consultas->execute($borrar, $valores3);
         return $eliminado;
     }
 
@@ -588,8 +558,7 @@ class ControladorComunicado
         $eliminado = false;
         $consulta = "DELETE FROM `comunicado` WHERE idcomunicado=:id;";
         $valores = array("id" => $id);
-        $consultas = new Consultas();
-        $eliminado = $consultas->execute($consulta, $valores);
+        $eliminado = $this->consultas->execute($consulta, $valores);
         $deldocs = $this->deleteIMGS($tag);
         return $eliminado;
     }
@@ -598,8 +567,7 @@ class ControladorComunicado
     {
         $consultado = false;
         $consulta = "select count(*) numrows from comunicado c $condicion;";
-        $consultas = new Consultas();
-        $consultado = $consultas->getResults($consulta, null);
+        $consultado = $this->consultas->getResults($consulta, null);
         return $consultado;
     }
 
@@ -617,8 +585,7 @@ class ControladorComunicado
     {
         $consultado = false;
         $consulta = "select * from comunicado c $condicion;";
-        $consultas = new Consultas();
-        $consultado = $consultas->getResults($consulta, null);
+        $consultado = $this->consultas->getResults($consulta, null);
         return $consultado;
     }
 
@@ -626,9 +593,8 @@ class ControladorComunicado
     {
         $consultado = false;
         $consulta = "SELECT * FROM usuariopermiso p where permiso_idusuario=:idusuario;";
-        $c = new Consultas();
         $valores = array("idusuario" => $idusuario);
-        $consultado = $c->getResults($consulta, $valores);
+        $consultado = $this->consultas->getResults($consulta, $valores);
         return $consultado;
     }
 
@@ -689,7 +655,7 @@ class ControladorComunicado
                 $fecha = $divideF[2] . ' - ' . $mes;
 
                 $datos .= "<tr>
-                <td>$fecha - $horacom</td>
+                <td>$fecha a ".date('h:i A', strtotime($horacom))."</td>
                 <td>$asunto</td>
                 <td class='text-center'>
                     <div>
@@ -701,7 +667,7 @@ class ControladorComunicado
                         <td class='text-center'><div class='dropdown dropend'>
                         <button class='button-list dropdown-toggle' title='Opciones'  type='button' data-bs-toggle='dropdown'><span class='fas fa-ellipsis-v'></span>
                         <span class='caret'></span></button>
-                        <ul class='dropdown-menu dropdown-menu-right'>";
+                        <ul class='dropdown-menu dropdown-menu-right z-1'>";
                 if ($div[1] == '1') {
                     $datos .= "<li class='notification-link py-1 ps-3'><a  class='text-decoration-none text-secondary-emphasis' onclick='editarComunicado($idcom);'>Editar comunicado <span class=' text-muted small fas fa-edit'></span></a></li>";
                 }
@@ -734,9 +700,8 @@ class ControladorComunicado
     {
         $consultado = false;
         $consulta = "SELECT * FROM doccomunicado where doc_tag=:tag;";
-        $consultas = new Consultas();
         $val = array("tag" => $tag);
-        $consultado = $consultas->getResults($consulta, $val);
+        $consultado = $this->consultas->getResults($consulta, $val);
         return $consultado;
     }
 
@@ -797,8 +762,7 @@ class ControladorComunicado
     {
         $consultado = false;
         $consulta = "SELECT * FROM categoria ORDER BY nombrecategoria;";
-        $consultas = new Consultas();
-        $consultado = $consultas->getResults($consulta, null);
+        $consultado = $this->consultas->getResults($consulta, null);
         return $consultado;
     }
 

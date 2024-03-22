@@ -158,7 +158,7 @@ class ControladorEmpresa {
                          <td>$direccion $codigo_postal, $municipio, $estado, $pais</td>
                          <td>$regimenfiscal</td>
                          <td align='center'>
-                         <div class='dropdown'>
+                         <div class='dropdown dropend'>
                             <button class='button-list dropdown-bs-toggle' title='Opciones'  type='button' data-bs-toggle='dropdown'><span class='fas fa-ellipsis-v'></span>
                             <span class='caret'></span></button>
                             <ul class='dropdown-menu dropdown-menu-right'>";
@@ -307,7 +307,7 @@ class ControladorEmpresa {
         $diferencias = $this->getZonaHoraria($c->getCp());
         $div = explode("</tr>", $diferencias);
         $insertado = false;
-        $consulta = "INSERT INTO `datos_facturacion` VALUES (null, :nombre, :rfc, :razon, :color, :calle, :numint, :numext, :colonia, :idmunicipio, :idestado, :estado, :municipio, :pais, :cp, :clave, :regimen, :correo, :telefono, :keyb64, :csd, :numcsd, :passcsd, :idbanco, :sucursal, :cuenta, :clabe, :oxxo, :idbanco1, :sucursal1, :cuenta1, :clabe1, :oxxo1, :idbanco2, :sucursal2, :cuenta2, :clabe2, :oxxo2, :idbanco3, :sucursal3, :cuenta3, :clabe3, :oxxo3, :firma, :difhorarioverano, :difhorarioinvierno) ;";
+        $consulta = "INSERT INTO `datos_facturacion` VALUES (null, :nombre, :rfc, :razon, :color, :calle, :numint, :numext, :colonia, :idestado, :idmunicipio, :estado, :municipio, :pais, :cp, :clave, :regimen, :correo, :telefono, :keyb64, :csd, :numcsd, :passcsd, :idbanco, :nombre_banco, :sucursal, :cuenta, :clabe, :oxxo, :idbanco1, :nombre_banco1, :sucursal1, :cuenta1, :clabe1, :oxxo1, :idbanco2, :nombre_banco2, :sucursal2, :cuenta2, :clabe2, :oxxo2, :idbanco3, :nombre_banco3, :sucursal3, :cuenta3, :clabe3, :oxxo3, :firma, :difhorarioverano, :difhorarioinvierno);";
         $valores = array("id" => null,
             "nombre" => $c->getNombreEmpresa(),
             "rfc" => $c->getRfc(),
@@ -317,8 +317,8 @@ class ControladorEmpresa {
             "numint" => $c->getNumint(),
             "numext" => $c->getNumext(),
             "colonia" => $c->getColonia(),
-            "idmunicipio" => $c->getMunicipio(),
             "idestado" => $c->getEstado(),
+            "idmunicipio" => $c->getMunicipio(),
             "estado"=> $c->getNombreEstado(),
             "municipio"=> $c->getNombreMunicipio(),
             "pais" => $c->getPais(),
@@ -332,21 +332,25 @@ class ControladorEmpresa {
             "numcsd" => $c->getNumcert(),
             "passcsd" => $c->getPasscsd(),
             "idbanco" => $c->getIdbanco(),
+            "nombre_banco" => $c->getNombreBanco1(),
             "sucursal" => $c->getSucursal(),
             "cuenta" => $c->getCuenta(),
             "clabe" => $c->getClabe(),
             "oxxo" => $c->getOxxo(),
             "idbanco1" => $c->getIdbanco1(),
+            "nombre_banco1" => $c->getNombreBanco2(),
             "sucursal1" => $c->getSucursal1(),
             "cuenta1" => $c->getCuenta1(),
             "clabe1" => $c->getClabe1(),
             "oxxo1" => $c->getOxxo1(),
             "idbanco2" => $c->getIdbanco2(),
+            "nombre_banco2" => $c->getNombreBanco3(),
             "sucursal2" => $c->getSucursal2(),
             "cuenta2" => $c->getCuenta2(),
             "clabe2" => $c->getClabe2(),
             "oxxo2" => $c->getOxxo2(),
             "idbanco3" => $c->getIdbanco3(),
+            "nombre_banco3" => $c->getNombreBanco4(),
             "sucursal3" => $c->getSucursal3(),
             "cuenta3" => $c->getCuenta3(),
             "clabe3" => $c->getClabe3(),
@@ -432,7 +436,7 @@ class ControladorEmpresa {
         }
 
         $insertado = false;
-        $consulta = "UPDATE `datos_facturacion` SET nombre_contribuyente=:nombre, rfc=:rfc, razon_social=:razon, color=:color, calle=:calle, numero_interior=:numint, numero_exterior=:numext, colonia=:colonia, idmunicipio=:idmunicipio, idestado=:idestado, estado=:estado, municipio=:municipio, pais=:pais, codigo_postal=:cp, c_regimenfiscal=:folio, regimen_fiscal=:regimen, correodatos=:correo, telefono=:telefono, keyb64=:keyb64, csd=:csd, numcsd=:numcsd,$passcsd idbanco=:idbanco, sucursal=:sucursal, cuenta=:cuenta, clabe=:clabe, tarjetaoxxo=:oxxo, idbanco1=:idbanco1, sucursal1=:sucursal1, cuenta1=:cuenta1, clabe1=:clabe1, tarjetaoxxo1=:oxxo1, idbanco2=:idbanco2, sucursal2=:sucursal2, cuenta2=:cuenta2, clabe2=:clabe2, tarjetaoxxo2=:oxxo2, idbanco3=:idbanco3, sucursal3=:sucursal3, cuenta3=:cuenta3, clabe3=:clabe3, tarjetaoxxo3=:oxxo3, firma=:firma, difhorarioverano=:difverano, difhorarioinvierno=:difinvierno WHERE id_datos=:id;";
+        $consulta = "UPDATE `datos_facturacion` SET nombre_contribuyente=:nombre, rfc=:rfc, razon_social=:razon, color=:color, calle=:calle, numero_interior=:numint, numero_exterior=:numext, colonia=:colonia, idestado=:idestado, idmunicipio=:idmunicipio, estado=:estado, municipio=:municipio, pais=:pais, codigo_postal=:cp, c_regimenfiscal=:folio, regimen_fiscal=:regimen, correodatos=:correo, telefono=:telefono, keyb64=:keyb64, csd=:csd, numcsd=:numcsd,$passcsd idbanco=:idbanco, nombre_banco=:nombre_banco,sucursal=:sucursal, cuenta=:cuenta, clabe=:clabe, tarjetaoxxo=:oxxo, idbanco1=:idbanco1, nombre_banco1=:nombre_banco1, sucursal1=:sucursal1, cuenta1=:cuenta1, clabe1=:clabe1, tarjetaoxxo1=:oxxo1, idbanco2=:idbanco2, nombre_banco2=:nombre_banco2,sucursal2=:sucursal2, cuenta2=:cuenta2, clabe2=:clabe2, tarjetaoxxo2=:oxxo2, idbanco3=:idbanco3, nombre_banco3=:nombre_banco3, sucursal3=:sucursal3, cuenta3=:cuenta3, clabe3=:clabe3, tarjetaoxxo3=:oxxo3, firma=:firma, difhorarioverano=:difverano, difhorarioinvierno=:difinvierno WHERE id_datos=:id;";
         $valores = array("nombre" => $c->getNombreEmpresa(),
             "rfc" => $c->getRfc(),
             "razon" => $c->getRazonSocial(),
@@ -441,8 +445,8 @@ class ControladorEmpresa {
             "numint" => $c->getNumint(),
             "numext" => $c->getNumext(),
             "colonia" => $c->getColonia(),
-            "idmunicipio" => $c->getMunicipio(),
             "idestado" => $c->getEstado(),
+            "idmunicipio" => $c->getMunicipio(),
             "estado"=> $c->getNombreEstado(),
             "municipio"=> $c->getNombreMunicipio(),
             "pais" => $c->getPais(),
@@ -456,21 +460,25 @@ class ControladorEmpresa {
             "numcsd" => $numcsd,
             "passcsd" => $c->getPasscsd(),
             "idbanco" => $c->getIdbanco(),
+            "nombre_banco" => $c->getNombreBanco1(),
             "sucursal" => $c->getSucursal(),
             "cuenta" => $c->getCuenta(),
             "clabe" => $c->getClabe(),
             "oxxo" => $c->getOxxo(),
             "idbanco1" => $c->getIdbanco1(),
+            "nombre_banco1" => $c->getNombreBanco2(),
             "sucursal1" => $c->getSucursal1(),
             "cuenta1" => $c->getCuenta1(),
             "clabe1" => $c->getClabe1(),
             "oxxo1" => $c->getOxxo1(),
             "idbanco2" => $c->getIdbanco2(),
+            "nombre_banco2" => $c->getNombreBanco3(),
             "sucursal2" => $c->getSucursal2(),
             "cuenta2" => $c->getCuenta2(),
             "clabe2" => $c->getClabe2(),
             "oxxo2" => $c->getOxxo2(),
             "idbanco3" => $c->getIdbanco3(),
+            "nombre_banco3" => $c->getNombreBanco4(),
             "sucursal3" => $c->getSucursal3(),
             "cuenta3" => $c->getCuenta3(),
             "clabe3" => $c->getClabe3(),

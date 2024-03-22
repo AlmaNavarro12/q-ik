@@ -41,6 +41,11 @@ function gestionarCliente(idcliente = null) {
     var cuenta3 = $("#cuenta3").val();
     var clabe3 = $("#clabe3").val();
 
+    var nombre_banco1 = $("#id-banco option:selected").text().substring(6);
+    var nombre_banco2 = $("#id-banco1 option:selected").text().substring(6);
+    var nombre_banco3 = $("#id-banco2 option:selected").text().substring(6);
+    var nombre_banco4 = $("#id-banco3 option:selected").text().substring(6);
+
     if ($("#datosficales").prop('checked')) {
         rfc = $("#rfc").val();
         razon = $("#razon_social").val();
@@ -49,7 +54,9 @@ function gestionarCliente(idcliente = null) {
         interior = $("#num_interior").val();
         exterior = $("#num_exterior").val();
         estado = $("#id-estado").val();
+        nombreestado = $("#id-estado option:selected").text().substring(6);
         municipio = $("#id-municipio").val();
+        nombremunicipio = $("#id-municipio option:selected").text();
         localidad = $("#localidad").val();
         postal = $("#codigo_postal").val();
     }
@@ -93,7 +100,9 @@ function gestionarCliente(idcliente = null) {
             interior: interior,
             exterior: exterior,
             estado: estado,
+            nombreestado: nombreestado,
             municipio: municipio,
+            nombremunicipio: nombremunicipio,
             localidad: localidad,
             postal: postal,
             idbanco: idbanco,
@@ -110,7 +119,11 @@ function gestionarCliente(idcliente = null) {
             clabe3: clabe3,
             correoalt1: correoalt1, 
             correoalt2: correoalt2, 
-            correoalt3: correoalt3
+            correoalt3: correoalt3,
+            nombrebanco1: nombre_banco1,
+            nombrebanco2: nombre_banco2,
+            nombrebanco3: nombre_banco3,
+            nombrebanco4: nombre_banco4,
         };
 
         $.ajax({
@@ -132,6 +145,7 @@ function gestionarCliente(idcliente = null) {
         });
     }
 }
+
 
 function buscarCliente(pag = "") {
     var REF = $("#buscar-cliente").val();

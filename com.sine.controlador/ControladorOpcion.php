@@ -98,26 +98,34 @@ class ControladorOpcion {
     }
 
     public function opcionesBancobyCliente($idcliente) {
-        $cliente = $this->getClienteID($idcliente);
+        $datos = $this->getClienteID($idcliente);
         $r = "";
-    
-        foreach ($cliente as $clienteactual) {
-            $bancoCuentaPairs = [];
-            for ($i = 0; $i < 4; $i++) {
-                $idbanco = $clienteactual["idbanco" . ($i == 0 ? '' : $i)];
-                $cuenta = $clienteactual["cuenta" . ($i == 0 ? '' : $i)];
-    
-                if ($idbanco != '0') {
-                    $banco = $this->getNomBanco($idbanco);
-                    $bancoCuentaPairs[] = "$banco - Cuenta: $cuenta";
-                }
-            }
-            $r .= "<option value='" . ($i + 1) . "'>" . implode("</option><option value='" . ($i + 1) . "'>", $bancoCuentaPairs) . "</option>";
+        foreach ($datos as $actual) {
+            $idbanco = $actual['idbanco'];
+            $cuenta = $actual['cuenta'];
+            $idbanco1 = $actual['idbanco1'];
+            $cuenta1 = $actual['cuenta1'];
+            $idbanco2 = $actual['idbanco2'];
+            $cuenta2 = $actual['cuenta2'];
+            $idbanco3 = $actual['idbanco3'];
+            $cuenta3 = $actual['cuenta3'];
         }
-    
+        
+        if ($idbanco != '0') {
+            $r .= "<option value='1'>" . $actual['nombre_banco']. ": " . $cuenta . "</option>";
+        }
+        if ($idbanco1 != '0') {
+            $r .= "<option value='2'>" . $actual['nombre_banco1'] . ": " . $cuenta1 . "</option>";
+        }
+        if ($idbanco2 != '0') {
+            $r .= "<option value='3'>" . $actual['nombre_banco2'] . ": " . $cuenta2 . "</option>";
+        }
+        if ($idbanco3 != '0') {
+            $r .= "<option value='4'>" . $actual['nombre_banco3'] . ": " . $cuenta3 . "</option>";
+        }
         return $r;
     }
-    
+
     private function getClienteID($idcliente) {
         $consultado = false;
         $consulta = "select * from cliente where id_cliente=:cid;";
@@ -126,41 +134,32 @@ class ControladorOpcion {
         return $consultado;
     }
 
-    private function getNombancoaux($idbanco) {
-        $consultado = false;
-        $consulta = "select nombre_banco from catalogo_banco where idcatalogo_banco=:bid;";
-        $val = array("bid" => $idbanco);
-        $consultado = $this->consultas->getResults($consulta, $val);
-        return $consultado;
-    }
-
-    public function getNomBanco($idbanco) {
-        $banco = $this->getNombancoaux($idbanco);
-        $nombre = "";
-        foreach ($banco as $bactual) {
-            $nombre = $bactual['nombre_banco'];
-        }
-        return $nombre;
-    }
-
     public function opcionesBeneficiario($iddatos) {
         $datos = $this->getDatosFacturacionbyID($iddatos);
         $r = "";
-        
         foreach ($datos as $actual) {
-            $bancoCuentaPairs = [];
-            for ($i = 0; $i < 4; $i++) {
-                $idbanco = $actual["idbanco" . ($i == 0 ? '' : $i)];
-                $cuenta = $actual["cuenta" . ($i == 0 ? '' : $i)];
-                
-                if ($idbanco != '0') {
-                    $banco = $this->getNomBanco($idbanco);
-                    $bancoCuentaPairs[] = "$banco - Cuenta: $cuenta";
-                }
-            }
-            $r .= "<option value='" . ($i + 1) . "'>" . implode("</option><option value='" . ($i + 1) . "'>", $bancoCuentaPairs) . "</option>";
+            $idbanco = $actual['idbanco'];
+            $cuenta = $actual['cuenta'];
+            $idbanco1 = $actual['idbanco1'];
+            $cuenta1 = $actual['cuenta1'];
+            $idbanco2 = $actual['idbanco2'];
+            $cuenta2 = $actual['cuenta2'];
+            $idbanco3 = $actual['idbanco3'];
+            $cuenta3 = $actual['cuenta3'];
         }
-    
+        
+        if ($idbanco != '0') {
+            $r .= "<option value='1'>" . $actual['nombre_banco']. ": " . $cuenta . "</option>";
+        }
+        if ($idbanco1 != '0') {
+            $r .= "<option value='2'>" . $actual['nombre_banco1'] . ": " . $cuenta1 . "</option>";
+        }
+        if ($idbanco2 != '0') {
+            $r .= "<option value='3'>" . $actual['nombre_banco2'] . ": " . $cuenta2 . "</option>";
+        }
+        if ($idbanco3 != '0') {
+            $r .= "<option value='4'>" . $actual['nombre_banco3'] . ": " . $cuenta3 . "</option>";
+        }
         return $r;
     }
 

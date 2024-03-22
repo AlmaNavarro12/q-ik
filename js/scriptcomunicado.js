@@ -11,7 +11,7 @@ function displayFileCom(id) {
     $.ajax({
         url: "com.sine.imprimir/img.php",
         type: "POST",
-        data: {pic: id},
+        data: { pic: id },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -23,20 +23,21 @@ function displayFileCom(id) {
                 var array = datos.split("<type>");
                 var t = array[0];
                 var data = array[1];
-                if(t == 'd'){
+                if (t == 'd') {
                     $('#archivo').modal('show');
                     $('#foto').html(data);
-                    //var newTab = window.open('com.sine.imprimir/img.php?filecom='+id);
-                    //newTab.document.body.innerHTML = data;
-                }else{
-                    //var newTab = window.open();
-                    //newTab.document.body.innerHTML = data;
+                } else {
                     $('#archivo').modal('show');
                     $('#foto').html(data);
                 }
             }
         }
     });
+}
+
+function cerrarModal(){
+    $('#archivo').modal('hide');
+    $('#foto').html("");
 }
 
 function disableDatos() {
@@ -53,7 +54,7 @@ function loadContactos() {
     $.ajax({
         url: "com.sine.enlace/enlacecomunicado.php",
         type: "POST",
-        data: {transaccion: "loadcontactos"},
+        data: { transaccion: "loadcontactos" },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -73,7 +74,7 @@ function loadCategoria() {
     $.ajax({
         url: 'com.sine.enlace/enlacecomunicado.php',
         type: 'POST',
-        data: {transaccion: 'loadcategoria', idcategoria: idcategoria},
+        data: { transaccion: 'loadcategoria', idcategoria: idcategoria },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -93,7 +94,7 @@ function cargarImgCom() {
     var img = $("#imagen").val();
     var formData = new FormData(document.getElementById("form-comunicado"));
     if (isnEmpty(img, 'imagen')) {
-        cargandoHide(); 
+        cargandoHide();
         cargandoShow();
         $.ajax({
             url: 'com.sine.enlace/cargarimgs.php',
@@ -108,11 +109,11 @@ function cargarImgCom() {
     }
 }
 
-function tablaIMG(d="") {
+function tablaIMG(d = "") {
     $.ajax({
         url: "com.sine.enlace/enlacecomunicado.php",
         type: "POST",
-        data: {transaccion: "tablaimg", d:d},
+        data: { transaccion: "tablaimg", d: d },
         success: function (datos) {
             console.log(datos);
             var texto = datos.toString();
@@ -137,7 +138,7 @@ function eliminarIMG(idtmp) {
         $.ajax({
             url: "com.sine.enlace/enlacecomunicado.php",
             type: "POST",
-            data: {transaccion: "eliminarimg", idtmp: idtmp},
+            data: { transaccion: "eliminarimg", idtmp: idtmp },
             success: function (datos) {
                 var texto = datos.toString();
                 var bandera = texto.substring(0, 1);
@@ -151,13 +152,13 @@ function eliminarIMG(idtmp) {
                 tablaIMG();
             }
         });
-    }).set({title: "Q-ik"});
+    }).set({ title: "Q-ik" });
 }
 
 function cargarLogoMail() {
-  
+
     var formData = new FormData();
-    var imgInput = $("#imagen")[0].files[0]; 
+    var imgInput = $("#imagen")[0].files[0];
     var rutaLogoMail = "temporal/tmp/";
 
     if (imgInput) {
@@ -278,7 +279,7 @@ function buscarComunicados(pag = "") {
     $.ajax({
         url: "com.sine.enlace/enlacecomunicado.php",
         type: "POST",
-        data: {transaccion: "listacomunicado", REF: REF, pag: pag, numreg: numreg},
+        data: { transaccion: "listacomunicado", REF: REF, pag: pag, numreg: numreg },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -300,7 +301,7 @@ function listaComunicados(pag = "") {
     $.ajax({
         url: "com.sine.enlace/enlacecomunicado.php",
         type: "POST",
-        data: {transaccion: "listacomunicado", REF: REF, pag: pag, numreg: numreg},
+        data: { transaccion: "listacomunicado", REF: REF, pag: pag, numreg: numreg },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -321,7 +322,7 @@ function editarComunicado(idcomunicado) {
     $.ajax({
         url: "com.sine.enlace/enlacecomunicado.php",
         type: "POST",
-        data: {transaccion: "editarcomunicado", idcomunicado: idcomunicado},
+        data: { transaccion: "editarcomunicado", idcomunicado: idcomunicado },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -378,11 +379,11 @@ function setValoresEditarComunicado(datos) {
     $("#color-txt").val(color);
     $("#size-txt").val(size);
     $("#texto-comunicado").val(txt);
-    
+
     $.ajax({
         url: "com.sine.enlace/enlacecomunicado.php",
         type: "POST",
-        data: {transaccion: "imgscom", tag: tag},
+        data: { transaccion: "imgscom", tag: tag },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -408,7 +409,7 @@ function setValoresEditarComunicado(datos) {
     }
 
     $("#btn-form-comunicado").attr("onclick", "gestionarComunicado(" + idcomunicado + ");");
-    if(chcom == '2'){
+    if (chcom == '2') {
         $('#contactos-div').show('slow');
         window.setTimeout("setValoresContactos('" + contactos + "')", 300);
     }
@@ -422,7 +423,7 @@ function eliminarComunicado(idcomunicado) {
         $.ajax({
             url: "com.sine.enlace/enlacecomunicado.php",
             type: "POST",
-            data: {transaccion: "eliminarcomunicado", idcomunicado: idcomunicado},
+            data: { transaccion: "eliminarcomunicado", idcomunicado: idcomunicado },
             success: function (datos) {
                 var texto = datos.toString();
                 var bandera = texto.substring(0, 1);
@@ -436,7 +437,7 @@ function eliminarComunicado(idcomunicado) {
                 }
             }
         });
-    }).set({title: "Q-ik"});
+    }).set({ title: "Q-ik" });
 }
 
 function loadFecha() {
@@ -444,7 +445,7 @@ function loadFecha() {
     $.ajax({
         url: 'com.sine.enlace/enlacecomunicado.php',
         type: 'POST',
-        data: {transaccion: 'fecha'},
+        data: { transaccion: 'fecha' },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -476,7 +477,7 @@ function crearComunicado(idcomunicado) {
     $.ajax({
         url: "com.sine.imprimir/imprimircomunicado.php",
         type: "POST",
-        data: {transaccion: "pdf", idcomunicado: idcomunicado},
+        data: { transaccion: "pdf", idcomunicado: idcomunicado },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -496,7 +497,7 @@ function canelarComunicado() {
     $.ajax({
         url: "com.sine.enlace/comunicado.php",
         type: "POST",
-        data: {transaccion: "cancelar"},
+        data: { transaccion: "cancelar" },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -505,20 +506,20 @@ function canelarComunicado() {
                 alertify.error(res);
             } else {
                 loadView('listacomunicado');
-                
+
             }
         }
     });
-    
+
 }
 
 //funcio
 function tablamodal(tag) {
     $('#archivo').modal('show');
     $.ajax({
-        url: "com.sine.enlace/enlacecomunicado.php", 
+        url: "com.sine.enlace/enlacecomunicado.php",
         type: "POST",
-        data: { transaccion: "modaltabla", tag:tag }, 
+        data: { transaccion: "modaltabla", tag: tag },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -529,18 +530,15 @@ function tablamodal(tag) {
                 $("#listaarchivo").html(datos);
             }
         }
-       
-    
-        
     });
 }
 
 function visutab(archivo, ext) {
-    var ruta = "./comunicado/" + archivo ;
-    if(ext=="jpg" || ext=="png" || ext=="jpeg" || ext=="gif"){
-     $("#foto").html('<img src="'+ruta+'" width="100%"/>')
-    }else{  
-        $('#foto').html('<embed type="application/pdf" src="'+ruta+'"  width="100%" style="height: 32rem"/>');
+    var ruta = "./comunicado/" + archivo;
+    if (ext == "jpg" || ext == "png" || ext == "jpeg" || ext == "gif") {
+        $("#foto").html('<img src="' + ruta + '" width="100%"/>')
+    } else {
+        $('#foto').html('<embed type="application/pdf" src="' + ruta + '"  width="100%" style="height: 32rem"/>');
     }
 
 }
@@ -549,7 +547,7 @@ function displayIMG(id) {
     $.ajax({
         url: "com.sine.imprimir/img.php",
         type: "POST",
-        data: {img: id},
+        data: { img: id },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -562,11 +560,11 @@ function displayIMG(id) {
                 var t = array[0];
                 var data = array[1];
                 if (t == 'd') {
-                    
-                    var newTab = window.open('com.sine.imprimir/img.php?doc=' + id);
-                    newTab.document.body.innerHTML = data;    
+
+
+                    var newTab = window.open('com.sine.imprimir/img.php?doc=' + id, '_blank');
+                    newTab.document.body.innerHTML = data;
                 } else {
-                    
                     $('#tabla').modal('show');
                     $('#fotito').html(data);
                 }

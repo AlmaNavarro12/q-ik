@@ -83,33 +83,39 @@
     </div>
 </div>
 
+<!--MOTIVO DE CANCELACION-->
 <div class="modal fade bs-example-modal-lg" id="modalcancelar" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-    <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <button type="button" class="close-modal" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="titulo-modal" id="myModalLabel">Motivo de la cancelaci&oacute;n:</h4>
+        <div class="modal-header py-0">
+                <div class="label-sub fs-5 py-0" id="titulo-alerta">
+                    Motivo de la cancelaci&oacute;n
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
             <div class="modal-body">
-                <div class="row">
+                <div class="row mt-3">
                     <div class="form-group">
-                        <select class="form-control input-form" id="motivo-cancelaci&oacute;n" name="motivo-cancelaci&oacute;n" onchange="checkCancelarPago();">
+                    <label class="label-form mb-1" for="uuid-reemplazo">Selecciona un motivo de cancelación:</label>
+                        <select class="form-select text-center input-form" id="motivo-cancelacion" name="motivo-cancelacion" onchange="checkCancelarPago();">
                             <option value="" id="option-default-motivo">- - - -</option>
-                            <optgroup id="motivos" class="contenedor-motivos text-left"> </optgroup>
+                            <optgroup id="motivos" class="contenedor-motivos text-start"> </optgroup>
                         </select>
                         <div id="motivo-cancelacion-errors"></div>
                     </div>
                 </div>
-                <div id="div-reemplazo" hidden>
-                    <div class="row">
-                        <label class="label-form mb-1" for="uuid-reemplazo">Folio Fiscal de reemplazo:</label>
+                <div id="div-reemplazo" style="display: none;">
+                    <div class="row mt-3">
+                        <label class="label-form mb-1" for="uuid-reemplazo">Folio fiscal de reemplazo:</label>
                         <div class="form-group">
                             <input type="text" class="form-control input-form cfdi input-form" id="uuid-reemplazo" placeholder="00000000-0000-0000-0000-000000000000">
                             <div id="uuid-reemplazo-errors"></div>
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-md-12 text-right" id="btn">
-                        <button class="button-modal" onclick="cancelarTimbre()" id="btn-cancelar">Cancelar Timbre <span class="glyphicon glyphicon-bell"></span></button>
+                <div class="row mt-3 mb-3">
+                    <div class="col-md-12 text-end" id="btn">
+                        <button class="button-modal" onclick="cancelarTimbrePago()" id="btn-cancelar">Cancelar timbre <span class="fas fa-bell"></span></button>
                     </div>	
                 </div>
             </div>
@@ -117,30 +123,35 @@
     </div>
 </div>
 
+<!--CHECAR STATUS DEL CFDI-->
 <div class="modal fade bs-example-modal-lg" id="modal-stcfdi" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <button type="button" class="close-modal" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="titulo-modal" id="myModalLabel">Status del CFDI</h4>
+        <div class="modal-header py-0">
+                <div class="label-sub fs-5 py-0" id="titulo-alerta">
+                   Status del CFDI
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
             <div class="modal-body">
                 <div class="row">
-                    <label class="label-sub" for="cod-status">Codigo Status: </label>
-                    <label class="label-form" id="cod-status"></label>
+                    <span class="label-sub py-0 my-0" for="cod-status">Codigo Status: </span>
+                    <span class="label-form" id="cod-status"></span>
                 </div>
                 
                 <div class="row">
-                    <label class="label-sub" for="estado-cfdi">Estado: </label>
-                    <label class="label-form" id="estado-cfdi"></label>
+                    <span class="label-sub py-0 my-0 mt-3" for="estado-cfdi">Estado: </span>
+                    <span class="label-form" id="estado-cfdi"></span>
                 </div>
                 
                 <div class="row">
-                    <label class="label-sub" for="cfdi-cancelable">Cancelable: </label>
-                    <label class="label-form" id="cfdi-cancelable"></label>
+                    <span class="label-sub py-0 my-0 mt-3" for="cfdi-cancelable">Cancelable: </span>
+                    <span class="label-form" id="cfdi-cancelable"></span>
                 </div>
                 
                 <div class="row">
-                    <label class="label-sub" for="estado-cancelacion">Estado Cancelacion: </label>
-                    <label class="label-form" id="estado-cancelacion"></label>
+                    <span class="label-sub py-0 my-0 mt-3" for="estado-cancelacion">Estado Cancelación: </span>
+                    <span class="label-form" id="estado-cancelacion"></span>
                 </div>
                 
                 <div class="row">

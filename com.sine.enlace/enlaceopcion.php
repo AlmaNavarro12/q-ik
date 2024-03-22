@@ -14,12 +14,16 @@ if (isset($_POST['transaccion'])) {
         case 'opcionesbeneficiario':
             $datos = $co->opcionesBeneficiario($_POST['iddatos']);
             break;
-        /*case 'opcionescliente':
-            $datos = $co->opcionesCliente();
-            break;*/
         case 'opcionesfacturacion':
             $datos = $co->opcionesDatFacturacion($_POST['id']);
             break;
+        case 'opcionesproveedor':
+            $datos = $co->opcionesProveedor($_POST['idprov']);
+            break;
+        /*case 'opcionescliente':
+            $datos = $co->opcionesCliente();
+            break;*/
+        
         /*case 'opcionesmpago':
             $datos = $co->opcionesMetodoPago($_POST['selected']);
             break;
@@ -37,9 +41,7 @@ if (isset($_POST['transaccion'])) {
         case 'opcionescomprobante':
             $datos = $co->opcionesComprobante($_POST['id']);
             break;*/
-        case 'opcionesproveedor':
-            $datos = $co->opcionesProveedor($_POST['idprov']);
-            break;
+        
         /*case 'opcionesregimen':
             $datos = $co->opcionesRegimen($_POST['idregimen']);
             break;
@@ -100,9 +102,9 @@ if (isset($_POST['transaccion'])) {
         case 'opcionesmeses':
             $datos = $co->opcionesMesesPeriodo($_POST['id']);
             break;
-        case 'anoglobal':
+        */case 'anoglobal':
             $datos = $co->opcionesAnoGlobal();
-            break;*/
+            break;
         default:
             break;
     }

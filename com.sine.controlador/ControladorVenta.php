@@ -1250,7 +1250,7 @@ class ControladorVenta
                               <div class='dropdown'>
                                 <button class='button-list dropdown-toggle' title='Opciones'  type='button' data-bs-toggle='dropdown'><span class='fas fa-ellipsis-v'></span>
                                 <span class='caret'></span></button>
-                                <ul class='dropdown-menu dropdown-menu-right z-3'>
+                                <ul class='dropdown-menu dropdown-menu-right z-1'>
                                 $exportar
                                 <li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' onclick=\"imprimirTicket('$tagventa', '$sello');\">Imprimir ticket <span class='text-muted small fas fa-file'></span></a></li>
                                 $cancelar
@@ -1587,14 +1587,16 @@ class ControladorVenta
                     UNION ALL
                     SELECT CONCAT('Cancelacion ',letra,folio) AS conceptomov, totalventa AS montomov
                     FROM datos_venta
-                    WHERE fecha_venta = :fecha AND idcancelado = :uid AND status_venta = 0$user_tkt";
+                    WHERE (fecha_venta = :fecha oR fecha_cancelado = :hoy) AND idcancelado = :uid AND status_venta = 0$user_tkt";
         } else {
             $consulta = "SELECT conceptomov, montomov FROM movefectivo WHERE tipomov=:tipo AND fechamov=:fecha$user";
         }
 
+        $hoy = date("Y-m-d");
         $val = array(
             "tipo" => $t,
             "fecha" => $fecha,
+            "hoy" => $hoy,
             "uid" => $uid,
             "hora" => $hora
         );
@@ -2244,16 +2246,17 @@ class ControladorVenta
         return $resultadosMovEfectivo;
     }
 
-    public function getCancelacionesByTag($tag, $uid, $hora)
+    public function getCancelacionesByTag($tag, $uid, $fecha, $hora)
     {
         $idsDatosVenta = $this->obtenerIdVentaByTag($tag);
         $resultadosMovEfectivo = array();
         foreach ($idsDatosVenta as $idVentas) {
             $consulta = "SELECT CONCAT('Cancelacion', letra, folio) AS conceptomov, totalventa AS montomov
                         FROM datos_venta 
-                        WHERE iddatos_venta = :iddatos_venta AND idcancelado = :uid_venta AND hora_cancelada < :hora;";
+                        WHERE iddatos_venta = :iddatos_venta AND idcancelado = :uid_venta AND fecha_cancelado = :fecha AND hora_cancelada < :hora;";
             $valores = array(
                 "iddatos_venta" => $idVentas["id_datosventa"],
+                "fecha" => $fecha,
                 "hora" => $hora,
                 "uid_venta" => $uid
             );

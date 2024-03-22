@@ -2,7 +2,7 @@
 include("modals.php");
 ?>
 <div id="form-factura" class="mb-3">
-    <div class="col-md-12 fijo z-1">
+    <div class="col-md-12 fijo z-2">
         <div class="titulo-lista" id="contenedor-titulo-form-factura">Corte de caja </div>
     </div>
     <div id="div-space">

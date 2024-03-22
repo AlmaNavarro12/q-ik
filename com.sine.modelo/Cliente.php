@@ -36,9 +36,16 @@ class Cliente {
     private $estado;
     private $pais;
     private $codigo_postal;
+    private $nombre_estado;
+    private $nombre_municipio;
     private $correoalt1;
     private $correoalt2;
     private $correoalt3;
+    private $nombrebanco1;
+    private $nombrebanco2;
+    private $nombrebanco3;
+    private $nombrebanco4;
+
     
     
     function __construct() {
@@ -112,6 +119,14 @@ class Cliente {
         return $this->clabe1;
     }
 
+    function getNombreEstado() {
+        return $this->nombre_estado;
+    }
+
+    function getNombreMunicipio() {
+        return $this->nombre_municipio;
+    }
+
     function getIdbanco2() {
         return $this->idbanco2;
     }
@@ -124,6 +139,22 @@ class Cliente {
         return $this->clabe2;
     }
 
+    function getNombreBanco1() {
+        return $this->nombrebanco1;
+    }
+
+    function getNombreBanco2() {
+        return $this->nombrebanco2;
+    }
+
+    function getNombreBanco3() {
+        return $this->nombrebanco3;
+    }
+
+    function getNombreBanco4() {
+        return $this->nombrebanco4;
+    }
+    
     function getIdbanco3() {
         return $this->idbanco3;
     }
@@ -240,6 +271,15 @@ class Cliente {
         $this->idbanco = $idbanco;
     }
 
+    function setNombreEstado($nombre_estado) {
+        $this->nombre_estado = $nombre_estado;
+    }
+
+    function setNombreMunicipio($nombre_municipio) {
+        $this->nombre_municipio = $nombre_municipio;
+    }
+
+
     function setCuenta($cuenta) {
         $this->cuenta = $cuenta;
     }
@@ -338,6 +378,22 @@ class Cliente {
 
     function setCorreoalt3($correoalt3) {
         $this->correoalt3 = $correoalt3;
+    }
+    
+    function setNombreBanco1($nombrebanco1) {
+        $this->nombrebanco1 = $nombrebanco1;
+    }
+
+    function setNombreBanco2($nombrebanco2) {
+        $this->nombrebanco2 = $nombrebanco2;
+    }
+
+    function setNombreBanco3($nombrebanco3) {
+        $this->nombrebanco3 = $nombrebanco3;
+    }
+
+    function setNombreBanco4($nombrebanco4) {
+        $this->nombrebanco4 = $nombrebanco4;
     }
 
 }

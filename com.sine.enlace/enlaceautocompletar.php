@@ -14,6 +14,9 @@ if (isset($_GET['transaccion'])) {
         case 'producto':
             echo json_encode($cp->getCoincidenciasBusquedaProducto($_GET['term']));
             break;
+        case 'facturas':
+            echo json_encode($cp->getCoincidenciasFacturas($_GET['term'], $_GET['iddatos']));
+            break;
         /*
         case 'emailcliente':
             echo json_encode($cp->getCoincidenciasBusquedaMail($_GET['term']));
@@ -24,9 +27,7 @@ if (isset($_GET['transaccion'])) {
         case 'datosfiscales':
             echo json_encode($cp->getCoincidenciasCliente($_GET['term']));
             break;*/
-        case 'facturas':
-            echo json_encode($cp->getCoincidenciasFacturas($_GET['term'], $_GET['iddatos']));
-            break;
+        
         /*case 'catunidad':
             echo json_encode($cp->getCoincidenciasCatalogoUnidad($_GET['term']));
             break; 

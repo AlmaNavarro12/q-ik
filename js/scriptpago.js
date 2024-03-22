@@ -40,9 +40,11 @@ function loadListaPago(pag = "") {
 }
 
 //------------------FORMULARIO
-function disableCuenta() {
-    var tag = $("#tabs").find('.sub-tab-active').attr("data-tab");
-    var formapago = $("#forma-" + tag).val();
+function disableCuenta(tagcom= "", forma= "") {
+    tag = tagcom == "" ? $("#tabs").find('.sub-tab-active').attr("data-tab") : tagcom;
+    console.log(tag);
+    formapago = forma == "" ? $("#forma-" + tag).val() : forma;
+    console.log(formapago);
     if (formapago == '2' || formapago == '3' || formapago == '4' || formapago == '5' || formapago == '6' || formapago == '18' || formapago == '19') {
         $("#cuenta-" + tag).removeAttr('disabled');
         $("#benef-" + tag).removeAttr('disabled');
@@ -140,7 +142,9 @@ function insertarComplemento(tag) {
         var tagcomp = $(a).attr('data-tab');
         var orden = $(a).attr('data-ord');
         var idformapago = $("#forma-" + tagcomp).val();
+        var nombreforma = $("#forma-" + tagcomp + " option:selected").text().substring(0, 2);
         var moneda = $("#moneda-" + tagcomp).val();
+        var nombremoneda = $("#moneda-" + tagcomp + " option:selected").text().substring(0, 3);
         var tcambio = $("#cambio-" + tagcomp).val();
         var fechapago = $("#fecha-" + tagcomp).val();
         var horapago = $("#hora-" + tagcomp).val();
@@ -151,16 +155,14 @@ function insertarComplemento(tag) {
         $.ajax({
             url: "com.sine.enlace/enlacepago.php",
             type: "POST",
-            data: {transaccion: "insertarcomplementos", tag: tag, tagcomp: tagcomp, orden:orden, idformapago: idformapago, moneda: moneda, tcambio: tcambio, fechapago: fechapago, horapago: horapago, cuenta: cuenta, beneficiario: beneficiario, numtransaccion: numtransaccion},
+            data: {transaccion: "insertarcomplementos", tag: tag, tagcomp: tagcomp, orden:orden, idformapago: idformapago, nombreforma:nombreforma, moneda: moneda, nombremoneda: nombremoneda, tcambio: tcambio, fechapago: fechapago, horapago: horapago, cuenta: cuenta, beneficiario: beneficiario, numtransaccion: numtransaccion},
             success: function (datos) {
                 var texto = datos.toString();
                 var bandera = texto.substring(0, 1);
                 var res = texto.substring(1, 1000);
                 if (bandera == '0') {
                     alertify.error(res);
-                } else {
-                    alertify.success('Pago registrado.');
-                }
+                } 
             }
         });
     }
@@ -173,7 +175,9 @@ function actualizarComplementos(tag) {
         var tagcomp = $(a).attr('data-tab');
         var orden = $(a).attr('data-ord');
         var idformapago = $("#forma-" + tagcomp).val();
+        var nombreforma = $("#forma-" + tagcomp + " option:selected").text().substring(0, 2);
         var moneda = $("#moneda-" + tagcomp).val();
+        var nombremoneda = $("#moneda-" + tagcomp + " option:selected").text().substring(0, 3);
         var tcambio = $("#cambio-" + tagcomp).val();
         var fechapago = $("#fecha-" + tagcomp).val();
         var horapago = $("#hora-" + tagcomp).val();
@@ -184,7 +188,7 @@ function actualizarComplementos(tag) {
         $.ajax({
             url: "com.sine.enlace/enlacepago.php",
             type: "POST",
-            data: {transaccion: "actualizarcomplementos", tag: tag, tagcomp: tagcomp, orden:orden, idformapago: idformapago, moneda: moneda, tcambio: tcambio, fechapago: fechapago, horapago: horapago, cuenta: cuenta, beneficiario: beneficiario, numtransaccion: numtransaccion},
+            data: {transaccion: "actualizarcomplementos", tag: tag, tagcomp: tagcomp, orden:orden, idformapago: idformapago, nombreforma:nombreforma, moneda: moneda, nombremoneda: nombremoneda, tcambio: tcambio, fechapago: fechapago, horapago: horapago, cuenta: cuenta, beneficiario: beneficiario, numtransaccion: numtransaccion},
             success: function (datos) {
                 var texto = datos.toString();
                 var bandera = texto.substring(0, 1);
@@ -192,7 +196,7 @@ function actualizarComplementos(tag) {
                 if (bandera == '0') {
                     alertify.error(res);
                 } else {
-                    alertify.success('Complemento actualizado.');
+                    //alertify.success('Complemento actualizado.');
                 }
             }
         });
@@ -231,6 +235,7 @@ function insertarPago() {
                     var tag = array[1];
                     insertarComplemento(tag);
                     loadView('listapago');
+                    alertify.success('Pago registrado correctamente.');
                 }
             }
         });
@@ -326,7 +331,7 @@ function editarPago(idpago) {
 
 function setValoresEditarPago(datos) {
     changeText("#contenedor-titulo-form-pago", "Editar pago");
-    changeText("#btn-form-pago", "Guardar cambios <span class='glyphicon glyphicon-floppy-disk'></span>");
+    changeText("#btn-form-pago", "Guardar cambios <span class='fas fa-save'></span>");
 
     var array = datos.split("</tr>");
     var idpago = array[0];
@@ -358,7 +363,7 @@ function setValoresEditarPago(datos) {
         $("#razon-emisor").val(razonemisor);
         $("#regimen-emisor").val(clvregemisor + "-" + regemisor);
         $("#cp-emisor").val(codpemisor);
-        $("#not-timbre").html("<label class='mark-required text-right'>*</label> <label class='label-required text-right'> Esta pago ya ha sido timbrado, por lo que solo puedes modificar la firma del contribuyente.</label>");
+        $("#not-timbre").html("<div class='row col-12 py-2'><label class='label-required text-danger fw-bold row'> * Esta pago ya ha sido timbrado, por lo que solo puedes modificar la firma del contribuyente.</label></div>");
         $("#folio-pago").attr("disabled", true);
         $("#nombre-cliente").attr("disabled", true);
         $("#rfc-cliente").attr("disabled", true);
@@ -366,6 +371,7 @@ function setValoresEditarPago(datos) {
         $("#regfiscal-cliente").attr("disabled", true);
         $("#cp-cliente").attr("disabled", true);
         $("#datos-facturacion").attr("disabled", true);
+        $("#obj-impuesto").attr("disabled", true);
     } else {
         loadFolioPago(idemisor);
         $("#folio-factura").removeAttr('disabled');
@@ -387,7 +393,6 @@ function setValoresEditarPago(datos) {
     if (chfirmar == '1') {
         $("#chfirma").attr('checked', true);
     }
-
     $.ajax({
         url: "com.sine.enlace/enlacepago.php",
         type: "POST",
@@ -400,25 +405,40 @@ function setValoresEditarPago(datos) {
                 alertify.error(res);
             } else {
                 var array = datos.split("<comp>");
+                console.log(array);
                 for (i = 0; i < array.length; i++) {
+                    if (array[array.length - 1] === "") {
+                        array.pop();
+                    }
                     var comps = array[i].split("<cut>");
                     $("#tabs").append(comps[0]);
                     $("#complementos").append(comps[1]);
                     var tag1 = comps[2];
                     var orden = comps[3];
-                    if(orden){
-                        comp = (parseFloat(orden)+1);
+                    var forma = comps[4];
+                    var moneda = comps[5];
+                    var cuentas = comps[6];
+                    var beneficiario = comps[7];
+                    var tcambio = comps[8];
+                
+                    if (orden) {
+                        comp = (parseFloat(orden) + 1);
                     }
-
+                
                     $(".sub-div").hide();
                     $(".tab-pago").removeClass("sub-tab-active");
-
+                
                     var first = $("#tabs").find('.tab-pago:first').attr("data-tab");
                     if (first) {
                         $("#complemento-" + first).show();
                         $("#tab-" + first).addClass("sub-tab-active");
                     }
-                    tablaRowCFDI(tag1, uuid);
+                    disableCuenta(tag1, forma);
+                    loadFormaPago(tag1, forma);
+                    loadMonedaComplemento(tag1, moneda);
+                    loadBancoCliente(tag1, cuentas);
+                    loadBancoBeneficiario(tag1, beneficiario);
+                    tablaRowCFDI(tag1, uuid, moneda, tcambio);
                 }
             }
         }
@@ -446,14 +466,13 @@ function checkCancelarPago() {
     }
 }
 
-function tablaRowCFDI(tag, uuid = "") {
-    var idmoneda = $("#moneda-" + tag).val();
-    var tcambio = $("#cambio-" + tag).val();
+function tablaRowCFDI(tag, uuid = "", moneda="", tcambio="") {
+    moneda = moneda == "" ? $("#moneda-" + tag).val() : moneda;
+    tcambio = tcambio == "" ? $("#cambio-" + tag).val() : tcambio;
     $.ajax({
         url: "com.sine.enlace/enlacepago.php",
         type: "POST",
-        //Al editar llegan dos datos
-        data: {transaccion: "loadtabla", tag: tag, idmoneda: idmoneda, tcambio: tcambio, uuid: uuid},
+        data: {transaccion: "loadtabla", tag: tag, idmoneda: moneda, tcambio: tcambio, uuid: uuid},
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -493,82 +512,6 @@ function loadFecha() {
                 alertify.error(res);
             } else {
                 $("#fecha-creacion").val(datos);
-            }
-        }
-    });
-}
-
-//-------------------CATALOGOS SAT
-function loadFormaPago(tag = "") {
-    $.ajax({
-        data: { transaccion: 'getOptions' },
-        url: '../../CATSAT/CATSAT/com.sine.enlace/enlaceFormaPago.php',
-        type: 'POST',
-        dataType: 'JSON',
-        success: function (res) {
-            if (res.status > 0) {
-                $(".cont-fpago-" + tag).html(res.datos);
-            }
-        }
-    });
-}
-
-function loadMonedaComplemento(tag = "") {
-    $.ajax({
-        data: { transaccion: 'getOptions' },
-        url: '../../CATSAT/CATSAT/com.sine.enlace/enlaceMonedas.php',
-        type: 'POST',
-        dataType: 'JSON',
-        success: function (res) {
-            if (res.status > 0) {
-                $(".contmoneda-" + tag).html(res.datos);
-            }
-        }
-    });
-}
-
-function getTipoCambio() {
-    var tag = $("#tabs").find('.sub-tab-active').attr("data-tab");
-    cargandoHide();
-    cargandoShow();
-    var idmoneda = $("#moneda-" + tag).val();
-    $.ajax({
-        url: '../../CATSAT/CATSAT/com.sine.enlace/enlaceMonedas.php',
-        type: 'POST',
-        data: { transaccion: 'gettipocambio', idmoneda: idmoneda },
-        success: function (datos) {
-            var texto = datos.toString();
-            var bandera = texto.substring(0, 1);
-            var res = texto.substring(1, 5000);
-            if (bandera == 0) {
-                alertify.error(res);
-            } else {
-                if (idmoneda != "1") {
-                    $("#cambio-" + tag).removeAttr('disabled');
-                } else {
-                    $("#cambio-" + tag).attr('disabled', true);
-                }
-                $("#cambio-" + tag).val(datos);
-            }
-            cargandoHide();
-        }
-    });
-}
-
-function loadMonedaCFDI(tag = "", idmoneda = "") {
-    $.ajax({
-        url: '../../CATSAT/CATSAT/com.sine.enlace/enlaceMonedas.php',
-        type: 'POST',
-        dataType: 'html',
-        data: { transaccion: 'opcionesmoneda', idmoneda: idmoneda },
-        success: function (datos) {
-            var texto = datos.toString();
-            var bandera = texto.substring(0, 1);
-            var res = texto.substring(1, 5000);
-            if (bandera == 0) {
-                alertify.error(res);
-            } else {
-                $(".contenedor-moneda-" + tag).html(datos);
             }
         }
     });
@@ -617,7 +560,7 @@ function autocompletarCliente() {
     });
 }
 
-function loadBancoCliente(tag) {
+function loadBancoCliente(tag, select = "") {
     $.ajax({
         url: 'com.sine.enlace/enlaceopcion.php',
         type: 'POST',
@@ -627,15 +570,17 @@ function loadBancoCliente(tag) {
             var bandera = texto.substring(0, 1);
             var res = texto.substring(1, 5000);
             if (bandera == 0) {
-                //alertify.error('Debe llenar datos del receptor.');
             } else {
                 $(".contenedor-cuenta-" + tag).html(datos);
+                if(select != ""){
+                    $("#cuenta-"+tag).val(select);
+                }
             }
         }
     });
 }
 
-function loadBancoBeneficiario(tag) {
+function loadBancoBeneficiario(tag, select = "") {
     var iddatos = $("#datos-facturacion").val();
     $.ajax({
         url: 'com.sine.enlace/enlaceopcion.php',
@@ -646,9 +591,11 @@ function loadBancoBeneficiario(tag) {
             var bandera = texto.substring(0, 1);
             var res = texto.substring(1, 5000);
             if (bandera == 0) {
-                //alertify.error(res);
             } else {
                 $(".contenedor-beneficiario-" + tag).html(datos);
+                if(select != "" && select != 0){
+                    $("#benef-"+tag).val(select);
+                }
             }
         }
     });
@@ -976,7 +923,7 @@ function loadFactura(idfactura, type, tag) {
 }
 
 function setvaloresFactura(datos, tag) {
-    var [iddatosfactura, uuid, tcambio, idmoneda, idmetodo, totalfactura, noparcialidad_tmp, montoant_tmp] = datos.split("</tr>").slice(0, 8);
+    var [iddatosfactura, uuid, tcambio, idmoneda, idmetodo, totalfactura, noparcialidad_tmp, montoant_tmp, parcialidad, tiene_egreso, monto_egreso] = datos.split("</tr>").slice(0, 8);
     $("#id-factura-" + tag).val(iddatosfactura);
     $("#uuid-" + tag).val(uuid);
     $("#cambiocfdi-" + tag).val(tcambio);
@@ -987,6 +934,36 @@ function setvaloresFactura(datos, tag) {
     $("#anterior-" + tag).val(montoant_tmp);
     $("#monto-" + tag).val(montoant_tmp);
     calcularRestante(tag);
+
+    if(tiene_egreso > 0){
+        aplicarEgreso(monto_egreso, montoant_tmp, tag, uuid);
+    }
+}
+
+function aplicarEgreso(monto, montoant_tmp, tag, uuid){
+    alertify.confirm("Este CFDI tiene un egreso aplicable ¿Deseas aplicarlo?", function () {
+        
+        cargandoShow();
+        var tab = $("#tabs").find('.sub-tab-active').attr("data-tab");
+        $.ajax({
+            data : {transaccion : "aplicarEgreso", uuid: uuid, monto: monto, montoant_tmp: montoant_tmp},
+            url  : "com.sine.enlace/enlacepago.php",
+            type : "POST",
+            success : function(datos){
+                var div = datos.split('</tr>');
+                var aplicado = div[0];
+                var restante = div[1];
+                if(aplicado > 0){
+                    $("#anterior-" + tab).val(restante);
+                    $("#monto-" + tab).val(restante);
+                    alertify.success("Egreso aplicado");
+                } else {
+                    alertify.error("No se pudo aplicar el egreso");
+                }
+                cargandoHide();
+            }
+        });
+    }).set({title: "Q-ik"});
 }
 
 function calcularRestante(tag = "") {
@@ -996,8 +973,13 @@ function calcularRestante(tag = "") {
     var monto = $("#monto-" + tag).val();
     var total = $("#anterior-" + tag).val();
     var restante = parseFloat(total) - parseFloat(monto);
-    $("#restante-" + tag).val(restante);
+    $("#restante-" + tag).val(myRound(restante));
 }
+
+function myRound(num, dec) {
+    var exp = Math.pow(10, dec || 2); 
+    return parseInt(num * exp, 10) / exp;
+} 
 
 function cambiarEstado(idfactura, idcliente, monto) {
     cargandoHide();
@@ -1145,6 +1127,7 @@ function loadTablaCFDI(uuid = "") {
 function agregarCFDI() {
     var tag = $("#tabs").find('.sub-tab-active').attr("data-tab");
     var idmoneda = $("#moneda-" + tag).val();
+    var nombremoneda = $("#moneda-" + tag + " option:selected").text().substring(0, 3);
     var tcambio = $("#cambio-" + tag).val();
     var idfactura = $("#id-factura-" + tag).val() || '0';
     var folio = $("#factura-" + tag).val();
@@ -1164,7 +1147,7 @@ function agregarCFDI() {
         $.ajax({
             url: "com.sine.enlace/enlacepago.php",
             type: "POST",
-            data: {transaccion: "agregarcfdi", tag: tag, idmoneda: idmoneda, tcambio: tcambio, type: type, idfactura: idfactura, folio: folio, uuid: uuid, tcamcfdi: tcamcfdi, idmonedacdfi: idmonedacdfi, cmetodo: cmetodo, factura: factura, parcialidad: parcialidad, totalfactura: totalfactura, montoanterior: montoanterior, montopago: montopago, montorestante: montorestante},
+           data: {transaccion: "agregarcfdi", tag: tag, idmoneda: idmoneda, nombremoneda: nombremoneda, tcambio: tcambio, type: type, idfactura: idfactura, folio: folio, uuid: uuid, tcamcfdi: tcamcfdi, idmonedacdfi: idmonedacdfi, cmetodo: cmetodo, factura: factura, parcialidad: parcialidad, totalfactura: totalfactura, montoanterior: montoanterior, montopago: montopago, montorestante: montorestante},
             success: function (datos) {
                 var texto = datos.toString();
                 var bandera = texto.substring(0, 1);

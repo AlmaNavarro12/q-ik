@@ -10,7 +10,7 @@ class ControladorCliente {
 
     private function insertarCliente($c) {
         $registrado = false;
-        $consulta = "INSERT INTO cliente VALUES (:id, :nombre, :apaterno, :amaterno, :nombre_empresa, :email_informacion, :email_facturacion, :email_gerencia, :telefono, :idbanco, :cuenta, :clabe, :idbanco1, :cuenta1, :clabe1, :idbanco2, :cuenta2, :clabe2, :idbanco3, :cuenta3, :clabe3, :rfc, :razon_social, :regimenfiscal, :calle, :numero_interior, :numero_exterior, :localidad, :idmunicipio, :idestado, :pais, :codigo_postal, :correoalt1, :correoalt2, :correoalt3);";
+        $consulta = "INSERT INTO cliente VALUES (:id, :nombre, :apaterno, :amaterno, :nombre_empresa, :email_informacion, :email_facturacion, :email_gerencia, :telefono, :idbanco, :cuenta, :clabe, :idbanco1, :cuenta1, :clabe1, :idbanco2, :cuenta2, :clabe2, :idbanco3, :cuenta3, :clabe3, :rfc, :razon_social, :regimenfiscal, :calle, :numero_interior, :numero_exterior, :localidad, :idestado, :nombre_estado, :idmunicipio, :nombre_estado, :pais, :codigo_postal, :correoalt1, :correoalt2, :correoalt3, :nombre_banco, :nombre_banco1,:nombre_banco2,:nombre_banco3);";
         $valores = $this->getValores($c);
         $registrado = $this->consultas->execute($consulta, $valores);
         return $registrado;
@@ -46,13 +46,19 @@ class ControladorCliente {
             "numero_interior" => $c->getNum_interior(),
             "numero_exterior" => $c->getNum_exterior(),
             "localidad" => $c->getLocalidad(),
-            "idmunicipio" => $c->getMunicipio(),
             "idestado" => $c->getEstado(),
+            "nombre_estado" => $c->getNombreEstado(),
+            "idmunicipio" => $c->getMunicipio(),
+            "nombre_municipio" => $c->getNombreMunicipio(),
             "pais" => $c->getPais(),
             "codigo_postal" => $c->getCodigo_postal(),
             "correoalt1" => $c->getCorreoalt1(),
             "correoalt2" => $c->getCorreoalt2(),
-            "correoalt3" => $c->getCorreoalt3()
+            "correoalt3" => $c->getCorreoalt3(),
+            "nombre_banco" => $c->getNombreBanco1(),
+            "nombre_banco1" => $c->getNombreBanco2(),
+            "nombre_banco2" => $c->getNombreBanco3(),
+            "nombre_banco3" => $c->getNombreBanco4()
         );
     }
 
@@ -164,7 +170,7 @@ class ControladorCliente {
 
     private function actualizarCliente($c) {
         $actualizado = false;
-        $consulta = "UPDATE cliente SET  nombre=:nombre, apaterno=:apaterno, amaterno=:amaterno, nombre_empresa=:nombre_empresa, email_informacion=:email_informacion, email_facturacion=:email_facturacion, email_gerencia=:email_gerencia, telefono=:telefono, idbanco=:idbanco, cuenta=:cuenta, clabe=:clabe, idbanco1=:idbanco1, cuenta1=:cuenta1, clabe1=:clabe1, idbanco2=:idbanco2, cuenta2=:cuenta2, clabe2=:clabe2, idbanco3=:idbanco3, cuenta3=:cuenta3, clabe3=:clabe3, rfc=:rfc, razon_social=:razon_social, regimen_cliente=:regimenfiscal, calle=:calle, numero_interior=:numero_interior, numero_exterior=:numero_exterior, localidad=:localidad, idmunicipio=:idmunicipio, idestado=:idestado, pais=:pais, codigo_postal=:codigo_postal, correoalt1=:correoalt1, correoalt2=:correoalt2, correoalt3=:correoalt3 WHERE id_cliente=:id;";
+        $consulta = "UPDATE cliente SET  nombre=:nombre, apaterno=:apaterno, amaterno=:amaterno, nombre_empresa=:nombre_empresa, email_informacion=:email_informacion, email_facturacion=:email_facturacion, email_gerencia=:email_gerencia, telefono=:telefono, idbanco=:idbanco, cuenta=:cuenta, clabe=:clabe, idbanco1=:idbanco1, cuenta1=:cuenta1, clabe1=:clabe1, idbanco2=:idbanco2, cuenta2=:cuenta2, clabe2=:clabe2, idbanco3=:idbanco3, cuenta3=:cuenta3, clabe3=:clabe3, rfc=:rfc, razon_social=:razon_social, regimen_cliente=:regimenfiscal, calle=:calle, numero_interior=:numero_interior, numero_exterior=:numero_exterior, localidad=:localidad, idestado=:idestado, nombre_estado=:nombre_estado, idmunicipio=:idmunicipio, nombre_municipio=:nombre_municipio, pais=:pais, codigo_postal=:codigo_postal, correoalt1=:correoalt1, correoalt2=:correoalt2, correoalt3=:correoalt3, nombre_banco=:nombre_banco, nombre_banco1=:nombre_banco1, nombre_banco2=:nombre_banco2, nombre_banco3=:nombre_banco3 WHERE id_cliente=:id;";
         $valores = $this->getValores($c);
         $actualizado = $this->consultas->execute($consulta, $valores);
         return $actualizado;

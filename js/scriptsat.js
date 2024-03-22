@@ -24,20 +24,128 @@ function aucompletarUnidad() {
 //-------------------------------------MONEDAS
 function loadOpcionesMoneda() {
     $.ajax({
-        data: { transaccion: 'getOptions' },
+        data: { transaccion: 'getOptions'},
         url: rutaPrincipal + 'com.sine.enlace/enlaceMonedas.php',
         type: 'POST',
         dataType: 'JSON',
         success: function (res) {
             if (res.status > 0) {
                 $('#moneda-pago').html(res.datos);
+                $('.contenedor-moneda').html(res.datos);
             }
         }
     });
 }
 
+function loadMonedaCFDI(tag = "", idmoneda = "") {
+    $.ajax({
+        url: rutaPrincipal + 'com.sine.enlace/enlaceMonedas.php',
+        type: 'POST',
+        dataType: 'html',
+        data: { transaccion: 'opcionesmoneda', idmoneda: idmoneda },
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 5000);
+            if (bandera == 0) {
+                alertify.error(res);
+            } else {
+                $(".contenedor-moneda-" + tag).html(datos);
+            }
+        }
+    });
+}
+
+function loadMonedaComplemento(tag = "", select = "") {
+    $.ajax({
+        data: { transaccion: 'getOptions' },
+        url: rutaPrincipal + 'com.sine.enlace/enlaceMonedas.php',
+        type: 'POST',
+        dataType: 'JSON',
+        success: function (res) {
+            if (res.status > 0) {
+                $(".contmoneda-" + tag).html(res.datos);
+                if(select != ""){
+                    $("#moneda-" + tag).val(select);
+                }
+            }
+        }
+    });
+}
+
+function getTipoCambio() {
+    var tag = $("#tabs").find('.sub-tab-active').attr("data-tab");
+    cargandoHide();
+    cargandoShow();
+    var idmoneda = $("#moneda-" + tag).val();
+    $.ajax({
+        url: rutaPrincipal+ 'com.sine.enlace/enlaceMonedas.php',
+        type: 'POST',
+        data: { transaccion: 'gettipocambio', idmoneda: idmoneda },
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 5000);
+            if (bandera == 0) {
+                alertify.error(res);
+            } else {
+                if (idmoneda != "1") {
+                    $("#cambio-" + tag).removeAttr('disabled');
+                } else {
+                    $("#cambio-" + tag).attr('disabled', true);
+                }
+                $("#cambio-" + tag).val(datos);
+            }
+            cargandoHide();
+        }
+    });
+}
+
+function getTipoCambioSinTag() {
+    cargandoHide();
+    cargandoShow();
+    var idmoneda = $("#id-moneda").val();
+    $.ajax({
+        url: rutaPrincipal+ 'com.sine.enlace/enlaceMonedas.php',
+        type: 'POST',
+        data: { transaccion: 'gettipocambio', idmoneda: idmoneda },
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 5000);
+            if (bandera == 0) {
+                alertify.error(res);
+            } else {
+                if (idmoneda != "1") {
+                    $("#tipo-cambio").removeAttr('disabled');
+                } else {
+                    $("#tipo-cambio").attr('disabled', true);
+                }
+                $("#tipo-cambio").val(datos);
+            }
+            cargandoHide();
+        }
+    });
+}
 //-------------------------------------FORMA DE PAGO
-function loadOpcionesFormaPago2() {
+function loadFormaPago(tag = "", select="") {
+    $.ajax({
+        data: { transaccion: 'getOptions' },
+        url: rutaPrincipal + 'com.sine.enlace/enlaceFormaPago.php',
+        type: 'POST',
+        dataType: 'JSON',
+        success: function (res) {
+            if (res.status > 0) {
+                $(".cont-fpago-" + tag).html(res.datos);
+                if(select != ""){
+                    $("#forma-" + tag).val(select);
+                }
+            }
+        }
+    });
+}
+
+function loadOpcionesFormaPago2(selected = "" ) {
     $.ajax({
         data: { transaccion: 'getOptions' },
         url: rutaPrincipal + 'com.sine.enlace/enlaceFormaPago.php',
@@ -46,6 +154,9 @@ function loadOpcionesFormaPago2() {
         success: function (res) {
             if (res.status > 0) {
                 $('#forma-pago').html(res.datos);
+                if(selected) {
+                    $("#id-forma-pago").val(selected);
+                }
             }
         }
     });
@@ -151,6 +262,111 @@ function aucompletarRegimen(){
             var regimen = c_regimen + " - " + desc_regimen;
             $('#regimen-fiscal').val(regimen);
             $('#desc_regimenFiscal').val(desc_regimen);
+        }
+    });
+}
+
+//----------------------------------METODO DE PAGO
+function loadOpcionesMetodoPago(id="", selected = "") {
+    $.ajax({
+        data: { transaccion: 'getOptions' },
+        url: rutaPrincipal + 'com.sine.enlace/enlaceMetodosPago.php',
+        type: 'POST',
+        dataType: 'JSON',
+        success: function (res) {
+            if (res.status > 0) {
+                $('.contenedor-metodo-pago').html(res.datos);
+                if(selected != ""){
+                    $('#'+id).val(selected);
+                }
+            }
+        }
+    });
+}
+
+//---------------------------------TIPO COMPROBANTE
+function loadOpcionesComprobante(id="", selected = "") {
+    $.ajax({
+        data: { transaccion: 'getOptions' },
+        url: rutaPrincipal + 'com.sine.enlace/enlaceComprobante.php',
+        type: 'POST',
+        dataType: 'JSON',
+        success: function (res) {
+            if (res.status > 0) {
+                $('.contenedor-tipo-comprobante').html(res.datos);
+                if(selected != ""){
+                    $('#'+id).val(selected);
+                }
+            }
+        }
+    });
+}
+
+//----------------------------------USO CFDI
+function loadOpcionesUsoCFDI(id="", selected = "") {
+    $.ajax({
+        data: { transaccion: 'getOptions'},
+        url: rutaPrincipal + 'com.sine.enlace/enlaceUsoCFDI.php',
+        type: 'POST',
+        dataType: 'JSON',
+        success: function (res) {
+            if (res.status > 0) {
+                $('.contenedor-uso').html(res.datos);
+                if(selected != ""){
+                    $('#'+id).val(selected);
+                }
+            }
+        }
+    });
+}
+
+//-----------------------------------TIPO DE RELACIOMN
+function loadOpcionesTipoRelacion() {
+    $.ajax({
+        data: { transaccion: 'getOptions'},
+        url: rutaPrincipal + 'com.sine.enlace/enlaceRelacion.php',
+        type: 'POST',
+        dataType: 'JSON',
+        success: function (res) {
+            if (res.status > 0) {
+                $('.contenedor-relacion').html(res.datos);
+            }
+        }
+    });
+}
+
+//---------------------------------PERIODICIDAD
+function opcionesPeriodoGlobal(id = "", selected = "") {
+    $.ajax({
+        data: { transaccion: 'getOptions'},
+        url: rutaPrincipal + 'com.sine.enlace/enlacePeriodicidad.php',
+        type: 'POST',
+        dataType: 'JSON',
+        success: function (res) {
+            if (res.status > 0) {
+                $('.contenedor-pglobal').html(res.datos);
+                if(selected != ""){
+                    $('#'+id).val(selected);
+                }
+            }
+        }
+    });
+}
+
+//--------------------------------MESES
+function opcionesMeses(id = "", selected = "") {
+    $.ajax({
+        data: { transaccion: 'getOptions'},
+        url: rutaPrincipal + 'com.sine.enlace/enlaceMeses.php',
+        type: 'POST',
+        dataType: 'JSON',
+        success: function (res) {
+            if (res.status > 0) {
+                $('.contenedor-mes').html(res.datos);
+                if(selected != ""){
+                    $('#'+id).val(selected);
+                }
+            }
         }
     });
 }

@@ -10,12 +10,12 @@ function firmaCanvas() {
     document.getElementById('undo').addEventListener('click', function () {
         var data = signaturePad.toData();
         if (data) {
-            data.pop(); 
+            data.pop();
             signaturePad.fromData(data);
         }
     });
 
-   document.getElementById('save').addEventListener('click', function () {
+    document.getElementById('save').addEventListener('click', function () {
         if (signaturePad.isEmpty()) {
             return alertify.error("Dibuje una firma válida.");
         }
@@ -27,7 +27,7 @@ function firmaCanvas() {
             $.ajax({
                 url: "com.sine.enlace/enlaceconfig.php",
                 type: "POST",
-                data: {transaccion: "guardarfirma", firma: firma, firmaanterior: firmaanterior},
+                data: { transaccion: "guardarfirma", firma: firma, firmaanterior: firmaanterior },
                 success: function (datos) {
                     var texto = datos.toString();
                     var bandera = texto.substring(0, 1);
@@ -44,9 +44,9 @@ function firmaCanvas() {
                     }
                 }
             });
-        }).set({title: "Q-ik"});
+        }).set({ title: "Q-ik" });
     });
- 
+
 }
 
 function insertarDatos() {
@@ -61,7 +61,7 @@ function insertarDatos() {
     var cp = $("#codigo_postal").val();
     var idestado = $("#id-estado").val();
     var idmunicipio = $("#id-municipio").val() || '0';
-    var estado = $("#id-estado option:selected").text();
+    var estado = $("#id-estado option:selected").text().substring(6);
     var municipio = $("#id-municipio option:selected").text();
     var pais = $("#pais-empresa").val();
     var regimen = $("#regimen-fiscal").val();
@@ -90,6 +90,10 @@ function insertarDatos() {
     var csd = $("#certificado-csd").val();
     var key = $("#archivo-key").val();
     var passkey = $("#password-key").val();
+    var nombre_banco1 = $("#id-banco option:selected").text().substring(6);
+    var nombre_banco2 = $("#id-banco1 option:selected").text().substring(6);
+    var nombre_banco3 = $("#id-banco2 option:selected").text().substring(6);
+    var nombre_banco4 = $("#id-banco3 option:selected").text().substring(6);
     var canvas = document.getElementById('firma-canvas');
     var firma = canvas.toDataURL();
     var firmaanterior = $("#firma-actual").val();
@@ -100,7 +104,9 @@ function insertarDatos() {
         $.ajax({
             url: "com.sine.enlace/enlaceempresa.php",
             type: "POST",
-            data: {transaccion: "insertardatos", nombre: nombre, rfc: rfc, razon: razon, color: color, calle: calle, interior: interior, exterior: exterior, colonia: colonia, correo: correo, telefono: telefono, cp: cp, idestado: idestado, idmunicipio: idmunicipio, estado: estado, municipio: municipio, pais: pais, regimen: regimen, passkey: passkey, idbanco: idbanco, sucursal: sucursal, cuenta: cuenta, clabe: clabe, oxxo: oxxo, idbanco1: idbanco1, sucursal1: sucursal1, cuenta1: cuenta1, clabe1: clabe1, oxxo1: oxxo1, idbanco2: idbanco2, sucursal2: sucursal2, cuenta2: cuenta2, clabe2: clabe2, oxxo2: oxxo2, idbanco3: idbanco3, sucursal3: sucursal3, cuenta3: cuenta3, clabe3: clabe3, oxxo3: oxxo3, firma: firma, firmaanterior: firmaanterior},
+            data: {
+                transaccion: "insertardatos", nombre: nombre, rfc: rfc, razon: razon, color: color, calle: calle, interior: interior, exterior: exterior, colonia: colonia, correo: correo, telefono: telefono, cp: cp, idestado: idestado, idmunicipio: idmunicipio, estado: estado, municipio: municipio, pais: pais, regimen: regimen, passkey: passkey, idbanco: idbanco, sucursal: sucursal, cuenta: cuenta, clabe: clabe, oxxo: oxxo, idbanco1: idbanco1, sucursal1: sucursal1, cuenta1: cuenta1, clabe1: clabe1, oxxo1: oxxo1, idbanco2: idbanco2, sucursal2: sucursal2, cuenta2: cuenta2, clabe2: clabe2, oxxo2: oxxo2, idbanco3: idbanco3, sucursal3: sucursal3, cuenta3: cuenta3, clabe3: clabe3, oxxo3: oxxo3, firma: firma, firmaanterior: firmaanterior,nombrebanco1: nombre_banco1, nombrebanco2: nombre_banco2, nombrebanco3: nombre_banco3, nombrebanco4: nombre_banco4
+            },
             success: function (datos) {
                 var texto = datos.toString();
                 var bandera = texto.substring(0, 1);
@@ -125,7 +131,7 @@ function loadListaEmpresa(pag = "") {
     $.ajax({
         url: "com.sine.enlace/enlaceempresa.php",
         type: "POST",
-        data: {transaccion: "listaempresa", nom: nom, numreg: numreg, pag: pag},
+        data: { transaccion: "listaempresa", nom: nom, numreg: numreg, pag: pag },
         success: function (datos) {
             //alert ("hola   "+datos);
             var texto = datos.toString();
@@ -147,7 +153,7 @@ function buscarEmpresa(pag = "") {
     $.ajax({
         url: "com.sine.enlace/enlaceempresa.php",
         type: "POST",
-        data: {transaccion: "listaempresa", nom: nom, numreg: numreg, pag: pag},
+        data: { transaccion: "listaempresa", nom: nom, numreg: numreg, pag: pag },
         success: function (datos) {
             //alert ("hola   "+datos);
             var texto = datos.toString();
@@ -168,7 +174,7 @@ function editarEmpresa(idempresa) {
     $.ajax({
         url: "com.sine.enlace/enlaceempresa.php",
         type: "POST",
-        data: {transaccion: "editarempresa", idempresa: idempresa},
+        data: { transaccion: "editarempresa", idempresa: idempresa },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -236,7 +242,7 @@ function setValoresEditarEmpresa(datos) {
     $("#num-int-empresa").val(interior);
     $("#num-ext-empresa").val(exterior);
     $("#colonia-empresa").val(colonia);
-    
+
     loadOpcionesEstado('contenedor-estado', 'id-estado', idestado);
     loadOpcionesMunicipio(idmunicipio, idestado);
 
@@ -254,9 +260,9 @@ function setValoresEditarEmpresa(datos) {
         $("#tarjeta-oxxo").val(oxxo);
     }
 
-    inicializarCampos(idbanco1, cuenta1, clabe1, sucursal1, oxxo1,  1);
-    inicializarCampos(idbanco2, cuenta2, clabe2, sucursal2, oxxo2,  2);
-    inicializarCampos(idbanco3, cuenta3, clabe3, sucursal3, oxxo3,  3);
+    inicializarCampos(idbanco1, cuenta1, clabe1, sucursal1, oxxo1, 1);
+    inicializarCampos(idbanco2, cuenta2, clabe2, sucursal2, oxxo2, 2);
+    inicializarCampos(idbanco3, cuenta3, clabe3, sucursal3, oxxo3, 3);
 
 
     $("#firma-actual").val(firma);
@@ -269,7 +275,7 @@ function errorKEY() {
     $.ajax({
         url: 'com.sine.enlace/enlaceempresa.php',
         type: "POST",
-        data: {transaccion: "execkey", passkey: passkey},
+        data: { transaccion: "execkey", passkey: passkey },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -339,7 +345,7 @@ function cargarKEY() {
                 if (bandera == '0') {
                     alertify.error(res);
                     $("#label-key").css("border-color", "red");
-                    $("#archivo-key-errors").text("El tipo de archivo no es valido");
+                    $("#archivo-key-errors").text("El tipo de archivo no es válido");
                     $("#archivo-key-errors").css("color", "red");
                 } else {
                     $("#label-key").css("border-color", "green");
@@ -354,8 +360,8 @@ function cargarKEY() {
 function isCanvasBlank(canvas) {
     const context = canvas.getContext('2d');
     const pixelBuffer = new Uint32Array(
-            context.getImageData(0, 0, canvas.width, canvas.height).data.buffer
-            );
+        context.getImageData(0, 0, canvas.width, canvas.height).data.buffer
+    );
     return !pixelBuffer.some(color => color !== 0);
 }
 
@@ -400,6 +406,10 @@ function actualizarEmpresa(idempresa) {
     var certificado = $("#certificado-csd").val();
     var key = $("#archivo-key").val();
     var passkey = $("#password-key").val();
+    var nombre_banco1 = $("#id-banco option:selected").text().substring(6);
+    var nombre_banco2 = $("#id-banco1 option:selected").text().substring(6);
+    var nombre_banco3 = $("#id-banco2 option:selected").text().substring(6);
+    var nombre_banco4 = $("#id-banco3 option:selected").text().substring(6);
     var firmaactual = $("#firma-actual").val();
     var canvas = document.getElementById('firma-canvas');
     const blank = isCanvasBlank(canvas);
@@ -430,7 +440,11 @@ function actualizarEmpresa(idempresa) {
         $.ajax({
             url: "com.sine.enlace/enlaceempresa.php",
             type: "POST",
-            data: {transaccion: "actualizarempresa", idempresa: idempresa, nombre: nombre, rfc: rfc, razon: razon, color: color, calle: calle, interior: interior, exterior: exterior, colonia: colonia, cp: cp, idestado: idestado, idmunicipio: idmunicipio, estado: estado, municipio: municipio, pais: pais, regimen: regimen, correo: correo, telefono: telefono, certificado: certificado, key: key, passkey: passkey, idbanco: idbanco, sucursal: sucursal, cuenta: cuenta, clabe: clabe, oxxo: oxxo, idbanco1: idbanco1, sucursal1: sucursal1, cuenta1: cuenta1, clabe1: clabe1, oxxo1: oxxo1, idbanco2: idbanco2, sucursal2: sucursal2, cuenta2: cuenta2, clabe2: clabe2, oxxo2: oxxo2, idbanco3: idbanco3, sucursal3: sucursal3, cuenta3: cuenta3, clabe3: clabe3, oxxo3: oxxo3, firma: firma, firmaactual: firmaactual},
+            data: { transaccion: "actualizarempresa", idempresa: idempresa, nombre: nombre, rfc: rfc, razon: razon, color: color, calle: calle, interior: interior, exterior: exterior, colonia: colonia, cp: cp, idestado: idestado, idmunicipio: idmunicipio, estado: estado, municipio: municipio, pais: pais, regimen: regimen, correo: correo, telefono: telefono, certificado: certificado, key: key, passkey: passkey, idbanco: idbanco, sucursal: sucursal, cuenta: cuenta, clabe: clabe, oxxo: oxxo, idbanco1: idbanco1, sucursal1: sucursal1, cuenta1: cuenta1, clabe1: clabe1, oxxo1: oxxo1, idbanco2: idbanco2, sucursal2: sucursal2, cuenta2: cuenta2, clabe2: clabe2, oxxo2: oxxo2, idbanco3: idbanco3, sucursal3: sucursal3, cuenta3: cuenta3, clabe3: clabe3, oxxo3: oxxo3, firma: firma, firmaactual: firmaactual, 
+            nombrebanco1: nombre_banco1,
+            nombrebanco2: nombre_banco2,
+            nombrebanco3: nombre_banco3,
+            nombrebanco4: nombre_banco4},
             success: function (datos) {
                 //alert(datos);
                 var texto = datos.toString();
@@ -456,7 +470,7 @@ function filtrarEmpresa() {
     $.ajax({
         url: "com.sine.enlace/enlaceempresa.php",
         type: "POST",
-        data: {transaccion: "filtrarempresa", RAZ: RAZ, RF: RF},
+        data: { transaccion: "filtrarempresa", RAZ: RAZ, RF: RF },
         success: function (datos) {
             //alert(datos);
             var texto = datos.toString();
@@ -476,7 +490,7 @@ function descargarArchivos(id) {
     $.ajax({
         url: "com.sine.imprimir/download.php",
         type: "POST",
-        data: {datosid: id},
+        data: { datosid: id },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -494,7 +508,7 @@ function eliminarEmpresa(did) {
         $.ajax({
             url: "com.sine.enlace/enlaceempresa.php",
             type: "POST",
-            data: {transaccion: "eliminarempresa", did: did},
+            data: { transaccion: "eliminarempresa", did: did },
             success: function (datos) {
                 var texto = datos.toString();
                 var bandera = texto.substring(0, 1);
@@ -508,24 +522,24 @@ function eliminarEmpresa(did) {
                 cargandoHide();
             }
         });
-    }).set({title: "Q-ik"});
+    }).set({ title: "Q-ik" });
 }
 
-function validaPaquete(){
-$.ajax({
-    data:{transaccion: 'validaPaquete'},
-    url: 'com.sine.enlace/enlaceempresa.php', 
-    type: 'POST', 
-    success: function(datos){
-        var div= datos.split('</tr>');
-        var paquete= div[0];
-        var nrazon= div[1];
-       
-            if((paquete=='Basico' && nrazon<2) || paquete!='Basico' ){
+function validaPaquete() {
+    $.ajax({
+        data: { transaccion: 'validaPaquete' },
+        url: 'com.sine.enlace/enlaceempresa.php',
+        type: 'POST',
+        success: function (datos) {
+            var div = datos.split('</tr>');
+            var paquete = div[0];
+            var nrazon = div[1];
+
+            if ((paquete == 'Basico' && nrazon < 2) || paquete != 'Basico') {
                 loadView('datosempresa');
-            }else{
+            } else {
                 alertify.error('el limite del paquete basico son 2 razones sociales')
-            } 
+            }
         }
     })
 
@@ -542,13 +556,13 @@ function confirmarEliminacion(id) {
 }
 
 function quitarCampo(id) {
-        $("#id-banco" + id).val("");
-        $("#cuenta" + id).val("");
-        $("#clabe" + id).val("");
+    $("#id-banco" + id).val("");
+    $("#cuenta" + id).val("");
+    $("#clabe" + id).val("");
 
-        //Se esconde el addcuentas segun el id
-        $("#addcuentas"+ id).attr("hidden", true);
-        renglon--;
+    //Se esconde el addcuentas segun el id
+    $("#addcuentas" + id).attr("hidden", true);
+    renglon--;
 }
 
 function nuevoCampo() {
@@ -562,14 +576,14 @@ function nuevoCampo() {
     // Si el campo está oculto, mostrarlo
     if ($(campoActual).is(":hidden")) {
         $(campoActual).attr("hidden", false);
-        loadOpcionesBanco("contenedor-banco"+renglon, "");
+        loadOpcionesBanco("contenedor-banco" + renglon, "");
     }
 }
 
 function inicializarCampos(idbanco, cuenta, clabe, sucursal, tarjeta, i) {
     if (idbanco !== '0') {
         $("#addcuentas" + i).attr('hidden', false);
-        loadOpcionesBanco('id-banco'+i, idbanco);
+        loadOpcionesBanco('id-banco' + i, idbanco);
         $("#cuenta" + i).val(cuenta);
         $("#sucursal" + i).val(sucursal);
         $("#tarjeta-oxxo" + i).val(tarjeta);

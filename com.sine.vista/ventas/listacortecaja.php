@@ -1,7 +1,7 @@
 <?php
 include("modals.php");
 ?>
-<div class="form-horizontal ps-3 fijo z-1">
+<div class="form-horizontal ps-3 fijo z-2">
     <div>
         <div class="titulo-lista">Listado de corte de cajas </div>
     </div>

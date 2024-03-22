@@ -1,16 +1,59 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <cfdi:Comprobante xmlns:cfdi="http://www.sat.gob.mx/cfd/4"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:pago20="http://www.sat.gob.mx/Pagos20" xsi:schemaLocation="http://www.sat.gob.mx/cfd/4 http://www.sat.gob.mx/sitio_internet/cfd/4/cfdv40.xsd http://www.sat.gob.mx/Pagos20 http://www.sat.gob.mx/sitio_internet/cfd/Pagos/Pagos20.xsd" Version="4.0" Serie="PP" Folio="P0001" Fecha="2024-03-09T20:04:42" SubTotal="0" Moneda="XXX" Total="0" TipoDeComprobante="P" Exportacion="01" LugarExpedicion="76074" NoCertificado="30001000000500003293" Certificado="MIIFwDCCA6igAwIBAgIUMzAwMDEwMDAwMDA1MDAwMDMyOTMwDQYJKoZIhvcNAQELBQAwggErMQ8wDQYDVQQDDAZBQyBVQVQxLjAsBgNVBAoMJVNFUlZJQ0lPIERFIEFETUlOSVNUUkFDSU9OIFRSSUJVVEFSSUExGjAYBgNVBAsMEVNBVC1JRVMgQXV0aG9yaXR5MSgwJgYJKoZIhvcNAQkBFhlvc2Nhci5tYXJ0aW5lekBzYXQuZ29iLm14MR0wGwYDVQQJDBQzcmEgY2VycmFkYSBkZSBjYWxpejEOMAwGA1UEEQwFMDYzNzAxCzAJBgNVBAYTAk1YMRkwFwYDVQQIDBBDSVVEQUQgREUgTUVYSUNPMREwDwYDVQQHDAhDT1lPQUNBTjERMA8GA1UELRMIMi41LjQuNDUxJTAjBgkqhkiG9w0BCQITFnJlc3BvbnNhYmxlOiBBQ0RNQS1TQVQwHhcNMjMwNTA5MTgzOTQ5WhcNMjcwNTA4MTgzOTQ5WjCBtTEYMBYGA1UEAxMPT1NDQVIgS0FMQSBIQUFLMRgwFgYDVQQpEw9PU0NBUiBLQUxBIEhBQUsxGDAWBgNVBAoTD09TQ0FSIEtBTEEgSEFBSzELMAkGA1UEBhMCTVgxIzAhBgkqhkiG9w0BCQEWFHBydWViYUBwcnVlYmEuZ29iLm14MRYwFAYDVQQtEw1LQUhPNjQxMTAxQjM5MRswGQYDVQQFExJLQUhPNjQxMTAxSE5UTEtTMDYwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCfK+VhR20SKibY8svsMlsKP0CufPF5dAW5CfW1752MEYwcLNrgy6iJDEcrWg8rO+FuzNZmKkJK3GlSFahemPPirsWNRcCeDKbhd+S0WyI8dNJuznpfIBbOHwFxaYEHlaqsS31X2c31tjfySOOD3ymk2NAKTrz2a1V4EPMIQ/uD5yZtg6PR/F+hDsT2IdEcWV5iPJdwl03TlJTuhL9ANrV1dqp0k8kxXsJS6M20Im7v2It4lYPJjNJlaLlrp0Y53OyC/IZMDH1BHyqUN/w2XVVQcc5JeshnD5RkkS5V1z9hVKUYe91S1jOWiqLK3g0zNVmhoOfYF9HFMtMNmP3/Q4SbAgMBAAGjTzBNMAwGA1UdEwEB/wQCMAAwCwYDVR0PBAQDAgPYMBEGCWCGSAGG+EIBAQQEAwIFoDAdBgNVHSUEFjAUBggrBgEFBQcDBAYIKwYBBQUHAwIwDQYJKoZIhvcNAQELBQADggIBAAgLxbLmXr+LG5lDtRH5wltzpF0fTMcm9lHKg59JKvblAoeiCTDxKpQHOyI4U2NGT01PX7+Mc0Qdm4NtoL8ooP+oa2x2OL8Oa/0JC/47qhLyKBHoTnKoY0X2YO2Eeb5EjclSY2a/35N53413CvDO0lDpKAUoQ6AZ+aXZxUIuU24IBf/GVmaYBooygDv7ZPiJFaP62g7mwT7xHYbi6YVgZgOobU7Tj+89VOBoANejEN/zTpsKVGcq1AYe1yRvBMH+nEqJ5FFHa6TNtYbdTXfAOX8yarJu9T1yqZFllK+KYWauWjv8f5bdC5/hfnUgE9jV9d09DU16rSy3cIe9YOv5iLN7nXbu9MFy5qY3NAnFqlgJZANOCYryzahDTyl4gkRcML4oIsoGYcKuLhNShPsVzdLxcnH+63+7ZU/b/RIDzbthsc4eZetaUwvANr9OM95G3/MWXtf+Wu5pO0+ihtZIRCi3FRohqrteYd6uWAoMC8U2QROiVcDNzAOd4+LMjTygzZn6bbqMwS8+zg9JGCq4cVhkmk4jnlSqXnsCWH/Cdod5NpRvbDiZF+Bgo2Qwe/binRFguYrXqFoQpld49j+XX57niDmIggtYPlY6DP9fN9UBDX3cdLFph7BBmxw2Lmsi9rcukzeAMMyYvO9egLPA/vGZ3PU06Lo84ao6BZc4/Cwr" Sello="">
-    <cfdi:Emisor Rfc="KAHO641101B39" Nombre="OSCAR KALA HAAK" RegimenFiscal="616 "/>
-    <cfdi:Receptor Rfc="NAGA021226FJ0" Nombre="ALMA DELIA NAVARRO" DomicilioFiscalReceptor="76826" RegimenFiscalReceptor="616 " UsoCFDI="CP01"/>
+    xmlns:pago20="http://www.sat.gob.mx/Pagos20" xsi:schemaLocation="http://www.sat.gob.mx/cfd/4 http://www.sat.gob.mx/sitio_internet/cfd/4/cfdv40.xsd http://www.sat.gob.mx/Pagos20 http://www.sat.gob.mx/sitio_internet/cfd/Pagos/Pagos20.xsd" Version="4.0" Serie="PP" Folio="P0061" Fecha="2024-03-22T09:12:45" SubTotal="0" Moneda="XXX" Total="0" TipoDeComprobante="P" Exportacion="01" LugarExpedicion="76074" NoCertificado="30001000000500003318" Certificado="MIIFcTCCA1mgAwIBAgIUMzAwMDEwMDAwMDA1MDAwMDMzMTgwDQYJKoZIhvcNAQELBQAwggErMQ8wDQYDVQQDDAZBQyBVQVQxLjAsBgNVBAoMJVNFUlZJQ0lPIERFIEFETUlOSVNUUkFDSU9OIFRSSUJVVEFSSUExGjAYBgNVBAsMEVNBVC1JRVMgQXV0aG9yaXR5MSgwJgYJKoZIhvcNAQkBFhlvc2Nhci5tYXJ0aW5lekBzYXQuZ29iLm14MR0wGwYDVQQJDBQzcmEgY2VycmFkYSBkZSBjYWxpejEOMAwGA1UEEQwFMDYzNzAxCzAJBgNVBAYTAk1YMRkwFwYDVQQIDBBDSVVEQUQgREUgTUVYSUNPMREwDwYDVQQHDAhDT1lPQUNBTjERMA8GA1UELRMIMi41LjQuNDUxJTAjBgkqhkiG9w0BCQITFnJlc3BvbnNhYmxlOiBBQ0RNQS1TQVQwHhcNMjMwNTEwMTU1MzIyWhcNMjcwNTEwMTU1MzIyWjCBmDEYMBYGA1UEAxMPT1NDQVIgS0FMQSBIQUFLMRgwFgYDVQQpEw9PU0NBUiBLQUxBIEhBQUsxGDAWBgNVBAoTD09TQ0FSIEtBTEEgSEFBSzEWMBQGA1UELRMNS0FITzY0MTEwMUIzOTEbMBkGA1UEBRMSS0FITzY0MTEwMUhOVExLUzA2MRMwEQYDVQQLEwpTdWN1cnNhbCAxMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAoGn3Zld2n+1t0KAyxnrlzniAm4YmmMjWzEJhzG9vpKnQnxSveHe1GLf4THl2v2i4C1GSshNwStpeTFEx3kRs6k9tTI36cPb0BnAJzby80GqzNesx74HtLyGNAmItkTFgdr5I3RSlW0Utd42wFETlB9cOgqhA8HqKl7efNUq+12527RTA+tcubtgrGQJxhqaBj/yGmC0yFCmpNhhXnHUBhnnVoDPfZfbPb0kU4IW6lnHaR37A6ElPbnaBpq1GrW7kWejL4dUlIp4FtT8eyZfyfrbqSG7Ic7X0WegOHBbmsmVUrBsLuAXfI+BKfGNCPzJb6l2jLhYL0+81kdEvt2ufGwIDAQABox0wGzAMBgNVHRMBAf8EAjAAMAsGA1UdDwQEAwIGwDANBgkqhkiG9w0BAQsFAAOCAgEAFw+NejTBngfxEqLN/yjgunU1eBcd403CJbIFv+H0haS2RKv/z5BKev2NwwshWCvnZ67O+ZS86crD3clrRmw9TZWVP1FjCMdO/sNVWq7wRrIXUaImhOwDt95AXOdPeBc5I35tMmGbXn1zf6FimRYTj9slkUmIXh5nY6wb9eH2nMWwXxuhJYsRX8oZ2h2IUkmngByBbujG0xekn4Aqvm+ez6ULaRG+ZykB3sufGh5bWi2VtrkoAOQgvDZpA/5KNPxAaRy3o3pjSOyyjuhZ2x/zvk82RmeihK8qpA6IzAtMEHKf9f0HaR9J2KhGJmCsHaChj5uxpUHTM4M7DE2lTcgnUxNqekmrUOkMGBLYromcTxZjbL+lFKmocwmDVqMCY/IPYhzjLmgihDnNj12IaZVUMhjSQTw65dkBNN8uBJBvUev+MfFxTldzul1z6tA6NwG5fHaYHVYq8pEdzb/0QEAKmNBYtzh9HZvuL4FnX9QfOASI/hhRwEk2MAYzGKU08erhSNnjTZiBhAxqLENOVv82vmJSyyOas8tL1EMEIFMx21ygliR+HqoW/ksfSOZcSpTO5d2rhV/0AB8tq6cCPh3hTb86V9SSHm8NUqJRcWfu90ujZexSTMvVegwnUiEHgDaPO8pLofu0wDSJVB+WcYvfUhlu6MnRIO9cVM5vf6bXXCE=" Sello="AII0f9vIOQaHAmGSOw+KS5AVtd67IQNixhRtn+fMHsRFTUK+SwAQe2r2i+mhyE77gJd3f3kIsy2I46xahFGqUVAQz+/ESV9c1vLlRSe5yPb6gBn7AjR0xi+VfxYON/fIrAceEDQ8EgME+9e0aGD/Nf5uwfGIhEJaaDfFTRFYgynsLmFoTn9rSNjovTPi9cy3Z4/K0J77F5ckinZARURtgPvusSlyI/Qbnew6VCHotyrXQvX1ZmPNsCmAscZqm7rkLnxcByU1CKfRZT24tFrmeC2Opx/Jurgzj5cKyJfIg6IxR4O2RJRPhfICZFw1dSAPsOZ7cVda+tcNtyBOx2ar1g==">
+    <cfdi:Emisor Rfc="KAHO641101B39" Nombre="OSCAR KALA HAAK" RegimenFiscal="616"/>
+    <cfdi:Receptor Rfc="JUFA7608212V6" Nombre="ADRIANA JUAREZ FERNANDEZ" DomicilioFiscalReceptor="01160" RegimenFiscalReceptor="616" UsoCFDI="CP01"/>
     <cfdi:Conceptos>
         <cfdi:Concepto ClaveProdServ="84111506" Cantidad="1" ClaveUnidad="ACT" Descripcion="Pago" ValorUnitario="0" Importe="0" ObjetoImp="01"/>
     </cfdi:Conceptos>
     <cfdi:Complemento>
         <pago20:Pagos Version="2.0">
-            <pago20:Totales MontoTotalPagos="0.00"/>
-            <pago20:Pago FechaPago="2024-03-11T10:00:00" FormaDePagoP="01" MonedaP="MXN" TipoCambioP="1" Monto="0.00"/>
+            <pago20:Totales MontoTotalPagos="37.22" TotalTrasladosBaseIVA16="32.08" TotalTrasladosImpuestoIVA16="5.12" TotalRetencionesISR="4.13" TotalRetencionesIVA="5.06"/>
+            <pago20:Pago FechaPago="2024-03-23T10:00:00" FormaDePagoP="01" MonedaP="MXN" TipoCambioP="1" Monto="20.00">
+                <pago20:DoctoRelacionado IdDocumento="7fbc5c9d-7a0d-4c9b-9df3-2115f61f8b8d" Folio="P0049" MonedaDR="MXN" EquivalenciaDR="1" NumParcialidad="1" ImpSaldoAnt="37.22" ImpPagado="20" ImpSaldoInsoluto="17.22" ObjetoImpDR="02">
+                    <pago20:ImpuestosDR>
+                        <pago20:RetencionesDR>
+                            <pago20:RetencionDR BaseDR="22.22" ImpuestoDR="001" TipoFactorDR="Tasa" TasaOCuotaDR="0.100000" ImporteDR="2.22"/>
+                            <pago20:RetencionDR BaseDR="22.72" ImpuestoDR="002" TipoFactorDR="Tasa" TasaOCuotaDR="0.120000" ImporteDR="2.72"/>
+                        </pago20:RetencionesDR>
+                        <pago20:TrasladosDR>
+                            <pago20:TrasladoDR BaseDR="17.24" ImpuestoDR="002" TipoFactorDR="Tasa" TasaOCuotaDR="0.160000" ImporteDR="2.75"/>
+                        </pago20:TrasladosDR>
+                    </pago20:ImpuestosDR>
+                </pago20:DoctoRelacionado>
+                <pago20:ImpuestosP>
+                    <pago20:RetencionesP>
+                        <pago20:RetencionP ImpuestoP="001" ImporteP="2.22"/>
+                        <pago20:RetencionP ImpuestoP="002" ImporteP="2.72"/>
+                    </pago20:RetencionesP>
+                    <pago20:TrasladosP>
+                        <pago20:TrasladoP BaseP="17.24" ImpuestoP="002" TipoFactorP="Tasa" TasaOCuotaP="0.160000" ImporteP="2.75"/>
+                    </pago20:TrasladosP>
+                </pago20:ImpuestosP>
+            </pago20:Pago>
+            <pago20:Pago FechaPago="2024-03-23T12:15:00" FormaDePagoP="12" MonedaP="MXN" TipoCambioP="1" Monto="17.22">
+                <pago20:DoctoRelacionado IdDocumento="7fbc5c9d-7a0d-4c9b-9df3-2115f61f8b8d" Folio="P0049" MonedaDR="MXN" EquivalenciaDR="1" NumParcialidad="2" ImpSaldoAnt="17.22" ImpPagado="17.22" ImpSaldoInsoluto="0" ObjetoImpDR="02">
+                    <pago20:ImpuestosDR>
+                        <pago20:RetencionesDR>
+                            <pago20:RetencionDR BaseDR="19.13" ImpuestoDR="001" TipoFactorDR="Tasa" TasaOCuotaDR="0.100000" ImporteDR="1.91"/>
+                            <pago20:RetencionDR BaseDR="19.56" ImpuestoDR="002" TipoFactorDR="Tasa" TasaOCuotaDR="0.120000" ImporteDR="2.34"/>
+                        </pago20:RetencionesDR>
+                        <pago20:TrasladosDR>
+                            <pago20:TrasladoDR BaseDR="14.84" ImpuestoDR="002" TipoFactorDR="Tasa" TasaOCuotaDR="0.160000" ImporteDR="2.37"/>
+                        </pago20:TrasladosDR>
+                    </pago20:ImpuestosDR>
+                </pago20:DoctoRelacionado>
+                <pago20:ImpuestosP>
+                    <pago20:RetencionesP>
+                        <pago20:RetencionP ImpuestoP="001" ImporteP="1.91"/>
+                        <pago20:RetencionP ImpuestoP="002" ImporteP="2.34"/>
+                    </pago20:RetencionesP>
+                    <pago20:TrasladosP>
+                        <pago20:TrasladoP BaseP="14.84" ImpuestoP="002" TipoFactorP="Tasa" TasaOCuotaP="0.160000" ImporteP="2.37"/>
+                    </pago20:TrasladosP>
+                </pago20:ImpuestosP>
+            </pago20:Pago>
         </pago20:Pagos>
     </cfdi:Complemento>
 </cfdi:Comprobante>

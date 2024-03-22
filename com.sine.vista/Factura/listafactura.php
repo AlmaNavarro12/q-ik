@@ -1,7 +1,7 @@
 <?php
 include("modals.php");
 ?>
-<div class="form-horizontal ps-3 fijo z-1">
+<div class="form-horizontal ps-3 fijo z-2">
 <div><div class="titulo-lista">Facturas </div> </div>
     <div class="row col-12 p-0">
         <div class="col-sm-6 py-1">
@@ -26,8 +26,8 @@ include("modals.php");
         <thead class="p-0">
             <tr>
                 <th></th>
-                <th class="col-auto">N°Folio </th>
-                <th class="col-auto">Fecha de Creacion </th>
+                <th class="col-auto">No.Folio </th>
+                <th class="col-auto">Fecha de creación </th>
                 <th class="col-auto">Emisor</th>
                 <th class="col-auto">Cliente</th>
                 <th class="col-auto">Estado </th>
@@ -35,12 +35,12 @@ include("modals.php");
                 <th class="col-auto">Traslados </th>
                 <th class="col-auto">Retenciones </th>
                 <th class="col-auto">Total </th>
-                <th class="col-auto"><span class="fas fa-ellipsis-v"></span></th>
+                <th class="col-auto">Opción</th>
             </tr>
         </thead>
     </table>
 </div>
-<script type="text/javascript" src="js/scriptpago.js"></script>
+<script type="text/javascript" src="js/scriptfactura.js"></script>
 <script>
     $(document).ready(function() {
         var cleave = new Cleave('.cfdi', {

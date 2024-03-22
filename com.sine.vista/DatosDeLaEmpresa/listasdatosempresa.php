@@ -1,4 +1,4 @@
-<div class="form-horizontal ps-3 fijo z-1">
+<div class="form-horizontal ps-3 fijo z-2">
 <div><div class="titulo-lista">Datos de facturación </div> </div>
     <div class="row col-12 p-0">
         <div class="col-sm-6 py-1">

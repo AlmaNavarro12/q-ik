@@ -851,7 +851,7 @@ $pdf->SetLineHeight(4.5);
 $pdf->SetX(10);
 $direccion = "CP. $cpcliente";
 if ($idcliente != '0') {
-   // $direccion = $cf->getDireccionCliente($idcliente, $idpago);
+   $direccion = $cf->getDireccionCliente($idcliente, $idpago);
 }
 $pdf->RowNBCount(Array('Direccion',  iconv("utf-8","windows-1252",$direccion)));
 $pdf->SetLineHeight(1.5);

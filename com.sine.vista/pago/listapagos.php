@@ -1,12 +1,12 @@
 <?php
 include("modals.php");
 ?>
-<div class="form-horizontal ps-3 fijo z-1">
+<div class="form-horizontal ps-3 fijo z-2">
 <div><div class="titulo-lista">Pagos </div> </div>
     <div class="row col-12 p-0">
         <div class="col-sm-6 py-1">
             <input type="text" class="form-control input-search text-secondary-emphasis" id="buscar-pago"
-                placeholder="Buscar pagos (Folio, Emisor o Receptor)" oninput="buscarPago()">
+                placeholder="Buscar pagos (Folio, emisor o receptor)" oninput="buscarPago()">
         </div>
         <div class="col-sm-2 py-1">
             <select class="form-select input-search text-center" id="num-reg" name="num-reg" onchange="buscarPago()">

@@ -1,7 +1,6 @@
 <?php
 if (isset($_FILES["archivo-key"])) {
     $rfc = $_POST['rfc-empresa'];
-    $pass = $_POST['password-key'];
     $tempfile = ($_FILES['archivo-key']['tmp_name']);
     $file = $_FILES["archivo-key"];
     $nombre = $file["name"];

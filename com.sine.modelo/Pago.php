@@ -29,6 +29,9 @@ class Pago {
     private $tagPago;
     private $tagcomp;
     private $orden;
+    private $nombremoneda;
+    private $nombreforma;
+
 
             
     function __construct() {
@@ -127,6 +130,14 @@ class Pago {
         return $this->chfirmar;
     }
 
+    function getNombreMoneda() {
+        return $this->nombremoneda;
+    }
+
+    function getNombreForma() {
+        return $this->nombreforma;
+    }
+
     function getActualizarfiscales() {
         return $this->actualizarfiscales;
     }
@@ -205,6 +216,14 @@ class Pago {
 
     function setPago_cuenta($pago_cuenta) {
         $this->pago_cuenta = $pago_cuenta;
+    }
+
+    function setNombreMoneda($nombremoneda) {
+        $this->nombremoneda = $nombremoneda;
+    }
+
+    function setNombreForma($nombreforma) {
+        $this->nombreforma = $nombreforma;
     }
 
     function setNooperacion($nooperacion) {

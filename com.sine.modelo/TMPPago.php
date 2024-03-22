@@ -20,6 +20,7 @@ class TMPPago {
     private $sessionid;
     private $type;
     private $tag;
+    private $nombremoneda;
 
     
     function __construct() {
@@ -72,6 +73,10 @@ class TMPPago {
 
     function getParcialidadtmp() {
         return $this->parcialidadtmp;
+    }
+
+    function getNombreMoneda() {
+        return $this->nombremoneda;
     }
 
     function getMontopagotmp() {
@@ -148,6 +153,10 @@ class TMPPago {
 
     function setMontopagotmp($montopagotmp) {
         $this->montopagotmp = $montopagotmp;
+    }
+    
+    function setNombreMoneda($nombremoneda) {
+        $this->nombremoneda = $nombremoneda;
     }
 
     function setMontoanteriortmp($montoanteriortmp) {

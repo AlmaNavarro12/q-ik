@@ -57,8 +57,10 @@ function obtenerDatosCliente(){
     $c->setNum_interior($_POST['interior']);
     $c->setNum_exterior($_POST['exterior']);
     $c->setLocalidad($_POST['localidad']);
-    $c->setMunicipio($_POST['municipio']);
     $c->setEstado($_POST['estado']);
+    $c->setNombreEstado($_POST['nombreestado']);
+    $c->setMunicipio($_POST['municipio']);
+    $c->setNombreMunicipio($_POST['nombremunicipio']);
     $c->setCodigo_postal($_POST['postal']);
     $c->setIdBanco($_POST['idbanco']);
     $c->setCuenta($_POST['cuenta']);
@@ -72,5 +74,10 @@ function obtenerDatosCliente(){
     $c->setIdBanco3($_POST['idbanco3']);
     $c->setCuenta3($_POST['cuenta3']);
     $c->setClabe3($_POST['clabe3']);
+    $c->setNombreBanco1($_POST['nombrebanco1']);
+    $c->setNombreBanco2($_POST['nombrebanco2']);
+    $c->setNombreBanco3($_POST['nombrebanco3']);
+    $c->setNombreBanco4($_POST['nombrebanco4']);
+    
     return $c;
 }

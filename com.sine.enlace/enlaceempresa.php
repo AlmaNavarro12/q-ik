@@ -8,15 +8,8 @@ if (isset($_POST['transaccion'])) {
 
     switch ($transaccion) {
         case 'insertardatos':
-            $datosEmpresa = obtenerdatosEmpresa();
-            $actualizado = $cu->saveDatos($datosEmpresa);
-            if ($actualizado != "") {
-                echo "Empresa insertada";
-            } else {
-                echo "0Error: no se insertó el registro";
-            }
-
-            $carpeta = '../temporal/' . $rfc . '/';
+            $rfc = $_POST['rfc'];
+            $carpeta = '../temporal/' . $rfc. '/';
             $csd = $carpeta . 'csd.cer';
             $cerpem = $carpeta . 'csdPEM.pem';
             $key = $carpeta . 'key.key';
@@ -25,7 +18,7 @@ if (isset($_POST['transaccion'])) {
 
             $shellConvertCSD = "openssl x509 -inform der -in $csd -out $cerpem";
             shell_exec($shellConvertCSD);
-
+            
             $numcert = file_get_contents($carpeta . 'Serial.txt');
             $divide = explode("=", $numcert);
             $numcert2 = $divide[1];
@@ -33,6 +26,17 @@ if (isset($_POST['transaccion'])) {
             $result = implode(':', $par);
             $divide2 = explode(":", $result);
             $numcert = $divide2[1] . $divide2[3] . $divide2[5] . $divide2[7] . $divide2[9] . $divide2[11] . $divide2[13] . $divide2[15] . $divide2[17] . $divide2[19] . $divide2[21] . $divide2[23] . $divide2[25] . $divide2[27] . $divide2[29] . $divide2[31] . $divide2[33] . $divide2[35] . $divide2[37] . $divide2[39];
+
+            $c = obtenerdatosEmpresa();
+            $c->setCsd($cerb64);
+            $c->setKeyB64($keyB64);
+            $c->setNumcert($numcert);
+            $actualizado = $cu->saveDatos($c);
+            if ($actualizado != "") {
+                echo "Empresa insertada correctamente.";
+            } else {
+                echo "0Error: no se insertó el registro";
+            }
             break;
         case 'listaempresa':
             $nom = $_POST['nom'];
@@ -184,6 +188,10 @@ if (isset($_POST['transaccion'])) {
             $c->setNumcert($numcert);
             $c->setFirma($firma);
             $c->setFirmaanterior($firmaactual);
+            $c->setNombreBanco1($_POST['nombrebanco1']);
+            $c->setNombreBanco2($_POST['nombrebanco2']);
+            $c->setNombreBanco3($_POST['nombrebanco3']);
+            $c->setNombreBanco4($_POST['nombrebanco4']);
             $actualizado = $cu->actualizarDatos($c);
             if ($actualizado != "") {
                 echo $actualizado;
@@ -233,19 +241,15 @@ function obtenerdatosEmpresa()
     $c->setTelefono($_POST['telefono']);
     $c->setMunicipio($_POST['idmunicipio']);
     $c->setEstado($_POST['idestado']);
-    //sss
     $c->setNombreEstado($_POST['estado']);
     $c->setNombreMunicipio($_POST['municipio']);
     $c->setPais($_POST['pais']);
     $c->setCp($_POST['cp']);
-
-    // Establecer folio fiscal y régimen fiscal
     $regimenFiscal = explode("-", $_POST['regimen']);
     $folioFiscal = $regimenFiscal[0];
     $regimen = $regimenFiscal[1];
     $c->setFolioFiscal($folioFiscal);
     $c->setRegimenFiscal($regimen);
-
     $c->setIdbanco($_POST['idbanco']);
     $c->setSucursal($_POST['sucursal']);
     $c->setCuenta($_POST['cuenta']);
@@ -268,25 +272,9 @@ function obtenerdatosEmpresa()
     $c->setOxxo3($_POST['oxxo3']);
     $c->setPasscsd($_POST['passkey']);
     $c->setFirma($_POST['firma']);
-
-    //  lógica para obtener keyb64, csd y numcsd
-    $rfc = $_POST['rfc'];
-    $carpeta = '../temporal/' . $rfc . '/';
-    $csd = $carpeta . 'csd.cer';
-    $key = $carpeta . 'key.key';
-    $cerb64 = base64_encode(file_get_contents($csd));
-    $keyB64 = base64_encode(file_get_contents($key));
-    $numcert = file_get_contents($carpeta . 'Serial.txt');
-    $divide = explode("=", $numcert);
-    $numcert2 = $divide[1];
-    $par = str_split($numcert2);
-    $result = implode(':', $par);
-    $divide2 = explode(":", $result);
-    $numcert = $divide2[1] . $divide2[3] . $divide2[5] . $divide2[7] . $divide2[9] . $divide2[11] . $divide2[13] . $divide2[15] . $divide2[17] . $divide2[19] . $divide2[21] . $divide2[23] . $divide2[25] . $divide2[27] . $divide2[29] . $divide2[31] . $divide2[33] . $divide2[35] . $divide2[37] . $divide2[39];
-
-    $c->setCsd($cerb64);
-    $c->setKeyB64($keyB64);
-    $c->setNumcert($numcert);
-
+    $c->setNombreBanco1($_POST['nombrebanco1']);
+    $c->setNombreBanco2($_POST['nombrebanco2']);
+    $c->setNombreBanco3($_POST['nombrebanco3']);
+    $c->setNombreBanco4($_POST['nombrebanco4']);
     return $c;
 }

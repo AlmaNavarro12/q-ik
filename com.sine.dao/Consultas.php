@@ -29,7 +29,7 @@ class Consultas extends Conexion {
                     $resultado = true;
                 }
             } catch (PDOException $evento) {
-                echo "0No puede ejecutar la consulta";
+                echo "0No puede ejecutar la consulta.";
                 echo $evento->getMessage();
             }
         }
@@ -55,7 +55,7 @@ class Consultas extends Conexion {
                     $statement->closeCursor();
                 }
             } catch (PDOException $evento) {
-                $resultado .= "0No puede ejecutar la consulta" . $evento->getMessage();
+                $resultado .= "0No puede ejecutar la consulta:" . $evento->getMessage();
             }
         }
         return $resultado;

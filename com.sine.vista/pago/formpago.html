@@ -150,7 +150,6 @@
                     <div id="regfiscal-cliente-errors"></div>
                 </div>
             </div>
-
             <div class="col-md-4 py-2">
                 <label class="label-form text-right" for="cp-cliente">C&oacute;digo postal del cliente</label> <label
                     class="mark-required text-danger fw-bold">*</label>
@@ -162,26 +161,27 @@
             </div>
             <div class="col-md-3 py-2">
                 <label class="label-form text-right" for="obj-impuesto">Objeto de impuesto</label> <label
-                class="mark-required text-danger fw-bold">*</label>
-                    <select class="form-control text-center input-form" id="obj-impuesto" name="obj-impuesto">
-                        <option value="" id="option-default-datos">- - - -</option>
-                        <optgroup class="text-left">
-                            <option class="text-start ps-2" value="01-No objeto de impuesto">01 - No objeto de impuesto</option>
-                            <option class="text-start ps-2" value="02-si objeto de impuesto">02 - Si objeto de impuesto</option>
-                        </optgroup>
-                    </select>
-                    <div id="obj-impuesto-errors"></div>
-                </div>
+                    class="mark-required text-danger fw-bold">*</label>
+                <select class="form-select text-center input-form" id="obj-impuesto" name="obj-impuesto">
+                    <option value="" id="option-default-datos">- - - -</option>
+                    <optgroup class="text-left">
+                        <option class="text-start ps-2" value="01-No objeto de impuesto">01 - No objeto de impuesto
+                        </option>
+                        <option class="text-start ps-2" value="02-si objeto de impuesto">02 - Si objeto de impuesto
+                        </option>
+                    </optgroup>
+                </select>
+                <div id="obj-impuesto-errors"></div>
+            </div>
             <div class='col-md-1 py-2'>
                 <label class='label-form text-right' for='chfirma'>Firmar</label><label
-                class="mark-required text-danger fw-bold">&nbsp;</label>
+                    class="mark-required text-danger fw-bold">&nbsp;</label>
                 <div class='form-group ps-1'>
-                    <input class='input-check' id='chfirma' name='chfirma' type='checkbox'/>
+                    <input class='input-check' id='chfirma' name='chfirma' type='checkbox' />
                 </div>
                 <div id='chfirma-errors'></div>
             </div>
         </div>
-
         <div class="row mt-4">
             <div class="col-md-6">
                 <label class="label-sub">Datos de Pago</label>
