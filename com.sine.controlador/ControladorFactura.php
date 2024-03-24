@@ -2077,7 +2077,7 @@ class ControladorFactura {
 
     private function getSevicios($condicion) {
         $consultado = false;
-        $consulta = "SELECT dat.iddatos_factura, dat.iddatosfacturacion, dat.letra, dat.folio_interno_fac, dat.fecha_creacion, dat.rzreceptor cliente, dat.status_pago, dat.uuid, dat.idcliente, dat.tipofactura, dat.subtotal,dat.subtotaliva, dat.subtotalret, dat.totalfactura, dat.factura_rzsocial emisor, d.color FROM datos_factura dat INNER JOIN datos_facturacion d ON (d.id_datos=dat.iddatosfacturacion) $condicion;";
+        $consulta = "SELECT dat.iddatos_factura, dat.iddatosfacturacion, dat.letra, dat.folio_interno_fac, dat.fecha_creacion, dat.rzreceptor cliente, dat.status_pago, dat.uuid, dat.idcliente, dat.tipofactura, dat.subtotal,dat.subtotaliva, dat.subtotalret, dat.totalfactura, dat.factura_rzsocial emisor, dat.id_moneda, d.color FROM datos_factura dat INNER JOIN datos_facturacion d ON (d.id_datos=dat.iddatosfacturacion) $condicion;";
         $consultas = new Consultas();
         $consultado = $consultas->getResults($consulta, null);
         return $consultado;
@@ -2157,6 +2157,7 @@ class ControladorFactura {
             $subiva = $listafacturaActual['subtotaliva'];
             $subret = $listafacturaActual['subtotalret'];
             $total = $listafacturaActual['totalfactura'];
+            $idmoneda = $listafacturaActual['id_moneda'];
             $emisor = $listafacturaActual['emisor'];
             $colorrow = $listafacturaActual['color'];
         	if ($emisor == "") {
@@ -2269,7 +2270,7 @@ class ControladorFactura {
                         <td class='text-center'>$ " . number_format($iva, 2, '.', ',') . "</td>
                         <td class='text-center'>$ " . number_format($ret, 2, '.', ',') . "</td>
                         <td class='text-center'>$" . number_format($total, 2, '.', ',') . "</td>
-                        <td class='text-center'>MXN</td>
+                        <td class='text-center'>$idmoneda</td>
                         <td align='center'><div class='dropdown'>
                         <button class='button-list dropdown-toggle' title='Opciones'  type='button' data-bs-toggle='dropdown'><span class='fas fa-ellipsis-v'></span>
                         <span class='caret'></span></button>

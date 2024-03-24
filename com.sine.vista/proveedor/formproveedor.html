@@ -1,130 +1,143 @@
-    <div class="col-md-12"><div class="titulo-lista" id="contenedor-titulo-form-proveedor">Nuevo proveedor </div> </div>
-    <div id="div-space">
+<div class="col-md-12 fijo z-2">
+    <div class="titulo-lista" id="contenedor-titulo-form-proveedor">Nuevo proveedor </div>
+</div>
+<div id="div-space">
+</div>
+<div class="div-form p-5 border border-secondary-subtle">
+    <div class="row">
+        <div class="col-md-12 d-flex justify-content-end mb-2">
+            <label class="fw-bold text-danger small">* Campo obligatorio</label>
+        </div>
     </div>
-    <div class="div-form p-5 border border-secondary-subtle">
-        <div class="row">
-            <div class="col-md-12 d-flex justify-content-end mb-2">
-                <label class="fw-bold text-danger small">* Campo obligatorio</label>
+    <div class="row">
+        <div class="col-md-6 py-2">
+            <label class="label-form text-right" for="empresa">Empresa</label> <label
+                class="mark-required text-danger fw-bold">*</label>
+            <div class="form-group">
+                <input class="form-control text-center input-form" name="empresa" id="empresa" placeholder="Empresa" />
+                <div id="empresa-errors"></div>
             </div>
         </div>
-        <div class="row">
-            <div class="col-md-6 py-2">
-                <label class="label-form text-right" for="empresa">Empresa</label> <label
-                    class="mark-required text-danger fw-bold">*</label>
-                <div class="form-group">
-                    <input class="form-control text-center input-form" name="empresa" id="empresa" placeholder="Empresa"/>
-                    <div id="empresa-errors"></div>
-                </div>
-            </div>
 
-            <div class="col-md-6 py-2">
-                <label class="label-form text-right" for="representante">Representante</label> <label
-                    class="mark-required text-danger fw-bold">*</label>
-                <div class="form-group">
-                    <input class="form-control text-center input-form" name="representante" id="representante" placeholder="Representante" oninput="validarLet(this)"/>
-                    <div id="representante-errors"></div>
+        <div class="col-md-6 py-2">
+            <label class="label-form text-right" for="representante">Representante</label> <label
+                class="mark-required text-danger fw-bold">*</label>
+            <div class="form-group">
+                <input class="form-control text-center input-form" name="representante" id="representante"
+                    placeholder="Representante" oninput="validarLet(this)" />
+                <div id="representante-errors"></div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 py-2">
+            <label class="label-form text-right" for="telefono">Tel&eacute;fono</label> <label
+                class="mark-required text-danger fw-bold">*</label>
+            <div class="form-group">
+                <input class="form-control text-center input-form" name="telefono" id="telefono"
+                    placeholder="Tel&eacute;fono" type="text" maxlength="10" oninput="validarNum(this)" />
+                <div id="telefono-errors"></div>
+            </div>
+        </div>
+
+        <div class="col-md-6 py-2">
+            <label class="label-form text-right" for="correo">Correo</label> <label
+                class="mark-required text-danger fw-bold">*</label>
+            <div class="form-group">
+                <input class="form-control text-center input-form" name="correo" id="correo"
+                    placeholder="Correo electr&oacute;nico" />
+                <div id="correo-errors"></div>
+            </div>
+        </div>
+
+    </div>
+    <div class="row">
+        <div class="col-md-6 py-2">
+            <label class="label-form text-right" for="cuenta"> Cuenta </label> <label
+                class="mark-required text-danger fw-bold">&nbsp;</label>
+            <div class="form-group">
+                <input class="form-control text-center input-form" id="cuenta" minlength="18" maxlength="20"
+                    name="cuenta" placeholder="N&uacute;mero de cuenta bancaria" />
+                <div id="cuenta-errors"></div>
+            </div>
+        </div>
+
+        <div class="col-md-6 py-2">
+            <label class="label-form text-right" for="clabe"> Clabe </label> <label
+                class="mark-required text-danger fw-bold">&nbsp;</label>
+            <div class="form-group">
+                <input class="form-control text-center input-form" id="clabe" name="clabe"
+                    placeholder="Clabe interbancaria" minlength="18" maxlength="20" />
+                <div id="clabe-errors"></div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 py-2">
+            <label class="label-form text-right" for="id-banco">Banco</label> <label
+                class="mark-required text-danger fw-bold">&nbsp;</label>
+            <div class="form-group">
+                <select class="form-select text-center input-form" id="id-banco" name="id-banco">
+                    <option value="" id="option-default-banco">- - - -</option>
+                    <optgroup id="banco" class="contenedor-banco text-start"> </optgroup>
+                </select>
+                <input type="hidden" id="nombre_banco" name="nombre_banco">
+                <div id="id-banco-errors"></div>
+            </div>
+        </div>
+
+        <div class="col-md-6 py-2">
+            <label class="label-form text-right" for="sucursal"> No. de Sucursal </label>
+            <label class="mark-required text-danger fw-bold">&nbsp;</label>
+            <div class="form-group">
+                <input class="form-control text-center input-form" id="sucursal" name="sucursal"
+                    placeholder="Sucursal bancaria" oninput="validarNum(this)" />
+                <div id="sucursal-errors"></div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-2">
+        <div class="col-md-6 py-2">
+            <div class="form-group d-flex aling-items-center">
+                <input class="input-check" checked="" id="datosficales" name="datosficales" type="checkbox"
+                    onchange="checkfiscales()" />
+                <label class="label-form ms-2" for="datosficales">¿Ingresar datos fiscales?</label>
+                <div id="datosficales-errors">
                 </div>
             </div>
         </div>
+    </div>
+    <div id="fiscales">
         <div class="row">
             <div class="col-md-6 py-2">
-                <label class="label-form text-right" for="telefono">Tel&eacute;fono</label> <label
-                    class="mark-required text-danger fw-bold">*</label>
-                <div class="form-group">
-                    <input class="form-control text-center input-form" name="telefono" id="telefono" placeholder="Tel&eacute;fono" type="text" maxlength="10" oninput="validarNum(this)"/>
-                    <div id="telefono-errors"></div>
-                </div>
-            </div>
-
-            <div class="col-md-6 py-2">
-                <label class="label-form text-right" for="correo">Correo</label> <label
-                    class="mark-required text-danger fw-bold">*</label>
-                <div class="form-group">
-                    <input class="form-control text-center input-form" name="correo" id="correo" placeholder="Correo electr&oacute;nico"/>
-                    <div id="correo-errors"></div>
-                </div>
-            </div>
-
-        </div>
-        <div class="row">
-            <div class="col-md-6 py-2">
-                <label class="label-form text-right" for="cuenta"> Cuenta </label>  <label
-                    class="mark-required text-danger fw-bold">&nbsp;</label>
-                <div class="form-group">
-                    <input class="form-control text-center input-form" id="cuenta" minlength="18" maxlength="20" name="cuenta" placeholder="N&uacute;mero de cuenta bancaria" />
-                    <div id="cuenta-errors"></div>
-                </div>
-            </div>
-
-            <div class="col-md-6 py-2">
-                <label class="label-form text-right" for="clabe"> Clabe </label>  <label
-                    class="mark-required text-danger fw-bold">&nbsp;</label>
-                <div class="form-group">
-                    <input class="form-control text-center input-form" id="clabe" name="clabe" placeholder="Clabe interbancaria" minlength="18" maxlength="20"/>
-                    <div id="clabe-errors"></div>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-6 py-2">
-                <label class="label-form text-right" for="id-banco">Banco</label>  <label
-                    class="mark-required text-danger fw-bold">&nbsp;</label>
-                <div class="form-group">
-                    <select class="form-select text-center input-form" id="id-banco" name="id-banco" >
-                        <option value="" id="option-default-banco">- - - -</option>
-                        <optgroup id="banco" class="contenedor-banco text-start"> </optgroup>
-                    </select>
-                    <input type="hidden" id="nombre_banco" name="nombre_banco">
-                    <div id="id-banco-errors"></div>
-                </div>
-            </div>
-
-            <div class="col-md-6 py-2">
-                <label class="label-form text-right" for="sucursal"> No. de Sucursal </label>  
+                <label class="label-form text-right" for="rfc-proveedor">RFC</label>
                 <label class="mark-required text-danger fw-bold">&nbsp;</label>
                 <div class="form-group">
-                    <input class="form-control text-center input-form" id="sucursal" name="sucursal" placeholder="Sucursal bancaria" oninput="validarNum(this)"/>
-                    <div id="sucursal-errors"></div>
+                    <input class="form-control text-center input-form" id="rfc-proveedor" maxlength="13"
+                        name="rfc-proveedor" placeholder="RFC del proveedor" type="text" />
+                    <div id="rfc-proveedor-errors">
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="row mt-2">
             <div class="col-md-6 py-2">
-                <div class="form-group d-flex aling-items-center">
-                    <input class="input-check" checked="" id="datosficales" name="datosficales" type="checkbox" onchange="checkfiscales()"/>
-                    <label class="label-form ms-2" for="datosficales">¿Ingresar datos fiscales?</label>
-                    <div id="datosficales-errors">
+                <label class="label-form text-right" for="razon-proveedor">Raz&oacute;n social</label>
+                <label class="mark-required text-danger fw-bold">&nbsp;</label>
+                <div class="form-group">
+                    <input class="form-control text-center input-form" id="razon-proveedor" name="razon-proveedor"
+                        placeholder="Razon Social del proveedor" type="text" />
+                    <div id="razon-proveedor-errors">
                     </div>
                 </div>
             </div>
         </div>
-        <div id="fiscales">
-            <div class="row">
-                <div class="col-md-6 py-2">
-                    <label class="label-form text-right" for="rfc-proveedor">RFC</label> 
-                <label class="mark-required text-danger fw-bold">&nbsp;</label>
-                    <div class="form-group">
-                        <input class="form-control text-center input-form" id="rfc-proveedor" maxlength="13" name="rfc-proveedor" placeholder="RFC del proveedor" type="text"/>
-                        <div id="rfc-proveedor-errors">
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6 py-2">
-                    <label class="label-form text-right" for="razon-proveedor">Raz&oacute;n social</label> 
-                <label class="mark-required text-danger fw-bold">&nbsp;</label>
-                    <div class="form-group">
-                        <input class="form-control text-center input-form" id="razon-proveedor" name="razon-proveedor" placeholder="Razon Social del proveedor" type="text"/>
-                        <div id="razon-proveedor-errors">
-                        </div>
-                    </div> 
-                </div>
-            </div>
-        </div>
-        <div class="row mt-3">
-            <div class="col-12 text-end">
-                <button class="button-form btn col-auto btn-danger" onclick="loadView('listaproveedor');"> Cancelar <span class="fas fa-times"></span> </button>
-                <button class="button-form btn col-auto btn-primary" id="btn-form-proveedor" onclick="guardarProveedor();" > Guardar <span class="fas fa-save"></span> </button> 
-            </div>
+    </div>
+    <div class="row mt-3">
+        <div class="col-12 text-end">
+            <button class="button-form btn col-auto btn-danger" onclick="loadView('listaproveedor');"> Cancelar <span
+                    class="fas fa-times"></span> </button>
+            <button class="button-form btn col-auto btn-primary" id="btn-form-proveedor" onclick="guardarProveedor();">
+                Guardar <span class="fas fa-save"></span> </button>
         </div>
     </div>
+</div>
 <script type="text/javascript" src="js/scriptproveedor.js"></script>

@@ -2,8 +2,8 @@
 include("modals.php");
 ?>
 
-<form action="#" onsubmit="return false;" id="form-comunicado" style="height: 100%;">
-    <div class="col-md-12">
+<form action="#" onsubmit="return false;" id="form-comunicado">
+    <div class="col-md-12 fijo z-2">
         <div class="titulo-lista" id="contenedor-titulo-form-comunicado">Nuevo comunicado </div>
     </div>
     <div class="div-form p-5 border border-secondary-subtle">

@@ -1,24 +1,11 @@
-<div id="form-empresa" style="height: 100%;">
-    <div class="col-md-12">
+<div id="form-empresa">
+    <div class="col-md-12 fijo z-2">
         <div class="titulo-lista" id="contenedor-titulo-form-empresa">Nuevos datos de facturaci&oacute;n </div>
     </div>
     <div class="div-form p-5 border border-secondary-subtle mb-4">
         <div class="row">
             <div class="col-md-12 d-flex justify-content-end">
                 <label class="fw-bold text-danger small">* Campo obligatorio</label>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-8">
-            </div>
-            <div class="new-tooltip icon tip col-md-2 text-center">
-                <div class="new-tooltip icon tip me-2">
-                    <span class="fas fa-question-circle small text-primary-emphasis"></span>
-                    <span class="tiptext">Se abrirá una ventana directamente a la herramienta de validación del SAT para
-                        verificar el RFC de su cliente.</span>    </div>
-                <label class="label-sub click-label" style="cursor: pointer;" onclick="validarRFC();">Validar RFC <span
-                        class="fas fa-pencil-alt"></span></label>
-                
             </div>
         </div>
         <div class="row py-1">
@@ -32,17 +19,6 @@
                 </div>
             </div>
             <div class="col-md-6 py-2">
-                <label class="label-form text-right" for="rfc-empresa">RFC</label> <label
-                    class="mark-required text-danger fw-bold">*</label>
-                <div class="form-group">
-                    <input class="form-control text-center input-form" id="rfc-empresa" name="rfc-empresa"
-                        placeholder="RFC" type="text" maxlength="13" />
-                    <div id="rfc-empresa-errors"></div>
-                </div>
-            </div>
-        </div>
-        <div class="row py-1">
-            <div class="col-md-6 py-2">
                 <label class="label-form text-right" for="razon-social">Razón social</label> <label
                     class="mark-required text-danger fw-bold">*</label>
                 <div class="form-group">
@@ -51,7 +27,32 @@
                     <div id="razon-social-errors"></div>
                 </div>
             </div>
-
+            
+        </div>
+        <div class="row py-1">
+            <div class="col-md-6 py-2">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label class="label-form text-right col-12" for="rfc-empresa">RFC <label
+                            class="mark-required text-danger fw-bold">*</label></label>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="new-tooltip icon tip text-end col-md-12">
+                            <div class="new-tooltip icon tip">
+                                <span class="fas fa-question-circle small text-primary-emphasis"></span>
+                                <span class="tiptext">Se abrirá una ventana directamente a la herramienta de validación del SAT para
+                                    verificar el RFC que se ingresa.</span>
+                            </div>
+                            <label class="click-label fw-semibold" style="cursor: pointer; color: #17177C;" onclick="validarRFC();">Validar RFC </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <input class="form-control text-center input-form" id="rfc-empresa" name="rfc-empresa"
+                        placeholder="RFC" type="text" maxlength="13" />
+                    <div id="rfc-empresa-errors"></div>
+                </div>
+            </div>
             <div class="col-md-6 py-2">
                 <label class="label-form text-right" for="color-datos">Color distintivo</label><label
                 class="mark-required text-danger fw-bold">&nbsp;</label>

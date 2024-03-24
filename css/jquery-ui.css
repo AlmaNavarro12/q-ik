@@ -995,6 +995,7 @@ a.ui-button:active,
 .ui-state-active a:link,
 .ui-state-active a:visited {
 	color: #ffffff;
+	width: 100%;
 	text-decoration: none;
 }
 

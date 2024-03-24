@@ -778,11 +778,11 @@ function loadView(vista) {
         'nomina': ["loadFecha()", 300, "loadOpcionesFacturacion()", 310, "loadOpcionesRegimen()", 320, "listaPercepciones()", 330, "listaDeducciones()", 340, "listaOtrosPagos()", 350, "optionListPercepciones()", 360, "optionListDeducciones()", 370, "optionListOtrosPagos()", 380],
         'listanomina': ["loadBtnCrear('nomina')", 300, "filtrarFolio()", 320],
         'direccion': ["loadOpcionesEstado()", 320],
-        'listadireccion': ["loadBtnCrear('destino')", 300, "filtrarUbicacion()", 320],
+        'listadireccion': ["loadBtnCrear('destino')", 300, "buscarUbicacion()", 320],
         'transporte': [],
-        'listatransporte': ["loadBtnCrear('transporte')", 300, "filtrarTransporte()", 320],
+        'listatransporte': ["loadBtnCrear('transporte')", 300, "buscarTransporte()", 320],
         'remolque': [],
-        'listaremolque': ["loadBtnCrear('remolque')", 300, "filtrarRemolque()", 320],
+        'listaremolque': ["loadBtnCrear('remolque')", 300, "buscarRemolque()", 320],
         'operador': ["loadOpcionesEstado()", 320],
         'listaoperador': ["loadBtnCrear('operador')", 300, "filtrarOperador()", 320],
         'carta': ["truncateTmpCarta()", 300, "truncateTmpIMG()", 320, "loadOpcionesFolios('4')", 350, "loadFecha()", 370, "loadOpcionesEstado()", 400, "filtrarProducto()", 420, "loadOpcionesFormaPago()", 450, "loadOpcionesMetodoPago()", 470, "loadOpcionesMoneda()", 500, "loadOpcionesUsoCFDI()", 520, "loadOpcionesComprobante()", 550, "loadOpcionesFacturacion()", 570, "loadOpcionesProveedor()", 600, "opcionesPeriodoGlobal()", 620, "opcionesMeses()", 650, "opcionesAnoGlobal()", 670],
@@ -1373,6 +1373,43 @@ function truncateTmp() {
             if (bandera == '0') {
                 alertify.error(res);
             } 
+        }
+    });
+}
+
+function truncateTmpCarta() {
+    $.ajax({
+        url: "com.sine.enlace/enlacecarta.php",
+        type: "POST",
+        data: {transaccion: "cancelar"},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 1000);
+            if (bandera == '0') {
+                alertify.error(res);
+            } else {
+
+            }
+        }
+    });
+}
+
+function loadFecha() {
+    $.ajax({
+        url: 'com.sine.enlace/enlacefactura.php',
+        type: 'POST',
+        data: {transaccion: 'fecha'},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 5000);
+            if (bandera == '') {
+                alertify.error(res);
+            } else {
+                //alert(datos);
+                $("#fecha-creacion").val(datos);
+            }
         }
     });
 }

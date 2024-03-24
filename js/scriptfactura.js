@@ -930,7 +930,7 @@ function setvaloresRegistrarPago(datos) {
                         $("#complemento-" + first).show();
                         $("#tab-" + first).addClass("sub-tab-active");
                     }
-                    tablaRowCFDI(tag1, forma);
+                    tablaRowCFDI(tag1, "", moneda);
                     loadFormaPago(tag1, forma);
                     loadMonedaComplemento(tag1, moneda);
                     disableCuenta(tag1, forma);
@@ -1580,27 +1580,6 @@ function loadDatosFactura(iddatos = "") {
             }
 
             cargandoHide();
-        }
-    });
-}
-
-function loadFecha() {
-    ////cargandoShow();
-    $.ajax({
-        url: 'com.sine.enlace/enlacefactura.php',
-        type: 'POST',
-        data: {transaccion: 'fecha'},
-        success: function (datos) {
-            var texto = datos.toString();
-            var bandera = texto.substring(0, 1);
-            var res = texto.substring(1, 5000);
-            if (bandera == '') {
-                alertify.error(res);
-            } else {
-                //alert(datos);
-                $("#fecha-creacion").val(datos);
-            }
-            ////cargandoHide();
         }
     });
 }

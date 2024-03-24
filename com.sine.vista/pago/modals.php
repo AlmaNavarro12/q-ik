@@ -129,13 +129,13 @@
         <div class="modal-content">
         <div class="modal-header py-0">
                 <div class="label-sub fs-5 py-0" id="titulo-alerta">
-                   Status del CFDI
+                   Estado del CFDI
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="row">
-                    <span class="label-sub py-0 my-0" for="cod-status">Codigo Status: </span>
+                    <span class="label-sub py-0 my-0" for="cod-status">Código de estado: </span>
                     <span class="label-form" id="cod-status"></span>
                 </div>
                 
@@ -150,7 +150,7 @@
                 </div>
                 
                 <div class="row">
-                    <span class="label-sub py-0 my-0 mt-3" for="estado-cancelacion">Estado Cancelación: </span>
+                    <span class="label-sub py-0 my-0 mt-3" for="estado-cancelacion">Estado cancelación: </span>
                     <span class="label-form" id="estado-cancelacion"></span>
                 </div>
                 

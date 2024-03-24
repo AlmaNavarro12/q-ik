@@ -65,7 +65,7 @@ class ControladorAuto {
         $resultadosCarta = $this->consultas->getResults($consultaCarta, null);
         foreach ($resultadosCarta as $resultado) {
             $datos[] = [
-                "value" => "Carta Porte - " . $resultado['letra'] . $resultado['foliocarta'],
+                "value" => "Carta Porte-" . $resultado['letra'] . $resultado['foliocarta'],
                 "id" => $resultado["idfactura_carta"],
                 "type" => 'c'
             ];
@@ -91,6 +91,42 @@ class ControladorAuto {
                 "id" => $resultado["idproser"],
                 "codigo" => $resultado['codproducto'],
                 "nombre" => $resultado['nombre_producto']);
+            $contador++;
+        }
+        if ($contador == 0) {
+            $datos [] = array("value" => "No se encontraron registros", "id" => "Ninguno");
+        }
+        return $datos;
+    }
+
+    public function getCoincidenciasLocalidad($referencia) {
+        $datos = array();
+        $consulta = "SELECT * FROM localidadenvio WHERE (c_Localidad LIKE '%$referencia%' OR Descripcion LIKE '%$referencia%') LIMIT 15;";
+        $c = new Consultas();
+        $resultados = $c->getResults($consulta, null);
+        $contador = 0;
+        foreach ($resultados as $resultado) {
+            $datos[] = array("value" => $resultado['c_Localidad']."-".$resultado['Descripcion'],
+                "id" => $resultado["id_localidad"],
+                "nombre" => $resultado['Descripcion']);
+            $contador++;
+        }
+        if ($contador == 0) {
+            $datos [] = array("value" => "No se encontraron registros", "id" => "Ninguno");
+        }
+        return $datos;
+    }
+
+    public function getCoincidenciasEmpleado($referencia) {
+        $datos = array();
+        $consulta = "SELECT * FROM empleado WHERE (nombreempleado LIKE '%$referencia%' OR rfcempleado LIKE '%$referencia%' OR curpempleado LIKE '%$referencia%') LIMIT 15;";
+        $resultados = $this->consultas->getResults($consulta, null);
+        $contador = 0;
+        foreach ($resultados as $resultado) {
+            $datos[] = array("value" => $resultado['nombreempleado'],
+                "id" => $resultado["idempleado"],
+                "nombre" => $resultado['nombreempleado'],
+                "rfc" => $resultado['rfcempleado']);
             $contador++;
         }
         if ($contador == 0) {

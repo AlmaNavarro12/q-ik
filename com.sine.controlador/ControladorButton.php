@@ -29,7 +29,7 @@ class ControladorButton{
         $botones = [
             'factura' => ['crearfactura', 'factura', 'Crear Factura'],
             'pago' => ['crearpago', 'pago', 'Crear Pago'],
-            'cotizacion' => ['crearcotizacion', 'cotizacion', 'Crear Cotizacion'],
+            'cotizacion' => ['crearcotizacion', 'cotizacion', 'Crear Cotización'],
             'cliente' => ['crearcliente', 'nuevocliente', 'Nuevo Cliente'],
             'comunicado' => ['crearcomunicado', 'comunicado', 'Crear Comunicado'],
             'producto' => ['crearproducto', 'nuevoproducto', 'Crear producto'],
@@ -52,7 +52,7 @@ class ControladorButton{
             'folio' => ['addfolio', 'folio', 'Crear Folio'],
             'empleado' => ['crearempleado', 'empleado', 'Registrar Empleado'],
             'nomina' => ['crearnomina', 'nomina', 'Crear Nomina'],
-            'destino' => ['crearubicacion', 'direccion', 'Crear Ubicacion'],
+            'destino' => ['crearubicacion', 'direccion', 'Crear Ubicación'],
             'transporte' => ['creartransporte', 'transporte', 'Crear Transporte'],
             'remolque' => ['crearremolque', 'remolque', 'Crear Remolque'],
             'operador' => ['crearoperador', 'operador', 'Crear Operador'],

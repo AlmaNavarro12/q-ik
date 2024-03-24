@@ -228,7 +228,7 @@ require_once 'Enrutador.php';
                                                 }
                                                 if ($listacarta == '1') {
                                                 ?>
-                                                    <li class='lista-submenu-elemento ps-5 list-menu' data-submenu='listacarta'> Carta Porte</li>
+                                                    <li class='lista-submenu-elemento ps-5 list-menu' data-submenu='listacarta'> Carta porte</li>
                                                 <?php
                                                 }
                                                 ?>

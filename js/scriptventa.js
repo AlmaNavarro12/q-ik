@@ -887,24 +887,6 @@ function modalSupervisor(){
     }
 }
 
-function loadFecha() {
-    $.ajax({
-        url: 'com.sine.enlace/enlacefactura.php',
-        type: 'POST',
-        data: { transaccion: 'fecha' },
-        success: function (datos) {
-            var texto = datos.toString();
-            var bandera = texto.substring(0, 1);
-            var res = texto.substring(1, 5000);
-            if (bandera == '') {
-                alertify.error(res);
-            } else {
-                $("#fecha-creacion").val(datos);
-            }
-        }
-    });
-}
-
 function validarSupervisor() {
     var usuario = $("#supervisor").val();
     var contrasena = $("#contrasena").val();

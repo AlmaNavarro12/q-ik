@@ -1,0 +1,139 @@
+<div id="form-operador">
+    <div class="col-md-12 fijo z-2"><div class="titulo-lista" id="contenedor-titulo-form-operador">Nuevo operador </div> </div>
+    <div id="div-space">
+    </div>
+    <div class="div-form p-5 border border-secondary-subtle">
+        <div class="row">
+            <div class="col-md-12 d-flex justify-content-end mb-2">
+                <label class="fw-bold text-danger small">* Campo obligatorio</label>
+            </div>
+        </div>
+        <div class="row col-12">
+            <div class="col-md-6">
+                <label class="label-sub">Datos Operador</label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 py-2">
+                <label class="label-form text-right" for="nombre-operador">Nombre</label> <label class="mark-required text-danger fw-bold">*</label>
+                <div class="form-group">
+                    <input class="form-control text-center input-form" id="nombre-operador" name="nombre-operador" placeholder="Nombre" type="text" oninput="autocompletarEmpleado(); validarLet(this)">
+                    <div id="nombre-errors">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 py-2">
+                <label class="label-form text-right" for="apaterno-operador">Apellido paterno</label> <label class="mark-required text-danger fw-bold">*</label>
+                <div class="form-group">
+                    <input class="form-control text-center input-form" id="apaterno-operador" name="apaterno-operador" placeholder="Apellido paterno" type="text" oninput="validarLet(this)"/>
+                    <div id="apellido-paterno-errors"></div>
+                </div>
+            </div>
+        </div>
+        <div class="row">    
+            <div class="col-md-6 py-2">
+                <label class="label-form text-right" for="amaterno-operador">Apellido materno</label> <label class="mark-required text-danger fw-bold">*</label>
+                <div class="form-group">
+                    <input class="form-control text-center input-form" id="amaterno-operador" name="amaterno-operador" placeholder="Apellido materno" type="text" oninput="validarLet(this)"/>
+                    <div id="apellido-materno-errors">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 py-2">
+                <label class="label-form text-right" for="num-licencia">N&uacute;mero de licencia</label> <label class="mark-required text-danger fw-bold">*</label>
+                <div class="form-group">
+                    <input class="form-control text-center input-form" id="num-licencia" name="num-licencia" placeholder="N&uacute;mero de licencia" type="text"/>
+                    <div id="num-licencia-errors">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 py-2">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label class="label-form text-right col-12" for="rfc-operador">RFC del operador  <label
+                            class="mark-required text-danger fw-bold">*</label></label>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="new-tooltip icon tip text-end col-md-12">
+                            <div class="new-tooltip icon tip">
+                                <span class="fas fa-question-circle small text-primary-emphasis"></span>
+                                <span class="tiptext">Se abrirá una ventana directamente a la herramienta de validación del SAT para
+                                    verificar el RFC que se ingresa.</span>
+                            </div>
+                            <label class="click-label fw-semibold pe-1 me-1" style="cursor: pointer; color: #17177C;" onclick="validarRFC();">Validar RFC </label>
+                        </div>
+                    </div>
+                </div>
+                <div id="div-user" class="form-group">
+                    <input class="form-control text-center input-form" id="rfc-operador" name="rfc-operador" maxlength="13" minlength="13" placeholder="Nombre del operador" type="text"/>
+                    <div id="usuario-errors">
+                    </div>
+                </div>
+                <span id="span-user"></span>
+            </div>
+            <div class="col-md-6 py-2">
+                <label class="label-form text-right" for="empresa-operador">Empresa</label> <label class="mark-required text-danger fw-bold">&nbsp;</label>
+                <div class="form-group">
+                    <input class="form-control text-center input-form" id="empresa-operador" name="empresa-operador" placeholder="Empresa contratista" type="text"/>
+                    <div id="empresa-operador-errors">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <label class="label-sub mt-4">Direcci&oacute;n Fiscal</label>
+        <div class="row">
+            <div class="col-md-6 py-2">
+                <div class="new-tooltip icon tip me-2">
+                    <span class="fas fa-question-circle small text-primary-emphasis"></span>
+                    <span class="tiptext">Al ingresar el código postal se selecciona el estado y municipio correspondiente. Si no es el estado o municipio deseados puedes seleccionarlos del listado manualmente.</span>
+                </div>
+                <label class="label-form text-right" for="codigo_postal">C&oacute;digo postal</label>  <label class="mark-required text-danger fw-bold">*</label>
+                <div class="form-group">
+                    <input class="form-control text-center input-form" id="codigo_postal" name="codigo_postal" placeholder="C&oacute;digo postal del domicilio" type="text" maxlength="5" minlength="5" onblur="getEstadoMunicipioByCodP();" oninput="validarNum(this)"/>
+                    <div id="codigo_postal-errors">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 py-2">
+                <label class="label-form text-right" for="id-estado">Estado</label> <label class="mark-required text-danger fw-bold">*</label>
+                <div class="form-group">
+                    <select class="form-select text-center input-form" id="id-estado" name="id-estado" onchange="loadOpcionesMunicipio();">
+                        <option value="" id="option-default-estado">- - - -</option>
+                        <optgroup id="estados" class="contenedor-estado text-start"> </optgroup>
+                    </select>
+                    <div id="id-estado-errors"></div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 py-2">
+                <label class="label-form text-right" for="id-municipio">Municipio</label> <label class="mark-required text-danger fw-bold">&nbsp;</label>
+                <div class="form-group">
+                    <select class="form-select text-center input-form" id="id-municipio" name="id-municipio" >
+                        <option value="" id="option-default-municipio">- - - -</option>
+                        <optgroup class="contenedor-municipio text-start"> </optgroup>
+                    </select>
+                    <div id="id-municipio-errors">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 py-2">
+                <label class="label-form text-right" for="calle-operador">Calle</label> <label class="mark-required text-danger fw-bold">&nbsp;</label>
+                <div class="form-group">
+                    <input class="form-control text-center input-form" id="calle-operador" name="calle-operador" placeholder="Calle del domicilio" type="text"/>
+                    <div id="calle-operador-errors">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-4">
+            <div class="col-md-12 text-end">
+                <button class="button-form btn btn-danger" onclick="loadView('listaoperador');" >Cancelar <span class="fas fa-times"></span></button> &nbsp;
+                <button class="button-form btn btn-primary" onclick="insertarOperador()" id="btn-form-operador">Guardar <span class="fas fa-save"></span></button>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="js/scriptoperador.js"></script>

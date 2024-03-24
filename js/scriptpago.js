@@ -42,9 +42,8 @@ function loadListaPago(pag = "") {
 //------------------FORMULARIO
 function disableCuenta(tagcom= "", forma= "") {
     tag = tagcom == "" ? $("#tabs").find('.sub-tab-active').attr("data-tab") : tagcom;
-    console.log(tag);
     formapago = forma == "" ? $("#forma-" + tag).val() : forma;
-    console.log(formapago);
+    console.log("Forma de pago: " + formapago);
     if (formapago == '2' || formapago == '3' || formapago == '4' || formapago == '5' || formapago == '6' || formapago == '18' || formapago == '19') {
         $("#cuenta-" + tag).removeAttr('disabled');
         $("#benef-" + tag).removeAttr('disabled');
@@ -363,7 +362,7 @@ function setValoresEditarPago(datos) {
         $("#razon-emisor").val(razonemisor);
         $("#regimen-emisor").val(clvregemisor + "-" + regemisor);
         $("#cp-emisor").val(codpemisor);
-        $("#not-timbre").html("<div class='row col-12 py-2'><label class='label-required text-danger fw-bold row'> * Esta pago ya ha sido timbrado, por lo que solo puedes modificar la firma del contribuyente.</label></div>");
+        $("#not-timbre").html("<div  class='alert alert-danger ps-4'><label class='label-required text-danger fw-bold'> * Este pago ya ha sido timbrado, por lo que solo puedes modificar la firma del contribuyente.</label></div>");
         $("#folio-pago").attr("disabled", true);
         $("#nombre-cliente").attr("disabled", true);
         $("#rfc-cliente").attr("disabled", true);
@@ -372,6 +371,7 @@ function setValoresEditarPago(datos) {
         $("#cp-cliente").attr("disabled", true);
         $("#datos-facturacion").attr("disabled", true);
         $("#obj-impuesto").attr("disabled", true);
+        $("#btn-nuevo-producto").attr("disabled", true);
     } else {
         loadFolioPago(idemisor);
         $("#folio-factura").removeAttr('disabled');
@@ -433,7 +433,9 @@ function setValoresEditarPago(datos) {
                         $("#complemento-" + first).show();
                         $("#tab-" + first).addClass("sub-tab-active");
                     }
-                    disableCuenta(tag1, forma);
+                    if(uuid == ""){
+                        disableCuenta(tag1, forma);
+                    }
                     loadFormaPago(tag1, forma);
                     loadMonedaComplemento(tag1, moneda);
                     loadBancoCliente(tag1, cuentas);
@@ -485,34 +487,6 @@ function tablaRowCFDI(tag, uuid = "", moneda="", tcambio="") {
                 $("#lista-cfdi-" + tag).html(p2);
             }
             cargandoHide();
-        }
-    });
-}
-
-function setvaloresCuentas(idordenante, idbeneficiario) {
-    if (idordenante != '0') {
-        $("#id-bancocuenta").val(idordenante);
-    }
-    if (idbeneficiario != '0') {
-        $("#id-bancobeneficiario").val(idbeneficiario);
-    }
-}
-
-//-------------------FECHA
-function loadFecha() {
-    $.ajax({
-        url: 'com.sine.enlace/enlacefactura.php',
-        type: 'POST',
-        data: { transaccion: 'fecha' },
-        success: function (datos) {
-            var texto = datos.toString();
-            var bandera = texto.substring(0, 1);
-            var res = texto.substring(1, 5000);
-            if (bandera == '') {
-                alertify.error(res);
-            } else {
-                $("#fecha-creacion").val(datos);
-            }
         }
     });
 }
@@ -970,16 +944,11 @@ function calcularRestante(tag = "") {
     if (tag == "") {
         tag = $("#tabs").find('.sub-tab-active').attr('data-tab');
     }
-    var monto = $("#monto-" + tag).val();
-    var total = $("#anterior-" + tag).val();
-    var restante = parseFloat(total) - parseFloat(monto);
-    $("#restante-" + tag).val(myRound(restante));
+    var monto = parseFloat($("#monto-" + tag).val());
+    var total = parseFloat($("#anterior-" + tag).val());
+    var restante = (total * 100 - monto * 100) / 100;
+    $("#restante-" + tag).val(restante.toFixed(2));
 }
-
-function myRound(num, dec) {
-    var exp = Math.pow(10, dec || 2); 
-    return parseInt(num * exp, 10) / exp;
-} 
 
 function cambiarEstado(idfactura, idcliente, monto) {
     cargandoHide();
@@ -1144,6 +1113,12 @@ function agregarCFDI() {
     var montorestante = $("#restante-" + tag).val();
 
     if (isnEmpty(idmoneda, "moneda-" + tag) && isnEmpty(factura, "factura-" + tag) && isnEmpty(type, "type-" + tag) && isnEmpty(idmonedacdfi, "monedarel-" + tag) && isnEmpty(parcialidad, "parcialidad-" + tag) && isnEmpty(totalfactura, "total-" + tag) && isnZero(montoanterior, "anterior-" + tag) && isPositive(montopago, "monto-" + tag) && isnEmpty(montorestante, "restante-" + tag)) {
+        
+        if (idmoneda !== idmonedacdfi) {
+            alertify.alert("No puedes agregar un pago con moneda diferente a la moneda que se declaró en la factura.").set({title: "Q-ik"}).set('labels', {ok: 'Aceptar'});
+            return;
+        }
+
         $.ajax({
             url: "com.sine.enlace/enlacepago.php",
             type: "POST",

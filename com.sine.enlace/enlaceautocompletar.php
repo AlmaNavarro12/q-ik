@@ -17,7 +17,14 @@ if (isset($_GET['transaccion'])) {
         case 'facturas':
             echo json_encode($cp->getCoincidenciasFacturas($_GET['term'], $_GET['iddatos']));
             break;
-        /*
+        case 'localidad':
+            echo json_encode($cp->getCoincidenciasLocalidad($_GET['term']));
+            break;
+        case 'empleado':
+            echo json_encode($cp->getCoincidenciasEmpleado($_GET['term']));
+            break;
+        
+            /*
         case 'emailcliente':
             echo json_encode($cp->getCoincidenciasBusquedaMail($_GET['term']));
             break;
@@ -27,9 +34,9 @@ if (isset($_GET['transaccion'])) {
         case 'datosfiscales':
             echo json_encode($cp->getCoincidenciasCliente($_GET['term']));
             break;*/
-        
-        /*case 'catunidad':
-            echo json_encode($cp->getCoincidenciasCatalogoUnidad($_GET['term']));
+
+            /*case 'catunidad':
+            echo json_encode($cp->getCoincidenciasCatalogoUnidad($_GET['term'])); CATSAT
             break; 
         case 'foliocotizaion':
             echo json_encode($cp->getCoincidenciasFolioCotizacion($_GET['term']));
@@ -38,20 +45,16 @@ if (isset($_GET['transaccion'])) {
             echo json_encode($cp->getCoincidenciasDireccion($_GET['term']));
             break;
         case 'regimenfiscal':
-            echo json_encode($cp->getCoincidenciasRegimen($_GET['term']));
+            echo json_encode($cp->getCoincidenciasRegimen($_GET['term'])); CATSAT
             break;
         case 'claveregimen':
-            echo json_encode($cp->getCoincidenciasClvRegimen($_GET['term']));
+            echo json_encode($cp->getCoincidenciasClvRegimen($_GET['term'])); YA ESTA EN CATSAT
             break;
-        case 'empleado':
-            echo json_encode($cp->getCoincidenciasEmpleado($_GET['term']));
-            break;
-        case 'localidad':
-            echo json_encode($cp->getCoincidenciasLocalidad($_GET['term']));
-            break;
+        
         case 'tipopermiso':
-            echo json_encode($cp->getCoincidenciasTipoPermiso($_GET['term']));
+            echo json_encode($cp->getCoincidenciasTipoPermiso($_GET['term'])); YA ESTA EN CATSAT
             break;
+        
         case 'conftransporte':
             echo json_encode($cp->getCoincidenciasConfigTransporte($_GET['term']));
             break;

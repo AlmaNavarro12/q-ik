@@ -370,3 +370,36 @@ function opcionesMeses(id = "", selected = "") {
         }
     });
 }
+
+//----------------------------------TIPO PERMISO
+function aucompletarPermiso(){
+    $('#tipo-permiso').autocomplete({
+        source: rutaPrincipal + "com.sine.enlace/enlacePermiso.php?transaccion=autocompleta",
+        select: function (event, ui) {
+            var a = ui.item.value;
+            var id = ui.item.id;
+        }
+    });
+}
+
+//----------------------------------TIPO AUTOTRANSPORTE
+function aucompletarConfigTransporte() {
+    $('#conf-transporte').autocomplete({
+        source: rutaPrincipal + "com.sine.enlace/enlaceAutotransporte.php?transaccion=autocompleta",
+        select: function (event, ui) {
+            var a = ui.item.value;
+            var id = ui.item.id;
+        }
+    });
+}
+
+//---------------------------------TIPO REMOLQUE
+function aucompletarTipoRemolque() {
+    $('#tipo-remolque').autocomplete({
+        source: rutaPrincipal + "com.sine.enlace/enlaceTipoRemolque.php?transaccion=autocompleta",
+        select: function (event, ui) {
+            var a = ui.item.value;
+            var id = ui.item.id;
+        }
+    });
+}

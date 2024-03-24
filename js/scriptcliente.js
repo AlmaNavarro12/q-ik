@@ -54,9 +54,9 @@ function gestionarCliente(idcliente = null) {
         interior = $("#num_interior").val();
         exterior = $("#num_exterior").val();
         estado = $("#id-estado").val();
-        nombreestado = $("#id-estado option:selected").text().substring(6);
+        var nombreestado = $("#id-estado option:selected").text().substring(6);
         municipio = $("#id-municipio").val();
-        nombremunicipio = $("#id-municipio option:selected").text();
+        var nombremunicipio = $("#id-municipio option:selected").text();
         localidad = $("#localidad").val();
         postal = $("#codigo_postal").val();
     }
