@@ -20,62 +20,10 @@ if (isset($_POST['transaccion'])) {
         case 'opcionesproveedor':
             $datos = $co->opcionesProveedor($_POST['idprov']);
             break;
-        /*case 'opcionescliente':
-            $datos = $co->opcionesCliente();
-            break;*/
-        
-        /*case 'opcionesmpago':
-            $datos = $co->opcionesMetodoPago($_POST['selected']);
+        case 'anoglobal':
+            $datos = $co->opcionesAnoGlobal();
             break;
-        case 'opcionesformapago':
-            $datos = $co->opcionesFormaPago('', $_POST['selected']);
-            break;
-        case 'opcionesformapago2':
-            $condicion = "where c_pago !='99'";
-            $datos = $co->opcionesFormaPago($condicion, $_POST['selected']);
-            break;
-       
-        case 'opcionesusocfdi':
-            $datos = $co->opcionesUsoCFDI($_POST['iduso']);
-            break;
-        case 'opcionescomprobante':
-            $datos = $co->opcionesComprobante($_POST['id']);
-            break;*/
-        
-        /*case 'opcionesregimen':
-            $datos = $co->opcionesRegimen($_POST['idregimen']);
-            break;
-        case 'opcionesperiodicidad':
-            $datos = $co->opcionesPeriodicidad($_POST['idper']);
-            break;
-        case 'opcionesjornada':
-            $datos = $co->opcionesJornada($_POST['idjor']);
-            break;
-        case 'opcionescontrato':
-            $datos = $co->opcionesContrato($_POST['idcontrato']);
-            break;
-        case 'buscarcp':
-            $datos = $co->opcionesEstadoCP($_POST['cp']);
-            break;
-        case 'opcionesestado':
-            $datos = $co->opcionesEstadoClv($_POST['idestado']);
-            break;
-        case 'opcionesmunicipio':
-            $datos = $co->opcionesMunicipioByEstado($_POST['idestado'], $_POST['idmunicipio']);
-            break;
-        case 'opcionesbanco':
-            $datos = $co->opcionesBanco($_POST['idbanco']); -->CONTROLADORBANCO
-            break;
-        case 'addopcionesbanco':
-            $datos = $co->addopcionesBanco($_POST['a'], $_POST['idbanco']);
-            break;
-        case 'opcionesriesgo':
-            $datos = $co->opcionesRiesgo($_POST['idriesgo']);
-            break;
-        case 'opcionesvendedor':
-            $datos = $co->opcionesVendedor();
-            break;
-        */case 'opcionesano':
+        case 'opcionesano':
             $datos = $co->opcionesAno();
             break;
         case 'opcionesusuario':
@@ -90,21 +38,77 @@ if (isset($_POST['transaccion'])) {
         case 'opcionesmotivo':
             $datos = $co->opcionesMotivo();
             break;
+        
+        /*case 'opcionescliente':
+            $datos = $co->opcionesCliente();
+            break;*/
+        
+        /*case 'opcionesmpago':
+            $datos = $co->opcionesMetodoPago($_POST['selected']); CATSAT
+            break;
+        case 'opcionesformapago':
+            $datos = $co->opcionesFormaPago('', $_POST['selected']); CATSAT
+            break;
+        case 'opcionesformapago2':
+            $condicion = "where c_pago !='99'";
+            $datos = $co->opcionesFormaPago($condicion, $_POST['selected']); CATSAT
+            break;
+       
+        case 'opcionesusocfdi':
+            $datos = $co->opcionesUsoCFDI($_POST['iduso']); CATSAT
+            break;
+        case 'opcionescomprobante':
+            $datos = $co->opcionesComprobante($_POST['id']);
+            break;*/
+        
+        /*case 'opcionesregimen':
+            $datos = $co->opcionesRegimen($_POST['idregimen']); CATSAT
+            break;
+        case 'opcionesperiodicidad':
+            $datos = $co->opcionesPeriodicidad($_POST['idper']);
+            break;
+        case 'opcionesjornada':
+            $datos = $co->opcionesJornada($_POST['idjor']);
+            break;
+        case 'opcionescontrato':
+            $datos = $co->opcionesContrato($_POST['idcontrato']);
+            break;
+        case 'buscarcp':
+            $datos = $co->opcionesEstadoCP($_POST['cp']); CATSAT
+            break;
+        case 'opcionesestado':
+            $datos = $co->opcionesEstadoClv($_POST['idestado']); CATSAT
+            break;
+        case 'opcionesmunicipio':
+            $datos = $co->opcionesMunicipioByEstado($_POST['idestado'], $_POST['idmunicipio']); CATSAT
+            break;
+        case 'opcionesbanco':
+            $datos = $co->opcionesBanco($_POST['idbanco']); -->CONTROLADORBANCO
+            break;
+        case 'addopcionesbanco':
+            $datos = $co->addopcionesBanco($_POST['a'], $_POST['idbanco']); CATSAT
+            break;
+        case 'opcionesriesgo':
+            $datos = $co->opcionesRiesgo($_POST['idriesgo']);
+            break;
+        case 'opcionesvendedor':
+            $datos = $co->opcionesVendedor();
+            break;
+        */
         /*case 'opcionesimpuestos':
-            $datos = $co->opcionesImpuestos($_POST['t']);
+            $datos = $co->opcionesImpuestos($_POST['t']); 
             break;
-        case 'opcionesrelacion':
-            $datos = $co->opcionesTipoRelacion();
-            break;
+        
         case 'periodoglobal':
-            $datos = $co->opcionesPeriodoGlobal($_POST['id']);
+            $datos = $co->opcionesPeriodoGlobal($_POST['id']); CATSAT
             break;
         case 'opcionesmeses':
-            $datos = $co->opcionesMesesPeriodo($_POST['id']);
+            $datos = $co->opcionesMesesPeriodo($_POST['id']); CATSAT
             break;
-        */case 'anoglobal':
-            $datos = $co->opcionesAnoGlobal();
+            case 'opcionesrelacion':
+            $datos = $co->opcionesTipoRelacion(); CATSAT
             break;
+        */
         default:
             break;
     }

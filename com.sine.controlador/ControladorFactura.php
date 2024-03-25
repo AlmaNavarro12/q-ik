@@ -2687,7 +2687,7 @@ class ControladorFactura {
                         <th class='col-md-1'>Cantidad </th>
                         <th class='col-md-1'>P.Venta </th>
                         <th class='col-md-1'>Importe </th>
-                        <th class='col-md-1'>Descuento %</th>
+                        <th class='col-md-1'>Desc %</th>
                         <th class='col-md-1'>Traslados</th>
                         <th class='col-md-1'>Retenciones</th>
                         <th class='col-md-1'>Total</th>

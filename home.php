@@ -312,7 +312,7 @@ require_once 'Enrutador.php';
                                     ?>
                                         <li class="list-element mt-1 list-menu ps-5" data-submenu='listacontratos'>
                                             <div class="marker"></div>
-                                            <div class="pad"></div><label>Factura automatica</label>
+                                            <div class="pad"></div><label>Factura automática</label>
                                         </li>
                                     <?php
                                     }

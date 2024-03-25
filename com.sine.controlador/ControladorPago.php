@@ -1460,9 +1460,14 @@ class ControladorPago{
     }
 
     function truncarDosDecimales($numero) {
-        $numero_truncado = floor($numero * pow(10, 2)) / pow(10, 2);
-        return $numero_truncado;
+        $parteEntera = (int)$numero;
+        $decimales = $numero - $parteEntera;
+        $factor = 100; 
+        $truncado = $decimales * $factor;
+        $valor = $parteEntera + $truncado / $factor;
+        return number_format($valor, 2, '.', '');
     }
+    
 
     function generarImpuestosDr($monto_neto, $retenciones){
         $divRetencion = explode('<impuesto>', $retenciones);
@@ -1752,7 +1757,7 @@ class ControladorPago{
             }
 
             $this->cfdisPago($tagpago, $tagcomp, $sid);
-            $datos .= "<button id='tab-$tagcomp' $disabled class='tab-pago sub-tab-active' data-tab='$tagcomp' data-ord='$orden' name='tab-complemento' >Complemento $orden &nbsp; $close</button>
+            $datos .= "<button id='tab-$tagcomp' class='tab-pago sub-tab-active' data-tab='$tagcomp' data-ord='$orden' name='tab-complemento' >Complemento $orden &nbsp; $close</button>
                 <cut>
                 <div id='complemento-$tagcomp' class='sub-div'>
                 <div class='row'>

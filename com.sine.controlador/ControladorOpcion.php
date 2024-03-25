@@ -228,4 +228,15 @@ class ControladorOpcion {
         }
         return $r;
     }
+
+    public function opcionesAnoGlobal() {
+        $fecha = getdate();
+        $y = $fecha['year'];
+        $anio_de_inicio = $y-1;
+        $op = "";
+        foreach (range($anio_de_inicio, $y) as $x) {
+            $op .= "<option id='ano" . $x . "' value='" . $x . "'>" . $x . "  " . "</option>";
+        }
+        return $op;
+    }
 }

@@ -51,11 +51,11 @@ function addinventario() {
         $("#inventario").show('slow');
         if ($("#chinventario").prop('checked')) {
             $("#cantidad").removeAttr('disabled');
-            changeText("#labelinventario", "¿Desactivar inventario?")
+            changeText("#labelinventario", "¿Desactivar inventario?");
         } else {
             $("#cantidad").attr('disabled', true);
             $("#cantidad").val('0');
-            changeText("#labelinventario", "¿Activar inventario?")
+            changeText("#labelinventario", "¿Activar inventario?");
         }
     } else {
         $("#chinventario").removeAttr('checked');
@@ -65,6 +65,7 @@ function addinventario() {
         $("#clave-unidad").val('E48-Unidad de servicio');
     }
 }
+
 
 function calcularGanancia() {
     var preciocompra = $("#pcompra").val() || '0';

@@ -33,7 +33,7 @@
                 </div>
                 <div class="row">
                     <div class="col-md-6 form-group py-2">
-                        <label class="label-form mb-1" for="apellido-materno">Correo Gerencia</label>
+                        <label class="label-form mb-1" for="apellido-materno">Correo gerencia</label>
                         <div class="input-group">
                             <input class="form-control input-form" id="correo3" name="nombre_empresa" placeholder="Correo de Facturaci&oacute;n" type="text"/>
                             <div class="input-group-text"><input class="input-check" id="chcorreo3" name="nombre_empresa" type="checkbox"/></div>
@@ -43,9 +43,9 @@
                     </div>
 
                     <div class="col-md-6 form-group py-2">
-                        <label class="label-form mb-1" for="apellido-materno">Correo Alternativo 1</label>
+                        <label class="label-form mb-1" for="apellido-materno">Correo alternativo 1</label>
                         <div class="input-group">
-                            <input class="form-control input-form" id="correo4" name="correo4" placeholder="Correo Alternativo 1" type="text"/>
+                            <input class="form-control input-form" id="correo4" name="correo4" placeholder="Correo alternativo 1" type="text"/>
                             <div class="input-group-text"><input class="input-check" id="chcorreo4" name="nombre_empresa" type="checkbox"/></div>
                         </div>
                         <div id="correo4-errors">
@@ -54,9 +54,9 @@
                 </div>
                 <div class="row">
                     <div class="col-md-6 form-group py-2">
-                        <label class="label-form mb-1" for="apellido-materno">Correo Alternativo 2</label>
+                        <label class="label-form mb-1" for="apellido-materno">Correo alternativo 2</label>
                         <div class="input-group">
-                            <input class="form-control input-form" id="correo5" name="correo4" placeholder="Correo Alternativo 2" type="text"/>
+                            <input class="form-control input-form" id="correo5" name="correo4" placeholder="Correo alternativo 2" type="text"/>
                             <div class="input-group-text"><input class="input-check" id="chcorreo5" name="nombre_empresa" type="checkbox"/></div>
                         </div>
                         <div id="correo5-errors">
@@ -64,9 +64,9 @@
                     </div>
 
                     <div class="col-md-6 form-group py-2">
-                        <label class="label-form mb-1" for="apellido-materno">Correo Alternativo 3</label>
+                        <label class="label-form mb-1" for="apellido-materno">Correo alternativo 3</label>
                         <div class="input-group">
-                            <input class="form-control input-form" id="correo6" name="correo6" placeholder="Correo Alternativo 3" type="text"/>
+                            <input class="form-control input-form" id="correo6" name="correo6" placeholder="Correo alternativo 3" type="text"/>
                             <div class="input-group-text"><input class="input-check" id="chcorreo6" name="nombre_empresa" type="checkbox"/></div>
                         </div>
                         <div id="correo6-errors">
@@ -84,7 +84,7 @@
 </div>
 
 <!--MOTIVO DE CANCELACION-->
-<div class="modal fade bs-example-modal-lg" id="modalcancelar" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+<div class="modal fade bs-example-modal-lg" id="modalcancelar" tabindex="-1" data-bs-keyboard="true" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
         <div class="modal-header py-0">

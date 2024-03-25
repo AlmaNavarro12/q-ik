@@ -104,7 +104,7 @@ class ControladorOperador {
     
     private function getOperadores($condicion) {
         $consultado = false;
-        $consulta = "SELECT o.*  FROM operador o $condicion;";
+        $consulta = "SELECT * FROM operador $condicion;";
         $consultado = $this->consultas->getResults($consulta, null);
         return $consultado;
     }
@@ -148,9 +148,9 @@ class ControladorOperador {
         <tbody>";
         $condicion = "";
         if ($REF == "") {
-            $condicion = " WHERE opstatus='1' ORDER BY o.nombreoperador";
+            $condicion = " WHERE opstatus='1' ORDER BY nombreoperador";
         } else {
-            $condicion = "WHERE opstatus='1' AND ((concat(nombreoperador,' ',apaternooperador,' ',amaternooperador) LIKE '%$REF%') OR (numlicencia LIKE '%$REF%') OR (rfcoperador LIKE '%$REF%') OR (empresa LIKE '%$REF%')) ORDER BY o.nombreoperador;";
+            $condicion = "WHERE opstatus='1' AND ((concat(nombreoperador,' ',apaternooperador,' ',amaternooperador) LIKE '%$REF%') OR (numlicencia LIKE '%$REF%') OR (rfcoperador LIKE '%$REF%') OR (empresa LIKE '%$REF%')) ORDER BY nombreoperador";
         }
         $numrows = $this->getNumrows($condicion);
         $page = (isset($pag) && !empty($pag)) ? $pag : 1;

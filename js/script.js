@@ -742,9 +742,7 @@ function loadView(vista) {
         'precio': ["truncateTmp()", 400, "truncateTmpCot()", 450],
         'pago': ["loadFecha()", 300, "cancelarPago2()", 320, "loadOpcionesFolios('3')", 350, "loadOpcionesMoneda()", 400, "loadOpcionesFormaPago2()", 420, "loadOpcionesFacturacion()", 500],
         'listapago': ["loadBtnCrear('pago')", 350, "opcionesMotivoCancelar()", 380, "loadListaPago()", 400],
-        
         'factura': ["truncateTmp()", 300, "loadOpcionesFacturacion()", 320, "loadFecha()", 350, "loadOpcionesFolios('1')", 370, "filtrarProducto()", 400, "loadOpcionesFormaPago2()", 420, "loadOpcionesMetodoPago()", 450, "loadOpcionesMoneda()", 470, "loadOpcionesUsoCFDI()", 500, "loadOpcionesComprobante()", 520, "loadOpcionesProveedor()", 550, "loadOpcionesTipoRelacion()", 570, "opcionesPeriodoGlobal()", 600, "opcionesMeses()", 320, "opcionesAnoGlobal()", 650],
-        
         'listafactura': ["truncateTmp()", 300, "truncateTmpCot()", 350, "loadBtnCrear('factura')", 400, "loadListaFactura()", 300, "opcionesMotivoCancelar()", 420,],
         'cotizacion': ["truncateTmpCot()", 300, "loadOpcionesImpuestos('1')", 320, "loadOpcionesImpuestos('2')", 340, "loadOpcionesFolios('5')", 350, "loadFecha()", 370, "loadOpcionesFacturacion()", 400, "loadOpcionesComprobante()", 420, "2()", 450, "loadOpcionesMetodoPago()", 470, "loadOpcionesMoneda()", 500, "loadOpcionesUsoCFDI()", 520, "filtrarProducto() ", 550, "loadOpcionesProveedor()", 600],
         'listacotizacion': ["truncateTmp()", 300, "truncateTmpCot()", 350, "loadBtnCrear('cotizacion')", 360, "filtrarCotizacion()", 400],
@@ -785,7 +783,9 @@ function loadView(vista) {
         'listaremolque': ["loadBtnCrear('remolque')", 300, "buscarRemolque()", 320],
         'operador': ["loadOpcionesEstado()", 320],
         'listaoperador': ["loadBtnCrear('operador')", 300, "filtrarOperador()", 320],
-        'carta': ["truncateTmpCarta()", 300, "truncateTmpIMG()", 320, "loadOpcionesFolios('4')", 350, "loadFecha()", 370, "loadOpcionesEstado()", 400, "filtrarProducto()", 420, "loadOpcionesFormaPago()", 450, "loadOpcionesMetodoPago()", 470, "loadOpcionesMoneda()", 500, "loadOpcionesUsoCFDI()", 520, "loadOpcionesComprobante()", 550, "loadOpcionesFacturacion()", 570, "loadOpcionesProveedor()", 600, "opcionesPeriodoGlobal()", 620, "opcionesMeses()", 650, "opcionesAnoGlobal()", 670],
+        
+        'carta': ["truncateTmpCarta()", 300, "truncateTmpIMG()", 320, "loadOpcionesFolios('4')", 350, "loadFecha()", 370, "loadOpcionesEstado()", 400, "filtrarProducto()", 420, "loadOpcionesFormaPago2()", 450, "loadOpcionesMetodoPago()", 470, "loadOpcionesMoneda()", 500, "loadOpcionesUsoCFDI()", 520, "loadOpcionesComprobante()", 550, "loadOpcionesFacturacion()", 570, "loadOpcionesProveedor()", 600, "opcionesPeriodoGlobal()", 620, "opcionesMeses()", 650, "opcionesAnoGlobal()", 670, "loadOpcionesTipoRelacion()", 300],
+        
         'listacarta': ["truncateTmpCarta()", 300, "truncateTmpIMG()", 300, "loadBtnCrear('carta')", 300, "filtrarCarta()", 320, "opcionesMotivoCancelar()", 350],
         'puntodeventa': ["newVenta()", 300, "checkFondo()", 300, "loadBtnVentas('puntodeventa')", 300, "truncateTickets()", 300],
         'listaticket': ["loadBtnCrear('ventas')", 300, "loadOpcionesUsuario()", 300, "filtrarVentas()", 300],
@@ -979,6 +979,39 @@ function cargarImgPerfil() {
                 $("#profimg").html(view);
                 $("#fileuser").val(fn);
                 $("#imagenusuario").val('');
+            }
+        });
+    }
+}
+
+function cargarImgProducto() {
+    var formData = new FormData();
+    var imgInput = $("#imagen")[0].files[0];
+    var rutaProductos = "temporal/productos/";
+
+    formData.append("imagen", imgInput);
+    formData.append("ruta_personalizada", rutaProductos);
+    var img = $("#imagen").val();
+    if (isnEmpty(img, 'imagen')) {
+        cargandoHide();
+        cargandoShow();
+        $.ajax({
+            url: 'com.sine.enlace/cargarimg.php',
+            type: "POST",
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function (datos) {
+                var array = datos.split("<corte>");
+                var view = array[0];
+                var fn = array[1];
+                if(view != ""){
+                    $("#imagenproducto").show('slow');
+                    $("#muestraimagenproducto").html(view);
+                    $("#filename").val(fn);
+                    $("#imagen").val('');
+                }
+                cargandoHide();
             }
         });
     }
@@ -1239,7 +1272,7 @@ function loadOpcionesFolios(id = "", serie = "", folio = "") {
             var bandera = texto.substring(0, 1);
             var res = texto.substring(1, 5000);
             if (bandera == 0) {
-                alertify.error(res);
+                alertify.error('No hay folios registrados para esta área.');
             } else {
                 $(".contenedor-folios").html(datos);
             }

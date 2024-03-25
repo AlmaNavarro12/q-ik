@@ -88,8 +88,6 @@ function insertarOperador(oid = null) {
 }
 
 function filtrarOperador(pag = "") {
-    cargandoHide();
-    cargandoShow();
     $.ajax({
         url: "com.sine.enlace/enlaceoperador.php",
         type: "POST",
