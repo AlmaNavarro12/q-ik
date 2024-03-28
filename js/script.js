@@ -433,6 +433,28 @@ function isEmail(val, id) {
     }
 }
 
+function isCheckedMailSend(ch1, ch2, ch3, ch4, ch5, ch6) {
+    if (ch1 == 0 && ch2 == 0 && ch3 == 0 && ch4 == 0 && ch5 == 0 && ch6 == 0) {
+        alertify.error('Debes seleccionar por lo menos un correo eletrónico para el envio.');
+        return false;
+    } else {
+        return true;
+    }
+}
+
+function dateEmpty(val, id) {
+    if (val == "") {
+        $("." + id).css("border-color", "red");
+        $("#" + id + "-errors").text("Este campo no puede estar vacío.");
+        $("#" + id + "-errors").css("color", "red");
+        return false;
+    } else {
+        $("#" + id + "-errors").text("");
+        $("." + id).css("border-color", "green");
+        return true;
+    }
+}
+
 function isNumber(val, id) {
     if (val != "") {
         if (!isNaN(val)) {
@@ -742,8 +764,11 @@ function loadView(vista) {
         'precio': ["truncateTmp()", 400, "truncateTmpCot()", 450],
         'pago': ["loadFecha()", 300, "cancelarPago2()", 320, "loadOpcionesFolios('3')", 350, "loadOpcionesMoneda()", 400, "loadOpcionesFormaPago2()", 420, "loadOpcionesFacturacion()", 500],
         'listapago': ["loadBtnCrear('pago')", 350, "opcionesMotivoCancelar()", 380, "loadListaPago()", 400],
-        'factura': ["truncateTmp()", 300, "loadOpcionesFacturacion()", 320, "loadFecha()", 350, "loadOpcionesFolios('1')", 370, "filtrarProducto()", 400, "loadOpcionesFormaPago2()", 420, "loadOpcionesMetodoPago()", 450, "loadOpcionesMoneda()", 470, "loadOpcionesUsoCFDI()", 500, "loadOpcionesComprobante()", 520, "loadOpcionesProveedor()", 550, "loadOpcionesTipoRelacion()", 570, "opcionesPeriodoGlobal()", 600, "opcionesMeses()", 320, "opcionesAnoGlobal()", 650],
+        
+        'factura': ["truncateTmp()", 300, "getOptionsTaxes()", 300, "loadOpcionesFacturacion()", 320, "loadFecha()", 350, "loadOpcionesFolios('1')", 370, "filtrarProducto()", 400, "loadOpcionesFormaPago2()", 420, "loadOpcionesMetodoPago()", 450, "loadOpcionesMoneda()", 470, "loadOpcionesUsoCFDI()", 500, "loadOpcionesComprobante()", 520, "loadOpcionesProveedor()", 550, "loadOpcionesTipoRelacion()", 570, "opcionesPeriodoGlobal()", 600, "opcionesMeses()", 320, "opcionesAnoGlobal()", 650],
+        
         'listafactura': ["truncateTmp()", 300, "truncateTmpCot()", 350, "loadBtnCrear('factura')", 400, "loadListaFactura()", 300, "opcionesMotivoCancelar()", 420,],
+        
         'cotizacion': ["truncateTmpCot()", 300, "loadOpcionesImpuestos('1')", 320, "loadOpcionesImpuestos('2')", 340, "loadOpcionesFolios('5')", 350, "loadFecha()", 370, "loadOpcionesFacturacion()", 400, "loadOpcionesComprobante()", 420, "2()", 450, "loadOpcionesMetodoPago()", 470, "loadOpcionesMoneda()", 500, "loadOpcionesUsoCFDI()", 520, "filtrarProducto() ", 550, "loadOpcionesProveedor()", 600],
         'listacotizacion': ["truncateTmp()", 300, "truncateTmpCot()", 350, "loadBtnCrear('cotizacion')", 360, "filtrarCotizacion()", 400],
         'instalacion': ["truncateTmp()", 350, "truncateTmpCot()", 400, "loadFolio()", 430, "loadDocumento()", 450, "loadFecha()", 500],
@@ -755,8 +780,10 @@ function loadView(vista) {
         'listaproveedor': ["truncateTickets()", 300, "truncateTmp()", 300, "truncateTmpCot()", 350, "loadBtnCrear('proveedor')", 370, "loadListaProveedor()", 400],
         'forminventario': ["truncateTmp()", 300, "truncateTmpCot()", 350, "loadOpcionesProducto()", 400],
         'listainventario': ["truncateTmp()", 300, "truncateTmpCot()", 350, "loadListaInventario()", 400],
-        'reportefactura': ["truncateTmp()", 300, "truncateTmpCot()", 350, "loadOpcionesCliente()", 400, "loadOpcionesFacturacion()", 450, "loadOpcionesMoneda()", 470],
-        'reportepago': ["loadOpcionesCliente()", 400, "loadOpcionesFacturacion()", 450, "loadOpcionesMoneda()", 470],
+        
+        'reportefactura': ["truncateTmp()", 300, "truncateTmpCot()", 350, "loadOpcionesFormaPago2()", 300, "loadOpcionesCliente()", 400, "loadOpcionesFacturacion()", 450, "loadOpcionesMoneda()", 470],
+        'reportepago': ["loadOpcionesCliente()", 400, "loadOpcionesFacturacion()", 450, "loadOpcionesMoneda()", 470, "loadOpcionesFormaPago2()", 300],
+        
         'reportegrafica': ["loadOpcionesFacturacion()", 350, "loadopcionesAno()", 400, "reporteGraficaActual()", 450, "reporteGraficaAnterior()", 500],
         'reportesat': ["loadopcionesAno()", 400, "loadOpcionesFacturacion()", 450, "reporteBimestralActual()", 500, "reporteBimestralAnterior()", 550, "reporteBimestralAnterior2()", 600],
         'datosiva': ["loadopcionesAno()", 350, "loadlistaIVA()", 400, "loadOpcionesFacturacion()", 450],
@@ -1262,6 +1289,42 @@ function loadopcionesAno() {
     });
 }
 
+function getOptionsTaxes(taxes = "") {
+    cargandoShow();
+    $.ajax({
+        data: { transaccion: "taxesproductos", taxes: taxes },
+        url: 'com.sine.enlace/enlaceproducto.php',
+        type: 'POST',
+        dataType: 'JSON',
+        success: function (response) {
+            if (response.bandera > 0) {
+                $('#imp-apli').html(response.impuestos);
+                $('#input-imp-apli').html(response.inputs);
+            } else {
+                alertify.error("No hay impuestos registrados.");
+            }
+        }
+    });
+    cargandoHide();
+}
+
+function habilitaImp(val) {
+    var div = val.split('-');
+    var porcentaje = div[0];
+    var impuesto = div[1];
+    var id = div[2];
+    if ($('#imp' + id).is(':checked')) {
+        $('#CalcImp' + id).show(1500, "easeOutQuint");
+    } else {
+        $('#CalcImp' + id).hide(1500, "easeOutQuint");
+    }
+    if ($('#pventa').val() != "") {
+        calcularImpuestosTotal();
+    } else {
+        calcularImpuestosTotalReverse();
+    }
+}
+
 function loadOpcionesFolios(id = "", serie = "", folio = "") {
     $.ajax({
         url: 'com.sine.enlace/enlaceopcion.php',
@@ -1298,11 +1361,11 @@ function loadOpcionesFacturacion(id = "") {
     });
 }
 
-function opcionesMotivoCancelar() {
+function loadOpcionesCliente() {
     $.ajax({
         url: 'com.sine.enlace/enlaceopcion.php',
         type: 'POST',
-        data: { transaccion: 'opcionesmotivo' },
+        data: {transaccion: 'opcionescliente'},
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -1310,7 +1373,7 @@ function opcionesMotivoCancelar() {
             if (bandera == 0) {
                 alertify.error(res);
             } else {
-                $(".contenedor-motivos").html(datos);
+                $(".contenedor-cliente").html(datos);
             }
         }
     });

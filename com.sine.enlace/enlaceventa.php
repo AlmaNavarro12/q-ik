@@ -80,7 +80,7 @@ if (isset($_POST['transaccion'])) {
             $insertado = $cv->agregarProducto($_POST['producto'], $_POST['tab'], session_id(), $_POST['cantidad']);
             break;
         case 'cortecaja':
-            $insertado = $cv->getCorteCaja($_POST['user']);
+            $insertado = $cv->getCorteCaja($_POST['user'], $_POST['pago']);
             break;
         case 'checkPersisionNewProduct':
             $bandera = $cv->verificarF5();
@@ -91,7 +91,7 @@ if (isset($_POST['transaccion'])) {
             echo $bandera ? $bandera : "0Ha occurrido un error.";
             break;
         case 'insertarcorte':
-            $insertado = $cv->insertarCorte(obtenerDatosCorte());
+            $insertado = $cv->insertarCorte(obtenerDatosCorte(), $_POST['pago']);
             echo $insertado != "" ? $insertado : "0Error: No se pudo realizar la operacion.";
             break;
         case 'filtrarcorte':

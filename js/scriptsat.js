@@ -22,7 +22,7 @@ function aucompletarUnidad() {
 }
 
 //-------------------------------------MONEDAS
-function loadOpcionesMoneda() {
+function loadOpcionesMoneda(id= "", selected = "") {
     $.ajax({
         data: { transaccion: 'getOptions'},
         url: rutaPrincipal + 'com.sine.enlace/enlaceMonedas.php',
@@ -32,6 +32,9 @@ function loadOpcionesMoneda() {
             if (res.status > 0) {
                 $('#moneda-pago').html(res.datos);
                 $('.contenedor-moneda').html(res.datos);
+                if(selected != ""){
+                    $('#'+id).val(selected);
+                }
             }
         }
     });
@@ -400,6 +403,21 @@ function aucompletarTipoRemolque() {
         select: function (event, ui) {
             var a = ui.item.value;
             var id = ui.item.id;
+        }
+    });
+}
+
+//-----------------------------------MOTIVO DE CANCELACION
+function opcionesMotivoCancelar() {
+    $.ajax({
+        data: { transaccion: 'getOptions'},
+        url: rutaPrincipal + 'com.sine.enlace/enlaceMotivo.php',
+        type: 'POST',
+        dataType: 'JSON',
+        success: function (res) {
+            if (res.status > 0) {
+                $('.contenedor-motivos').html(res.datos);
+            }
         }
     });
 }

@@ -418,6 +418,7 @@ function setValoresEditarProducto(datos) {
     changeText("#btn-form-producto-guardar", "Guardar cambios <span class='fas fa-save'></span></a>");
 
     var array = datos.split("</tr>");
+    console.log(array);
     var tipo = array[10];
     var imagen = array[14];
     var chinventario = array[15];
@@ -439,7 +440,7 @@ function setValoresEditarProducto(datos) {
     $("#producto").val(array[2]);
     $("#tipo").val(tipo);
     $("#cantidad").val(array[16]);
-    $("#clave-unidad").val(array[11] + "-" + array[12]);
+    $("#clave-unidad").val(array[3] + "-" + array[4]);
     $("#descripcion").val(array[5]);
     $("#pcompra").val(array[6]);
     $("#porganancia").val(array[7])

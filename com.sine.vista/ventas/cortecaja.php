@@ -2,7 +2,7 @@
 include("modals.php");
 ?>
 <div id="form-factura" class="mb-3">
-    <div class="col-md-12 fijo z-2">
+    <div class="col-md-12">
         <div class="titulo-lista" id="contenedor-titulo-form-factura">Corte de caja </div>
     </div>
     <div id="div-space">
@@ -27,6 +27,11 @@ include("modals.php");
                     <input class="form-control input-form text-center" id="fecha-creacion" name="fecha-creacion" type="text" disabled />
                     <div id="fecha-creacion-errors"></div>
                 </div>
+            </div>
+            <div class="col-md-4 py-1 mt-2" id="pago_factura" style="display: none;">
+                    <label class="label-radio d-flex align-items-center col-12">
+                        <input class="input-check-sm me-2" type="checkbox" id="pago" name="pago" onchange="corteCaja()"> <span class="fw-semibold lh-sm" style="color: #0d0d91;">¿Incluir pagos de facturas? </span> 
+                </label>
             </div>
             <!--
             <div class="col-md-4 py-1">
@@ -57,7 +62,7 @@ include("modals.php");
                         <div id="tab-entradas">
                             <ul class='list-group mb-3'>
                                 <li class='list-group-item d-flex justify-content-between'>
-                                    <span class='fw-bold text-muted'>Total (MXN)</span>
+                                    <span class='fw-bold text-muted'>Total ($)</span>
                                     <strong>$ 0.00</strong>
                                 </li>
                             </ul>
@@ -70,9 +75,9 @@ include("modals.php");
                     <div class="card-body text-center">
                         <label class="label-sub-tit fw-semibold fs-5 text-uppercase text-center">Salidas de efectivo </label>
                         <div id="tab-salidas">
-                        <ul class='list-group mb-3'>
+                            <ul class='list-group mb-3'>
                                 <li class='list-group-item d-flex justify-content-between'>
-                                    <span class='fw-bold text-muted'>Total (MXN)</span>
+                                    <span class='fw-bold text-muted'>Total ($)</span>
                                     <strong>$ 0.00</strong>
                                 </li>
                             </ul>
@@ -85,9 +90,9 @@ include("modals.php");
                     <div class="card-body text-center">
                         <label class="label-sub-tit fw-semibold fs-5 text-uppercase text-center">Dinero en caja </label>
                         <div id="tab-caja">
-                        <ul class='list-group mb-3'>
+                            <ul class='list-group mb-3'>
                                 <li class='list-group-item d-flex justify-content-between'>
-                                    <span class='fw-bold text-muted'>Total (MXN)</span>
+                                    <span class='fw-bold text-muted'>Total ($)</span>
                                     <strong>$ 0.00</strong>
                                 </li>
                             </ul>

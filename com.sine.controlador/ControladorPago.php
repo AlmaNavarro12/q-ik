@@ -515,13 +515,10 @@ class ControladorPago{
         return ($type == 'f') ? $this->dataFactura($id, $idpago) : (($type == 'c') ? $this->dataFacturaCarta($id, $idpago) : false);
     }
 
-    private function dataFactura($id, $idpago)
-    {
+    private function dataFactura($id, $idpago) {
         $datos = "";
         $getfactura = $this->getFactura($id);
-        $actual = reset($getfactura);
-
-        if ($actual !== false) {
+        foreach ($getfactura as $actual) {
             $iddatosfactura = $actual['iddatos_factura'];
             $tcambio = $actual['tcambio'];
             $idmoneda = $actual['id_moneda'];
@@ -531,7 +528,11 @@ class ControladorPago{
 
             $parcialidad = $this->getParcialidad($iddatosfactura, $idpago);
             $noparc = $parcialidad - 1;
-            $montoanterior = ($noparc == '0') ? $actual['totalfactura'] : $this->getMontoAnterior($noparc, $iddatosfactura);
+            if ($noparc == '0') {
+                $montoanterior = $actual['totalfactura'];
+            } else {
+                $montoanterior = $this->getMontoAnterior($noparc, $iddatosfactura);
+            }
             $egresos = "</tr>".$this->getTieneEgreso($uuid);
             $datos = "$iddatosfactura</tr>$uuid</tr>$tcambio</tr>$idmoneda</tr>$cmetodo</tr>$totalfactura</tr>$parcialidad</tr>$montoanterior</tr>$noparc".$egresos;
         }
@@ -596,31 +597,29 @@ class ControladorPago{
         return $consultado;
     }
 
-    private function getMontoAnteriorAux($noparcialidad, $idfactura_tmp)
-    {
+    private function getMontoAnteriorAux($noparcialidad, $idfactura_tmp) {
         $consultado = false;
         $consulta = "SELECT montoinsoluto FROM detallepago WHERE noparcialidad=:noparcialidad AND pago_idfactura=:idfactura AND type=:tipo;";
-        $val = array(
-            "noparcialidad" => $noparcialidad,
+        $val = array("noparcialidad" => $noparcialidad,
             "idfactura" => $idfactura_tmp,
-            "tipo" => 'f'
-        );
+            "tipo" => 'f');
         $consultado = $this->consultas->getResults($consulta, $val);
         return $consultado;
     }
 
-    private function getMontoAnterior($noparcialidad_tmp, $idfactura_tmp)
-    {
+    private function getMontoAnterior($noparcialidad_tmp, $idfactura_tmp) {
+        $totalfactura = "";
+        $totalfactura2 = "";
         $total = $this->getMontoAnteriorAux($noparcialidad_tmp, $idfactura_tmp);
-        if (!empty($total)) {
-            $totalfactura = $total[0]['montoinsoluto'];
-        } else {
+        foreach ($total as $actual) {
+            $totalfactura = $actual['montoinsoluto'];
+        }
+        if ($totalfactura == "") {
             $total2 = $this->getMontoAnteriorAux2($noparcialidad_tmp, $idfactura_tmp);
-            if (!empty($total2)) {
-                $totalfactura = $total2[0]['montoinsolutotmp'];
-            } else {
-                $totalfactura = "";
+            foreach ($total2 as $actual2) {
+                $totalfactura2 = $actual2['montoinsolutotmp'];
             }
+            $totalfactura = $totalfactura2;
         }
         return $totalfactura;
     }
@@ -843,16 +842,16 @@ class ControladorPago{
         return $insertado;
     }
 
-    public function eliminar($idtemp, $sessionid)
+    /*public function eliminar($idtemp, $sessionid)
     {
         $eliminado = false;
         $consulta = "DELETE FROM `tmppago` WHERE idtmppago=:id;";
         $valores = array("id" => $idtemp);
         $eliminado = $this->consultas->execute($consulta, $valores);
         return $eliminado;
-    }
+    }*/
 
-    /**public function eliminar($idtemp, $sessionid)
+    public function eliminar($idtemp)
     {
         $eliminado = false;
 
@@ -869,9 +868,8 @@ class ControladorPago{
             $valores_eliminar = array("id" => $idtemp);
             $eliminado = $this->consultas->execute($consulta_eliminar, $valores_eliminar);
         }
-
         return $eliminado;
-    } */
+    } 
 
     public function cancelar($sid, $tag = "")
     {
@@ -899,11 +897,11 @@ class ControladorPago{
     {
         $insertado = false;
         $fecha = date('Y-m-d');
+        $hora = date('H:i:s');
         $tag = $this->genTag();
         $folios = $this->getFolio($p->getFoliopago());
         list($serie, $letra, $nfolio) = explode("</tr>", $folios, 3);
-
-        $consulta = "INSERT INTO `pagos` VALUES (:idpago, :rfcemisor, :razonemisor, :clvregemisor, :regfiscalemisor, :codpemisor, :serie, :letra, :foliopago, :fechacreacion, :pago_idcliente, :nombrecliente, :rfcreceptor, :razonreceptor, :regfiscalreceptor, :codpreceptor, :pago_idfiscales, :totalpagado, :chfirmar, :cadenaoriginalpago, :nocertsatpago, :nocertcfdipago, :uuidpago, :sellosatpago, :sellocfdipago, :fechatimbrado, :qrcode, :cfdipago, :cfdicancel, :cancelado, :tagpago, :objimpuesto)";
+        $consulta = "INSERT INTO `pagos` VALUES (:idpago, :rfcemisor, :razonemisor, :clvregemisor, :regfiscalemisor, :codpemisor, :serie, :letra, :foliopago, :fechacreacion, :hora_creacion, :pago_idcliente, :nombrecliente, :rfcreceptor, :razonreceptor, :regfiscalreceptor, :codpreceptor, :pago_idfiscales, :totalpagado, :chfirmar, :cadenaoriginalpago, :nocertsatpago, :nocertcfdipago, :uuidpago, :sellosatpago, :sellocfdipago, :fechatimbrado, :qrcode, :cfdipago, :cfdicancel, :cancelado, :tagpago, :objimpuesto, :sessionid)";
         $valores = array(
             "idpago" => null,
             "rfcemisor" => '',
@@ -915,6 +913,7 @@ class ControladorPago{
             "letra" => $letra,
             "foliopago" => $nfolio,
             "fechacreacion" => $fecha,
+            "hora_creacion" => $hora,
             "pago_idcliente" => $p->getIdcliente(),
             "nombrecliente" => $p->getNombrecliente(),
             "rfcreceptor" => $p->getRfccliente(),
@@ -936,7 +935,8 @@ class ControladorPago{
             "cfdicancel" => null,
             "cancelado" => '0',
             "tagpago" => $tag,
-            "objimpuesto" => $objimpuesto
+            "objimpuesto" => $objimpuesto,
+            "sessionid" => $_SESSION[sha1("idusuario")]
         );
         $insertado = $this->consultas->execute($consulta, $valores);
         return "<cut>$tag<cut>";
@@ -983,11 +983,12 @@ class ControladorPago{
 
     public function insertarComplemento($p) {
         $insertar = false;
-        $consulta = "INSERT INTO complemento_pago VALUES (:id, :orden, :idforma, :nombreforma, :idmoneda, :nombremoneda, :tcambio, :fechapago, :horapago, :cuentaord, :cuentabnf, :notransaccion, :total, :tagcomp, :tagpago);";
+        $consulta = "INSERT INTO complemento_pago VALUES (:id, :orden, :idforma, :c_forma, :nombre_forma, :idmoneda, :nombremoneda, :tcambio, :fechapago, :horapago, :cuentaord, :cuentabnf, :notransaccion, :total, :tagcomp, :tagpago);";
         $val = array("id" => null,
             "orden" => $p->getOrden(),
             "idforma" => $p->getPagoidformapago(),
-            "nombreforma" => $p->getNombreForma(),
+            "c_forma" => $p->getCForma(),
+            "nombre_forma" => $p->getNombreForma(),
             "idmoneda" => $p->getPagoidmoneda(),
             "nombremoneda" => $p->getNombreMoneda(),
             "tcambio" => $p->getTipocambio(),
@@ -2305,12 +2306,46 @@ class ControladorPago{
                 "estado" => '1',
                 "cfdi" => $cfdi);
             $actualizado = $this->consultas->execute($consulta, $valores);
-            $actualizado = "1$status_uuid - $mensaje_cancel";
+            
+
+            if($actualizado){
+                $actualizado = "1$status_uuid - $mensaje_cancel";
+                $this->actualizarEstadoFacturas($idpago);
+            }
         } else {
             $actualizado = "0$status_uuid - $mensaje_cancel";
         }
         return $actualizado;
     }
+
+    function actualizarEstadoFacturas($idpago) {
+        echo $idpago;
+        $consulta_tag = "SELECT tagpago FROM `pagos` WHERE idpago=:id;";
+        $valores_tag = array("id" => $idpago);
+        $result_tag = $this->consultas->getResults($consulta_tag, $valores_tag);
+    
+        echo print_r($result_tag);
+        foreach ($result_tag as $tagfactura) {
+            $tag = $tagfactura['tagpago'];
+    
+            $consulta_facturas = "SELECT pago_idfactura FROM `detallepago` WHERE detalle_tagencabezado=:tag;";
+            $valores_facturas = array("tag" => $tag);
+            $result_facturas = $this->consultas->getResults($consulta_facturas, $valores_facturas);
+    
+            echo print_r($result_facturas);
+
+                foreach ($result_facturas as $factura) {
+                    $idfactura = $factura['pago_idfactura'];
+                    $type = 'f'; 
+    
+                    $estado = $this->getestadoFactura($idfactura, $type);
+                    if ($estado != '3') {
+                        $actualizar = $this->estadoFactura($idfactura, '2', $type);
+                    }
+                }
+        }
+    }
+    
 
     public function validarActualizarPago($p, $objimpuesto) {
         $datos = $this->actualizarPago($p, $objimpuesto);
@@ -2346,7 +2381,7 @@ class ControladorPago{
             "codpreceptor" => $p->getCodpostal(),
             "pago_idfiscales" => $p->getPago_idfiscales(),
             "chfirmar" => $p->getChfirmar(),
-            "objimpuesto" => $objimpuesto
+            "objimpuesto" => $objimpuesto,
         );
         $insertado = $this->consultas->execute($consulta, $valores);
 
@@ -2371,10 +2406,11 @@ class ControladorPago{
 
     public function actualizarComplemento($p) {
         $insertar = false;
-        $consulta = "INSERT INTO complemento_pago VALUES (:id, :orden, :idforma, :formapago, :idmoneda, :nombremoneda, :tcambio, :fechapago, :horapago, :cuentaord, :cuentabnf, :notransaccion, :total, :tagcomp, :tagpago)";
+        $consulta = "INSERT INTO complemento_pago VALUES (:id, :orden, :idforma, :cforma, :formapago, :idmoneda, :nombremoneda, :tcambio, :fechapago, :horapago, :cuentaord, :cuentabnf, :notransaccion, :total, :tagcomp, :tagpago)";
         $val = array("id" => null,
             "orden" => $p->getOrden(),
             "idforma" => $p->getPagoidformapago(),
+            "cforma" => $p->getCForma(),
             "formapago" => $p->getNombreForma(),
             "idmoneda" => $p->getPagoidmoneda(),
             "nombremoneda" => $p->getNombreMoneda(),
@@ -2598,7 +2634,7 @@ class ControladorPago{
                     <tbody >
                         <tr>
                             <td colspan='2'>
-                                <label class='label-form mb-1' for='factura-$tagcomp'>Folio factura</label>
+                                <label class='label-form mb-1' for='factura-$tagcomp'>Folio factura </label>
                                 <input id='id-factura-$tagcomp' type='hidden' value='$idfactura' /><input class='form-control text-center input-form' id='factura-$tagcomp' name='factura-$tagcomp' placeholder='Factura' type='text' oninput='aucompletarFactura();' value='Factura-$folio'/>
                             </td>
                             <td colspan='2'>

@@ -23,7 +23,9 @@ if (isset($_GET['transaccion'])) {
         case 'empleado':
             echo json_encode($cp->getCoincidenciasEmpleado($_GET['term']));
             break;
-        
+            case 'facturastimbradas':
+                echo json_encode($cp->getCoincidenciasFacturasTimbradas($_GET['term'], $_GET['iddatos']));
+                break;
             /*
         case 'emailcliente':
             echo json_encode($cp->getCoincidenciasBusquedaMail($_GET['term']));

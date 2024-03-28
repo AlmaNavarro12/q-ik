@@ -38,6 +38,15 @@ class Factura {
     private $mesperiodo;
     private $anoperiodo;
     private $tag;
+    //NUEVO
+    private $nombremoneda;
+    private $nombremetodo;
+    private $nombrecomprobante;
+    private $nombrepago;
+    private $nombrecfdi;
+
+
+    
 
     function __construct() {
         
@@ -162,7 +171,7 @@ class Factura {
     function getActualizarfiscales() {
         return $this->actualizarfiscales;
     }
-
+    
     function setIddatos_factura($iddatos_factura) {
         $this->iddatos_factura = $iddatos_factura;
     }
@@ -282,7 +291,7 @@ class Factura {
     function setActualizarfiscales($actualizarfiscales) {
         $this->actualizarfiscales = $actualizarfiscales;
     }
-    
+
     function getTag() {
         return $this->tag;
     }
@@ -329,6 +338,47 @@ class Factura {
 
     function setCliente($cliente) {
         $this->cliente = $cliente;
+    }
+
+    //nuevoSET++++++++++++++++
+    function setNombremoneda($idmoneda) {
+        $this->nombremoneda = $idmoneda;
+    }
+
+    function setNombremetodo($idmetodopago) {
+        $this->nombremetodo = $idmetodopago;    
+    }
+    
+    function setNombrecomprobante($tipocomprobante) {
+        $this->nombrecomprobante = $tipocomprobante;  
+    }
+    
+    function setNombrepago($idformapago) { 
+        $this->nombrepago = $idformapago;
+    }
+    
+    function setNombrecfdi($idusocfdi) {   
+         $this->nombrecfdi = $idusocfdi;    
+    }
+
+    function getNombremoneda() {
+        return $this->nombremoneda;
+    }
+
+    function getNombremetodo() {
+        return $this->nombremetodo;     
+    }
+
+    function getNombrecomprobante() {
+        return $this->nombrecomprobante;    
+    }
+
+    function getNombrepago() {  
+        return $this->nombrepago;
+    }
+
+    function getNombrecfdi(){
+        return $this->nombrecfdi;
     }
 
 }

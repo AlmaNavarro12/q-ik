@@ -35,12 +35,14 @@ if (isset($_POST['transaccion'])) {
         case 'correolist':
             $datos = $co->opcionesCorreoList();
             break;
-        case 'opcionesmotivo':
-            $datos = $co->opcionesMotivo();
+        case 'opcionescliente':
+            $datos = $co->opcionesCliente();
             break;
         
-        /*case 'opcionescliente':
-            $datos = $co->opcionesCliente();
+        
+        /*
+            case 'opcionesmotivo':
+            $datos = $co->opcionesMotivo(); CATSAT
             break;*/
         
         /*case 'opcionesmpago':

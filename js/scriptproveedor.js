@@ -50,7 +50,7 @@ function checkfiscales(){
 
 $(document).ready(function() {
     $("#id-banco").change(function() {
-        var nombreBanco = $(this).find("option:selected").text().trim().substring(5); 
+        var nombreBanco = $(this).find("option:selected").text().trim().substring(4); 
         $("#nombre_banco").val(nombreBanco); 
     });
 });

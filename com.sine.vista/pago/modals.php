@@ -113,7 +113,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="row mt-3 mb-3">
+                <div class="row mt-3 mb-5">
                     <div class="col-md-12 text-end" id="btn">
                         <button class="button-modal" onclick="cancelarTimbrePago()" id="btn-cancelar">Cancelar timbre <span class="fas fa-bell"></span></button>
                     </div>	

@@ -10,6 +10,22 @@ class ControladorOpcion {
         $this->consultas = new Consultas();
     }
 
+    private function getCliente() {
+        $consultado = false;
+        $consulta = "select * from cliente order by nombre_empresa;";
+        $consultado = $this->consultas->getResults($consulta, null);
+        return $consultado;
+    }
+
+    public function opcionesCliente() {
+        $cliente = $this->getCliente();
+        $r = "";
+        foreach ($cliente as $clienteactual) {
+            $r .= "<option value='" . $clienteactual['id_cliente'] . "'>" . $clienteactual['nombre_empresa'] . "</option>";
+        }
+        return $r;
+    }
+
     private function getCorreoListAux() {
         $consultado = false;
         $consulta = "select * from correoenvio order by correo;";
@@ -189,24 +205,6 @@ class ControladorOpcion {
             $r .= "<option $selected value='" . $clienteactual['id_datos'] . "'>" . $clienteactual['nombre_contribuyente'] . "</option>";
         }
         return $r;
-    }
-
-    private function getMotivosAux() {
-        $consultado = false;
-        $consulta = "SELECT * FROM catalogo_motivo order by clvmotivo;";
-        $consultado = $this->consultas->getResults($consulta, null);
-        return $consultado;
-    }
-
-    public function opcionesMotivo() {
-        $get = $this->getMotivosAux();
-        $op = "";
-        foreach ($get as $actual) {
-            $clv = $actual['clvmotivo'];
-            $descripcion = $actual['descripcionmotivo'];
-            $op .= "<option id='motivo" . $clv . "' value='" . $clv . "'>" . $clv . " " . $descripcion . "</option>";
-        }
-        return $op;
     }
 
     private function getProveedor() {

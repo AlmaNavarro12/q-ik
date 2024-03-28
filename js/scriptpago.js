@@ -43,7 +43,6 @@ function loadListaPago(pag = "") {
 function disableCuenta(tagcom= "", forma= "") {
     tag = tagcom == "" ? $("#tabs").find('.sub-tab-active').attr("data-tab") : tagcom;
     formapago = forma == "" ? $("#forma-" + tag).val() : forma;
-    console.log("Forma de pago: " + formapago);
     if (formapago == '2' || formapago == '3' || formapago == '4' || formapago == '5' || formapago == '6' || formapago == '18' || formapago == '19') {
         $("#cuenta-" + tag).removeAttr('disabled');
         $("#benef-" + tag).removeAttr('disabled');
@@ -141,7 +140,8 @@ function insertarComplemento(tag) {
         var tagcomp = $(a).attr('data-tab');
         var orden = $(a).attr('data-ord');
         var idformapago = $("#forma-" + tagcomp).val();
-        var nombreforma = $("#forma-" + tagcomp + " option:selected").text().substring(0, 2);
+        var cforma = $("#forma-" + tagcomp + " option:selected").text().substring(0, 2);
+        var nombreforma = $("#forma-" + tagcomp + " option:selected").text().substring(3);
         var moneda = $("#moneda-" + tagcomp).val();
         var nombremoneda = $("#moneda-" + tagcomp + " option:selected").text().substring(0, 3);
         var tcambio = $("#cambio-" + tagcomp).val();
@@ -154,7 +154,7 @@ function insertarComplemento(tag) {
         $.ajax({
             url: "com.sine.enlace/enlacepago.php",
             type: "POST",
-            data: {transaccion: "insertarcomplementos", tag: tag, tagcomp: tagcomp, orden:orden, idformapago: idformapago, nombreforma:nombreforma, moneda: moneda, nombremoneda: nombremoneda, tcambio: tcambio, fechapago: fechapago, horapago: horapago, cuenta: cuenta, beneficiario: beneficiario, numtransaccion: numtransaccion},
+            data: {transaccion: "insertarcomplementos", tag: tag, tagcomp: tagcomp, orden:orden, idformapago: idformapago, cforma:cforma, nombreforma:nombreforma, moneda: moneda, nombremoneda: nombremoneda, tcambio: tcambio, fechapago: fechapago, horapago: horapago, cuenta: cuenta, beneficiario: beneficiario, numtransaccion: numtransaccion},
             success: function (datos) {
                 var texto = datos.toString();
                 var bandera = texto.substring(0, 1);
@@ -174,7 +174,8 @@ function actualizarComplementos(tag) {
         var tagcomp = $(a).attr('data-tab');
         var orden = $(a).attr('data-ord');
         var idformapago = $("#forma-" + tagcomp).val();
-        var nombreforma = $("#forma-" + tagcomp + " option:selected").text().substring(0, 2);
+        var cforma = $("#forma-" + tagcomp + " option:selected").text().substring(0, 2);
+        var nombreforma = $("#forma-" + tagcomp + " option:selected").text().substring(3);
         var moneda = $("#moneda-" + tagcomp).val();
         var nombremoneda = $("#moneda-" + tagcomp + " option:selected").text().substring(0, 3);
         var tcambio = $("#cambio-" + tagcomp).val();
@@ -187,16 +188,14 @@ function actualizarComplementos(tag) {
         $.ajax({
             url: "com.sine.enlace/enlacepago.php",
             type: "POST",
-            data: {transaccion: "actualizarcomplementos", tag: tag, tagcomp: tagcomp, orden:orden, idformapago: idformapago, nombreforma:nombreforma, moneda: moneda, nombremoneda: nombremoneda, tcambio: tcambio, fechapago: fechapago, horapago: horapago, cuenta: cuenta, beneficiario: beneficiario, numtransaccion: numtransaccion},
+            data: {transaccion: "actualizarcomplementos", tag: tag, tagcomp: tagcomp, orden:orden, idformapago: idformapago, cforma:cforma, nombreforma:nombreforma, moneda: moneda, nombremoneda: nombremoneda, tcambio: tcambio, fechapago: fechapago, horapago: horapago, cuenta: cuenta, beneficiario: beneficiario, numtransaccion: numtransaccion},
             success: function (datos) {
                 var texto = datos.toString();
                 var bandera = texto.substring(0, 1);
                 var res = texto.substring(1, 1000);
                 if (bandera == '0') {
                     alertify.error(res);
-                } else {
-                    //alertify.success('Complemento actualizado.');
-                }
+                } 
             }
         });
     }
@@ -405,7 +404,6 @@ function setValoresEditarPago(datos) {
                 alertify.error(res);
             } else {
                 var array = datos.split("<comp>");
-                console.log(array);
                 for (i = 0; i < array.length; i++) {
                     if (array[array.length - 1] === "") {
                         array.pop();
@@ -897,7 +895,8 @@ function loadFactura(idfactura, type, tag) {
 }
 
 function setvaloresFactura(datos, tag) {
-    var [iddatosfactura, uuid, tcambio, idmoneda, idmetodo, totalfactura, noparcialidad_tmp, montoant_tmp, parcialidad, tiene_egreso, monto_egreso] = datos.split("</tr>").slice(0, 8);
+    console.log(datos);
+    var [iddatosfactura, uuid, tcambio, idmoneda, idmetodo, totalfactura, noparcialidad_tmp, montoant_tmp, parcialidad, tiene_egreso, monto_egreso] = datos.split("</tr>");
     $("#id-factura-" + tag).val(iddatosfactura);
     $("#uuid-" + tag).val(uuid);
     $("#cambiocfdi-" + tag).val(tcambio);
@@ -909,6 +908,7 @@ function setvaloresFactura(datos, tag) {
     $("#monto-" + tag).val(montoant_tmp);
     calcularRestante(tag);
 
+    console.log(tiene_egreso);
     if(tiene_egreso > 0){
         aplicarEgreso(monto_egreso, montoant_tmp, tag, uuid);
     }
@@ -930,7 +930,7 @@ function aplicarEgreso(monto, montoant_tmp, tag, uuid){
                 if(aplicado > 0){
                     $("#anterior-" + tab).val(restante);
                     $("#monto-" + tab).val(restante);
-                    alertify.success("Egreso aplicado");
+                    alertify.success("Egreso aplicado correctamente");
                 } else {
                     alertify.error("No se pudo aplicar el egreso");
                 }
@@ -1111,8 +1111,12 @@ function agregarCFDI() {
     var montoanterior = $("#anterior-" + tag).val();
     var montopago = $("#monto-" + tag).val();
     var montorestante = $("#restante-" + tag).val();
+    var forma = $("#forma-" + tag).val();
+    var fecha = $("#fecha-" + tag).val();
+    var hora = $("#hora-" + tag).val();
 
-    if (isnEmpty(idmoneda, "moneda-" + tag) && isnEmpty(factura, "factura-" + tag) && isnEmpty(type, "type-" + tag) && isnEmpty(idmonedacdfi, "monedarel-" + tag) && isnEmpty(parcialidad, "parcialidad-" + tag) && isnEmpty(totalfactura, "total-" + tag) && isnZero(montoanterior, "anterior-" + tag) && isPositive(montopago, "monto-" + tag) && isnEmpty(montorestante, "restante-" + tag)) {
+
+    if (isnEmpty(idmoneda, "moneda-" + tag) && isnEmpty(forma, "forma-" + tag) && isnEmpty(fecha, "fecha-" + tag) && isnEmpty(hora, "hora-" + tag) && isnEmpty(factura, "factura-" + tag) && isnEmpty(type, "type-" + tag) && isnEmpty(idmonedacdfi, "monedarel-" + tag) && isnEmpty(parcialidad, "parcialidad-" + tag) && isnEmpty(totalfactura, "total-" + tag) && isnZero(montoanterior, "anterior-" + tag) && isPositive(montopago, "monto-" + tag) && isnEmpty(montorestante, "restante-" + tag)) {
         
         if (idmoneda !== idmonedacdfi) {
             alertify.alert("No puedes agregar un pago con moneda diferente a la moneda que se declaró en la factura.").set({title: "Q-ik"}).set('labels', {ok: 'Aceptar'});

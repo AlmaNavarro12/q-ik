@@ -81,6 +81,40 @@ class ControladorAuto {
         return $datos;
     }
 
+    public function getCoincidenciasFacturasTimbradas($referencia, $iddatos) {
+        $datos = [];
+    
+        $consultaFactura = "SELECT * FROM datos_factura WHERE (concat(letra, folio_interno_fac) LIKE '%$referencia%') AND idcliente = :datos ORDER BY folio_interno_fac DESC LIMIT 15;";
+        $valores = array("datos" => $iddatos);
+        $resultadosFactura = $this->consultas->getResults($consultaFactura, $valores);
+        foreach ($resultadosFactura as $resultado) {
+            $datos[] = [
+                "value" => "Factura-" . $resultado['letra'] . $resultado['folio_interno_fac'],
+                "id" => $resultado["iddatos_factura"],
+                "type" => 'f'
+            ];
+        }
+    
+        $consultaCarta = "SELECT * FROM factura_carta WHERE (concat(letra, foliocarta) LIKE '%$referencia%') AND idcliente = '$iddatos' ORDER BY foliocarta DESC LIMIT 15;";
+        $resultadosCarta = $this->consultas->getResults($consultaCarta, null);
+        foreach ($resultadosCarta as $resultado) {
+            $datos[] = [
+                "value" => "Carta Porte-" . $resultado['letra'] . $resultado['foliocarta'],
+                "id" => $resultado["idfactura_carta"],
+                "type" => 'c'
+            ];
+        }
+    
+        if (empty($datos)) {
+            $datos[] = [
+                "value" => "No se encontraron registros",
+                "id" => "Ninguno"
+            ];
+        }
+    
+        return $datos;
+    }
+
     public function getCoincidenciasBusquedaProducto($referencia) {
         $datos = array();
         $consulta = "SELECT * FROM productos_servicios WHERE ((codproducto LIKE '%$referencia%') OR (nombre_producto LIKE '%$referencia%') OR (descripcion_producto LIKE '%$referencia%') OR (clave_fiscal LIKE '%$referencia%')) AND cantinv > 0 LIMIT 15;";

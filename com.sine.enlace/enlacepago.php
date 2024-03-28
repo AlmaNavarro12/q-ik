@@ -40,7 +40,7 @@ if (isset($_POST['transaccion'])) {
             echo $insertado ? $insertado : "0Error: No se insertó el registro. ";
             break;
         case 'eliminar':
-            $eliminado = $cp->eliminar($_POST['idtemp'], session_id());
+            $eliminado = $cp->eliminar($_POST['idtemp']);
             echo $eliminado != "" ? $eliminado : "0No se han econtrado datos.";
             break;
         case 'borrarcomplemento':
@@ -48,7 +48,7 @@ if (isset($_POST['transaccion'])) {
             echo $insertado ? $insertado : "0Error al eliminar el complemento.";
             break;
         case 'insertarpago':
-            $insertado = $cp->validarPago(obtenerDatosPago(), $_POST['objimpuesto']);
+            $insertado = $cp->validarPago(obtenerDatosPago(), $_POST['objimpuesto'], session_id());
             echo $insertado ? $insertado : "0Error: no insertó el registro";
             break;
         case 'insertarcomplementos':
@@ -204,6 +204,7 @@ function obtenerDatosComplementoPago()
     $p->setTagcomp($_POST['tagcomp']);
     $p->setOrden($_POST['orden']);
     $p->setPagoidformapago($_POST['idformapago']);
+    $p->setCForma($_POST['cforma']);
     $p->setNombreForma($_POST['nombreforma']);
     $p->setPagoidmoneda($_POST['moneda']);
     $p->setNombreMoneda($_POST['nombremoneda']);

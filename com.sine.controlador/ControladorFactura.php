@@ -5,31 +5,38 @@ require_once '../com.sine.modelo/Session.php';
 require_once '../com.sine.modelo/Factura.php';
 require_once '../com.sine.modelo/SendMail.php';
 require_once '../com.sine.modelo/TMP.php';
+require_once '../com.sine.controlador/ControladorSat.php';
 
 use SWServices\Toolkit\SignService as Sellar;
 use SWServices\Stamp\StampService as StampService;
 use SWServices\Cancelation\CancelationService as CancelationService;
 use SWServices\SatQuery\SatQueryService as consultaCfdiSAT;
+use PHPMailer\PHPMailer\PHPMailer;
 
 date_default_timezone_set("America/Mexico_City");
 
-class ControladorFactura {
+class ControladorFactura
+{
     private  $consultas;
-    
-    function __construct() {
+    private $controladorSAT;
+
+    function __construct()
+    {
         $this->consultas = new Consultas();
+        $this->controladorSAT = new ControladorSat();
     }
 
-    private function getSWAccessAux() {
+    private function getSWAccessAux()
+    {
         $consultado = false;
         $consulta = "SELECT * FROM swaccess WHERE idswaccess=:id;";
-        $consultas = new Consultas();
         $valores = array("id" => '1');
-        $consultado = $consultas->getResults($consulta, $valores);
+        $consultado = $this->consultas->getResults($consulta, $valores);
         return $consultado;
     }
 
-    private function getSWAccess() {
+    private function getSWAccess()
+    {
         $datos = "";
         $get = $this->getSWAccessAux();
         foreach ($get as $actual) {
@@ -39,34 +46,76 @@ class ControladorFactura {
         $datos = "$url</tr>$token";
         return $datos;
     }
-
-    private function getTMPCFDIS($sessionId) {
+    private function getTMPCFDIS($sessionId)
+    {
         $consultado = false;
-        $consultas = new Consultas();
-        $consulta = "SELECT * FROM tmpcfdi WHERE sessionid=:sessionid ORDER BY idtmpcfdi";
+        $consulta = "SELECT tmp.*, CONCAT(df.letra,df.folio_interno_fac) folio 
+                    FROM tmpcfdi tmp
+                    INNER JOIN datos_factura df ON df.uuid = tmp.uuid
+                    WHERE sessionid=:sessionid
+                    UNION ALL
+                    SELECT tmp.*, CONCAT(fc.letra,fc.foliocarta) folio
+                    FROM tmpcfdi tmp
+                    INNER JOIN factura_carta fc ON fc.uuid = tmp.uuid
+                    WHERE sessionid=:sessionid
+                    ORDER BY idtmpcfdi";
         $valores = array("sessionid" => $sessionId);
-        $consultado = $consultas->getResults($consulta, $valores);
+        $consultado = $this->consultas->getResults($consulta, $valores);
         return $consultado;
     }
 
-    public function agregarCFDI($t) {
+    private function getTMPCfdiEgreso($sessionId)
+    {
+        $consultado = false;
+        $consulta = "SELECT * FROM tmpegreso WHERE sessionid = :sid";
+        $valores = array("sid" => $sessionId);
+        $consultado = $this->consultas->getResults($consulta, $valores);
+        return $consultado;
+    }
+
+
+    public function agregarCFDI($t)
+    {
         $insertado = false;
-        $consulta = "INSERT INTO `tmpcfdi` VALUES (:id, :tiporel, :uuid, :session);";
-        $valores = array("id" => null,
+        $consulta = "INSERT INTO tmpcfdi VALUES (:id, :tiporel, :descripcion, :uuid, :sessionid);";
+        $valores = array(
+            "id" => null,
             "tiporel" => $t->getTiporel(),
+            "descripcion" => $t->getDescripcion(),
             "uuid" => $t->getUuid(),
-            "session" => $t->getSessionid());
-        $con = new Consultas();
-        $con->execute($consulta, $valores);
+            "sessionid" => $t->getSessionid()
+        );
+        $this->consultas->execute($consulta, $valores);
+
+        if ($t->getTipoComprobante() == 2) {
+            $div = explode('-', $t->getFolioDoc());
+            $folio = $div[1];
+            $consulta = "INSERT INTO tmpegreso VALUES (:id, :id_doc, :folio_doc, :type, :uuid, :tiporel, :descripcion, :monto, :idprod, :sessionid);";
+            $valores = array(
+                "id" => null,
+                "id_doc" => $t->getIdDoc(),
+                "folio_doc" => $folio,
+                "type" => $t->getType(),
+                "uuid" => $t->getUuid(),
+                "tiporel" => $t->getTiporel(),
+                "descripcion" => $t->getDescripcion(),
+                "monto" => 0,
+                "idprod" => 0,
+                "sessionid" => $t->getSessionid()
+            );
+            $this->consultas->execute($consulta, $valores);
+        }
         $datos = $this->tablaCFDI($t->getSessionid());
         return $datos;
     }
 
-    private function tablaCFDI($idsession, $uuid = "") {
+    private function tablaCFDI($idsession, $uuid = "")
+    {
         $datos = "<corte><thead class='sin-paddding'>
             <tr>
-                <th class='text-center'>RELACION</th>
+                <th class='text-center'>FOLIO</th>
                 <th class='text-center'>CFDI</th>
+                <th class='text-center'>TIPO DE RELACIÓN</th>
                 <th class='text-center'>ELIMINAR</th></tr>
                 </thead><tbody>";
         $disuuid = "";
@@ -76,64 +125,69 @@ class ControladorFactura {
         $cfdi = $this->getTMPCFDIS($idsession);
         foreach ($cfdi as $actual) {
             $idtmp = $actual['idtmpcfdi'];
-            $tiporel = $actual['tiporel'];
+            $folio = $actual['folio'];
+            $tiporel = $actual['desc_tiporel'];
             $uuid = $actual['uuid'];
             $datos .= "
                     <tr>
-                        <td>$tiporel</td>
+                        <td>$folio</td>
                         <td>$uuid</td>
-                        <td><button $disuuid class='button-list' onclick='eliminarCFDI($idtmp)' title='Eliminar CFDI'><span class='fas fa-times'></span></button></td>
+                        <td>$tiporel</td>
+                        <td class='text-center'><button $disuuid class='button-list' onclick='eliminarCFDI($idtmp)' title='Eliminar CFDI'><span class='fas fa-times'></span></button></td>
                     </tr>
-                     ";
+                    ";
         }
         return $datos;
     }
 
-    private function getDistinctCfdisRelacionados($id) {
+    private function getDistinctCfdisRelacionados($id)
+    {
         $consultado = false;
-        $consultas = new Consultas();
         $consulta = "SELECT DISTINCT tiporel FROM cfdirelacionado WHERE cfditag=:id;";
         $val = array("id" => $id);
-        $consultado = $consultas->getResults($consulta, $val);
+        $consultado = $this->consultas->getResults($consulta, $val);
         return $consultado;
     }
 
-    private function getcfdisRelacionadosByTipo($id, $tipo) {
+    private function getcfdisRelacionadosByTipo($id, $tipo)
+    {
         $consultado = false;
-        $consultas = new Consultas();
         $consulta = "SELECT * FROM cfdirelacionado WHERE cfditag=:id AND tiporel=:tipo;";
-        $val = array("id" => $id,
-            "tipo" => $tipo);
-        $consultado = $consultas->getResults($consulta, $val);
+        $val = array(
+            "id" => $id,
+            "tipo" => $tipo
+        );
+        $consultado = $this->consultas->getResults($consulta, $val);
         return $consultado;
     }
 
-    public function getcfdisRelacionados($id) {
+    public function getcfdisRelacionados($id)
+    {
         $consultado = false;
-        $consultas = new Consultas();
-        $consulta = "SELECT * FROM cfdirelacionado c INNER JOIN catalogo_relacion r ON (r.c_tiporelacion=c.tiporel) WHERE c.cfditag=:id ORDER BY tiporel;";
+        $consulta = "SELECT * FROM cfdirelacionado WHERE cfditag = :id ORDER BY tiporel;";
         $val = array("id" => $id);
-        $consultado = $consultas->getResults($consulta, $val);
+        $consultado = $this->consultas->getResults($consulta, $val);
         return $consultado;
     }
-   
-    
-  
-    
 
-    public function cfdisRelacionados($tag, $sessionid, $uuidTim) {
+
+    public function cfdisRelacionados($tag, $sessionid, $uuidTim)
+    {
         $productos = $this->getcfdisRelacionados($tag);
         foreach ($productos as $productoactual) {
             $tiporel = $productoactual["tiporel"];
+            $desctiporel = $productoactual['desctiporel'];
             $uuid = $productoactual['uuid'];
 
-            $consulta = "INSERT INTO `tmpcfdi` VALUES (:id, :tiporel, :uuid, :session);";
-            $valores = array("id" => null,
+            $consulta = "INSERT INTO `tmpcfdi` VALUES (:id, :tiporel, :desctiporel, :uuid, :session);";
+            $valores = array(
+                "id" => null,
                 "tiporel" => $tiporel,
+                "desctiporel" => $desctiporel,
                 "uuid" => $uuid,
-                "session" => $sessionid);
-            $con = new Consultas();
-            $con->execute($consulta, $valores);
+                "session" => $sessionid
+            );
+            $this->consultas->execute($consulta, $valores);
         }
         $tabla = $this->tablaCFDI($sessionid, $uuidTim);
         return $tabla;
@@ -142,14 +196,30 @@ class ControladorFactura {
     public function eliminarCFDI($idtmp, $sessionid) {
         $insertado = false;
         $con = new Consultas();
+
+        $query = "SELECT * FROM tmpcfdi WHERE idtmpcfdi = :id";
+        $val = array("id" => $idtmp);
+        $stmt = $con->getResults($query, $val);
+        foreach($stmt as $rs){
+            $uuid = $rs['uuid'];
+        }
+
         $consulta = "DELETE FROM `tmpcfdi` WHERE idtmpcfdi=:id;";
         $valores = array("id" => $idtmp);
         $con->execute($consulta, $valores);
+        
+        
+        $consulta = "DELETE FROM tmpegreso WHERE uuid=:uuid";
+        $valores = array("uuid" => $uuid);
+        $con->execute($consulta, $valores);  
+
+
         $datos = $this->tablaCFDI($sessionid);
         return $datos;
     }
 
-    public function modificarChIva($idtmp, $chiva, $chret) {
+    public function modificarChIva($idtmp, $chiva, $chret)
+    {
         $check = $this->checkProductoTMPAux($idtmp);
         foreach ($check as $actual) {
             $canttmp = $actual['cantidad_tmp'];
@@ -183,44 +253,50 @@ class ControladorFactura {
         $retenciones = $divR[0];
         $Tret = $divR[1];
 
-        $total = (( bcdiv($importe, '1', 2) + bcdiv($Timp, '1', 2)) - bcdiv($Tret, '1', 2));
+        $total = ((bcdiv($importe, '1', 2) + bcdiv($Timp, '1', 2)) - bcdiv($Tret, '1', 2));
         $consulta = "UPDATE `tmp` set trasladotmp=:chiva, retenciontmp=:chret, totunitario_tmp=:totun, impdescuento_tmp=:impdesc, imptotal_tmp=:total where idtmp = :idtmp;";
-        $con = new Consultas();
-        $val = array("chiva" => $traslados,
+        $val = array(
+            "chiva" => $traslados,
             "chret" => $retenciones,
             "totun" => $totalun,
             "impdesc" => $impdesc,
             "total" => $total,
-            "idtmp" => $idtmp);
-        $datos = $con->execute($consulta, $val);
+            "idtmp" => $idtmp
+        );
+        $datos = $this->consultas->execute($consulta, $val);
         return $datos;
     }
 
-    public function getDatosEncabezado() {
+    public function getDatosEncabezado()
+    {
         $consultado = false;
         $consulta = "SELECT * FROM encabezados WHERE idencabezado=:id;";
-        $consultas = new Consultas();
+
         $valores = array("id" => '1');
-        $consultado = $consultas->getResults($consulta, $valores);
+        $consultado = $this->consultas->getResults($consulta, $valores);
         return $consultado;
     }
 
-    public function getTipoCambio() {
+    public function getTipoCambio()
+    {
         $data = json_decode(file_get_contents('http://www.banxico.org.mx/pubDGOBC_Sisfix-war/Sisfix_JSON'), true);
         $cambio = $data['tcfix'];
         $actualizar = $this->saveTipoCambio($cambio);
         return $cambio;
     }
-
-    public function saveTipoCambio($cambio) {
-        $consulta = "UPDATE `catalogo_moneda` SET tipo_cambio=:tcambio where idcatalogo_moneda=:id;";
-        $valores = array("id" => '2',
-            "tcambio" => $cambio);
-        $con = new Consultas();
-        $insertado = $con->execute($consulta, $valores);
+    //cambio R?
+    public function saveTipoCambio($cambio)
+    {
+        $consulta = "UPDATE `datos_factura` SET tcambio=:tcambio where iddatos_factura=:id;";
+        $valores = array(
+            "id" => '2',
+            "tcambio" => $cambio
+        );
+        $insertado = $this->consultas->execute($consulta, $valores);
     }
 
-    public function genString($length = 6) {
+    public function genString($length = 6)
+    {
         $str = "";
         $characters = array_merge(range('A', 'Z'), range('a', 'z'), range('0', '9'));
         $max = count($characters) - 1;
@@ -231,7 +307,8 @@ class ControladorFactura {
         return $str;
     }
 
-    public function getTelefono($idfactura) {
+    public function getTelefono($idfactura)
+    {
         $correos = $this->getCorreosAux($idfactura);
         foreach ($correos as $actual) {
             $telefono = $actual['telefono'];
@@ -239,7 +316,8 @@ class ControladorFactura {
         return "$telefono";
     }
 
-    public function getCorreo($idfactura) {
+    public function getCorreo($idfactura)
+    {
         $datos = "";
         $correos = $this->getCorreosAux($idfactura);
         foreach ($correos as $actual) {
@@ -254,34 +332,38 @@ class ControladorFactura {
         return $datos;
     }
 
-    public function getCorreosAux($idfactura) {
+    public function getCorreosAux($idfactura)
+    {
         $consultado = false;
-        $consultas = new Consultas();
+
         $consulta = "SELECT c.email_informacion,c.email_facturacion,c.email_gerencia, c.correoalt1, c.correoalt2, c.correoalt3, c.telefono FROM datos_factura dat INNER JOIN cliente c ON (dat.idcliente=c.id_cliente) WHERE dat.iddatos_factura=:id;";
         $val = array("id" => $idfactura);
-        $consultado = $consultas->getResults($consulta, $val);
+        $consultado = $this->consultas->getResults($consulta, $val);
         return $consultado;
     }
 
-    private function checkProductoTMPAux($idtmp) {
+    private function checkProductoTMPAux($idtmp)
+    {
         $consultado = false;
-        $consultas = new Consultas();
+
         $consulta = "SELECT * FROM tmp WHERE idtmp=:id;";
         $val = array("id" => $idtmp);
-        $consultado = $consultas->getResults($consulta, $val);
+        $consultado = $this->consultas->getResults($consulta, $val);
         return $consultado;
     }
 
-    private function checkProductoAux($idtmp) {
+    private function checkProductoAux($idtmp)
+    {
         $consultado = false;
-        $consultas = new Consultas();
+
         $consulta = "SELECT cantinv, chinventario FROM productos_servicios WHERE idproser=:id;";
         $val = array("id" => $idtmp);
-        $consultado = $consultas->getResults($consulta, $val);
+        $consultado = $this->consultas->getResults($consulta, $val);
         return $consultado;
     }
 
-    private function reBuildArray2($importe, $array) {
+    private function reBuildArray2($importe, $array)
+    {
         $div = explode("<impuesto>", $array);
         $row = array();
         $Timp = 0;
@@ -292,13 +374,13 @@ class ControladorFactura {
             if ($Timp > 0) {
                 $row[] = bcdiv($imp, '1', 2) . '-' . $div2[1] . '-' . $div2[2];
             }
-          
         }
         $rearray = implode("<impuesto>", $row);
         return $rearray;
     }
 
-    private function reBuildArray($importe, $array) {
+    private function reBuildArray($importe, $array)
+    {
         $div = explode("<impuesto>", $array);
         $row = array();
         $Timp = 0;
@@ -314,9 +396,8 @@ class ControladorFactura {
         return $rearray . "<cut>" . $Timp;
     }
 
-   
-
-    public function incrementarProducto($idtmp) {
+    public function incrementarProducto($idtmp)
+    {
         $check = $this->checkProductoTMPAux($idtmp);
         foreach ($check as $actual) {
             $canttmp = $actual['cantidad_tmp'];
@@ -331,8 +412,8 @@ class ControladorFactura {
         $cantidad = 0;
 
         $prod = $this->checkProductoAux($idproducto);
-        foreach ($prod as $pactual) { 
-            $chinv = $pactual['chinventario']; //328
+        foreach ($prod as $pactual) {
+            $chinv = $pactual['chinventario'];
             $cantidad = $pactual['cantinv'];
         }
 
@@ -358,33 +439,36 @@ class ControladorFactura {
                 $datos = "0El inventario no es suficiente para agregar mas producto";
             } else {
                 $consulta = "UPDATE `tmp` set cantidad_tmp=:cant, totunitario_tmp=:totuni, impdescuento_tmp=:impdesc, imptotal_tmp=:imptot, trasladotmp=:traslados, retenciontmp=:retenciones  where idtmp = :id;";
-                $valores = array("id" => $idtmp,
+                $valores = array(
+                    "id" => $idtmp,
                     "cant" => $cant,
                     "totuni" => bcdiv($totalun, '1', 2),
                     "impdesc" => bcdiv($impdesc, '1', 2),
                     "imptot" => bcdiv($total, '1', 2),
                     "traslados" => $traslados,
-                    "retenciones" => $retenciones);
-                $con = new Consultas();
-                $datos = $con->execute($consulta, $valores);
+                    "retenciones" => $retenciones
+                );
+                $datos = $this->consultas->execute($consulta, $valores);
                 $inv = $this->removerInventario($idproducto, '1');
             }
         } else if ($chinv == '0') {
             $consulta = "UPDATE `tmp` set cantidad_tmp=:cant, totunitario_tmp=:totuni, impdescuento_tmp=:impdesc, imptotal_tmp=:imptot, trasladotmp=:traslados, retenciontmp=:retenciones  where idtmp = :id;";
-            $valores = array("id" => $idtmp,
+            $valores = array(
+                "id" => $idtmp,
                 "cant" => $cant,
                 "totuni" => bcdiv($totalun, '1', 2),
                 "impdesc" => bcdiv($impdesc, '1', 2),
                 "imptot" => bcdiv($total, '1', 2),
                 "traslados" => $traslados,
-                "retenciones" => $retenciones);
-            $con = new Consultas();
-            $datos = $con->execute($consulta, $valores);
+                "retenciones" => $retenciones
+            );
+            $datos = $this->consultas->execute($consulta, $valores);
         }
         return $datos;
     }
 
-    public function reducirProducto($idtmp) {
+    public function reducirProducto($idtmp)
+    {
         $check = $this->checkProductoTMPAux($idtmp);
         foreach ($check as $actual) {
             $canttmp = $actual['cantidad_tmp'];
@@ -422,22 +506,24 @@ class ControladorFactura {
         $total = ((bcdiv($importe, '1', 2) + bcdiv($Timp, '1', 2)) - bcdiv($Tret, '1', 2));
 
         $consulta = "UPDATE `tmp` set cantidad_tmp=:cant, totunitario_tmp=:totuni, impdescuento_tmp=:impdesc, imptotal_tmp=:imptot, trasladotmp=:traslados, retenciontmp=:retenciones  where idtmp = :id;";
-        $valores = array("id" => $idtmp,
+        $valores = array(
+            "id" => $idtmp,
             "cant" => $cant,
             "totuni" => bcdiv($totalun, '1', 2),
             "impdesc" => bcdiv($impdesc, '1', 2),
             "imptot" => bcdiv($total, '1', 2),
             "traslados" => $traslados,
-            "retenciones" => $retenciones);
-        $con = new Consultas();
-        $datos = $con->execute($consulta, $valores);
+            "retenciones" => $retenciones
+        );
+        $datos = $this->consultas->execute($consulta, $valores);
         if ($chinv == '1') {
             $inv = $this->restaurarInventario($idproducto, '1');
         }
         return $datos;
     }
 
-    public function modificarCantidad($idtmp, $cant) {
+    public function modificarCantidad($idtmp, $cant)
+    {
         $check = $this->checkProductoTMPAux($idtmp);
         foreach ($check as $actual) {
             $canttmp = $actual['cantidad_tmp'];
@@ -472,58 +558,63 @@ class ControladorFactura {
         $Tret = $divR[1];
 
         $restante = ($cantidad + $canttmp) - $cant;
-        $total = (( bcdiv($importe, '1', 2) + bcdiv($Timp, '1', 2)) - bcdiv($Tret, '1', 2));
+        $total = ((bcdiv($importe, '1', 2) + bcdiv($Timp, '1', 2)) - bcdiv($Tret, '1', 2));
 
         if ($chinv == '1') {
             if ($restante < 0) {
                 $datos = "0El inventario no es suficiente para agregar mas producto";
             } else {
                 $consulta = "UPDATE `tmp` set cantidad_tmp=:cant, totunitario_tmp=:totuni, impdescuento_tmp=:impdesc, imptotal_tmp=:imptot, trasladotmp=:traslados, retenciontmp=:retenciones  where idtmp = :id;";
-                $valores = array("id" => $idtmp,
+                $valores = array(
+                    "id" => $idtmp,
                     "cant" => $cant,
                     "totuni" => bcdiv($totalun, '1', 2),
                     "impdesc" => bcdiv($impdesc, '1', 2),
                     "imptot" => bcdiv($total, '1', 2),
                     "traslados" => $traslados,
-                    "retenciones" => $retenciones);
-                $con = new Consultas();
-                $datos = $con->execute($consulta, $valores);
+                    "retenciones" => $retenciones
+                );
+                $datos = $this->consultas->execute($consulta, $valores);
                 $inv = $this->restaurarInvCant($idproducto, $restante);
             }
         } else if ($chinv == '0') {
             $consulta = "UPDATE `tmp` set cantidad_tmp=:cant, totunitario_tmp=:totuni, impdescuento_tmp=:impdesc, imptotal_tmp=:imptot, trasladotmp=:traslados, retenciontmp=:retenciones  where idtmp = :id;";
-            $valores = array("id" => $idtmp,
+            $valores = array(
+                "id" => $idtmp,
                 "cant" => $cant,
                 "totuni" => bcdiv($totalun, '1', 2),
                 "impdesc" => bcdiv($impdesc, '1', 2),
                 "imptot" => bcdiv($total, '1', 2),
                 "traslados" => $traslados,
-                "retenciones" => $retenciones);
-            $con = new Consultas();
-            $datos = $con->execute($consulta, $valores);
+                "retenciones" => $retenciones
+            );
+            $datos = $this->consultas->execute($consulta, $valores);
         }
         return $datos;
     }
 
-    public function getCodNomProducto($id) {
+    public function getCodNomProducto($id)
+    {
         $consultado = false;
         $consulta = "SELECT codproducto,nombre_producto FROM productos_servicios WHERE idproser=:id;";
-        $consultas = new Consultas();
+
         $valores = array("id" => $id);
-        $consultado = $consultas->getResults($consulta, $valores);
+        $consultado = $this->consultas->getResults($consulta, $valores);
         return $consultado;
     }
 
-    public function checkInventarioAux($idprod) {
+    public function checkInventarioAux($idprod)
+    {
         $consultado = false;
-        $consultas = new Consultas();
+
         $consulta = "SELECT chinventario,cantinv FROM productos_servicios where idproser=:pid;";
         $val = array("pid" => $idprod);
-        $consultado = $consultas->getResults($consulta, $val);
+        $consultado = $this->consultas->getResults($consulta, $val);
         return $consultado;
     }
 
-    public function checkInventario($t) {
+    public function checkInventario($t)
+    {
         $idproducto = $t->getIdproductotmp();
         $cantidad = $t->getCantidadtmp();
         $inventario = $this->checkInventarioAux($idproducto);
@@ -547,9 +638,9 @@ class ControladorFactura {
         return $datos;
     }
 
-    public function agregar($t, $chinv) {
-        $insertado = true; 
-        $con = new Consultas();
+    public function agregar($t, $chinv)
+    {
+        $insertado = true;
         $datos = "";
         $clvfiscal = "";
         $clvunidad = "";
@@ -563,7 +654,8 @@ class ControladorFactura {
         $retenciones = $this->reBuildArray2($importe, $t->getIdretencion());
 
         $consulta = "INSERT INTO `tmp` VALUES (:id, :idproducto, :nombre, :cantidad, :precio, :importe, :descuento, :impdescuento, :imptotal, :idtraslado, :idretencion, :observaciones, :chinventario, :clvfiscal, :clvunidad, :session);";
-        $valores = array("id" => null,
+        $valores = array(
+            "id" => null,
             "idproducto" => $t->getIdproductotmp(),
             "nombre" => $t->getDescripciontmp(),
             "cantidad" => $t->getCantidadtmp(),
@@ -578,26 +670,30 @@ class ControladorFactura {
             "chinventario" => $chinv,
             "clvfiscal" => $clvfiscal,
             "clvunidad" => $clvunidad,
-            "session" => $t->getSessionid());
-        $datos = $con->execute($consulta, $valores);
+            "session" => $t->getSessionid()
+        );
+        $datos = $this->consultas->execute($consulta, $valores);
         return $datos;
     }
-   
 
-    public function tablaProd($sessionid, $uuid = "") {
+
+    public function tablaProd($sessionid, $uuid = "", $tcomp)
+    {
         $datos = "<thead class='sin-paddding'>
-            <tr >
-                <th class='text-center'>CLV FISCAL</th>
+            <tr class='align-middle'>
+                <th class='text-center'>CLAVE FISCAL</th>
                 <th class='text-center'>CANT.</th>
-                <th class='text-center'>DESCRIPCION</th>
+                <th class='text-center'>DESC.</th>
                 <th class='text-center'>PRECIO</th>
                 <th class='text-center'>IMPORTE</th>
-                <th class='text-center'>DESCUENTO</th>
+                <th class='text-center'>DESC(%)</th>
                 <th class='text-center'>TRASLADOS</th>
                 <th class='text-center'>RETENCIONES</th>
-                <th class='text-center col-md-2'>OBSERVACIONES</th>
-                <th class='text-center'>OPCIONES</th></tr>
+                <th class='text-center col-md-2'>OBSERVACIÓN</th>
+                " . (($tcomp == 2) ? "<th class='text-center'>CFDI Relacionado</th>" : "") . "
+                <th class='text-center'>OPCIÓN</th></tr>
                 </thead><tbody>";
+        $n = 0;
         $sumador_total = 0;
         $sumador_iva = 0;
         $sumador_ret = 0;
@@ -610,6 +706,7 @@ class ControladorFactura {
         $imptraslados = $this->getImpuestos('1');
         $impretenciones = $this->getImpuestos('2');
         foreach ($productos as $productoactual) {
+            $n++;
             $id_tmp = $productoactual['idtmp'];
             $idproducto = $productoactual['id_productotmp'];
             $nombre = $productoactual['tmpnombre'];
@@ -627,7 +724,6 @@ class ControladorFactura {
 
             if ($obser == "") {
                 $obser = "<span class='fas fa-pencil-alt'></span>";
-              
             }
 
             $importe = bcdiv($ptotal, '1', 2) - bcdiv($descuento, '1', 2);
@@ -664,20 +760,23 @@ class ControladorFactura {
                 $divcheck = explode("<imp>", $checktraslado);
                 foreach ($divcheck as $t) {
                     if ($t == $tactual['porcentaje'] . "-" . $tactual['impuesto']) {
-                        $iconT = "";
+                        $iconT = "far fa-check-square";
                         $checkedT = "checked";
                         break;
                     } else {
-                        $iconT = "";
+                        $iconT = "far fa-square";
                         $checkedT = "";
                     }
                 }
-                $optraslados = $optraslados . "<li data-location='tabla' data-id='$id_tmp'><label class='dropdown-item checkbox'>
+                $optraslados = $optraslados . 
+                
+                "<li data-location='tabla' data-id='$id_tmp'>
+                <div class='checkbox d-flex justify-content-start z-3'>
                 <input type='checkbox' $checkedT value='" . $tactual['porcentaje'] . "' name='chtrastabla$id_tmp' data-impuesto='" . $tactual['impuesto'] . "' data-tipo='" . $tactual['tipoimpuesto'] . "' />
-                <span class='glyphicon $iconT' id='chuso1span'></span>
+                <span class='$iconT me-2' id='chuso1span'></span><small>
                 " . $tactual['nombre'] . " (" . $tactual['porcentaje'] . "%)
-            </label></li>";
-                }
+                </small></div></li>";
+            }
 
             $checkedR = "";
             $iconR = "";
@@ -686,20 +785,21 @@ class ControladorFactura {
                 $divcheckR = explode("<imp>", $checkretencion);
                 foreach ($divcheckR as $r) {
                     if ($r == $ractual['porcentaje'] . "-" . $ractual['impuesto']) {
-                        $iconR = "";
+                        $iconR = "far fa-check-square";
                         $checkedR = "checked";
                         break;
                     } else {
-                        $iconR = "";
+                        $iconR = "far fa-square";
                         $checkedR = "";
                     }
                 }
-                 $opretencion = $opretencion . "<li data-location='tabla' data-id='$id_tmp'><label class='dropdown-item checkbox'>
+                $opretencion = $opretencion . "<li data-location='tabla' data-id='$id_tmp'>
+                <div class='checkbox d-flex justify-content-start z-3'>
                  <input type='checkbox' $checkedR value='" . $ractual['porcentaje'] . "' name='chrettabla$id_tmp' data-impuesto='" . $ractual['impuesto'] . "' data-tipo='" . $ractual['tipoimpuesto'] . "' />
-                     <span class='glyphicon $iconR' id='chuso1span'></span>
+                     <span class='$iconR me-2' id='chuso1span'></span><small>
                      " . $ractual['nombre'] . " (" . $ractual['porcentaje'] . "%)
-                 </label></li>";
-               }
+                 </small></div></li>";
+            }
 
             $sumador_iva += bcdiv($imp, '1', 2);
             $sumador_ret += bcdiv($ret, '1', 2);
@@ -713,11 +813,11 @@ class ControladorFactura {
             <tr>
                 <td>$clvfiscal</td>
                 <td>
-                    <div class='btn-group'>
+                    <div class='btn-group btn-group-sm'>
                         <button type='button' class='btn btn-outline-secondary btn-sm ' $disabledminus $disuuid data-type='minus' data-field='quant[1]' onclick='reducirCantidad($id_tmp);'>
                             <i class='fas fa-minus'></i>
                         </button>
-                        <button $disuuid class='badge rounded-pill text-bg-info' data-bs-toggle='modal' data-bs-target='#modal-cantidad' onclick='setCantidad($id_tmp,$cantidad)'>
+                        <button $disuuid class='badge btn btn-info' data-bs-toggle='modal' data-bs-target='#modal-cantidad' onclick='setCantidad($id_tmp,$cantidad)'>
                             <div class='badge' id='badcant$id_tmp'>$cantidad</div>
                         </button>
                         <button type='button' class='btn btn-outline-secondary btn-sm ' data-type='plus' onclick='incrementarCantidad($id_tmp);' $disuuid>
@@ -726,14 +826,14 @@ class ControladorFactura {
                     </div>
                 </td>
                 <td>$nombre</td>
-                <td>$ " . number_format(bcdiv($pventa, '1', 2), 2, '.', ',') . "</td>
-                <td>$ " . number_format(bcdiv($ptotal, '1', 2), 2, '.', ',') . "</td>
-                <td>$ " . number_format(bcdiv($descuento, '1', 2), 2, '.', ',') . "</td>
+                <td class='text-center'>$ " . number_format(bcdiv($pventa, '1', 2), 2, '.', ',') . "</td>
+                <td class='text-center'>$ " . number_format(bcdiv($ptotal, '1', 2), 2, '.', ',') . (($tcomp == 2) ? "<input id='total$n' type='hidden' value='$ptotal'>" : "") . "</td>
+                <td class='text-center'>$ " . number_format(bcdiv($descuento, '1', 2), 2, '.', ',') . "</td>
                 <td>
                     <div class='input-group'>
                         <div class='dropdown'>
-                            <button type='button' class='button-impuesto dropdown-toggle' data-bs-toggle='dropdown' $disuuid>Traslados <span class='caret'></span></button>
-                            <ul class='dropdown-menu'>
+                            <button type='button' class='button-impuesto dropdown-toggle' $disuuid data-bs-toggle='dropdown' aria-expanded='true'>Traslados <span class='caret'></span></button>
+                            <ul class='dropdown-menu ps-3 z-3 lh-sm'>
                                 $optraslados
                             </ul>
                         </div>
@@ -742,20 +842,21 @@ class ControladorFactura {
                 <td>
                     <div class='input-group'>
                         <div class='dropdown'>
-                            <button type='button' class='button-impuesto dropdown-toggle' data-bs-toggle='dropdown' $disuuid>Retenciones <span class='caret'></span></button>
-                            <ul class='dropdown-menu'>
+                            <button type='button' class='button-impuesto dropdown-toggle' data-bs-toggle='dropdown' $disuuid aria-expanded='true'>Retenciones <span class='caret'></span></button>
+                            <ul class='dropdown-menu ps-3 z-3 lh-sm'>
                                 $opretencion
                             </ul>
                         </div>
                     </div>
                 </td>
                 <td title='Da click para agregar Observaciones' data-bs-toggle='modal' data-bs-target='#modal-observaciones' onclick=\"setIDTMP($id_tmp,'$observaciones');\" style='vertical-align:middle; cursor: pointer; color: #17177C; text-align:center;'>$obser</td>
-                <td>
+                " . (($tcomp == 2) ? "<td>" . $this->getOptionsEgresos($sessionid, $n, $id_tmp, $ptotal, $disuuid) . "</td>" : "") . "
+                <td class='text-center'>
                     <div class='dropdown'>
-                        <button class='button-list dropdown-toggle' title='Editar'  type='button' data-bs-toggle='dropdown' $disuuid><i class='fas fa-edit'></i> <span class='caret'></span></button>
+                        <button class='button-list dropdown-toggle' title='Editar'  type='button' data-bs-toggle='dropdown' $disuuid><i class='fas fa-ellipsis-v'></i> <span class='caret'></span></button>
                         <ul class='dropdown-menu dropdown-menu-end'>
-                            <li class='notification-link py-1 ps-3' ><a class='text-decoration-none text-secondary-emphasis'  data-bs-toggle='modal' data-bs-target='#editar-producto' onclick='editarConcepto($id_tmp);'>Editar Factura <i class='text-muted small fas fa-edit'></i></a></li>
-                            <li class='notification-link py-1 ps-3' ><a class='text-decoration-none text-secondary-emphasis'  data-bs-toggle='modal' data-bs-target='#nuevo-producto' onclick='editarProductoFactura($idproducto,$id_tmp);'>Editar Productos <i class='text-muted small fas fa-edit'></i></a></li>
+                            <li class='notification-link py-1 ps-3' ><a class='text-decoration-none text-secondary-emphasis'  data-bs-toggle='modal' data-bs-target='#editar-producto' onclick='editarConcepto($id_tmp);'>Editar factura <i class='text-muted small fas fa-edit'></i></a></li>
+                            <li class='notification-link py-1 ps-3' ><a class='text-decoration-none text-secondary-emphasis'  data-bs-toggle='modal' data-bs-target='#nuevo-producto' onclick='editarProductoFactura($idproducto,$id_tmp);'>Editar productos <i class='text-muted small fas fa-edit'></i></a></li>
                             <li class='notification-link py-1 ps-3' ><a  class='text-decoration-none text-secondary-emphasis' onclick='eliminar($id_tmp,$cantidad,$idproducto); return false;'>Eliminar <i class='text-muted small fas fa-trash'></i></a></li>
                         </ul>
                     </div>
@@ -766,50 +867,73 @@ class ControladorFactura {
 
         $total_factura = ((bcdiv($sumador_total, '1', 2) + bcdiv($sumador_iva, '1', 2)) - bcdiv($sumador_ret, '1', 2)) - bcdiv($sumador_descuento, '1', 2);
 
+        $subtotal = bcdiv($sumador_total, '1', 2);
+        $descuentos = bcdiv($sumador_descuento, '1', 2);
+        $subdescuento = $subtotal - $descuentos;
+
         $datos .= "</tbody><tfoot><tr>
-        <th colspan='3'></th>
-        <th>SUBTOTAL</th>
-        <th colspan='2'>$ " . number_format(bcdiv($sumador_total, '1', 2), 2, '.', ',') . "</th>
-        <th></th></tr>";
+        <th colspan='5'>
+        <ul class='list-group mb-3 mt-3 pe-0'>
+        <li class='list-group-item d-flex justify-content-between lh-sm'>
+            <div>
+                <h6 class='my-0 titulo-lista fs-6 fw-semibold'>SUBTOTAL:</h6>
+            </div>
+            <span class='titulo-lista fw-semibold fs-6 pe-0 me-0'>$" . number_format(bcdiv($sumador_total, '1', 2), 2, '.', ',') . " </span>
+        </li>";
+
+        if ($sumador_descuento > 0) {
+            $datos .= " <li class='list-group-item d-flex justify-content-between lh-sm'>
+            <div>
+                <h6 class='my-0 titulo-lista fs-6 fw-semibold'>DESCUENTOS:</h6>
+            </div>
+            <span class='titulo-lista fw-semibold fs-6 pe-0 me-0'>$" . number_format(bcdiv($sumador_descuento, '1', 2), 2, '.', ',') . " </span>
+        </li>";
+
+            $datos .= " <li class='list-group-item d-flex justify-content-between lh-sm'>
+            <div>
+                <h6 class='my-0 titulo-lista fs-6 fw-semibold'>SUBDESCUENTO:</h6>
+            </div>
+            <span class='titulo-lista fw-semibold fs-6 pe-0 me-0'>$" . number_format(bcdiv($subdescuento, '1', 2), 2, '.', ',') . " </span>
+        </li>";
+        }
 
         if ($sumador_iva > 0) {
-            $datos .= "<tr>
-                <th colspan='3'></th>
-                <th>TRASLADOS</th>
-                <th colspan='2'>$ " . number_format(bcdiv($sumador_iva, '1', 2), 2, '.', ',') . "</th>
-                <th></th></tr>";
+            $datos .= " <li class='list-group-item d-flex justify-content-between lh-sm'>
+            <div>
+                <h6 class='my-0 titulo-lista fs-6 fw-semibold'>TRASLADOS:</h6>
+            </div>
+            <span class='titulo-lista fw-semibold fs-6 pe-0 me-0'>$" . number_format(bcdiv($sumador_iva, '1', 2), 2, '.', ',') . " </span>
+        </li>";
         }
         if ($sumador_ret > 0) {
-            $datos .= "<tr>
-                <th colspan='3'></th>
-                <th>RETENCIONES</th>
-                <th colspan='2'>$ " . number_format(bcdiv($sumador_ret, '1', 2), 2, '.', ',') . "</th>
-                <th></th></tr>";
-        }
-        if ($sumador_descuento > 0) {
-            $datos .= "<tr>
-                <th colspan='3'></th>
-                <th>DESCUENTOS</th>
-                <th colspan='2'>$ " . number_format(bcdiv($sumador_descuento, '1', 2), 2, '.', ',') . "</th>
-                <th></th></tr>";
-        }
-        $datos .= "<tr>
-        <th colspan='3'></th>
-        <th>TOTAL</th>
-        <th colspan='2'>$ " . number_format(bcdiv($total_factura, '1', 2), 2, '.', ',') . "</th>
-        <th></th></tr></tfoot>";
-            return $datos;
+            $datos .= " <li class='list-group-item d-flex justify-content-between lh-sm'>
+            <div>
+                <h6 class='my-0 titulo-lista fs-6 fw-semibold'>RETENCIONES:</h6>
+            </div>
+            <span class='titulo-lista fw-semibold fs-6 pe-0 me-0'>$" . number_format(bcdiv($sumador_ret, '1', 2), 2, '.', ',') . " </span>
+        </li>";
         }
 
-    public function gettmppagoAux($idfactura) {
+        $datos .= "<li class='list-group-item d-flex justify-content-between lh-sm'>
+        <div>
+            <h6 class='my-0 titulo-lista fs-6 fw-bold'>TOTAL:</h6>
+        </div>
+        <span class='titulo-lista fw-bold fs-6 pe-0 me-0'>$" . number_format(bcdiv($total_factura, '1', 2), 2, '.', ',') . " </span>
+    </li></ul></th></tfoot>";
+        return $datos;
+    }
+
+    public function gettmppagoAux($idfactura)
+    {
         $consultado = false;
         $consulta = "select min(montoinsoluto_tmp) montoinsoluto from tmppago where idfactura_tmp =$idfactura;";
-        $consultas = new Consultas();
-        $consultado = $consultas->getResults($consulta, null);
+
+        $consultado = $this->consultas->getResults($consulta, null);
         return $consultado;
     }
 
-    public function checktmppago($idfactura) {
+    public function checktmppago($idfactura)
+    {
         $tmp = $this->gettmppagoAux($idfactura);
         $montoant = "";
         foreach ($tmp as $tmpactual) {
@@ -823,36 +947,40 @@ class ControladorFactura {
         return $montoant;
     }
 
-    public function agregarObservaciones($t) {
+    public function agregarObservaciones($t)
+    {
         $consulta = "UPDATE `tmp` set observaciones_tmp=:observaciones where idtmp = :id;";
-        $valores = array("id" => $t->getIdtmp(),
-            "observaciones" => $t->getObservacionestmp());
-        $con = new Consultas();
-        $datos = $con->execute($consulta, $valores);
+        $valores = array(
+            "id" => $t->getIdtmp(),
+            "observaciones" => $t->getObservacionestmp()
+        );
+        $datos = $this->consultas->execute($consulta, $valores);
         return $datos;
     }
 
-    public function getDetalle($idfactura) {
+    public function getDetalle($idfactura)
+    {
         $consultado = false;
         $consulta = "SELECT det.* FROM detalle_factura det WHERE tagdetallef=:id ORDER BY iddetalle_factura ASC";
-        $consultas = new Consultas();
+
         $val = array("id" => $idfactura);
-        $consultado = $consultas->getResults($consulta, $val);
+        $consultado = $this->consultas->getResults($consulta, $val);
         return $consultado;
     }
 
-    public function getProductosFactura($id) {
-        $consultas = new Consultas();
+    public function getProductosFactura($id)
+    {
+
         $consultado = false;
         $consulta = "SELECT * FROM detalle_factura WHERE tagdetallef=:id ORDER BY iddetalle_factura";
         $val = array("id" => $id);
-        $consultado = $consultas->getResults($consulta, $val);
+        $consultado = $this->consultas->getResults($consulta, $val);
         return $consultado;
     }
 
-    public function productosFactura($tag, $sessionid) {
+    public function productosFactura($tag, $sessionid)
+    {
         $insertado = false;
-        $con = new Consultas();
         $productos = $this->getProductosFactura($tag);
         foreach ($productos as $productoactual) {
             $idproducto = $productoactual["id_producto_servicio"];
@@ -871,7 +999,8 @@ class ControladorFactura {
             $clvunidad = $productoactual['clvunidad'];
 
             $consulta = "INSERT INTO `tmp` VALUES (:id, :idproducto, :nombre, :cantidad, :precio, :importe, :descuento, :impdescuento, :imptotal, :tras, :ret, :observaciones, :chinv, :clvfiscal, :clvunidad, :session);";
-            $valores = array("id" => null,
+            $valores = array(
+                "id" => null,
                 "idproducto" => $idproducto,
                 "nombre" => $nombre,
                 "cantidad" => $cantidad,
@@ -886,57 +1015,64 @@ class ControladorFactura {
                 "chinv" => $chinventario,
                 "clvfiscal" => $clvfiscal,
                 "clvunidad" => $clvunidad,
-                "session" => $sessionid);
-            $insertado = $con->execute($consulta, $valores);
+                "session" => $sessionid
+            );
+            $insertado = $this->consultas->execute($consulta, $valores);
         }
         return $insertado;
     }
 
-    private function getTMP($sid) {
+    private function getTMP($sid)
+    {
         $consultado = false;
-        $consultas = new Consultas();
+
         $consulta = "SELECT tmp.* FROM tmp WHERE tmp.session_id=:sid ORDER by idtmp";
         $val = array("sid" => $sid);
-        $consultado = $consultas->getResults($consulta, $val);
+        $consultado = $this->consultas->getResults($consulta, $val);
         return $consultado;
     }
-
-    public function getTMPPago($sessionId) {
+    //cambio NO
+    public function getTMPPago($sessionId)
+    {
         $consultado = false;
         $consulta = "SELECT tmp.*, cb.nombre_banco, dat.uuid FROM tmppago tmp inner join catalogo_banco cb on (cb.idcatalogo_banco=tmp.idbanco_tmp) inner join datos_factura dat on (dat.iddatos_factura=tmp.idfactura_tmp) where tmp.sessionid='$sessionId' order by idtmppago";
-        $consultas = new Consultas();
-        $consultado = $consultas->getResults($consulta, null);
+
+        $consultado = $this->consultas->getResults($consulta, null);
         return $consultado;
     }
 
-    public function verificarProductos($sessionId) {
+    public function verificarProductos($sessionId)
+    {
         $consultado = false;
         $consulta = "SELECT * FROM tmp WHERE session_id=:idsession;";
-        $consultas = new Consultas();
+
         $valores = array("idsession" => $sessionId);
-        $consultado = $consultas->getResults($consulta, $valores);
+        $consultado = $this->consultas->getResults($consulta, $valores);
         return $consultado;
     }
 
-    public function verificarPagos($sessionid) {
+    public function verificarPagos($sessionid)
+    {
         $consultado = false;
         $consulta = "SELECT * FROM tmppago WHERE sessionid=:idsession;";
-        $consultas = new Consultas();
+
         $valores = array("idsession" => $sessionid);
-        $consultado = $consultas->getResults($consulta, $valores);
+        $consultado = $this->consultas->getResults($consulta, $valores);
         return $consultado;
     }
 
-    public function checkPagosaux($id) {
+    public function checkPagosaux($id)
+    {
         $consultado = false;
         $consulta = "SELECT * FROM pagos WHERE pago_idfactura=:id;";
-        $consultas = new Consultas();
+
         $valores = array("id" => $id);
-        $consultado = $consultas->getResults($consulta, $valores);
+        $consultado = $this->consultas->getResults($consulta, $valores);
         return $consultado;
     }
 
-    public function checkPagos($id) {
+    public function checkPagos($id)
+    {
         $pagos = $this->checkPagosaux($id);
         $idpago = "";
         foreach ($pagos as $actual) {
@@ -950,16 +1086,18 @@ class ControladorFactura {
         return $datos;
     }
 
-    public function checkDetallePagosaux($id) {
+    public function checkDetallePagosaux($id)
+    {
         $consultado = false;
         $consulta = "SELECT * FROM detalle_pago WHERE idfactura=:id;";
-        $consultas = new Consultas();
+
         $valores = array("id" => $id);
-        $consultado = $consultas->getResults($consulta, $valores);
+        $consultado = $this->consultas->getResults($consulta, $valores);
         return $consultado;
     }
 
-    public function checkDetallePagos($id) {
+    public function checkDetallePagos($id)
+    {
         $pagos = $this->checkDetallePagosaux($id);
         $idpago = "";
         foreach ($pagos as $actual) {
@@ -973,7 +1111,8 @@ class ControladorFactura {
         return $datos;
     }
 
-    private function genTag($sid) {
+    private function genTag($sid)
+    {
         $fecha = getdate();
         $d = $fecha['mday'];
         $m = $fecha['mon'];
@@ -1011,21 +1150,23 @@ class ControladorFactura {
         return $tag;
     }
 
-    private function validarFactura($sid) {
+    private function validarFactura($sid)
+    {
         $validar = false;
         $prod = 0;
         $productos = $this->verificarProductos($sid);
         foreach ($productos as $actual) {
-            $prod ++;
+            $prod++;
         }
         if ($prod == 0) {
             $validar = true;
-            echo "0debes agregar un producto o selecionar un concepto.";
+            echo "0Debes agregar un producto o seleccionar un concepto.";
         }
         return $validar;
     }
 
-    public function nuevoFactura($c) {
+    public function nuevoFactura($c)
+    {
         $insertado = false;
         $validar = $this->validarFactura($c->getSessionid());
         if (!$validar) {
@@ -1034,25 +1175,28 @@ class ControladorFactura {
         return $insertado;
     }
 
-    private function updateFolioConsecutivo($id) {
+    private function updateFolioConsecutivo($id)
+    {
         $consultado = false;
-        $consultas = new Consultas();
+
         $consulta = "UPDATE folio SET consecutivo=(consecutivo+1) WHERE idfolio=:id;";
         $val = array("id" => $id);
-        $consultado = $consultas->execute($consulta, $val);
+        $consultado = $this->consultas->execute($consulta, $val);
         return $consultado;
     }
 
-    private function getFoliobyID($id) {
+    private function getFoliobyID($id)
+    {
         $consultado = false;
-        $consultas = new Consultas();
+
         $consulta = "SELECT * FROM folio WHERE idfolio=:id;";
         $val = array("id" => $id);
-        $consultado = $consultas->getResults($consulta, $val);
+        $consultado = $this->consultas->getResults($consulta, $val);
         return $consultado;
     }
 
-    private function getFolio($id) {
+    private function getFolio($id)
+    {
         $datos = "";
         $folios = $this->getFoliobyID($id);
         foreach ($folios as $actual) {
@@ -1072,7 +1216,8 @@ class ControladorFactura {
         return $datos;
     }
 
-    private function insertarFactura($f) {
+    private function insertarFactura($f)
+    {
         $insertado = false;
         $hoy = date("Y-m-d");
         $tag = $this->genTag($f->getSessionid());
@@ -1083,8 +1228,15 @@ class ControladorFactura {
         $letra = $Fdiv[1];
         $nfolio = $Fdiv[2];
 
-        $consulta = "INSERT INTO `datos_factura` VALUES (:id, :fecha, :rfcemisor, :rzsocial, :clvregimen, :regimen, :codp, :serie, :letra, :folio, :idcliente, :cliente, :rfcreceptor, :rzreceptor, :dirreceptor, :cpreceptor, :regfiscalreceptor, :chfirmar, :cadena, :certSAT, :certCFDI, :uuid, :selloSAT, :sellocfdi, :fechatimbrado, :qrcode, :cfdistring, :cfdicancel, :status, :idmetodopago, :idformapago, :idmoneda, :tcambio, :iduso, :tipocomprobante, :tipofactura, :iddatosfacturacion, :cfdis, :subtotal, :subiva, :subret, :totdescuentos, :total, :chperiodo, :periodocobro, :tag, :periodo, :mes, :anho);";
-        $valores = array("id" => null,
+        $consulta = "INSERT INTO `datos_factura` VALUES (:id, :fecha, :rfcemisor, :rzsocial, :clvregimen, :regimen, :codp, :serie, 
+        :letra, :folio, :idcliente, :cliente, :rfcreceptor, :rzreceptor, :dirreceptor, :cpreceptor, :regfiscalreceptor, :chfirmar, 
+        :cadena, :certSAT, :certCFDI, :uuid, :selloSAT, :sellocfdi, :fechatimbrado, :qrcode, :cfdistring, :cfdicancel, :status, 
+        :idmetodopago, :nombremetodo, :idformapago, :nombrepago, :idmoneda, :nombremoneda, :tcambio, :iduso, :nombrecfdi, 
+        :tipocomprobante, :nombrecomprobante, :tipofactura, :iddatosfacturacion, :cfdis, :subtotal, :subiva, :subret, :totdescuentos, 
+        :total, :chperiodo, :periodocobro, :tag, :periodo, :mes, :anho);";
+
+        $valores = array(
+            "id" => null,
             "fecha" => $hoy,
             "rfcemisor" => '',
             "rzsocial" => '',
@@ -1114,11 +1266,16 @@ class ControladorFactura {
             "cfdicancel" => null,
             "status" => '2',
             "idmetodopago" => $f->getIdmetodopago(),
+            "nombremetodo" => $f->getNombremetodo(),
             "idformapago" => $f->getIdformapago(),
+            "nombrepago" => $f->getNombrepago(),
             "idmoneda" => $f->getIdmoneda(),
+            "nombremoneda" => $f->getNombremoneda(),
             "tcambio" => $f->getTcambio(),
             "iduso" => $f->getIdusocfdi(),
+            "nombrecfdi" => $f->getNombrecfdi(),
             "tipocomprobante" => $f->getTipocomprobante(),
+            "nombrecomprobante" => $f->getNombrecomprobante(),
             "tipofactura" => '2',
             "iddatosfacturacion" => $f->getIddatosfacturacion(),
             "cfdis" => $f->getCfdisrel(),
@@ -1132,27 +1289,35 @@ class ControladorFactura {
             "tag" => $tag,
             "periodo" => $f->getPeriodicidad(),
             "mes" => $f->getMesperiodo(),
-            "anho" => $f->getAnoperiodo());
-        $con = new Consultas();
-        $insertado = $con->execute($consulta, $valores);
+            "anho" => $f->getAnoperiodo(),
+        );
+
+
+        $insertado = $this->consultas->execute($consulta, $valores);
+
 
         $this->detalleFactura($f->getSessionid(), $tag);
         if ($f->getCfdisrel() == '1') {
             $this->detalleCFDIS($f->getSessionid(), $tag);
+            if ($f->getTipocomprobante() == 2) {
+                $this->detalleCfdiEgreso($f->getSessionid(), $tag);
+            }
         }
         if ($f->getIdcotizacion() != "") {
             $this->actualizarCotizacion($f->getIdcotizacion(), $tag);
         }
+
         $datos = '<corte>' . $tag . '<corte>';
         return $datos;
     }
 
-    private function detalleFactura($idsession, $tag) {
+
+    private function detalleFactura($idsession, $tag)
+    {
         $sumador_total = 0;
-        $sumador_iva = 0;   
+        $sumador_iva = 0;
         $sumador_ret = 0;
         $sumador_descuento = 0;
-        $con = new Consultas();
         $productos = $this->getTMP($idsession);
         foreach ($productos as $productoactual) {
             $id_tmp = $productoactual['idtmp'];
@@ -1191,8 +1356,11 @@ class ControladorFactura {
             $sumador_ret += bcdiv($ret, '1', 2);
             $sumador_total += bcdiv($ptotal, '1', 2);
             $sumador_descuento += bcdiv($impdescuento, '1', 2);
-            $consulta2 = "INSERT INTO `detalle_factura` VALUES (:id,:cantidad,:precio, :subtotal, :descuento, :impdescuento, :totdescuento, :traslados, :retenciones, :observaciones, :idproducto, :nombreprod, :chinv, :clvfiscal, :clvunidad, :iddatosfactura);";
-            $valores2 = array("id" => null,
+            $consulta2 = "INSERT INTO `detalle_factura` VALUES (:id,:cantidad,:precio, :subtotal, :descuento, 
+            :impdescuento, :totdescuento, :traslados, :retenciones, :observaciones, :idproducto, :nombreprod, 
+            :chinv, :clvfiscal, :clvunidad, :iddatosfactura);";
+            $valores2 = array(
+                "id" => null,
                 "cantidad" => $cantidad,
                 "precio" => bcdiv($pventa, '1', 2),
                 "subtotal" => bcdiv($ptotal, '1', 2),
@@ -1207,68 +1375,116 @@ class ControladorFactura {
                 "chinv" => $chinv,
                 "clvfiscal" => $clvfiscal,
                 "clvunidad" => $clvunidad,
-                "iddatosfactura" => $tag);
+                "iddatosfactura" => $tag
+            );
 
-            $insertado = $con->execute($consulta2, $valores2);
+            $insertado = $this->consultas->execute($consulta2, $valores2);
         }
         $totaltraslados = $this->checkArray($idsession, '1');
         $totalretencion = $this->checkArray($idsession, '2');
         $borrar = "DELETE FROM `tmp` WHERE session_id=:id;";
         $valores3 = array("id" => $idsession);
-        $eliminado = $con->execute($borrar, $valores3);
+        $eliminado = $this->consultas->execute($borrar, $valores3);
 
         $total_factura = ((bcdiv($sumador_total, '1', 2) + bcdiv($sumador_iva, '1', 2)) - bcdiv($sumador_ret, '1', 2)) - bcdiv($sumador_descuento, '1', 2);
         $update = "UPDATE `datos_factura` set subtotal=:subtotal, subtotaliva=:iva, subtotalret=:ret, totaldescuentos=:totdesc, totalfactura=:total WHERE tagfactura=:tag;";
-        $valores4 = array("tag" => $tag,
+        $valores4 = array(
+            "tag" => $tag,
             "subtotal" => bcdiv($sumador_total, '1', 2),
             "iva" => $totaltraslados,
             "ret" => $totalretencion,
             "totdesc" => bcdiv($sumador_descuento, '1', 2),
-            "total" => bcdiv($total_factura, '1', 2));
-        $insertado = $con->execute($update, $valores4);
+            "total" => bcdiv($total_factura, '1', 2)
+        );
+        $insertado = $this->consultas->execute($update, $valores4);
         return $insertado;
     }
 
-    private function detalleCFDIS($idsession, $tag) {
+    private function detalleCFDIS($idsession, $tag)
+    {
         $cfdi = $this->getTMPCFDIS($idsession);
         foreach ($cfdi as $actual) {
             $idtmpcfdi = $actual['idtmpcfdi'];
             $tiporel = $actual['tiporel'];
+            $descrel = $actual['desc_tiporel'];
             $uuid = $actual['uuid'];
 
-            $con = new Consultas();
-            $consulta2 = "INSERT INTO `cfdirelacionado` VALUES (:id, :tiporel, :uuid, :tag);";
-            $valores2 = array("id" => null,
+            $consulta2 = "INSERT INTO `cfdirelacionado` VALUES (:id, :tiporel, :desctiporel, :uuid, :tag);";
+            $valores2 = array(
+                "id" => null,
                 "tiporel" => $tiporel,
+                "desctiporel" => $descrel,
                 "uuid" => $uuid,
-                "tag" => $tag);
-            $insertado = $con->execute($consulta2, $valores2);
+                "tag" => $tag
+            );
+            $insertado = $this->consultas->execute($consulta2, $valores2);
         }
         $cfdi = $this->deleteTMPCFDI($idsession);
         return $insertado;
     }
 
-    private function actualizarCotizacion($idcot, $idfactura) {
+    //nuevo
+    private function detalleCfdiEgreso($idsession, $tag)
+    {
+        $cfdi = $this->getTMPCfdiEgreso($idsession);
+        foreach ($cfdi as $actual) {
+            $id_doc = $actual['id_doc'];
+            $folio_doc = $actual['folio_doc'];
+            $type = $actual['type'];
+            $uuid = $actual['uuid'];
+            $tiporel = $actual['tiporel'];
+            $descripcion_rel = $actual['descripcion_rel'];
+            $monto_egreso = $actual['monto_egreso'];
+
+            $consulta2 = "INSERT INTO cfdiegreso VALUES (:id, :iddoc, :foliodoc, :type, :uuid, :tiporel, 
+            :descrel, :monto, :aplicada, :tag)";
+            $valores2 = array(
+                "id" => null,
+                "iddoc" => $id_doc,
+                "foliodoc" => $folio_doc,
+                "type" => $type,
+                "uuid" => $uuid,
+                "tiporel" => $tiporel,
+                "descrel" => $descripcion_rel,
+                "monto" => $monto_egreso,
+                "aplicada" => 0,
+                "tag" => $tag
+            );
+            $insertado = $this->consultas->execute($consulta2, $valores2);
+        }
+        $cfdi = $this->deleteTMPEgreso($idsession);
+        return $insertado;
+    }
+
+
+    private function actualizarCotizacion($idcot, $idfactura)
+    {
         $consultado = false;
-        $consultas = new Consultas();
+
         $consulta = "UPDATE `datos_cotizacion` SET expfactura=:exp WHERE iddatos_cotizacion=:id;";
-        $valores = array("id" => $idcot, 
-            "exp" => $idfactura);
-        $consultado = $consultas->getResults($consulta, $valores);
+        $valores = array(
+            "id" => $idcot,
+            "exp" => $idfactura
+        );
+        $consultado = $this->consultas->getResults($consulta, $valores);
         return $consultado;
     }
 
-    private function getIDFacturaAux($folio, $iddatos) {
+    private function getIDFacturaAux($folio, $iddatos)
+    {
         $consultado = false;
-        $consultas = new Consultas();
+
         $consulta = "SELECT iddatos_factura FROM datos_factura WHERE folio_interno_fac=:folio AND iddatosfacturacion=:iddatos;";
-        $valores = array("folio" => $folio,
-            "iddatos" => $iddatos);
-        $consultado = $consultas->getResults($consulta, $valores);
+        $valores = array(
+            "folio" => $folio,
+            "iddatos" => $iddatos
+        );
+        $consultado = $this->consultas->getResults($consulta, $valores);
         return $consultado;
     }
 
-    public function getIDFactura($folio, $iddatos) {
+    public function getIDFactura($folio, $iddatos)
+    {
         $idfactura = "";
         $facturas = $this->getIDFacturaAux($folio, $iddatos);
         foreach ($facturas as $facturaactual) {
@@ -1277,45 +1493,51 @@ class ControladorFactura {
         return $idfactura;
     }
 
-    public function removerInventario($idproducto, $cantidad) {
+    public function removerInventario($idproducto, $cantidad)
+    {
         $consultado = false;
         $consulta = "UPDATE `productos_servicios` set cantinv=cantinv-:cantidad where idproser=:idproducto;";
-        $consultas = new Consultas();
+
         $valores = array("idproducto" => $idproducto, "cantidad" => $cantidad);
-        $consultado = $consultas->getResults($consulta, $valores);
+        $consultado = $this->consultas->getResults($consulta, $valores);
         return $consultado;
     }
 
-    public function restaurarInventario($idproducto, $cantidad) {
+    public function restaurarInventario($idproducto, $cantidad)
+    {
         $consultado = false;
         $consulta = "UPDATE `productos_servicios` set cantinv=cantinv+:cantidad where idproser=:idproducto;";
-        $consultas = new Consultas();
+
         $valores = array("idproducto" => $idproducto, "cantidad" => $cantidad);
-        $consultado = $consultas->getResults($consulta, $valores);
+        $consultado = $this->consultas->getResults($consulta, $valores);
         return $consultado;
     }
 
-    private function restaurarInvCant($idproducto, $cantidad) {
+    private function restaurarInvCant($idproducto, $cantidad)
+    {
         $consultado = false;
         $consulta = "UPDATE `productos_servicios` set cantinv=:cantidad where idproser=:idproducto;";
-        $consultas = new Consultas();
+
         $valores = array("idproducto" => $idproducto, "cantidad" => $cantidad);
-        $consultado = $consultas->getResults($consulta, $valores);
+        $consultado = $this->consultas->getResults($consulta, $valores);
         return $consultado;
     }
 
-    public function estadoFactura($idfactura) {
+    public function estadoFactura($idfactura)
+    {
         $actualizado = false;
         $consulta = "UPDATE `datos_factura` SET status_pago=:estado, cfdicancel=:cfdi WHERE iddatos_factura=:id;);";
-        $valores = array("id" => $idfactura,
+        $valores = array(
+            "id" => $idfactura,
             "estado" => '2',
-            "cfdi" => '');
-        $con = new Consultas();
-        $actualizado = $con->execute($consulta, $valores);
+            "cfdi" => ''
+        );
+        $actualizado = $this->consultas->execute($consulta, $valores);
         return $actualizado;
     }
 
-    public function getFecha() {
+    public function getFecha()
+    {
         $datos = "";
         $fecha = getdate();
         $d = $fecha['mday'];
@@ -1331,7 +1553,8 @@ class ControladorFactura {
         return $datos;
     }
 
-    public function getParcialidad($idfactura) {
+    public function getParcialidad($idfactura)
+    {
         $datos = "";
         $parcialidad = $this->getParcialidadAux($idfactura);
         foreach ($parcialidad as $p) {
@@ -1343,16 +1566,18 @@ class ControladorFactura {
         return $datos;
     }
 
-    public function getParcialidadAux($idfactura) {
+    public function getParcialidadAux($idfactura)
+    {
         $consultado = false;
         $consulta = "SELECT (noparcialidad)+1 as par FROM pagos where pago_idfactura=:id;";
-        $consultas = new Consultas();
+
         $valores = array("id" => $idfactura);
-        $consultado = $consultas->getResults($consulta, $valores);
+        $consultado = $this->consultas->getResults($consulta, $valores);
         return $consultado;
     }
 
-    public function getDatosEmisor($fid) {
+    public function getDatosEmisor($fid)
+    {
         $datos = "";
         $sine = $this->getDatosFacturacionbyId($fid);
         foreach ($sine as $dactual) {
@@ -1365,46 +1590,47 @@ class ControladorFactura {
         }
         return $datos;
     }
-
-    public function getFacturaById($idfactura) {
+    //cambio NO
+    public function getFacturaById($idfactura)
+    {
         $consultado = false;
-        $consultas = new Consultas();
-        $consulta = "SELECT * FROM datos_factura dat INNER JOIN catalogo_metodo_pago cmp ON (dat.id_metodo_pago= cmp.idmetodo_pago) 
-                INNER JOIN catalogo_pago cp ON (dat.id_forma_pago = cp.idcatalogo_pago) 
-                INNER JOIN catalogo_moneda cm ON (cm.idcatalogo_moneda = dat.id_moneda)
-                INNER JOIN catalogo_uso_cfdi cuc ON (dat.id_uso_cfdi= cuc.iduso_cfdi) 
-                INNER JOIN catalogo_comprobante cc ON (dat.id_tipo_comprobante=cc.idcatalogo_comprobante) 
-                INNER JOIN datos_facturacion df ON (df.id_datos=dat.iddatosfacturacion) WHERE dat.iddatos_factura=:id;";
+        $consulta = "SELECT dat.*, df.* FROM datos_factura dat
+                        INNER JOIN datos_facturacion df ON df.id_datos = dat.iddatosfacturacion
+                        WHERE dat.iddatos_factura=:id;";
         $val = array("id" => $idfactura);
-        $consultado = $consultas->getResults($consulta, $val);
+        $consultado = $this->consultas->getResults($consulta, $val);
         return $consultado;
     }
 
-    public function getFacturaPagoById2($idfactura) {
+
+    public function getFacturaPagoById2($idfactura)
+    {
         $consultado = false;
-        $consultas = new Consultas();
+
         $consulta = "select p.*, dat.iddatos_factura, dat.folio_interno_fac,dat.uuid, dat.id_metodo_pago,dat.id_forma_pago from pagos p inner join datos_factura dat on (p.pago_idfactura=dat.iddatos_factura) where p.pago_idfactura = '$idfactura' order by idpago desc limit 1;";
-        $consultado = $consultas->getResults($consulta, null);
+        $consultado = $this->consultas->getResults($consulta, null);
         return $consultado;
     }
-
-    public function getPagoById($idpago) {
+    //cambio NO
+    public function getPagoById($idpago)
+    {
         $consultado = false;
         $consulta = "SELECT p.*, dat.folio_interno_fac, dat.id_metodo_pago, cp.descripcion_pago FROM pagos p inner join datos_factura dat on (p.pago_idfactura=dat.iddatos_factura) inner join catalogo_pago cp on (p.id_formapago=cp.idcatalogo_pago) where idpago='$idpago';";
-        $consultas = new Consultas();
-        $consultado = $consultas->getResults($consulta, null);
+        $consultado = $this->consultas->getResults($consulta, null);
         return $consultado;
     }
 
-    public function getMontoAnteriorAux($noparc, $idfactura) {
+    public function getMontoAnteriorAux($noparc, $idfactura)
+    {
         $consultado = false;
         $consulta = "select montoinsoluto from pagos where noparcialidad=$noparc and pago_idfactura=$idfactura;";
-        $consultas = new Consultas();
-        $consultado = $consultas->getResults($consulta, null);
+
+        $consultado = $this->consultas->getResults($consulta, null);
         return $consultado;
     }
 
-    public function getMontoAnterior($noparc, $idfactura) {
+    public function getMontoAnterior($noparc, $idfactura)
+    {
         $total = $this->getMontoAnteriorAux($noparc, $idfactura);
         $totalfactura = "";
         foreach ($total as $actual) {
@@ -1412,17 +1638,18 @@ class ControladorFactura {
         }
         return $totalfactura;
     }
-
-    private function getNombancoaux($idbanco) {
+    //cambio NO
+    private function getNombancoaux($idbanco)
+    {
         $consultado = false;
         $consulta = "select nombre_banco from catalogo_banco where idcatalogo_banco=:bid;";
-        $consultas = new Consultas();
         $val = array("bid" => $idbanco);
-        $consultado = $consultas->getResults($consulta, $val);
+        $consultado = $this->consultas->getResults($consulta, $val);
         return $consultado;
     }
 
-    private function getNomBanco($idbanco) {
+    private function getNomBanco($idbanco)
+    {
         $banco = $this->getNombancoaux($idbanco);
         $nombre = "";
         foreach ($banco as $bactual) {
@@ -1431,7 +1658,8 @@ class ControladorFactura {
         return $nombre;
     }
 
-    public function getDatosPago($idpago) {
+    public function getDatosPago($idpago)
+    {
         $pago = $this->getPagoById($idpago);
         $datos = "";
         foreach ($pago as $pagoactual) {
@@ -1468,16 +1696,18 @@ class ControladorFactura {
         return $datos;
     }
 
-    private function getFacturaPagoById($idfactura) {
+    private function getFacturaPagoById($idfactura)
+    {
         $consultado = false;
-        $consultas = new Consultas();
+
         $consulta = "SELECT f.*, df.nombre_contribuyente FROM datos_factura f INNER JOIN datos_facturacion df ON (f.iddatosfacturacion=df.id_datos) WHERE iddatos_factura=:id;";
         $val = array("id" => $idfactura);
-        $consultado = $consultas->getResults($consulta, $val);
+        $consultado = $this->consultas->getResults($consulta, $val);
         return $consultado;
     }
 
-    public function getDatosFacPago($idfactura) {
+    public function getDatosFacPago($idfactura)
+    {
         $factura = $this->getFacturaPagoById($idfactura);
         $datos = "";
         foreach ($factura as $facturaactual) {
@@ -1501,7 +1731,8 @@ class ControladorFactura {
         return $datos;
     }
 
-    public function getDatosFacPago2($idfactura) {
+    public function getDatosFacPago2($idfactura)
+    {
         $factura = $this->getFacturaPagoById2($idfactura);
         $datos = "";
         foreach ($factura as $facturaactual) {
@@ -1518,7 +1749,8 @@ class ControladorFactura {
         return $datos;
     }
 
-    public function getClienteExportar($idcliente) {
+    public function getClienteExportar($idcliente)
+    {
         $datos = "";
         $clientes = $this->getClientebyID($idcliente);
         foreach ($clientes as $actual) {
@@ -1533,16 +1765,17 @@ class ControladorFactura {
         return $datos;
     }
 
-    private function getClientebyID($idcliente) {
+    private function getClientebyID($idcliente)
+    {
         $consultado = false;
-        $con = new Consultas();
         $consulta = "SELECT * FROM cliente WHERE id_cliente=:cid;";
         $val = array("cid" => $idcliente);
-        $consultado = $con->getResults($consulta, $val);
+        $consultado = $this->consultas->getResults($consulta, $val);
         return $consultado;
     }
 
-    private function getNombreCliente($idcliente) {
+    private function getNombreCliente($idcliente)
+    {
         $nombre = "";
         $datos = $this->getClientebyID($idcliente);
         foreach ($datos as $actual) {
@@ -1551,16 +1784,17 @@ class ControladorFactura {
         return $nombre;
     }
 
-    private function getFacturaEditar($idfactura) {
+    private function getFacturaEditar($idfactura)
+    {
         $consultado = false;
-        $consultas = new Consultas();
         $consulta = "SELECT * FROM datos_factura dat WHERE dat.iddatos_factura=:id;";
         $val = array("id" => $idfactura);
-        $consultado = $consultas->getResults($consulta, $val);
+        $consultado = $this->consultas->getResults($consulta, $val);
         return $consultado;
     }
 
-    public function getDatosFactura($idFactura) {
+    public function getDatosFactura($idFactura)
+    {
         $factura = $this->getFacturaEditar($idFactura);
         $datos = "";
         foreach ($factura as $facturaactual) {
@@ -1595,7 +1829,7 @@ class ControladorFactura {
             $periodoglobal = $facturaactual['periodoglobal'];
             $mesperiodo = $facturaactual['mesperiodo'];
             $anhoperiodo = $facturaactual['anhoperiodo'];
-        	$cpemisor = $facturaactual['factura_cpemisor'];
+            $cpemisor = $facturaactual['factura_cpemisor'];
 
             $datos = "$idfactura</tr>$serie</tr>$letra</tr>$folio</tr>$fecha_creacion</tr>$idcliente</tr>$cliente</tr>$rfccliente</tr>$rzreceptor</tr>$cpreceptor</tr>$regfiscalrec</tr>$idmetodo_pago</tr>$idmoneda</tr>$iduso_cfdi</tr>$idforma_pago</tr>$idtipo_comprobante</tr>$status</tr>$uuid</tr>$iddatos</tr>$chfirmar</tr>$cfdisrel</tr>$tcambio</tr>$rfc</tr>$rzsocial</tr>$clvreg</tr>$regimen</tr>$tag</tr>$dirreceptor</tr>$periodoglobal</tr>$mesperiodo</tr>$anhoperiodo</tr>$cpemisor";
             break;
@@ -1603,7 +1837,8 @@ class ControladorFactura {
         return $datos;
     }
 
-    public function checkArray($idsession, $idimpuesto) {
+    public function checkArray($idsession, $idimpuesto)
+    {
         $productos = $this->getTMP($idsession);
         $imptraslados = $this->getImpuestos($idimpuesto);
         $row = array();
@@ -1637,7 +1872,8 @@ class ControladorFactura {
         return $trasarray;
     }
 
-    public function modificarFactura($c) {
+    public function modificarFactura($c)
+    {
         $insertado = false;
         $validar = $this->validarFactura($c->getSessionid());
         if (!$validar) {
@@ -1646,10 +1882,9 @@ class ControladorFactura {
         return $insertado;
     }
 
-    public function actualizarFactura($f) {
+    public function actualizarFactura($f)
+    {
         $actualizado = false;
-        $con = new Consultas();
-
         $updfolio = "";
         $serie = "";
         $letra = "";
@@ -1663,8 +1898,9 @@ class ControladorFactura {
             $nfolio = $Fdiv[2];
         }
 
-        $consulta = "UPDATE `datos_factura` SET $updfolio idcliente=:idcliente, nombrecliente=:cliente, rfcreceptor=:rfcreceptor, rzreceptor=:rzreceptor, dircliente=:dircliente, cpreceptor=:cpreceptor, regfiscalreceptor=:regfiscalreceptor, chfirmar=:chfirmar, id_metodo_pago=:idmetodopago,id_forma_pago=:idformapago,id_moneda=:idmoneda, tcambio=:tcambio, id_uso_cfdi=:iduso,id_tipo_comprobante=:tipocomprobante, iddatosfacturacion=:iddatos, cfdisrel=:cfdisrel, periodoglobal=:periodo, mesperiodo=:mesp, anhoperiodo=:anhop WHERE iddatos_factura=:idfactura;";
-        $valores = array("idfactura" => $f->getIddatos_factura(),
+        $consulta = "UPDATE `datos_factura` SET $updfolio idcliente=:idcliente, nombrecliente=:cliente, rfcreceptor=:rfcreceptor, rzreceptor=:rzreceptor, dircliente=:dircliente, cpreceptor=:cpreceptor, regfiscalreceptor=:regfiscalreceptor, chfirmar=:chfirmar, id_metodo_pago=:idmetodopago,id_forma_pago=:idformapago,id_moneda=:idmoneda, tcambio=:tcambio, id_uso_cfdi=:iduso,id_tipo_comprobante=:tipocomprobante, iddatosfacturacion=:iddatos, cfdisrel=:cfdisrel, periodoglobal=:periodo, mesperiodo=:mesp, anhoperiodo=:anhop, moneda=:nombremoneda, metodo_pago=:nombremetodo, tipo_comprobante=:nombrecomprobante, forma_pago=:nombrepago, uso_cfdi=:nombrecfdi WHERE iddatos_factura=:idfactura;";
+        $valores = array(
+            "idfactura" => $f->getIddatos_factura(),
             /*"rfc" => $rfc,
             "rzsocial" => $rzsocial,
             "clvreg" => $clvreg,
@@ -1691,21 +1927,31 @@ class ControladorFactura {
             "cfdisrel" => $f->getCfdisrel(),
             "periodo" => $f->getPeriodicidad(),
             "mesp" => $f->getMesperiodo(),
-            "anhop" => $f->getAnoperiodo());
+            "anhop" => $f->getAnoperiodo(),
+            //nuevo
+            "nombremoneda" => $f->getNombremoneda(),
+            "nombremetodo" => $f->getNombremetodo(),
+            "nombrecomprobante" => $f->getNombrecomprobante(),
+            "nombrepago" => $f->getNombrepago(),
+            "nombrecfdi" => $f->getNombrecfdi()
 
-        $actualizado = $con->execute($consulta, $valores);
+        );
+        $actualizado = $this->consultas->execute($consulta, $valores);
         $datos = $this->actualizarDetalle($f->getSessionid(), $f->getTag());
         $cfdi = $this->actualizarCFDIS($f->getSessionid(), $f->getTag());
+        //nu
+        $cfdi = $this->actualizarCfdiEgreso($f->getSessionid(), $f->getTag());
         return $actualizado;
     }
 
-    public function actualizarDetalle($idsession, $tag) {
+    public function actualizarDetalle($idsession, $tag)
+    {
         $insertado = false;
         $sumador_total = 0;
         $sumador_iva = 0;
         $sumador_ret = 0;
         $sumador_descuento = 0;
-    	
+
         $borrar = $this->eliminarFacturaAux($tag);
         $productos = $this->getTMP($idsession);
         foreach ($productos as $productoactual) {
@@ -1746,7 +1992,8 @@ class ControladorFactura {
             $sumador_total += bcdiv($ptotal, '1', 2);
             $sumador_descuento += bcdiv($impdescuento, '1', 2);
             $consulta2 = "INSERT INTO `detalle_factura` VALUES (:id,:cantidad,:precio, :subtotal, :descuento, :impdescuento, :totdescuento, :traslados, :retenciones, :observaciones, :idproducto, :nombreprod, :chinv, :clvfiscal, :clvunidad, :iddatosfactura);";
-            $valores2 = array("id" => null,
+            $valores2 = array(
+                "id" => null,
                 "cantidad" => $cantidad,
                 "precio" => bcdiv($pventa, '1', 2),
                 "subtotal" => bcdiv($ptotal, '1', 2),
@@ -1761,64 +2008,100 @@ class ControladorFactura {
                 "chinv" => $chinv,
                 "clvfiscal" => $clvfiscal,
                 "clvunidad" => $clvunidad,
-                "iddatosfactura" => $tag);
-                $con = new Consultas();
-            $insertado = $con->execute($consulta2, $valores2);
+                "iddatosfactura" => $tag
+            );
+            $insertado = $this->consultas->execute($consulta2, $valores2);
         }
 
-        $con = new Consultas();
         $totaltraslados = $this->checkArray($idsession, '1');
         $totalretencion = $this->checkArray($idsession, '2');
         $borrar = "DELETE FROM `tmp` WHERE session_id=:id;";
         $valores3 = array("id" => $idsession);
-        $eliminado = $con->execute($borrar, $valores3);
+        $eliminado = $this->consultas->execute($borrar, $valores3);
 
-        $con = new Consultas();
         $total_factura = ((bcdiv($sumador_total, '1', 2) + bcdiv($sumador_iva, '1', 2)) - bcdiv($sumador_ret, '1', 2)) - bcdiv($sumador_descuento, '1', 2);
         $update = "UPDATE `datos_factura` SET subtotal=:subtotal, subtotaliva=:iva, subtotalret=:ret, totaldescuentos=:totdesc, totalfactura=:total WHERE tagfactura=:tag;";
-        $valores4 = array("tag" => $tag,
+        $valores4 = array(
+            "tag" => $tag,
             "subtotal" => bcdiv($sumador_total, '1', 2),
             "iva" => $totaltraslados,
             "ret" => $totalretencion,
             "totdesc" => bcdiv($sumador_descuento, '1', 2),
-            "total" => bcdiv($total_factura, '1', 2));
-        $insertado = $con->execute($update, $valores4);
+            "total" => bcdiv($total_factura, '1', 2)
+        );
+        $insertado = $this->consultas->execute($update, $valores4);
         return $insertado;
     }
 
-    private function actualizarCFDIS($idsession, $tag) {
+    private function actualizarCFDIS($idsession, $tag)
+    {
         $insertado = false;
-        
         $this->eliminarCFDIAux($tag);
 
         $cfdi = $this->getTMPCFDIS($idsession);
         foreach ($cfdi as $actual) {
             $idtmpcfdi = $actual['idtmpcfdi'];
             $tiporel = $actual['tiporel'];
+            $descrel = $actual['desc_tiporel'];
             $uuid = $actual['uuid'];
 
-            $consulta2 = "INSERT INTO `cfdirelacionado` VALUES (:id, :tiporel, :uuid, :tag);";
-            $valores2 = array("id" => null,
+            $consulta2 = "INSERT INTO `cfdirelacionado` VALUES (:id, :tiporel, :desctiporel, :uuid, :tag);";
+            $valores2 = array(
+                "id" => null,
                 "tiporel" => $tiporel,
+                "desctiporel" => $descrel,
                 "uuid" => $uuid,
-                "tag" => $tag);
-                $con = new Consultas();
-            $insertado = $con->execute($consulta2, $valores2);
+                "tag" => $tag
+            );
+            $insertado = $this->consultas->execute($consulta2, $valores2);
         }
         $cfdi = $this->deleteTMPCFDI($idsession);
         return $insertado;
     }
+    private function actualizarCfdiEgreso($idsession, $tag)
+    {
+        $insertado = false;
+        $this->eliminarCFDIEgresoAux($tag);
+        $cfdi = $this->getTMPCfdiEgreso($idsession);
+        foreach ($cfdi as $actual) {
+            $id_doc = $actual['id_doc'];
+            $folio_doc = $actual['folio_doc'];
+            $type = $actual['type'];
+            $uuid = $actual['uuid'];
+            $tiporel = $actual['tiporel'];
+            $descripcion_rel = $actual['descripcion_rel'];
+            $monto_egreso = $actual['monto_egreso'];
 
-    private function getTagbyID($id) {
+            $consulta2 = "INSERT INTO cfdiegreso VALUES (:id, :iddoc, :foliodoc, :type, :uuid, :tiporel, :descrel, :monto, :aplicada, :tag)";
+            $valores2 = array(
+                "id" => null,
+                "iddoc" => $id_doc,
+                "foliodoc" => $folio_doc,
+                "type" => $type,
+                "uuid" => $uuid,
+                "tiporel" => $tiporel,
+                "descrel" => $descripcion_rel,
+                "monto" => $monto_egreso,
+                "aplicada" => 0,
+                "tag" => $tag
+            );
+            $insertado = $this->consultas->execute($consulta2, $valores2);
+        }
+        $cfdi = $this->deleteTMPEgreso($idsession);
+        return $insertado;
+    }
+
+    private function getTagbyID($id)
+    {
         $consultado = false;
-        $con = new Consultas();
         $consulta = "SELECT * FROM datos_factura WHERE iddatos_factura=:id";
         $val = array("id" => $id);
-        $consultado = $con->getResults($consulta, $val);
+        $consultado = $this->consultas->getResults($consulta, $val);
         return $consultado;
     }
 
-    private function getTagAux($id) {
+    private function getTagAux($id)
+    {
         $tag = "";
         $datos = $this->getTagbyID($id);
         foreach ($datos as $actual) {
@@ -1827,46 +2110,60 @@ class ControladorFactura {
         return $tag;
     }
 
-    public function eliminarFactura($idfactura) {
+    public function eliminarFactura($idfactura)
+    {
         $eliminado = false;
-        $consultas = new Consultas();
+
         $tag = $this->getTagAux($idfactura);
         $consulta = "DELETE FROM `datos_factura` WHERE tagfactura=:tag;";
         $valores = array("tag" => $tag);
-        $eliminado = $consultas->execute($consulta, $valores);
+        $eliminado = $this->consultas->execute($consulta, $valores);
         $this->eliminarFacturaAux($tag);
         $this->eliminarCFDIAux($tag);
+        $this->eliminarCfdiEgresoAux($tag);
         return $eliminado;
     }
 
-    private function eliminarFacturaAux($idFactura) {
+    private function eliminarFacturaAux($idFactura)
+    {
         $eliminado = false;
-        $consultas = new Consultas();
+
         $consulta = "DELETE FROM `detalle_factura` WHERE tagdetallef=:id;";
         $valores = array("id" => $idFactura);
-        $eliminado = $consultas->execute($consulta, $valores);
+        $eliminado = $this->consultas->execute($consulta, $valores);
         return $eliminado;
     }
 
-    private function eliminarCFDIAux($tag) {
-        $con = new Consultas();
+    private function eliminarCFDIAux($tag)
+    {
         $eliminado = false;
         $borrar = "DELETE FROM `cfdirelacionado` WHERE cfditag=:tag;";
         $borrarvalores = array("tag" => $tag);
-        $eliminado = $con->execute($borrar, $borrarvalores);
+        $eliminado = $this->consultas->execute($borrar, $borrarvalores);
         return $eliminado;
     }
 
-    private function getTMPById($idtmp) {
+    private function eliminarCfdiEgresoAux($tag)
+    {
+        $eliminado = false;
+        $borrar = "DELETE FROM cfdiegreso WHERE tagfactura=:tag";
+        $borrarvalores = array("tag" => $tag);
+        $eliminado = $this->consultas->execute($borrar, $borrarvalores);
+        return $eliminado;
+    }
+
+    private function getTMPById($idtmp)
+    {
         $consultado = false;
         $consulta = "SELECT * FROM tmp WHERE idtmp=:id";
         $val = array("id" => $idtmp);
-        $consultas = new Consultas();
-        $consultado = $consultas->getResults($consulta, $val);
+
+        $consultado = $this->consultas->getResults($consulta, $val);
         return $consultado;
     }
 
-    public function getDatosTMP($idtmp) {
+    public function getDatosTMP($idtmp)
+    {
         $tmp = $this->getTMPById($idtmp);
         $datos = "";
         foreach ($tmp as $actual) {
@@ -1902,15 +2199,18 @@ class ControladorFactura {
                 $divcheck = explode("<imp>", $checktraslado);
                 foreach ($divcheck as $t) {
                     if ($t == $tactual['porcentaje'] . "-" . $tactual['impuesto']) {
-                        $iconT = "fa fa-check";
+                        $iconT = "far fa-check-square mx-2";
                         $checkedT = "checked";
                         break;
                     } else {
-                        $iconT = "glyphicon-unchecked";
+                        $iconT = "far fa-square mx-2";
                         $checkedT = "";
                     }
                 }
-                $optraslados .= "<li data-location='edit' data-id='$idtmp'><label class='dropdown-menu-item checkbox'><input type='checkbox' $checkedT value='" . $tactual['porcentaje'] . "' name='chtrasedit' data-impuesto='" . $tactual['impuesto'] . "' data-tipo='" . $tactual['tipoimpuesto'] . "'/><span class='glyphicon $iconT' id='chuso1span'></span>" . $tactual['nombre'] . " (" . $tactual['porcentaje'] . "%)" . "</label></li>";
+                $optraslados .= "<li data-location='edit' data-id='$idtmp'>
+                <label class='dropdown-menu-item checkbox ps-3 z-3'>
+                <input type='checkbox' $checkedT value='" . $tactual['porcentaje'] . "' name='chtrasedit' data-impuesto='" . $tactual['impuesto'] . "' data-tipo='" . $tactual['tipoimpuesto'] . "'/>
+                <span class='$iconT ms-2' id='chuso1span'></span>" . $tactual['nombre'] . " (" . $tactual['porcentaje'] . "%)" . "</label></li>";
             }
 
             $checkretencion = "";
@@ -1931,15 +2231,18 @@ class ControladorFactura {
                 $divcheckR = explode("<imp>", $checkretencion);
                 foreach ($divcheckR as $r) {
                     if ($r == $ractual['porcentaje'] . "-" . $ractual['impuesto']) {
-                        $iconR = "fa fa-check";
+                        $iconR = "far fa-check-square mx-2";
                         $checkedR = "checked";
                         break;
                     } else {
-                        $iconR = "glyphicon-unchecked";
+                        $iconR = "far fa-square mx-2";
                         $checkedR = "";
                     }
                 }
-                $opretencion .= "<li data-location='edit' data-id='$idtmp'><label class='dropdown-menu-item checkbox'><input type='checkbox' $checkedR value='" . $ractual['porcentaje'] . "' name='chretedit' data-impuesto='" . $ractual['impuesto'] . "' data-tipo='" . $ractual['tipoimpuesto'] . "'/><span class='glyphicon $iconR' id='chuso1span'></span>" . $ractual['nombre'] . " (" . $ractual['porcentaje'] . "%)" . "</label></li>";
+                $opretencion .= "<li data-location='edit' data-id='$idtmp'>
+                <label class='dropdown-menu-item checkbox'>
+                <input type='checkbox' $checkedR value='" . $ractual['porcentaje'] . "' name='chretedit' data-impuesto='" . $ractual['impuesto'] . "' data-tipo='" . $ractual['tipoimpuesto'] . "'/>
+                <span class='$iconR' id='chuso1span'></span>" . $ractual['nombre'] . " (" . $ractual['porcentaje'] . "%)" . "</label></li>";
             }
 
             $datos = "$idtmp</tr>$nombre</tr>$cantidad</tr>$precio</tr>$totunitario</tr>$descuento</tr>$impdescuento</tr>$total</tr>$observaciones</tr>$clvfiscal</tr>$clvunidad</tr>$optraslados</tr>$opretencion";
@@ -1948,7 +2251,8 @@ class ControladorFactura {
         return $datos;
     }
 
-    public function getDatosProducto($id) {
+    public function getDatosProducto($id)
+    {
         $tmp = $this->getProductoById($id);
         $datos = "";
         foreach ($tmp as $productoactual) {
@@ -1976,16 +2280,17 @@ class ControladorFactura {
         return $datos;
     }
 
-    private function getProveedorAux($pid) {
+    private function getProveedorAux($pid)
+    {
         $datos = false;
-        $con = new Consultas();
         $consulta = "SELECT * FROM proveedor WHERE idproveedor=:pid";
         $val = array("pid" => $pid);
-        $datos = $con->getResults($consulta, $val);
+        $datos = $this->consultas->getResults($consulta, $val);
         return $datos;
     }
 
-    private function getProveedor($pid) {
+    private function getProveedor($pid)
+    {
         $nombre = "";
         $datos = $this->getProveedorAux($pid);
         foreach ($datos as $actual) {
@@ -1994,7 +2299,8 @@ class ControladorFactura {
         return $nombre;
     }
 
-    public function checkConcepto($t) {
+    public function checkConcepto($t)
+    {
         $cant = $t->getCantidadtmp();
         $check = $this->checkProductoTMPAux($t->getIdtmp());
         foreach ($check as $actual) {
@@ -2024,15 +2330,15 @@ class ControladorFactura {
         return $datos;
     }
 
-    private function actualizarConcepto($t) {
+    private function actualizarConcepto($t)
+    {
         $actualizado = false;
-        $con = new Consultas();
         $importe = $t->getImportetmp() - $t->getImpdescuento();
         $traslados = $this->reBuildArray2($importe, $t->getIdtraslados());
         $retenciones = $this->reBuildArray2($importe, $t->getIdretencion());
-
         $consulta = "UPDATE `tmp` SET tmpnombre=:nombre, cantidad_tmp=:cantidad, precio_tmp=:precio, totunitario_tmp=:totunitario, descuento_tmp=:descuento, impdescuento_tmp=:impdescuento, imptotal_tmp=:imptotal, observaciones_tmp=:observaciones, trasladotmp=:tras, retenciontmp=:ret, clvfiscaltmp=:cfiscal, clvunidadtmp=:cunidad WHERE idtmp=:id;";
-        $valores = array("id" => $t->getIdtmp(),
+        $valores = array(
+            "id" => $t->getIdtmp(),
             "nombre" => $t->getDescripciontmp(),
             "cantidad" => $t->getCantidadtmp(),
             "precio" => $t->getPreciotmp(),
@@ -2044,12 +2350,14 @@ class ControladorFactura {
             "tras" => $traslados,
             "ret" => $retenciones,
             "cfiscal" => $t->getCfiscaltmp(),
-            "cunidad" => $t->getCunidadtmp());
-        $insertado = $con->execute($consulta, $valores);
+            "cunidad" => $t->getCunidadtmp()
+        );
+        $insertado = $this->consultas->execute($consulta, $valores);
         return $insertado;
     }
 
-    private function getPermisoById($idusuario) {
+    private function getPermisoById($idusuario)
+    {
         $consultado = false;
         $consulta = "SELECT p.crearfactura,p.editarfactura, p.eliminarfactura FROM usuariopermiso p where permiso_idusuario=:idusuario;";
         $c = new Consultas();
@@ -2057,16 +2365,19 @@ class ControladorFactura {
         $consultado = $c->getResults($consulta, $valores);
         return $consultado;
     }
-
-    private function getNumrowsAux($condicion) {
+    //cambio no
+    private function getNumrowsAux($condicion)
+    {
         $consultado = false;
         $consulta = "SELECT count(iddatos_factura) numrows FROM datos_factura dat INNER JOIN datos_facturacion d ON (d.id_datos=dat.iddatosfacturacion) $condicion;";
-        $consultas = new Consultas();
-        $consultado = $consultas->getResults($consulta, null);
+
+        $consultado = $this->consultas->getResults($consulta, null);
         return $consultado;
     }
 
-    private function getNumrows($condicion) {
+
+    private function getNumrows($condicion)
+    {
         $numrows = 0;
         $rows = $this->getNumrowsAux($condicion);
         foreach ($rows as $actual) {
@@ -2074,16 +2385,23 @@ class ControladorFactura {
         }
         return $numrows;
     }
-
-    private function getSevicios($condicion) {
+    //cambio si
+    private function getSevicios($condicion)
+    {
         $consultado = false;
-        $consulta = "SELECT dat.iddatos_factura, dat.iddatosfacturacion, dat.letra, dat.folio_interno_fac, dat.fecha_creacion, dat.rzreceptor cliente, dat.status_pago, dat.uuid, dat.idcliente, dat.tipofactura, dat.subtotal,dat.subtotaliva, dat.subtotalret, dat.totalfactura, dat.factura_rzsocial emisor, dat.id_moneda, d.color FROM datos_factura dat INNER JOIN datos_facturacion d ON (d.id_datos=dat.iddatosfacturacion) $condicion;";
-        $consultas = new Consultas();
-        $consultado = $consultas->getResults($consulta, null);
+        $consulta = "SELECT dat.iddatos_factura, dat.iddatosfacturacion, dat.letra, dat.folio_interno_fac, dat.fecha_creacion, dat.rzreceptor as cliente, dat.status_pago, dat.uuid, dat.idcliente, dat.tipofactura, dat.subtotal, dat.subtotaliva, dat.subtotalret, dat.totalfactura, dat.factura_rzsocial as emisor, d.color, df.moneda
+                FROM datos_factura dat 
+                INNER JOIN datos_facturacion d ON d.id_datos = dat.iddatosfacturacion
+                INNER JOIN datos_factura df ON df.iddatos_factura = dat.iddatos_factura
+                $condicion;";
+
+        $consultado = $this->consultas->getResults($consulta, null);
         return $consultado;
     }
 
-    private function getPermisos($idusuario) {
+
+    private function getPermisos($idusuario)
+    {
         $datos = "";
         $permisos = $this->getPermisoById($idusuario);
         foreach ($permisos as $actual) {
@@ -2095,7 +2413,8 @@ class ControladorFactura {
         return $datos;
     }
 
-	private function getNombreEmisor($fid) {
+    private function getNombreEmisor($fid)
+    {
         $razonsocial = "";
         $sine = $this->getDatosFacturacionbyId($fid);
         foreach ($sine as $dactual) {
@@ -2104,24 +2423,25 @@ class ControladorFactura {
         return $razonsocial;
     }
 
-    public function listaServiciosHistorial($pag, $REF, $numreg) {
+    public function listaServiciosHistorial($pag, $REF, $numreg)
+    {
         require_once '../com.sine.common/pagination.php';
         $idlogin = $_SESSION[sha1("idusuario")];
         $datos = "<thead class='sin-padding'>
             <tr class='align-middle'>
                 <th></th>
-                <th>No.Folio </th>
+                <th class='text-center'>No.Folio </th>
                 <th class='text-center'>Fecha de creación </th>
-                <th class='col-md-3'>Emisor</th>
-                <th>Cliente</th>
-                <th>Estado </th>
-                <th>Timbre </th>
-                <th>Subtotal </th>
-                <th>Traslados </th>
-                <th>Retenciones </th>
-                <th>Total </th>
-                <th>Moneda </th>
-                <th>Opción</th>
+                <th class='col-md-3 text-center'>Emisor</th>
+                <th class='text-center'>Cliente</th>
+                <th class='text-center'>Estado </th>
+                <th class='text-center'>Timbre </th>
+                <th class='text-center'>Subtotal </th>
+                <th class='text-center'>Traslado </th>
+                <th class='text-center'>Retención </th>
+                <th class='text-center'>Total </th>
+                <th class='text-center'>Moneda </th>
+                <th class='text-center'><span class='fas fa-ellipsis-v'></span></th>
                 
             </tr>
         </thead>
@@ -2130,7 +2450,7 @@ class ControladorFactura {
         if ($REF == "") {
             $condicion = "ORDER BY iddatos_factura desc";
         } else {
-            $condicion = "WHERE (concat(letra,folio_interno_fac) LIKE '%$REF%') OR (dat.rzreceptor LIKE '%$REF%') OR (dat.factura_rzsocial LIKE '%$REF%') ORDER BY iddatos_factura DESC";
+            $condicion = "WHERE (concat(dat.letra,dat.folio_interno_fac) LIKE '%$REF%') OR (dat.rzreceptor LIKE '%$REF%') OR (dat.factura_rzsocial LIKE '%$REF%') ORDER BY iddatos_factura DESC";
         }
         $permisos = $this->getPermisos($idlogin);
         $div = explode("</tr>", $permisos);
@@ -2151,20 +2471,19 @@ class ControladorFactura {
             $nombre_cliente = $listafacturaActual['cliente'];
             $estado = $listafacturaActual['status_pago'];
             $uuid = $listafacturaActual['uuid'];
-            $idcliente = $listafacturaActual['idcliente'];
-            $tipofactura = $listafacturaActual['tipofactura'];
             $subtotal = $listafacturaActual['subtotal'];
             $subiva = $listafacturaActual['subtotaliva'];
             $subret = $listafacturaActual['subtotalret'];
             $total = $listafacturaActual['totalfactura'];
-            $idmoneda = $listafacturaActual['id_moneda'];
             $emisor = $listafacturaActual['emisor'];
             $colorrow = $listafacturaActual['color'];
-        	if ($emisor == "") {
+            $divm = explode('-', $listafacturaActual['moneda']);
+            $cmoneda = $divm[0];
+            if ($emisor == "") {
                 $emisor = $this->getNombreEmisor($listafacturaActual['iddatosfacturacion']);
             }
-
             $iva = 0;
+
             if ($subiva != "") {
                 $diviva = explode("<impuesto>", $subiva);
                 foreach ($diviva as $ivan) {
@@ -2185,39 +2504,38 @@ class ControladorFactura {
             }
 
             $timbre = "";
-
             switch ($estado) {
                 case '1':
                     $estadoF = "Pagada";
-                    $color = "text-success";
+                    $color = "#29A50D";
                     $title = "Factura pagada";
                     $function = "onclick='tablaPagos($idfactura,$estado)'";
-                    $modal = "data-toggle='modal' data-target='#pagosfactura'";
+                    $modal = "data-bs-toggle='modal' data-bs-target='#pagosfactura'";
                     break;
                 case '2':
                     $estadoF = "Pendiente";
-                    $color = "text-danger";
+                    $color = "#ED495C";
                     $title = "Pago pendiente";
                     $function = "onclick='registrarPago($idfactura)'";
                     $modal = "";
                     break;
                 case '3':
                     $estadoF = "Cancelada";
-                    $color = "text-muted";
+                    $color = "#E4AC08";
                     $title = "Factura cancelada";
-                    $function = "";
+                    $function = "href='./com.sine.imprimir/imprimirxml.php?f=$idfactura&t=c' target='_blank'";
                     $modal = "";
                     break;
                 case '4':
-                    $estadoF = "Pago Parcial";
-                    $color = "text-warning";
-                    $title = "Factura pagada parcialmente";
+                    $estadoF = "Pago parcial";
+                    $color = "#128B8F";
+                    $title = "Factura pagada <br> parcialmente";
                     $function = "onclick='tablaPagos($idfactura,$estado)'";
-                    $modal = "data-toggle='modal' data-target='#pagosfactura'";
+                    $modal = "data-bs-toggle='modal' data-bs-target='#pagosfactura'";
                     break;
                 default:
                     $estadoF = "Pendiente";
-                    $color = "text-danger";
+                    $color = "#ED495C";
                     $title = "Pago pendiente";
                     $function = "onclick='registrarPago($idfactura)'";
                     $modal = "";
@@ -2225,77 +2543,88 @@ class ControladorFactura {
             }
 
             if ($uuid != "") {
-                $colorB = "text-success";
+                $colorB = "#2AA010";
                 $titbell = "Factura timbrada";
                 if ($estado == "3") {
-                    $tittimbre = "Factura Cancelada";
+                    $tittimbre = "Factura cancelada";
                     $timbre = "href='./com.sine.imprimir/imprimirxml.php?f=$idfactura&t=c' target='_blank'";
-                    $colorB = "text-muted";
+                    $colorB = "#f0ad4e";
                     $titbell = "Factura cancelada";
                 } else {
-                    $timbre = "data-toggle='modal' data-target='#modalcancelar' onclick='setCancelacion($idfactura)'";
+                    $timbre = "data-bs-toggle='modal' data-bs-target='#modalcancelar' onclick='setCancelacion($idfactura)'";
                     $tittimbre = "Cancelar factura";
                 }
             } else {
                 $timbre = "onclick='timbrarFactura($idfactura);'";
-                $tittimbre = "Timbrar Factura";
-                $colorB = "text-danger";
+                $tittimbre = "Timbrar factura";
+                $colorB = "#ED495C";
                 $titbell = "Factura sin timbrar";
             }
 
             $divideF = explode("-", $fecha);
             $mes = $this->translateMonth($divideF[1]);
 
-            $fecha = $divideF[2] . ' / ' . $mes;
-        
+            $fecha = $divideF[2] . ' - ' . $mes;
+
             $datos .= "
                     <tr class='table-row'>
                         <td style='background-color: $colorrow;'></td>
                         <td class='text-center'>$folio</td>
-                        <td class='text-center'>$fecha</td>
+                        <td>$fecha</td>
                         <td>$emisor</td>
                         <td>$nombre_cliente</td>
                         <td class='text-center'>
                             <div class='small-tooltip icon tip'>
-                                <a class='state-link $color' $modal $function ><span>$estadoF</span></a>
-                                <span class='tiptext $color'>$title</span>
+                                <a class='state-link' style='color: $color;' $modal $function ><span>$estadoF</span></a>
+                                <span class='tiptext' style='color: $color;'>$title</span>
                             </div>
                         <td class='text-center'>
                             <div class='small-tooltip icon tip'>
-                                <span class='fas fa-bell $colorB'></span>
-                                <span class='tiptext $colorB'>$titbell</span>
+                                <span style='color: $colorB;' class='fas fa-bell'></span>
+                                <span class='tiptext' style='color: $colorB;'>$titbell</span>
                             </div>
                         </td>
                         <td class='text-center'>$ " . number_format($subtotal, 2, '.', ',') . "</td>
                         <td class='text-center'>$ " . number_format($iva, 2, '.', ',') . "</td>
                         <td class='text-center'>$ " . number_format($ret, 2, '.', ',') . "</td>
                         <td class='text-center'>$" . number_format($total, 2, '.', ',') . "</td>
-                        <td class='text-center'>$idmoneda</td>
-                        <td align='center'><div class='dropdown'>
+                        <td class='text-center'>$cmoneda</td>
+                        <td align='center'><div class='dropdown dropend z-1'>
                         <button class='button-list dropdown-toggle' title='Opciones'  type='button' data-bs-toggle='dropdown'><span class='fas fa-ellipsis-v'></span>
                         <span class='caret'></span></button>
                         <ul class='dropdown-menu dropdown-menu-end'>";
 
             if ($div[0] == '1') {
-                //$datos .= "<li class='px-2'><a onclick='editarFactura($idfactura);'>Editar Factura <span class='glyphicon fas fa-edit'></span></a></li>";
-                $datos .= "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' onclick='editarFactura($idfactura);'>Editar Factura <span class='text-muted small fas fa-edit'></span></a></li>";
+                $datos .= "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' onclick='editarFactura($idfactura);'>Editar factura <span class='text-muted small fas fa-edit'></span></a></li>";
             }
-            if ($div[1] == '1') {
-                $datos .= "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' onclick=\"eliminarFactura('$idfactura');\">Eliminar Factura <span class=' text-muted small fas fa-times'></span></a></li>";
+            if ($div[1] == '1' && $uuid == "") {
+                $datos .= "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' onclick=\"eliminarFactura('$idfactura');\">Eliminar factura <span class=' text-muted small fas fa-times'></span></a></li>";
             }
 
-            $datos .= " <li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' onclick=\"imprimir_factura($idfactura);\">Ver Factura <span class=' text-muted small fas fa-eye'></span></a></li>
-                        <li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' href='./com.sine.imprimir/imprimirxml.php?f=$idfactura&t=a' target='_blank'>Ver XML <span class=' text-muted small fas fa-download'></span></a></li>
-                        <li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' $timbre>$tittimbre <span class='text-muted small fas fa-bell'></span></a></li>
-                        <li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' data-bs-toggle='modal' data-bs-target='#enviarmail' onclick='showCorreos($idfactura);'>Enviar <span class=' text-muted small fas fa-envelope'></span></a></li>";
+            $opciones = "";
+            if ($uuid != "" && $estadoF != "Cancelada") {
+                $opciones .= "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' onclick=\"imprimir_factura($idfactura);\">Ver factura <span class=' text-muted small fas fa-eye'></span></a></li>";
+                $opciones .= "<div class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' href='./com.sine.imprimir/imprimirxml.php?f=$idfactura&t=a' target='_blank'>Ver XML <span class=' text-muted small fas fa-download'></span></a></div>";
+                $opciones .= "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' $timbre>$tittimbre <span class='text-muted small fas fa-bell'></span></a></li>";
+                $opciones .= "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' data-bs-toggle='modal' data-bs-target='#enviarmail' onclick='showCorreos($idfactura);'>Enviar <span class=' text-muted small fas fa-envelope'></span></a></li>";
+            } else if ($estadoF == "Cancelada") {
+                $opciones .= "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' onclick=\"imprimir_factura($idfactura);\">Ver factura <span class=' text-muted small fas fa-eye'></span></a></li>";
+                $opciones .= "<div class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' $timbre>$tittimbre <span class='text-muted small fas fa-bell'></span></a></div>";
+                $opciones .= "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' data-bs-toggle='modal' data-bs-target='#enviarmail' onclick='showCorreos($idfactura);'>Enviar <span class=' text-muted small fas fa-envelope'></span></a></li>";
+            } else {
+                $opciones .= "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' onclick='imprimir_factura($idfactura);'>Ver factura <span class=' text-muted small fas fa-eye'></span></a></li>";
+                $opciones .= "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' onclick='timbrarFactura($idfactura);'>Timbrar factura <span class=' text-muted small fas fa-bell'></span></a></li>";
+            }
+            $datos .= $opciones;
 
             if ($div[2] == '1') {
-                $datos .= "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' onclick='copiarFactura($idfactura);'>Copiar Factura <span class='text-muted small fas fa-clipboard'></span></a></li>";
+                $datos .= "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' onclick='copiarFactura($idfactura);'>Copiar factura <span class='text-muted small fas fa-clipboard'></span></a></li>";
             }
 
             if ($uuid != "") {
-                $datos .= "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' data-bs-toggle='modal' data-bs-target='#modal-stcfdi' onclick='checkStatusCancelacion(\"".$idfactura."\");'>Comprobar estado del CFDI <i class='text-muted small fas fa-check-circle'></i></a></li>";
+                $datos .= "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis lh-base' data-bs-toggle='modal' data-bs-target='#modal-stcfdi' onclick='checkStatusCancelacion(\"" . $idfactura . "\");'>Comprobar estado <br> del CFDI <i class='text-muted small fas fa-check-circle'></i></a></li>";
             }
+
             $datos .= "</ul>
                         </div></td>
                     </tr>";
@@ -2307,64 +2636,76 @@ class ControladorFactura {
         if ($finales == 0) {
             $datos .= "<tr><td colspan='15'>No se encontraron registros</td></tr>";
         }
-        $datos .= "</tbody><tfoot><tr><th colspan='7' class='align-top'>Mostrando $inicios al $finales de $numrows registros</th>";
-        $datos .= "<th colspan='6'>" . paginate($page, $total_pages, $adjacents, $function) . "</th></tr></tfoot>";
+        $datos .= "</tbody><tfoot><tr><th colspan='6' class='align-top'>Mostrando $inicios al $finales de $numrows registros</th>";
+        $datos .= "<th colspan='9'>" . paginate($page, $total_pages, $adjacents, $function) . "</th></tr></tfoot>";
         return $datos;
     }
 
-    private function getProductoById($id) {
+    private function getProductoById($id)
+    {
         $consultado = false;
-        $consultas = new Consultas();
+
         $consulta = "SELECT * FROM productos_servicios p WHERE p.idproser=:pid;";
         $val = array("pid" => $id);
-        $consultado = $consultas->getResults($consulta, $val);
+        $consultado = $this->consultas->getResults($consulta, $val);
         return $consultado;
     }
 
-    public function eliminar($idtemp, $sessionid, $cantidad, $idproducto) {
+    public function eliminar($idtemp, $sessionid, $cantidad, $idproducto)
+    {
         $eliminado = false;
         $consulta = "DELETE FROM `tmp` WHERE idtmp=:id;";
         $valores = array("id" => $idtemp);
-        $consultas = new Consultas();
-        $eliminado = $consultas->execute($consulta, $valores);
+
+        $eliminado = $this->consultas->execute($consulta, $valores);
         $restaurar = $this->restaurarInventario($idproducto, $cantidad);
         return $eliminado;
     }
-
-    public function getPagosReg($folio, $idfactura) {
+    //cambio NO??
+    public function getPagosReg($folio, $idfactura)
+    {
         $consultado = false;
-        $consultas = new Consultas();
-        $consulta = "SELECT * 
-					FROM pagos p 
-					INNER JOIN complemento_pago cp ON (cp.tagpago=p.tagpago) 
-					INNER JOIN catalogo_pago c ON (c.idcatalogo_pago=cp.complemento_idformapago)
-					INNER JOIN detallepago dp ON (dp.detalle_tagencabezado=cp.tagpago) 
-					AND (dp.detalle_tagcomplemento=cp.tagcomplemento) 
-					WHERE p.tagpago = :pid 
-					AND dp.pago_idfactura = :fid";
+        $consultas = "SELECT DISTINCT p.foliopago, p.idpago, p.letra, cp.complemento_fechapago, cp.complemento_horapago,
+        (SELECT cp_inner.nombre_forma_pago FROM complemento_pago cp_inner WHERE cp_inner.tagpago = p.tagpago ORDER BY cp_inner.complemento_fechapago LIMIT 1
+        ) AS nombre_forma_pago,p.totalpagado,p.uuidpago,p.cancelado, 'p' AS type
+        FROM pagos p 
+        INNER JOIN complemento_pago cp ON cp.tagpago = p.tagpago
+        INNER JOIN detallepago dp ON dp.detalle_tagencabezado = cp.tagpago AND dp.detalle_tagcomplemento = cp.tagcomplemento
+        WHERE p.tagpago = :pid 
+        AND dp.pago_idfactura = :fid
+                    UNION ALL
+                    SELECT df.iddatos_factura idpago, df.letra, df.folio_interno_fac foliopago, df.fecha_creacion complemento_fechapago, '' complemento_horapago, df.forma_pago,
+                     df.totalfactura totalpagado, df.uuid uuidpago, CASE WHEN df.cfdicancel IS NULL THEN '0' ELSE '1' END cancelado, 'e' type
+                    FROM cfdiegreso ce
+                    INNER JOIN datos_factura df ON df.tagfactura = ce.tagfactura
+                    WHERE ce.iddoc = :fid AND ce.type = 'f'
+                    ORDER BY complemento_fechapago";
         $val = array("pid" => $folio, "fid" => $idfactura);
-        $consultado = $consultas->getResults($consulta, $val);
+        $consultado = $this->consultas->getResults($consultas, $val);
         return $consultado;
     }
 
-    public function getPagosDetalle($id) {
+    public function getPagosDetalle($id)
+    {
         $consultado = false;
-        $consultas = new Consultas();
-        $consulta = "SELECT pagos.foliopago, detallepago.detalle_tagencabezado 
+        $consulta = "SELECT DISTINCT pagos.foliopago, detallepago.detalle_tagencabezado 
 					FROM detallepago 
 					INNER JOIN pagos ON pagos.tagpago = detallepago.detalle_tagencabezado 
 					WHERE pago_idfactura=:id AND type=:type 
 					ORDER BY pagos.foliopago DESC";
-        $val = array("id" => $id,
-            "type" => 'f');
-        $consultado = $consultas->getResults($consulta, $val);
+        $val = array(
+            "id" => $id,
+            "type" => 'f'
+        );
+        $consultado = $this->consultas->getResults($consulta, $val);
         return $consultado;
     }
 
-    public function tablaPagosReg($idfactura, $status) {
+    public function tablaPagosReg($idfactura, $status)
+    {
         $datos = "<corte><thead class='sin-paddding'>
-            <tr>
-                <th class='text-center'>FOLIO DE PAGO</th>
+            <tr class='align-middle'>
+                <th class='text-center'>FOLIO DE PAGO $idfactura</th>
                 <th class='text-center'>FECHA DE PAGO</th>
                 <th class='text-center'>FORMA DE PAGO</th>
                 <th class='text-center'>TOTAL PAGADO</th>
@@ -2382,44 +2723,47 @@ class ControladorFactura {
                 $div = explode("-", $fechapago);
                 $mes = $this->translateMonth($div[1]);
 
-                $fechapago = $div[2] . ' - ' . $mes;
+                $fechapago = $div[2] . ' de ' . $mes;
                 $horapago = $pagoactual['complemento_horapago'];
                 $horapago = date('g:i a', strtotime($horapago));
-                $totalpagado = $pagoactual['monto'];
-                $c_pago = $pagoactual['c_pago'];
-                $formapago = $pagoactual['descripcion_pago'];
+                $totalpagado = $pagoactual['totalpagado'];
+                $c_pago = $pagoactual['nombre_forma_pago'] ?? $pagoactual['forma_pago'] ?? "Indefinido";
 
                 if ($pagoactual['cancelado'] == '0') {
                     $estado = "Activo";
+                    $class = "text-success fw-bold";
                     if ($pagoactual['uuidpago'] != '') {
                         $estado = "Timbrado";
+                        $class = "text-success fw-bold";
                     }
                 } else if ($pagoactual['cancelado'] == '1') {
                     $estado = "Cancelado";
+                    $class = "text-warning fw-bold";
                 }
 
                 $datos .= "
                     <tr>
-                        <td>$foliopago</td>
-                        <td>$fechapago - $horapago</td>
-                        <td>$c_pago $formapago</td>
-                        <td>$ " . number_format(bcdiv($totalpagado, '1', 2),2) . "</td>
-                        <td>$estado</td>
-                        <td align='center'><a class='btn button-list' title='Descagar PDF' onclick=\"imprimirpago($idpago);\"><span class='glyphicon glyphicon-list-alt'></span></a></td>
+                        <td class='text-center'>$foliopago</td>
+                        <td class='text-center'>$fechapago a " . date("g:i A", strtotime($horapago)) . "</td>
+                        <td class='text-center'>$c_pago</td>
+                        <td class='text-center'>$ " . number_format(bcdiv($totalpagado, '1', 2), 2) . "</td>
+                        <td class='text-center $class'>$estado</td>
+                        <td align='center'><a class='btn button-list' title='Descagar PDF' onclick=\"imprimirpago($idpago);\"><span class='fas fa-list-alt mt-1'></span></a></td>
                     </tr>
                      ";
             }
         }
 
         if ($status == '4') {
-            $datos .= "<tr><td colspan='5'></td><td><a class='btn button-list' title='Agregar nuevo pago' data-dismiss='modal' onclick=\"registrarPago($idfactura);\"><span class='glyphicon glyphicon-file'></span></a></td></tr>";
+            $datos .= "<tr><td colspan='5'></td><td><a class='btn button-list' title='Agregar nuevo pago' data-dismiss='modal' onclick=\"registrarPago($idfactura);\"><span class='fas fa-file'></span></a></td></tr>";
         }
 
         $datos .= "</tbody>";
         return $datos;
     }
 
-    public function translateMonth($m) {
+    public function translateMonth($m)
+    {
         switch ($m) {
             case '01':
                 $mes = 'Ene';
@@ -2457,23 +2801,24 @@ class ControladorFactura {
             case '12':
                 $mes = 'Dic';
                 break;
-            default :
+            default:
                 $mes = "";
                 break;
         }
         return $mes;
     }
 
-    public function resetPagos($sessionid) {
+    public function resetPagos($sessionid)
+    {
         $eliminado = false;
         $consulta = "DELETE FROM `tmppago` WHERE sessionid=:id;";
         $valores = array("id" => $sessionid);
-        $consultas = new Consultas();
-        $eliminado = $consultas->execute($consulta, $valores);
+        $eliminado = $this->consultas->execute($consulta, $valores);
         return $eliminado;
     }
 
-    public function cancelar($sessionid) {
+    public function cancelar($sessionid)
+    {
         $tmp = $this->getTMP($sessionid);
         foreach ($tmp as $actual) {
             $chinv = $actual['chinventariotmp'];
@@ -2486,72 +2831,79 @@ class ControladorFactura {
         $eliminado = false;
         $consulta = "DELETE FROM `tmp` WHERE session_id=:id;";
         $valores = array("id" => $sessionid);
-        $consultas = new Consultas();
-        $eliminado = $consultas->execute($consulta, $valores);
+
+        $eliminado = $this->consultas->execute($consulta, $valores);
         $cfdi = $this->deleteTMPCFDI($sessionid);
+        $egreso = $this->deleteTMPEgreso($sessionid);
         return $eliminado;
     }
 
-    private function deleteTMPCFDI($sessionid) {
+    private function deleteTMPCFDI($sessionid)
+    {
         $eliminado = false;
         $consulta = "DELETE FROM `tmpcfdi` WHERE sessionid=:id;";
         $valores = array("id" => $sessionid);
-        $consultas = new Consultas();
-        $eliminado = $consultas->execute($consulta, $valores);
+        $eliminado = $this->consultas->execute($consulta, $valores);
         return $eliminado;
     }
 
-    public function getPagos($idfactura) {
+    private function deleteTMPEgreso($sessionid)
+    {
+        $eliminado = false;
+        $consulta = "DELETE FROM `tmpegreso` WHERE sessionid=:id;";
+        $valores = array("id" => $sessionid);
+        $eliminado = $this->consultas->execute($consulta, $valores);
+        return $eliminado;
+    }
+    //cambio NO
+    public function getPagos($idfactura)
+    {
         $consultado = false;
         $consulta = "select * from pagos p inner join catalogo_pago cp on (p.id_formapago=cp.idcatalogo_pago) where idpago=:idpago;";
-        $consultas = new Consultas();
+
         $val = array("idpago" => $idfactura);
-        $consultado = $consultas->getResults($consulta, $val);
+        $consultado = $this->consultas->getResults($consulta, $val);
         return $consultado;
     }
 
-    public function getXMLImprimir($idfactura) {
+    public function getXMLImprimir($idfactura)
+    {
         $consultado = false;
         $consulta = "SELECT dat.letra,dat.folio_interno_fac, dat.uuid,dat.cfdistring,dat.cfdicancel,df.rfc FROM datos_factura as dat inner join datos_facturacion as df on (dat.iddatosfacturacion=df.id_datos) where dat.iddatos_factura=:id;";
         $val = array("id" => $idfactura);
-        $consultas = new Consultas();
-        $consultado = $consultas->getResults($consulta, $val);
+
+        $consultado = $this->consultas->getResults($consulta, $val);
         return $consultado;
     }
 
-    public function getFacturas($idfactura) {
-        $consultado = false;
-        $consultas = new Consultas();
-        $consulta = "SELECT * FROM datos_factura dat 
-        INNER JOIN catalogo_metodo_pago cmp ON (dat.id_metodo_pago= cmp.idmetodo_pago) 
-        INNER JOIN catalogo_pago cp ON (dat.id_forma_pago = cp.idcatalogo_pago) 
-        INNER JOIN catalogo_moneda cm ON (cm.idcatalogo_moneda = dat.id_moneda)
-        INNER JOIN catalogo_uso_cfdi cuc ON (dat.id_uso_cfdi= cuc.iduso_cfdi) 
-        INNER JOIN catalogo_comprobante cc ON (dat.id_tipo_comprobante=cc.idcatalogo_comprobante) WHERE dat.iddatos_factura=:id;";
+    public function getFacturas($idfactura)
+    {
+        $consulta = "SELECT * FROM datos_factura WHERE iddatos_factura=:id;";
         $val = array("id" => $idfactura);
-        $consultado = $consultas->getResults($consulta, $val);
+        $consultado = $this->consultas->getResults($consulta, $val);
         return $consultado;
     }
 
-    public function getFacturasAux($id) {
+    public function getFacturasAux($id)
+    {
         $consultado = false;
         $consulta = "SELECT tipo FROM productos_servicios WHERE idproser=:id;";
-        $consultas = new Consultas();
         $valores = array("id" => $id);
-        $consultado = $consultas->getResults($consulta, $valores);
+        $consultado = $this->consultas->getResults($consulta, $valores);
         return $consultado;
     }
 
-    public function getDatosFacturacionbyId($iddatos) {
+    public function getDatosFacturacionbyId($iddatos)
+    {
         $consultado = false;
         $consulta = "SELECT * FROM datos_facturacion WHERE id_datos=:id;";
-        $consultas = new Consultas();
         $valores = array("id" => $iddatos);
-        $consultado = $consultas->getResults($consulta, $valores);
+        $consultado = $this->consultas->getResults($consulta, $valores);
         return $consultado;
     }
 
-    public function getDireccionCliente($idcliente, $fid) {
+    public function getDireccionCliente($idcliente, $fid)
+    {
         $direccion = "";
         $datos = $this->getDatosCliente($idcliente, $fid);
         foreach ($datos as $actual) {
@@ -2564,6 +2916,8 @@ class ControladorFactura {
                 $localidad = $actual['localidad'];
                 $idmunicipio = $actual['idmunicipio'];
                 $idestadodir = $actual['idestado'];
+                $nombremunicipio = $actual['nombre_municipio'];
+                $nombreestado = $actual['nombre_estado'];
 
                 $next = "";
                 if ($numext != "") {
@@ -2582,13 +2936,13 @@ class ControladorFactura {
 
                 $municipio = "";
                 if ($idmunicipio != "0") {
-                    $muni = $this->getMunicipioAux($idmunicipio);
+                    $muni = $nombremunicipio;
                     $municipio = ", $muni";
                 }
 
                 $estadodir = "";
                 if ($idestadodir != "0") {
-                    $est = $this->getEstadoAux($idestadodir);
+                    $est = $$nombreestado;
                     $estadodir = ", $est";
                 }
 
@@ -2598,70 +2952,38 @@ class ControladorFactura {
         return $direccion;
     }
 
-    private function getDatosCliente($idcliente, $fid) {
+    private function getDatosCliente($idcliente, $fid)
+    {
         $consultado = false;
-        $consultas = new Consultas();
         $consulta = "SELECT c.*, d.cpreceptor FROM cliente c INNER JOIN datos_factura d ON (c.id_cliente=d.idcliente) WHERE id_cliente=:cid AND iddatos_factura=:fid;";
-        $val = array("cid" => $idcliente,
-            "fid" => $fid);
-        $consultado = $consultas->getResults($consulta, $val);
+        $val = array(
+            "cid" => $idcliente,
+            "fid" => $fid
+        );
+        $consultado = $this->consultas->getResults($consulta, $val);
         return $consultado;
     }
 
-    private function getEstadoAux($idestado) {
-        $estado = "";
-        $est = $this->getEstadoById($idestado);
-        foreach ($est as $actual) {
-            $estado = $actual['estado'];
-        }
-        return $estado;
-    }
-
-    private function getEstadoById($idestado) {
-        $consultado = false;
-        $consulta = "select * from estado WHERE id_estado=:id;";
-        $valores = array("id" => $idestado);
-        $consultas = new Consultas();
-        $consultado = $consultas->getResults($consulta, $valores);
-        return $consultado;
-    }
-
-    private function getMunicipioAux($idmun) {
-        $municipio = "";
-        $mun = $this->getMunicipioById($idmun);
-        foreach ($mun as $actual) {
-            $municipio = $actual['municipio'];
-        }
-        return $municipio;
-    }
-
-    private function getMunicipioById($idmun) {
-        $consultado = false;
-        $consulta = "select * from municipio WHERE id_municipio=:id;";
-        $valores = array("id" => $idmun);
-        $consultas = new Consultas();
-        $consultado = $consultas->getResults($consulta, $valores);
-        return $consultado;
-    }
-
-    private function getImpuestos($tipo) {
+    private function getImpuestos($tipo)
+    {
         $consultado = false;
         $consulta = "SELECT * FROM impuesto where tipoimpuesto=:tipo";
-        $consultas = new Consultas();
         $valores = array("tipo" => $tipo);
-        $consultado = $consultas->getResults($consulta, $valores);
+        $consultado = $this->consultas->getResults($consulta, $valores);
         return $consultado;
     }
 
-    private function getRowsProdAux($condicion) {
+    private function getRowsProdAux($condicion)
+    {
         $consultado = false;
         $consulta = "SELECT count(idproser) numrows FROM productos_servicios p $condicion ;";
-        $consultas = new Consultas();
-        $consultado = $consultas->getResults($consulta, null);
+
+        $consultado = $this->consultas->getResults($consulta, null);
         return $consultado;
     }
 
-    private function getRowsProd($condicion) {
+    private function getRowsProd($condicion)
+    {
         $numrows = 0;
         $rows = $this->getRowsProdAux($condicion);
         foreach ($rows as $actual) {
@@ -2670,29 +2992,30 @@ class ControladorFactura {
         return $numrows;
     }
 
-    private function getProdHistorial($condicion) {
+    private function getProdHistorial($condicion)
+    {
         $consultado = false;
-        $consultas = new Consultas();
         $consulta = "SELECT p.codproducto, p.idproser, p.nombre_producto, p.descripcion_producto, p.precio_venta, p.tipo, p.clave_fiscal FROM productos_servicios p $condicion;";
-        $consultado = $consultas->getResults($consulta, null);
+        $consultado = $this->consultas->getResults($consulta, null);
         return $consultado;
     }
 
-    public function listaProductosHistorial($NOM, $pag, $numreg) {
+    public function listaProductosHistorial($NOM, $pag, $numreg)
+    {
         require_once '../com.sine.common/pagination.php';
         $datos = "<thead>
                     <tr>
-                        <th class='col-md-1'>Código </th>
+                        <th class='col-md-1'>CÓdigo </th>
                         <th class='col-md-6'>Producto/Servicio   </th>
                         <th class='col-md-1'>Cantidad </th>
                         <th class='col-md-1'>P.Venta </th>
                         <th class='col-md-1'>Importe </th>
-                        <th class='col-md-1'>Desc %</th>
+                        <th class='col-md-1'>Desc % </th>
                         <th class='col-md-1'>Traslados</th>
                         <th class='col-md-1'>Retenciones</th>
                         <th class='col-md-1'>Total</th>
                         <th class='text-center'><span class='fas fa-plus'></span> </th>
-                    </tr>
+                    </tr> 
                   </thead>
                   <tbody>";
         $condicion = "";
@@ -2704,7 +3027,7 @@ class ControladorFactura {
 
         $numrows = $this->getRowsProd($condicion);
         $page = (isset($pag) && !empty($pag)) ? $pag : 1;
-        $per_page = $numreg; 
+        $per_page = $numreg;
         $adjacents = 4;
         $offset = ($page - 1) * $per_page;
         $total_pages = ceil($numrows / $per_page);
@@ -2725,6 +3048,7 @@ class ControladorFactura {
             } else if ($tipo == "2") {
                 $tipoP = "Servicio";
             }
+
             $checkedT = "";
             $iconT = "";
             $optraslados = "";
@@ -2738,8 +3062,7 @@ class ControladorFactura {
                     $iconT = "far fa-square mx-2";
                     $checkedT = "";
                 }
-                $optraslados .= "<li data-location='lista' data-id='$idprod'><label class='dropdown-menu-item checkbox'><input type='checkbox' $checkedT value='" . $tactual['porcentaje'] . "' name='chtraslado$idprod' data-impuesto='" . $tactual['impuesto'] . "' data-tipo='" . $tactual['tipoimpuesto'] . "'/><span class='glyphicon $iconT' id='chuso1span'></span>" . $tactual['nombre'] . " (" . $tactual['porcentaje'] . "%)" . "</label></li>";
-
+                $optraslados .= "<li data-location='lista' data-id='$idprod'><label class='dropdown-menu-item checkbox'><input type='checkbox' $checkedT value='" . $tactual['porcentaje'] . "' name='chtraslado$idprod' data-impuesto='" . $tactual['impuesto'] . "' data-tipo='" . $tactual['tipoimpuesto'] . "'/><span class='$iconT' id='chuso1span'></span>" . $tactual['nombre'] . " (" . $tactual['porcentaje'] . "%)" . "</label></li>";
             }
 
             $checkedR = "";
@@ -2755,7 +3078,7 @@ class ControladorFactura {
                     $iconR = "far fa-square mx-2";
                     $checkedR = "";
                 }
-                $opretencion .= "<li data-location='lista' data-id='$idprod'><label class='dropdown-menu-item checkbox'><input type='checkbox' $checkedR value='" . $ractual['porcentaje'] . "' name='chretencion$idprod' data-impuesto='" . $ractual['impuesto'] . "' data-tipo='" . $ractual['tipoimpuesto'] . "'/><span class='glyphicon $iconR' id='chuso1span'></span>" . $ractual['nombre'] . " (" . $ractual['porcentaje'] . "%)" . "</label></li>";
+                $opretencion .= "<li data-location='lista' data-id='$idprod'><label class='dropdown-menu-item checkbox'><input type='checkbox' $checkedR value='" . $ractual['porcentaje'] . "' name='chretencion$idprod' data-impuesto='" . $ractual['impuesto'] . "' data-tipo='" . $ractual['tipoimpuesto'] . "'/><span class='$iconR' id='chuso1span'></span>" . $ractual['nombre'] . " (" . $ractual['porcentaje'] . "%)" . "</label></li>";
             }
 
             $total = (bcdiv($pventa, '1', 2) + bcdiv($impT, '1', 2)) - bcdiv($impR, '1', 2);
@@ -2768,8 +3091,8 @@ class ControladorFactura {
                         <td><input class='form-control input-modal text-center input-sm' disabled id='importe_$idprod' name='importe_$idprod' value='$pventa' type='text'/></td>
                         <td><input class='form-control input-modal text-center input-sm' id='pordescuento_$idprod' name='pordescuento_$idprod' value='0' type='number' oninput='calcularDescuento($idprod)'/> <input class='form-control input-modal text-center input-sm' id='descuento_$idprod' name='descuento_$idprod' value='0' type='hidden'/></td>
                         <td><div class='input-group'>
-                        <div class='dropdown' >
-                        <button type='button' class='btn btn-sm btn-default dropdown-bs-toggle' data-bs-toggle='dropdown' data-bs-auto-close='outside' aria-expanded='false'>Traslados <span class='caret'></span></button>
+                        <div class='dropdown'>
+                        <button type='button' class='button-impuesto dropdown-bs-toggle' data-bs-toggle='dropdown'>Traslados <span class='caret'></span></button>
                         <ul class='dropdown-menu'>
                             $optraslados
                         </ul>
@@ -2777,7 +3100,7 @@ class ControladorFactura {
                         </div></td>
                         <td><div class='input-group'>
                         <div class='dropdown'>
-                        <button type='button' class='btn btn-sm btn-default dropdown-bs-toggle' data-bs-toggle='dropdown' data-bs-auto-close='outside' aria-expanded='false'>Retenciones <span class='caret'></span></button>
+                        <button type='button' class='button-impuesto dropdown-bs-toggle' data-bs-toggle='dropdown'>Retenciones <span class='caret'></span></button>
                         <ul class='dropdown-menu'>
                             $opretencion
                         </ul>
@@ -2801,16 +3124,17 @@ class ControladorFactura {
         return $datos;
     }
 
-    private function getSaldoAux() {
+    private function getSaldoAux()
+    {
         $consultado = false;
         $consulta = "SELECT * FROM contador_timbres WHERE idtimbres=:id;";
-        $consultas = new Consultas();
         $valores = array("id" => '1');
-        $consultado = $consultas->getResults($consulta, $valores);
+        $consultado = $this->consultas->getResults($consulta, $valores);
         return $consultado;
     }
 
-    private function checkSaldoAux() {
+    private function checkSaldoAux()
+    {
         $restantes = "0";
         $saldo = $this->getSaldoAux();
         foreach ($saldo as $actual) {
@@ -2819,7 +3143,8 @@ class ControladorFactura {
         return $restantes;
     }
 
-    public function checkSaldo($idfactura) {
+    public function checkSaldo($idfactura)
+    {
         $timbrar = "";
         $saldo = $this->checkSaldoAux();
         if ($saldo > 0) {
@@ -2830,7 +3155,8 @@ class ControladorFactura {
         return $timbrar;
     }
 
-    private function getFechaFactura($difverano, $difinvierno) {
+    private function getFechaFactura($difverano, $difinvierno)
+    {
         $hoy = date('Y-m-d');
         $hoy = date('Y-m-d', strtotime($hoy));
         $primer = date('Y-m-d', strtotime($_SESSION[sha1("primerdomingo")]));
@@ -2849,7 +3175,8 @@ class ControladorFactura {
         return $fecha;
     }
 
-    private function guardarXML($idfactura) {
+    private function guardarXML($idfactura)
+    {
         $timbre = false;
         $facturas = $this->getFacturas($idfactura);
         foreach ($facturas as $facturaactual) {
@@ -2859,7 +3186,8 @@ class ControladorFactura {
             $cpreceptor = $facturaactual['cpreceptor'];
             $regfiscalreceptor = $facturaactual['regfiscalreceptor'];
             $iddatos = $facturaactual['iddatosfacturacion'];
-            $cuso = $facturaactual['c_usocfdi'];
+            $divucfdi = explode('-', $facturaactual['uso_cfdi']);
+            $cuso = $divucfdi[0];
             $serie = $facturaactual['serie'];
             $letra = $facturaactual['letra'];
             $folio = $facturaactual['folio_interno_fac'];
@@ -2868,11 +3196,15 @@ class ControladorFactura {
             $subret = $facturaactual['subtotalret'];
             $totdescuentos = $facturaactual['totaldescuentos'];
             $total = $facturaactual['totalfactura'];
-            $c_moneda = $facturaactual['c_moneda'];
-            $tcambio = $facturaactual['tipo_cambio'];
-            $c_metodopago = $facturaactual['c_metodopago'];
-            $c_formapago = $facturaactual['c_pago'];
-            $c_tipoComprobante = $facturaactual['c_tipocomprobante'];
+            $divm = explode('-', $facturaactual['moneda']);
+            $c_moneda = $divm[0];
+            $tcambio = $facturaactual['tcambio'];
+            $divmp = explode('-', $facturaactual['metodo_pago']);
+            $c_metodopago = $divmp[0];
+            $divf =  explode('-', $facturaactual['forma_pago']);
+            $c_formapago = $divf[0];
+            $divtc = explode('-', $facturaactual['tipo_comprobante']);
+            $c_tipoComprobante = $divtc[0];
             $periodoglob = $facturaactual['periodoglobal'];
             $mesperiodo = $facturaactual['mesperiodo'];
             $anhoperiodo = $facturaactual['anhoperiodo'];
@@ -2881,7 +3213,7 @@ class ControladorFactura {
 
         $sine = $this->getDatosFacturacionbyId($iddatos);
         foreach ($sine as $sineactual) {
-        	$rfcemisor = $sineactual['rfc'];
+            $rfcemisor = $sineactual['rfc'];
             $rzemisor = $sineactual['razon_social'];
             $clvregemisor = $sineactual['c_regimenfiscal'];
             $regemisor = $sineactual['regimen_fiscal'];
@@ -2895,536 +3227,631 @@ class ControladorFactura {
         $xml = new DomDocument('1.0', 'UTF-8');
         $raiz = $xml->createElementNS('http://www.sat.gob.mx/cfd/4', 'cfdi:Comprobante');
         $raiz = $xml->appendChild($raiz);
-    	
+
         ////$fecha = $this->getFechaFactura($difverano, $difinvierno); Esta es la funcion que tenia David, la sustitui para poder timbrar
-   
+
         ///// Se usa para obtener la fecha 
-            $f = getdate();
+        $f = getdate();
 
-                $d = $f['mday'];
-                $m = $f['mon'];
-                $y = $f['year'];
-                $h = $f['hours']-1;
-                $mi = $f['minutes'];
-                $s = $f['seconds'];
-                if ($d < 10) {
-                    $d = "0$d";
-                }
-                if ($m < 10) {
-                    $m = "0$m";
-                }
-                if ($h < 10) {
-                    $h = "0$h";
-                }
-                if ($mi < 10) {
-                    $mi = "0$mi";
-                }
-                if ($s < 10) {
-                    $s = "0$s";
-                }
-                $fecha = $y . '-' . $m . '-' . $d . 'T' . $h . ':' . $mi . ':' . $s;
-            
-            
-             ///final de obtener la fecha
-            
-                
-                $raiz->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
-                $raiz->setAttributeNS('http://www.w3.org/2001/XMLSchema-instance', 'schemaLocation', 'http://www.sat.gob.mx/cfd/4 http://www.sat.gob.mx/sitio_internet/cfd/4/cfdv40.xsd');
-                $raiz->setAttribute('Version', '4.0');
-                $raiz->setAttribute('Serie', $serie);
-                $raiz->setAttribute('Folio', $letra . $folio);
-                $raiz->setAttribute('Fecha', $fecha);
-                $raiz->setAttribute('FormaPago', $c_formapago);
-                $raiz->setAttribute('SubTotal', bcdiv($subtotal, '1', 2));
-                if ($totdescuentos > 0) {
-                    $raiz->setAttribute('Descuento', bcdiv($totdescuentos, '1', 2));
-                }
-                $raiz->setAttribute('TipoCambio', $tcambio);
-                $raiz->setAttribute('Moneda', $c_moneda);
-                $raiz->setAttribute('Total', bcdiv($total, '1', 2));
-                $raiz->setAttribute('TipoDeComprobante', $c_tipoComprobante);
-                $raiz->setAttribute('Exportacion', '01');
-                $raiz->setAttribute('MetodoPago', $c_metodopago);
-                $raiz->setAttribute('LugarExpedicion', utf8_decode($cp));
-                $raiz->setAttribute('NoCertificado', $nocertificado);
-                //Convertir certificado a B64 con openssl: enc -in "CSD/00001000000407565367.cer" -a -A -out "cerB64.txt" 
-                $raiz->setAttribute('Certificado', $csd);
+        $d = $f['mday'];
+        $m = $f['mon'];
+        $y = $f['year'];
+        $h = $f['hours'] - 1;
+        $mi = $f['minutes'];
+        $s = $f['seconds'];
+        if ($d < 10) {
+            $d = "0$d";
+        }
+        if ($m < 10) {
+            $m = "0$m";
+        }
+        if ($h < 10) {
+            $h = "0$h";
+        }
+        if ($mi < 10) {
+            $mi = "0$mi";
+        }
+        if ($s < 10) {
+            $s = "0$s";
+        }
+        $fecha = $y . '-' . $m . '-' . $d . 'T' . $h . ':' . $mi . ':' . $s;
 
-                if ($rfcCliente == "XAXX010101000") {
-                    $global = $xml->createElement('cfdi:InformacionGlobal');
-                    $global = $raiz->appendChild($global);
-                    $global->setAttribute('Periodicidad', $periodoglob);
-                    $global->setAttribute('Meses', $mesperiodo);
-                    $global->setAttribute('Año', $anhoperiodo);
-                }
 
-                $cfdis = $this->getDistinctCfdisRelacionados($tag);
-                foreach ($cfdis as $relactual) {
-                    $tiporel = $relactual['tiporel'];
+        //final de obtener la fecha
 
-                    $cfdisrel = $xml->createElement('cfdi:CfdiRelacionados');
-                    $cfdisrel = $raiz->appendChild($cfdisrel);
-                    $cfdisrel->setAttribute('TipoRelacion', $tiporel);
+        $raiz->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
+        $raiz->setAttributeNS('http://www.w3.org/2001/XMLSchema-instance', 'schemaLocation', 'http://www.sat.gob.mx/cfd/4 http://www.sat.gob.mx/sitio_internet/cfd/4/cfdv40.xsd');
+        $raiz->setAttribute('Version', '4.0');
+        $raiz->setAttribute('Serie', $serie);
+        $raiz->setAttribute('Folio', $letra . $folio);
+        $raiz->setAttribute('Fecha', $fecha);
+        $raiz->setAttribute('FormaPago', $c_formapago);
+        $raiz->setAttribute('SubTotal', bcdiv($subtotal, '1', 2));
+        if ($totdescuentos > 0) {
+            $raiz->setAttribute('Descuento', bcdiv($totdescuentos, '1', 2));
+        }
+        $raiz->setAttribute('TipoCambio', $tcambio);
+        $raiz->setAttribute('Moneda', $c_moneda);
+        $raiz->setAttribute('Total', bcdiv($total, '1', 2));
+        $raiz->setAttribute('TipoDeComprobante', $c_tipoComprobante);
+        $raiz->setAttribute('Exportacion', '01');
+        $raiz->setAttribute('MetodoPago', $c_metodopago);
+        $raiz->setAttribute('LugarExpedicion', iconv("utf-8", "windows-1252", $cp));
+        $raiz->setAttribute('NoCertificado', $nocertificado);
+        //Convertir certificado a B64 con openssl: enc -in "CSD/00001000000407565367.cer" -a -A -out "cerB64.txt" 
+        $raiz->setAttribute('Certificado', $csd);
 
-                    $cfdis2 = $this->getcfdisRelacionadosByTipo($tag, $tiporel);
-                    foreach ($cfdis2 as $relactual2) {
-                        $uuid = $relactual2['uuid'];
-                        $cfdirel = $xml->createElement('cfdi:CfdiRelacionado');
-                        $cfdirel = $cfdisrel->appendChild($cfdirel);
-                        $cfdirel->setAttribute('UUID', $uuid);
-                    }
-                }
+        if ($rfcCliente == "XAXX010101000") {
+            $global = $xml->createElement('cfdi:InformacionGlobal');
+            $global = $raiz->appendChild($global);
+            $global->setAttribute('Periodicidad', $periodoglob);
+            $global->setAttribute('Meses', $mesperiodo);
+            $global->setAttribute('Año', $anhoperiodo);
+        }
 
-                $emisor = $xml->createElement('cfdi:Emisor');
-                $emisor = $raiz->appendChild($emisor);
-                $emisor->setAttribute('Rfc', $rfcemisor);
-                $emisor->setAttribute('Nombre', strtoupper($rzemisor));
-                $emisor->setAttribute('RegimenFiscal', $clvregemisor);
+        $cfdis = $this->getDistinctCfdisRelacionados($tag);
+        foreach ($cfdis as $relactual) {
+            $tiporel = $relactual['tiporel'];
 
-                $receptor = $xml->createElement('cfdi:Receptor');
-                $receptor = $raiz->appendChild($receptor);
-                $receptor->setAttribute('Rfc', $rfcCliente);
-                $receptor->setAttribute('Nombre', strtoupper($razonSocial));
-                $receptor->setAttribute('DomicilioFiscalReceptor', $cpreceptor);
-                $divreg = explode("-", $regfiscalreceptor);
-                $receptor->setAttribute('RegimenFiscalReceptor', $divreg[0]);
-                $receptor->setAttribute('UsoCFDI', $cuso);
-                $baseT = 0;
-                $baseR = 0;
+            $cfdisrel = $xml->createElement('cfdi:CfdiRelacionados');
+            $cfdisrel = $raiz->appendChild($cfdisrel);
+            $cfdisrel->setAttribute('TipoRelacion', "0" . $tiporel);
 
-                $conceptos = $xml->createElement('cfdi:Conceptos');
-                $conceptos = $raiz->appendChild($conceptos);
-                $detallefactura = $this->getDetalle($tag);
-                foreach ($detallefactura as $detalleactual) {
-                    $claveFiscal = $detalleactual['clvfiscal'];
-                    $precioV = $detalleactual['precio'];
-                    $cantidad = $detalleactual['cantidad'];
-                    $unidad = $detalleactual['clvunidad'];
-                    $descripcion = $detalleactual['factura_producto'];
-                    $totalu = $detalleactual['totalunitario'];
-                    $impdescuento = $detalleactual['impdescuento'];
-                    $traslados = $detalleactual['traslados'];
-                    $retenciones = $detalleactual['retenciones'];
-                    $objimp = "01";
-                    $importe = bcdiv($totalu, '1', 2) - bcdiv($impdescuento, '1', 2);
-
-                    $divfiscal = explode("-", $claveFiscal);
-                    $cfiscal = $divfiscal[0];
-
-                    $divunit = explode("-", $unidad);
-                    $cunidad = $divunit[0];
-                    $descunidad = $divunit[1];
-
-                    $concepto = $xml->createElement('cfdi:Concepto');
-                    $concepto = $conceptos->appendChild($concepto);
-                    $concepto->setAttribute('ClaveProdServ', $cfiscal);
-                    $concepto->setAttribute('Cantidad', $cantidad);
-                    $concepto->setAttribute('ClaveUnidad', $cunidad);
-                    $concepto->setAttribute('Unidad', $descunidad);
-                    $concepto->setAttribute('Descripcion', utf8_decode($descripcion));
-                    $concepto->setAttribute('ValorUnitario', bcdiv($precioV, '1', 2));
-                    $concepto->setAttribute('Importe', bcdiv($totalu, '1', 2));
-                    if ($traslados != "" || $retenciones != "") {
-                        $objimp = "02";
-                    }
-                    $concepto->setAttribute('ObjetoImp', $objimp);
-
-                    if ($impdescuento > 0) {
-                        $concepto->setAttribute('Descuento', bcdiv($impdescuento, '1', 2));
-                    }
-
-                    if ($traslados != "" || $retenciones != "") {
-                        $impuestos = $xml->createElement('cfdi:Impuestos');
-                        $impuestos = $concepto->appendChild($impuestos);
-                        $baseT += bcdiv($importe, '1', 2);
-                    }
-
-                    if ($traslados != "") {
-                        $nodetraslados = $xml->createElement('cfdi:Traslados');
-                        $nodetraslados = $impuestos->appendChild($nodetraslados);
-
-                        $divt = explode("<impuesto>", $traslados);
-                        foreach ($divt as $tras) {
-                            $divt = explode("-", $tras);
-                            $imp = "00$divt[2]";
-                            $traslado = $xml->createElement('cfdi:Traslado');
-                            $traslado = $nodetraslados->appendChild($traslado);
-                            $traslado->setAttribute('Base', bcdiv($importe, '1', 2));
-                            $traslado->setAttribute('Impuesto', $imp);
-                            $traslado->setAttribute('TipoFactor', 'Tasa');
-                            $traslado->setAttribute('TasaOCuota', bcdiv($divt[1], '1', 6));
-                            $traslado->setAttribute('Importe', bcdiv($divt[0], '1', 2));
-                        }
-                    }
-
-                    if ($retenciones != "") {
-                        $noderet = $xml->createElement('cfdi:Retenciones');
-                        $noderet = $impuestos->appendChild($noderet);
-
-                        $divr = explode("<impuesto>", $retenciones);
-                        foreach ($divr as $ret) {
-                            $divr = explode("-", $ret);
-                            $imp = "00$divr[2]";
-                            $retencion = $xml->createElement('cfdi:Retencion');
-                            $retencion = $noderet->appendChild($retencion);
-                            $retencion->setAttribute('Base', bcdiv($importe, '1', 2));
-                            $retencion->setAttribute('Impuesto', $imp);
-                            $retencion->setAttribute('TipoFactor', 'Tasa');
-                            $retencion->setAttribute('TasaOCuota', bcdiv($divr[1], '1', 6));
-                            $retencion->setAttribute('Importe', bcdiv($divr[0], '1', 2));
-                        }
-                    }
-                }
-
-                if ($subiva != "" || $subret != "") {
-                    $impuestosT = $xml->createElement('cfdi:Impuestos');
-                    $impuestosT = $raiz->appendChild($impuestosT);
-                }
-
-                $totalR = 0;
-                if ($subret != "" && $subret != "0.00--") {
-                    $noderet = $xml->createElement('cfdi:Retenciones');
-                    $noderet = $impuestosT->appendChild($noderet);
-                    $div2 = explode("<impuesto>", $subret);
-                    foreach ($div2 as $ret1) {
-                        $divr = explode("-", $ret1);
-                        $impr = "00$divr[2]";
-                        $retencion = $xml->createElement('cfdi:Retencion');
-                        $retencion = $noderet->appendChild($retencion);
-                        $retencion->setAttribute('Impuesto', $impr);
-                        $retencion->setAttribute('Importe', bcdiv($divr[0], '1', 2));
-                        $totalR += bcdiv($divr[0], '1', 2);
-                    }
-                    $impuestosT->setAttribute('TotalImpuestosRetenidos', bcdiv($totalR, '1', 2));
-                }
-
-                $totalT = 0;
-                if ($subiva != "" && $subiva != "0.00--") {
-                    $nodetraslados = $xml->createElement('cfdi:Traslados');
-                    $nodetraslados = $impuestosT->appendChild($nodetraslados);
-                    $div1 = explode("<impuesto>", $subiva);
-                    foreach ($div1 as $tras1) {
-                        $divt = explode("-", $tras1);
-                        $imp = "00$divt[2]";
-                        $traslado = $xml->createElement('cfdi:Traslado');
-                        $traslado = $nodetraslados->appendChild($traslado);
-                        $traslado->setAttribute('Base', bcdiv($baseT, '1', 2));
-                        $traslado->setAttribute('Impuesto', $imp);
-                        $traslado->setAttribute('TipoFactor', 'Tasa');
-                        $traslado->setAttribute('TasaOCuota', bcdiv($divt[1], '1', 6));
-                        $traslado->setAttribute('Importe', bcdiv($divt[0], '1', 2));
-                        $totalT += bcdiv($divt[0], '1', 2);
-                    }
-                    $impuestosT->setAttribute('TotalImpuestosTrasladados', bcdiv($totalT, '1', 2));
-                }
-
-                $sello = $this->SelloXML($xml->saveXML(), $rfcemisor);
-                $obj = json_decode($sello);
-                $xml2 = new DOMDocument("1.0", "UTF-8");
-                $xml2->loadXML($xml->saveXML());
-                $c = $xml2->getElementsByTagNameNS('http://www.sat.gob.mx/cfd/4', 'Comprobante')->item(0);
-                $c->setAttribute('Sello', $obj->sello); 
-                $doc = "../XML/XML2.xml";
-                $xml2->save($doc);
-                $timbre = $this->timbrado($xml2->saveXML(), $idfactura, $rfcemisor, $rzemisor, $clvregemisor, $regemisor, $cp);
-                return $timbre;
-            }   
- 
-            
-        function SelloXML($doc, $rfc) {
-            $xmlFile = $doc;
-            $carpeta = '../temporal/' . $rfc . '/';
-            $xslFile = "../vendor/recursos/cadenaoriginal_4_0.xslt";
-            $xml = new DOMDocument("1.0", "UTF-8");
-            $xml->loadXML($xmlFile);
-            $xsl = new DOMDocument();
-            $xsl->load($xslFile);
-            $proc = new XSLTProcessor;
-            $proc->importStyleSheet($xsl);
-            $cadenaOriginal = $proc->transformToXML($xml);
-            $fichero = "../vendor/recursos/cadenaOriginal.txt";
-            file_put_contents($fichero, $cadenaOriginal, LOCK_EX);
-            $params = array(
-                "cadenaOriginal" => "../vendor/recursos/cadenaOriginal.txt",
-                //Archivo key pem: pkcs8 -inform DET -in CSD/cer.key -passin pass:12345678a -out llaveprivada.pem
-                "archivoKeyPem" => $carpeta . 'keyPEM.pem',
-                //archivo cer pem: x509 -inform der -in CSD/cer.cer -out certificado.pem
-                "archivoCerPem" => $carpeta . 'csdPEM.pem'
-            );
-            try {
-                $result = Sellar::ObtenerSello($params);
-                return $result;
-            } catch (Exception $e) {
-                echo '0Caught exception: ', $e->getMessage(), "\n";
+            $cfdis2 = $this->getcfdisRelacionadosByTipo($tag, $tiporel);
+            foreach ($cfdis2 as $relactual2) {
+                $uuid = $relactual2['uuid'];
+                $cfdirel = $xml->createElement('cfdi:CfdiRelacionado');
+                $cfdirel = $cfdisrel->appendChild($cfdirel);
+                $cfdirel->setAttribute('UUID', $uuid);
             }
         }
-      
- 
-            function generarXML($filename, $content) {
-                $f = fopen($filename, "w");
-                fwrite($f, pack("CCC", 0xef, 0xbb, 0xbf));
-                fwrite($f, $content);
-                fclose($f);
+
+        $emisor = $xml->createElement('cfdi:Emisor');
+        $emisor = $raiz->appendChild($emisor);
+        $emisor->setAttribute('Rfc', $rfcemisor);
+        $emisor->setAttribute('Nombre', strtoupper($rzemisor));
+        $emisor->setAttribute('RegimenFiscal', $clvregemisor);
+
+        $receptor = $xml->createElement('cfdi:Receptor');
+        $receptor = $raiz->appendChild($receptor);
+        $receptor->setAttribute('Rfc', $rfcCliente);
+        $receptor->setAttribute('Nombre', strtoupper($razonSocial));
+        $receptor->setAttribute('DomicilioFiscalReceptor', $cpreceptor);
+        $divreg = explode("-", $regfiscalreceptor);
+        $receptor->setAttribute('RegimenFiscalReceptor', $divreg[0]);
+        $receptor->setAttribute('UsoCFDI', $cuso);
+        $baseT = 0;
+        $baseR = 0;
+
+        $conceptos = $xml->createElement('cfdi:Conceptos');
+        $conceptos = $raiz->appendChild($conceptos);
+        $detallefactura = $this->getDetalle($tag);
+        foreach ($detallefactura as $detalleactual) {
+            $claveFiscal = $detalleactual['clvfiscal'];
+            $precioV = $detalleactual['precio'];
+            $cantidad = $detalleactual['cantidad'];
+            $unidad = $detalleactual['clvunidad'];
+            $descripcion = $detalleactual['factura_producto'];
+            $totalu = $detalleactual['totalunitario'];
+            $impdescuento = $detalleactual['impdescuento'];
+            $traslados = $detalleactual['traslados'];
+            $retenciones = $detalleactual['retenciones'];
+            $objimp = "01";
+            $importe = bcdiv($totalu, '1', 2) - bcdiv($impdescuento, '1', 2);
+
+            $divfiscal = explode('-', $claveFiscal);
+            $cfiscal = $divfiscal[0];
+
+            $divunit = explode('-', $unidad);
+            $cunidad = $divunit[0];
+            $descunidad = $divunit[1];
+
+            $concepto = $xml->createElement('cfdi:Concepto');
+            $concepto = $conceptos->appendChild($concepto);
+            $concepto->setAttribute('ClaveProdServ', $cfiscal);
+            $concepto->setAttribute('Cantidad', $cantidad);
+            $concepto->setAttribute('ClaveUnidad', $cunidad);
+            $concepto->setAttribute('Unidad', $descunidad);
+            $concepto->setAttribute('Descripcion', iconv("utf-8", "windows-1252", $descripcion));
+            $concepto->setAttribute('ValorUnitario', bcdiv($precioV, '1', 2));
+            $concepto->setAttribute('Importe', bcdiv($totalu, '1', 2));
+            if ($traslados != "" || $retenciones != "") {
+                $objimp = "02";
+            }
+            $concepto->setAttribute('ObjetoImp', $objimp);
+
+            if ($impdescuento > 0) {
+                $concepto->setAttribute('Descuento', bcdiv($impdescuento, '1', 2));
             }
 
-            function timbrado($doc, $idfactura, $rfcemisor, $rzemisor, $clvregemisor, $regemisor, $cp) {
-                $swaccess = $this->getSWAccess();
-                $div = explode("</tr>", $swaccess);
-                $url = $div[0];
-                $token = $div[1];
-                $params = array(
-                    "url" => $url,
-                    "token" => $token
-                );
+            if ($traslados != "" || $retenciones != "") {
+                $impuestos = $xml->createElement('cfdi:Impuestos');
+                $impuestos = $concepto->appendChild($impuestos);
+                $baseT += bcdiv($importe, '1', 2);
+            }
 
-                try {
-                    //header("Content-type: text/plain");
-                    $stamp = StampService::Set($params);
-                    $result = $stamp::StampV4($doc);
-                    if ($result->status == "error") {
-                        return '0' . $result->message . " " . $result->messageDetail;
-                    } else if ($result->status == "success") {
-                        $guardar = $this->guardarTimbre($result, $idfactura, $rfcemisor, $rzemisor, $clvregemisor, $regemisor, $cp);
-                        var_dump($result);
-                        return $guardar;
-                    }
-                } catch (Exception $e) {
-                    //header("Content-type: text/plain");
-                    echo "0" . $e->getMessage();
+            if ($traslados != "") {
+                $nodetraslados = $xml->createElement('cfdi:Traslados');
+                $nodetraslados = $impuestos->appendChild($nodetraslados);
+
+                $divt = explode("<impuesto>", $traslados);
+                foreach ($divt as $tras) {
+                    $divt = explode("-", $tras);
+                    $imp = "00$divt[2]";
+                    $traslado = $xml->createElement('cfdi:Traslado');
+                    $traslado = $nodetraslados->appendChild($traslado);
+                    $traslado->setAttribute('Base', bcdiv($importe, '1', 2));
+                    $traslado->setAttribute('Impuesto', $imp);
+                    $traslado->setAttribute('TipoFactor', 'Tasa');
+                    $traslado->setAttribute('TasaOCuota', bcdiv($divt[1], '1', 6));
+                    $traslado->setAttribute('Importe', bcdiv($divt[0], '1', 2));
                 }
             }
 
-            private function guardarTimbre($result, $idfactura, $rfcemisor, $rzemisor, $clvregemisor, $regemisor, $cp) {
-                $actualizado = false;
-                $consulta = "UPDATE `datos_factura` SET factura_rfcemisor=:rfc, factura_rzsocial=:rzsocial, factura_clvregimen=:clvreg, factura_regimen=:regimen, factura_cpemisor=:cpemisor, cadenaoriginal=:cadena, nocertificadosat=:certSAT, nocertificadocfdi=:certCFDI, uuid=:uuid, sellosat=:selloSAT, sellocfdi=:selloCFDI, fechatimbrado=:fechatimbrado, qrcode=:qrcode, cfdistring=:cfdi, tipofactura=:tipo WHERE iddatos_factura=:id;";
-                $valores = array("rfc" => $rfcemisor,
-                    "rzsocial" => $rzemisor,
-                    "clvreg" => $clvregemisor,
-                    "regimen" => $regemisor,
-                    "cpemisor" => $cp,
-                    "cadena" => $result->data->cadenaOriginalSAT,
-                    "certSAT" => $result->data->noCertificadoSAT,
-                    "certCFDI" => $result->data->noCertificadoCFDI,
-                    "uuid" => $result->data->uuid,
-                    "selloSAT" => $result->data->selloSAT,
-                    "selloCFDI" => $result->data->selloCFDI,
-                    "fechatimbrado" => $result->data->fechaTimbrado,
-                    "qrcode" => $result->data->qrCode,
-                    "cfdi" => $result->data->cfdi,
-                    "tipo" => '1',
-                    "id" => $idfactura);
-                $consultas = new Consultas();
-                $actualizado = $consultas->execute($consulta, $valores);
-                $timbres = $this->updateTimbres();
-                return '+Timbre Guardado';
-            }
+            if ($retenciones != "") {
+                $noderet = $xml->createElement('cfdi:Retenciones');
+                $noderet = $impuestos->appendChild($noderet);
 
-            private function updateTimbres() {
-                $actualizado = false;
-                $consulta = "UPDATE `contador_timbres` SET  timbresUtilizados=timbresUtilizados+1, timbresRestantes=timbresRestantes-1 WHERE idtimbres=:idtimbres;";
-                $valores = array("idtimbres" => '1');
-                $consultas = new Consultas();
-                $actualizado = $consultas->execute($consulta, $valores);
-                return $actualizado;
-            }
-
-            public function getUUID($idfactura) {
-                $datos = "";
-                $uuid = $this->getUUIDAux($idfactura);
-                foreach ($uuid as $u) {
-                    $uuid = $u['uuid'];
-                    $folio = $u['letra'] . $u['folio_interno_fac'];
-                    $rfc = $u['rfc'];
-                    $pass = $u['passcsd'];
-                    $csd = $u['csd'];
-                    $key = $u['keyb64'];
-                    $datos = "$uuid</tr>$folio</tr>$rfc</tr>$pass</tr>$csd</tr>$key";
-                }
-                return $datos;
-            }
-
-            public function getUUIDAux($idfactura) {
-                $consultado = false;
-                $consulta = "SELECT f.uuid,f.letra,f.folio_interno_fac,d.rfc,d.passcsd, d.keyb64, d.csd FROM datos_factura f inner join datos_facturacion d on (f.iddatosfacturacion=d.id_datos) where iddatos_factura=:id;";
-                $val = array("id" => $idfactura);
-                $consultas = new Consultas();
-                $consultado = $consultas->getResults($consulta, $val);
-                return $consultado;
-            }
-
-            function cancelarTimbre($idfactura, $motivo, $reemplazo) {
-                $swaccess = $this->getSWAccess();
-                $div = explode("</tr>", $swaccess);
-                $url = $div[0];
-                $token = $div[1];
-
-                $get = $this->getUUID($idfactura);
-                $divideU = explode("</tr>", $get);
-                $uuid = $divideU[0];
-                $rfc = $divideU[2];
-                $pass = $divideU[3];
-                $csd = $divideU[4];
-                $key = $divideU[5];
-
-                if ($motivo == '01') {
-                    $params = array(
-                        "url" => $url,
-                        "token" => $token,
-                        "uuid" => $uuid,
-                        "password" => $pass,
-                        "rfc" => $rfc,
-                        "motivo" => $motivo,
-                        "foliosustitucion" => $reemplazo,
-                        "cerB64" => $csd,
-                        "keyB64" => $key
-                    );
-                } else {
-                    $params = array(
-                        "url" => $url,
-                        "token" => $token,
-                        "uuid" => $uuid,
-                        "password" => $pass,
-                        "rfc" => $rfc,
-                        "motivo" => $motivo,
-                        "cerB64" => $csd,
-                        "keyB64" => $key
-                    );
-                }
-
-                try {
-                    header('Content-type: text/plain');
-                    $cancelationService = CancelationService::Set($params);
-                    $result = $cancelationService::CancelationByCSD();
-                    if ($result->status == "error") {
-                        return '0' . $result->message . " " . $result->messageDetail;
-                    } else if ($result->status == "success") {
-                        $guardar = $this->cancelarFactura($idfactura, $result->data->acuse);
-                        var_dump($result);
-                        return $guardar;
-                    }
-                } catch (Exception $e) {
-                    echo 'Caught exception: ', $e->getMessage(), "\n";
+                $divr = explode("<impuesto>", $retenciones);
+                foreach ($divr as $ret) {
+                    $divr = explode("-", $ret);
+                    $imp = "00$divr[2]";
+                    $retencion = $xml->createElement('cfdi:Retencion');
+                    $retencion = $noderet->appendChild($retencion);
+                    $retencion->setAttribute('Base', bcdiv($importe, '1', 2));
+                    $retencion->setAttribute('Impuesto', $imp);
+                    $retencion->setAttribute('TipoFactor', 'Tasa');
+                    $retencion->setAttribute('TasaOCuota', bcdiv($divr[1], '1', 6));
+                    $retencion->setAttribute('Importe', bcdiv($divr[0], '1', 2));
                 }
             }
+        }
 
-            public function cancelarFactura($idfactura, $cfdi) {
-                $actualizado = false;
-                $consulta = "UPDATE `datos_factura` set status_pago=:estado, cfdicancel=:cfdi WHERE iddatos_factura=:id;);";
-                $valores = array("id" => $idfactura,
-                    "estado" => '3',
-                    "cfdi" => $cfdi);
-                $con = new Consultas();
-                $actualizado = $con->execute($consulta, $valores);
-                return $actualizado;
+        if ($subiva != "" || $subret != "") {
+            $impuestosT = $xml->createElement('cfdi:Impuestos');
+            $impuestosT = $raiz->appendChild($impuestosT);
+        }
+
+        $totalR = 0;
+        if ($subret != "" && $subret != "0.00--") {
+            $noderet = $xml->createElement('cfdi:Retenciones');
+            $noderet = $impuestosT->appendChild($noderet);
+            $div2 = explode("<impuesto>", $subret);
+            foreach ($div2 as $ret1) {
+                $divr = explode("-", $ret1);
+                $impr = "00$divr[2]";
+                $retencion = $xml->createElement('cfdi:Retencion');
+                $retencion = $noderet->appendChild($retencion);
+                $retencion->setAttribute('Impuesto', $impr);
+                $retencion->setAttribute('Importe', bcdiv($divr[0], '1', 2));
+                $totalR += bcdiv($divr[0], '1', 2);
+            }
+            $impuestosT->setAttribute('TotalImpuestosRetenidos', bcdiv($totalR, '1', 2));
+        }
+
+        $totalT = 0;
+        if ($subiva != "" && $subiva != "0.00--") {
+            $nodetraslados = $xml->createElement('cfdi:Traslados');
+            $nodetraslados = $impuestosT->appendChild($nodetraslados);
+            $div1 = explode("<impuesto>", $subiva);
+            foreach ($div1 as $tras1) {
+                $divt = explode("-", $tras1);
+                $imp = "00$divt[2]";
+                $traslado = $xml->createElement('cfdi:Traslado');
+                $traslado = $nodetraslados->appendChild($traslado);
+                $traslado->setAttribute('Base', bcdiv($baseT, '1', 2));
+                $traslado->setAttribute('Impuesto', $imp);
+                $traslado->setAttribute('TipoFactor', 'Tasa');
+                $traslado->setAttribute('TasaOCuota', bcdiv($divt[1], '1', 6));
+                $traslado->setAttribute('Importe', bcdiv($divt[0], '1', 2));
+                $totalT += bcdiv($divt[0], '1', 2);
+            }
+            $impuestosT->setAttribute('TotalImpuestosTrasladados', bcdiv($totalT, '1', 2));
+        }
+
+        $sello = $this->SelloXML($xml->saveXML(), $rfcemisor);
+        $obj = json_decode($sello);
+        $xml2 = new DOMDocument("1.0", "UTF-8");
+        $xml2->loadXML($xml->saveXML());
+        $c = $xml2->getElementsByTagNameNS('http://www.sat.gob.mx/cfd/4', 'Comprobante')->item(0);
+        $c->setAttribute('Sello', $obj->sello);
+        $doc = "../XML/XML2.xml";
+        $xml2->save($doc);
+        $timbre = $this->timbrado($xml2->saveXML(), $idfactura, $rfcemisor, $rzemisor, $clvregemisor, $regemisor, $cp);
+        return $timbre;
+    }
+
+    function SelloXML($doc, $rfc)
+    {
+        $xmlFile = $doc;
+        $carpeta = '../temporal/' . $rfc . '/';
+        $xslFile = "../vendor/recursos/cadenaoriginal_4_0.xslt";
+        $xml = new DOMDocument("1.0", "UTF-8");
+        $xml->loadXML($xmlFile);
+        $xsl = new DOMDocument();
+        $xsl->load($xslFile);
+        $proc = new XSLTProcessor;
+        $proc->importStyleSheet($xsl);
+        $cadenaOriginal = $proc->transformToXML($xml);
+        $fichero = "../vendor/recursos/cadenaOriginal.txt";
+        file_put_contents($fichero, $cadenaOriginal, LOCK_EX);
+        $params = array(
+            "cadenaOriginal" => "../vendor/recursos/cadenaOriginal.txt",
+            //Archivo key pem: pkcs8 -inform DET -in CSD/cer.key -passin pass:12345678a -out llaveprivada.pem
+            "archivoKeyPem" => $carpeta . 'keyPEM.pem',
+            //archivo cer pem: x509 -inform der -in CSD/cer.cer -out certificado.pem
+            "archivoCerPem" => $carpeta . 'csdPEM.pem'
+        );
+        try {
+            $result = Sellar::ObtenerSello($params);
+            return $result;
+        } catch (Exception $e) {
+            echo '0Caught exception: ', $e->getMessage(), "\n";
+        }
+    }
+
+
+    function generarXML($filename, $content)
+    {
+        $f = fopen($filename, "w");
+        fwrite($f, pack("CCC", 0xef, 0xbb, 0xbf));
+        fwrite($f, $content);
+        fclose($f);
+    }
+
+    function timbrado($doc, $idfactura, $rfcemisor, $rzemisor, $clvregemisor, $regemisor, $cp)
+    {
+        $swaccess = $this->getSWAccess();
+        $div = explode("</tr>", $swaccess);
+        $url = $div[0];
+        $token = $div[1];
+        $params = array(
+            "url" => $url,
+            "token" => $token
+        );
+
+        try {
+            //header("Content-type: text/plain");
+            $stamp = StampService::Set($params);
+            $result = $stamp::StampV4($doc);
+            if ($result->status == "error") {
+                return '0' . $result->message . " " . $result->messageDetail;
+            } else if ($result->status == "success") {
+                $guardar = $this->guardarTimbre($result, $idfactura, $rfcemisor, $rzemisor, $clvregemisor, $regemisor, $cp);
+                var_dump($result);
+                return $guardar;
+            }
+        } catch (Exception $e) {
+            //header("Content-type: text/plain");
+            echo "0" . $e->getMessage();
+        }
+    }
+
+    private function guardarTimbre($result, $idfactura, $rfcemisor, $rzemisor, $clvregemisor, $regemisor, $cp)
+    {
+        $actualizado = false;
+        $consulta = "UPDATE `datos_factura` SET factura_rfcemisor=:rfc, factura_rzsocial=:rzsocial, factura_clvregimen=:clvreg, factura_regimen=:regimen, factura_cpemisor=:cpemisor, cadenaoriginal=:cadena, nocertificadosat=:certSAT, nocertificadocfdi=:certCFDI, uuid=:uuid, sellosat=:selloSAT, sellocfdi=:selloCFDI, fechatimbrado=:fechatimbrado, qrcode=:qrcode, cfdistring=:cfdi, tipofactura=:tipo WHERE iddatos_factura=:id;";
+        $valores = array(
+            "rfc" => $rfcemisor,
+            "rzsocial" => $rzemisor,
+            "clvreg" => $clvregemisor,
+            "regimen" => $regemisor,
+            "cpemisor" => $cp,
+            "cadena" => $result->data->cadenaOriginalSAT,
+            "certSAT" => $result->data->noCertificadoSAT,
+            "certCFDI" => $result->data->noCertificadoCFDI,
+            "uuid" => $result->data->uuid,
+            "selloSAT" => $result->data->selloSAT,
+            "selloCFDI" => $result->data->selloCFDI,
+            "fechatimbrado" => $result->data->fechaTimbrado,
+            "qrcode" => $result->data->qrCode,
+            "cfdi" => $result->data->cfdi,
+            "tipo" => '1',
+            "id" => $idfactura
+        );
+
+        $actualizado = $this->consultas->execute($consulta, $valores);
+        $timbres = $this->updateTimbres();
+        return '+Timbre Guardado';
+    }
+
+    private function updateTimbres()
+    {
+        $actualizado = false;
+        $consulta = "UPDATE `contador_timbres` SET  timbresUtilizados=timbresUtilizados+1, timbresRestantes=timbresRestantes-1 WHERE idtimbres=:idtimbres;";
+        $valores = array("idtimbres" => '1');
+
+        $actualizado = $this->consultas->execute($consulta, $valores);
+        return $actualizado;
+    }
+
+    public function getUUID($idfactura)
+    {
+        $datos = "";
+        $uuid = $this->getUUIDAux($idfactura);
+        foreach ($uuid as $u) {
+            $uuid = $u['uuid'];
+            $folio = $u['letra'] . $u['folio_interno_fac'];
+            $rfc = $u['rfc'];
+            $pass = $u['passcsd'];
+            $csd = $u['csd'];
+            $key = $u['keyb64'];
+            $datos = "$uuid</tr>$folio</tr>$rfc</tr>$pass</tr>$csd</tr>$key";
+        }
+        return $datos;
+    }
+
+    public function getUUIDAux($idfactura)
+    {
+        $consultado = false;
+        $consulta = "SELECT f.uuid,f.letra,f.folio_interno_fac,d.rfc,d.passcsd, d.keyb64, d.csd FROM datos_factura f inner join datos_facturacion d on (f.iddatosfacturacion=d.id_datos) where iddatos_factura=:id;";
+        $val = array("id" => $idfactura);
+
+        $consultado = $this->consultas->getResults($consulta, $val);
+        return $consultado;
+    }
+
+    function cancelarTimbre($idfactura, $motivo, $reemplazo)
+    {
+        $swaccess = $this->getSWAccess();
+        $div = explode("</tr>", $swaccess);
+        $url = $div[0];
+        $token = $div[1];
+
+        $get = $this->getUUID($idfactura);
+        $divideU = explode("</tr>", $get);
+        $uuid = $divideU[0];
+        $rfc = $divideU[2];
+        $pass = $divideU[3];
+        $csd = $divideU[4];
+        $key = $divideU[5];
+
+        if ($motivo == '01') {
+            $params = array(
+                "url" => $url,
+                "token" => $token,
+                "uuid" => $uuid,
+                "password" => $pass,
+                "rfc" => $rfc,
+                "motivo" => $motivo,
+                "foliosustitucion" => $reemplazo,
+                "cerB64" => $csd,
+                "keyB64" => $key
+            );
+        } else {
+            $params = array(
+                "url" => $url,
+                "token" => $token,
+                "uuid" => $uuid,
+                "password" => $pass,
+                "rfc" => $rfc,
+                "motivo" => $motivo,
+                "cerB64" => $csd,
+                "keyB64" => $key
+            );
+        }
+
+        try {
+            header('Content-type: text/plain');
+            $cancelationService = CancelationService::Set($params);
+            $result = $cancelationService::CancelationByCSD();
+            if ($result->status == "error") {
+                return '0' . $result->message . " " . $result->messageDetail;
+            } else if ($result->status == "success") {
+                $guardar = $this->cancelarFactura($idfactura, $result->data->acuse);
+                //var_dump($result);
+                return $guardar;
+            }
+        } catch (Exception $e) {
+            echo 'Caught exception: ', $e->getMessage(), "\n";
+        }
+    }
+
+    public function cancelarFactura($idfactura, $cfdi)
+    {
+        $ruta = "../XML/XML_CANCEL.xml";
+        $archivo = fopen($ruta, "w");
+        fwrite($archivo, $cfdi);
+        fclose($archivo);
+
+        $xml = simplexml_load_file($ruta);
+        foreach ($xml->Folios as $folio) {
+            $uuid_cancel = $folio->UUID;
+            $status_uuid = $folio->EstatusUUID;
+        }
+
+        switch ($status_uuid) {
+            case 201:
+                $mensaje_cancel = "Solicitud de cancelación exitosa";
+                break;
+            case 202:
+                $mensaje_cancel = "Folio Fiscal Previamente Cancelado";
+                break;
+            case 203:
+                $mensaje_cancel = "Folio Fiscal No Correspondiente al Emisor";
+                break;
+            case 204:
+                $mensaje_cancel = "Folio Fiscal No Aplicable a Cancelación";
+                break;
+            case 205:
+                $mensaje_cancel = "Folio Fiscal No Existente";
+                break;
+            case 206:
+                $mensaje_cancel = "UUID no corresponde a un CFDI del Sector Primario";
+                break;
+            case 207:
+                $mensaje_cancel = "No se especificó el motivo de cancelación o el motivo no es valido";
+                break;
+            case 208:
+                $mensaje_cancel = "Folio Sustitución invalido";
+                break;
+            case 209:
+                $mensaje_cancel = "Folio Sustitución no requerido";
+                break;
+            case 210:
+                $mensaje_cancel = "La fecha de solicitud de cancelación es mayor a la fecha de declaración";
+                break;
+            case 211:
+                $mensaje_cancel = "La fecha de solicitud de cancelación límite para factura global";
+                break;
+            case 212:
+                $mensaje_cancel = "Relación no valida o inexistente";
+                break;
+            case 300:
+                $mensaje_cancel = "Usuario No Válido";
+                break;
+            case 301:
+                $mensaje_cancel = "XML Mal Formado";
+                break;
+            case 302:
+                $mensaje_cancel = "Sello Mal Formado";
+                break;
+            case 304:
+                $mensaje_cancel = "Certificado Revocado o Caduco";
+                break;
+            case 305:
+                $mensaje_cancel = "Certificado Inválido";
+                break;
+            case 309:
+                $mensaje_cancel = "Certificado Inválido";
+                break;
+            case 310:
+                $mensaje_cancel = "CSD Inválido";
+                break;
+            case 311:
+                $mensaje_cancel = "Motivo inválido";
+                break;
+            case 312:
+                $mensaje_cancel = "UUID no relacionado";
+                break;
+        }
+
+        $actualizado = "";
+        if ($status_uuid == 201 || $status_uuid == 202) {
+            $consulta = "UPDATE `datos_factura` set status_pago=:estado, cfdicancel=:cfdi WHERE iddatos_factura=:id;";
+            $valores = array(
+                "id" => $idfactura,
+                "estado" => '3',
+                "cfdi" => $cfdi
+            );
+            $actualizado = $this->consultas->execute($consulta, $valores);
+            $actualizado = "1$status_uuid - $mensaje_cancel";
+        } else {
+            $actualizado = "0$status_uuid - $mensaje_cancel";
+        }
+        return $actualizado;
+    }
+
+    private function getConfigMailAux()
+    {
+        $consultado = false;
+        $consulta = "SELECT * FROM correoenvio WHERE chuso1=:id;";
+        $valores = array("id" => '1');
+        $consultado = $this->consultas->getResults($consulta, $valores);
+        return $consultado;
+    }
+
+    private function getConfigMail()
+    {
+        $datos = "";
+        $get = $this->getConfigMailAux();
+        foreach ($get as $actual) {
+            $correo = $actual['correo'];
+            $pass = $actual['password'];
+            $remitente = $actual['remitente'];
+            $correoremitente = $actual['correoremitente'];
+            $host = $actual['host'];
+            $puerto = $actual['puerto'];
+            $seguridad = $actual['seguridad'];
+            $datos = "$correo</tr>$pass</tr>$remitente</tr>$correoremitente</tr>$host</tr>$puerto</tr>$seguridad";
+        }
+        return $datos;
+    }
+
+    public function mail($sm)
+    {
+        require_once '../com.sine.controlador/ControladorConfiguracion.php';
+        $cc = new ControladorConfiguracion();
+        $body = $cc->getMailBody('1');
+        $divM = explode("</tr>", $body);
+        $asunto = $divM[1];
+        $saludo = $divM[2];
+        $msg = $divM[3];
+        $logo = $divM[4];
+
+        $config = $this->getConfigMail();
+        if ($config != "") {
+            $div = explode("</tr>", $config);
+            $correoenvio = $div[0];
+            $pass = $div[1];
+            $remitente = $div[2];
+            $correoremitente = $div[3];
+            $host = $div[4];
+            $puerto = $div[5];
+            $seguridad = $div[6];
+
+            $mail = new PHPMailer;
+            $mail->isSMTP();
+            $mail->Mailer = 'smtp';
+            $mail->SMTPAuth = true;
+            $mail->Host = $host;
+            $mail->Port = $puerto;
+            $mail->SMTPSecure = $seguridad;
+
+            $mail->Username = $correoenvio;
+            $mail->Password = $pass;
+            $mail->From = $correoremitente;
+            $mail->FromName = $remitente;
+
+            $mail->Subject = iconv("utf-8", "windows-1252", $asunto);
+            $mail->isHTML(true);
+            $mail->Body = $this->bodyMail($asunto, $saludo, $sm->getRazonsocial(), $msg, $logo);
+
+            if ($sm->getChmail1() == '1') {
+                $mail->addAddress($sm->getMailalt1());
+            }
+            if ($sm->getChmail2() == '1') {
+                $mail->addAddress($sm->getMailalt2());
+            }
+            if ($sm->getChmail3() == '1') {
+                $mail->addAddress($sm->getMailalt3());
+            }
+            if ($sm->getChmail4() == '1') {
+                $mail->addAddress($sm->getMailalt4());
+            }
+            if ($sm->getChmail5() == '1') {
+                $mail->addAddress($sm->getMailalt5());
+            }
+            if ($sm->getChmail6() == '1') {
+                $mail->addAddress($sm->getMailalt6());
             }
 
-            private function getConfigMailAux() {
-                $consultado = false;
-                $consulta = "SELECT * FROM correoenvio WHERE chuso1=:id;";
-                $consultas = new Consultas();
-                $valores = array("id" => '1');
-                $consultado = $consultas->getResults($consulta, $valores);
-                return $consultado;
+            $mail->addStringAttachment($sm->getPdfstring(), $sm->getFolio() . "_" . $sm->getRfcemisor() . "_" . $sm->getUuid() . ".pdf");
+            if ($sm->getCfdistring() != "") {
+                $mail->addStringAttachment($sm->getCfdistring(), $sm->getFolio() . "_" . $sm->getRfcemisor() . "_" . $sm->getUuid() . ".xml");
             }
-
-            private function getConfigMail() {
-                $datos = "";
-                $get = $this->getConfigMailAux();
-                foreach ($get as $actual) {
-                    $correo = $actual['correo'];
-                    $pass = $actual['password'];
-                    $remitente = $actual['remitente'];
-                    $correoremitente = $actual['correoremitente'];
-                    $host = $actual['host'];
-                    $puerto = $actual['puerto'];
-                    $seguridad = $actual['seguridad'];
-                    $datos = "$correo</tr>$pass</tr>$remitente</tr>$correoremitente</tr>$host</tr>$puerto</tr>$seguridad";
-                }
-                return $datos;
+            if (!$mail->send()) {
+                echo '0No se envio el mensaje';
+                echo '0Mailer Error: ' . $mail->ErrorInfo;
+            } else {
+                return 'Se ha enviado la factura';
             }
+        } else {
+            return "No se configuro correo de envio";
+        }
+    }
 
-            public function mail($sm) {
-                require_once '../com.sine.controlador/ControladorConfiguracion.php';
-                $cc = new ControladorConfiguracion();
-                $body = $cc->getMailBody('1');
-                $divM = explode("</tr>", $body);
-                $asunto = $divM[1];
-                $saludo = $divM[2];
-                $msg = $divM[3];
-                $logo = $divM[4];
+    private function bodyMail($asunto, $saludo, $nombre, $msg, $logo)
+    {
+        $archivo = "../com.sine.dao/configuracion.ini";
+        $ajustes = parse_ini_file($archivo, true);
+        if (!$ajustes) {
+            throw new Exception("No se puede abrir el archivo " . $archivo);
+        }
+        $rfcfolder = $ajustes['cron']['rfcfolder'];
 
-                $config = $this->getConfigMail();
-                if ($config != "") {
-                    $div = explode("</tr>", $config);
-                    $correoenvio = $div[0];
-                    $pass = $div[1];
-                    $remitente = $div[2];
-                    $correoremitente = $div[3];
-                    $host = $div[4];
-                    $puerto = $div[5];
-                    $seguridad = $div[6];
-
-                    $mail = new PHPMailer;
-                    $mail->isSMTP();
-                    $mail->Mailer = 'smtp';
-                    $mail->SMTPAuth = true;
-                    $mail->Host = $host;
-                    $mail->Port = $puerto;
-                    $mail->SMTPSecure = $seguridad;
-
-                    $mail->Username = $correoenvio;
-                    $mail->Password = $pass;
-                    $mail->From = $correoremitente;
-                    $mail->FromName = $remitente;
-
-                    $mail->Subject = utf8_decode($asunto);
-                    $mail->isHTML(true);
-                    $mail->Body = $this->bodyMail($asunto, $saludo, $sm->getRazonsocial(), $msg, $logo);
-
-                    if ($sm->getChmail1() == '1') {
-                        $mail->addAddress($sm->getMailalt1());
-                    }
-                    if ($sm->getChmail2() == '1') {
-                        $mail->addAddress($sm->getMailalt2());
-                    }
-                    if ($sm->getChmail3() == '1') {
-                        $mail->addAddress($sm->getMailalt3());
-                    }
-                    if ($sm->getChmail4() == '1') {
-                        $mail->addAddress($sm->getMailalt4());
-                    }
-                    if ($sm->getChmail5() == '1') {
-                        $mail->addAddress($sm->getMailalt5());
-                    }
-                    if ($sm->getChmail6() == '1') {
-                        $mail->addAddress($sm->getMailalt6());
-                    }
-
-                    $mail->addStringAttachment($sm->getPdfstring(), $sm->getFolio() . "_" . $sm->getRfcemisor() . "_" . $sm->getUuid() . ".pdf");
-                    if ($sm->getCfdistring() != "") {
-                        $mail->addStringAttachment($sm->getCfdistring(), $sm->getFolio() . "_" . $sm->getRfcemisor() . "_" . $sm->getUuid() . ".xml");
-                    }
-                    if (!$mail->send()) {
-                        echo '0No se envio el mensaje';
-                        echo '0Mailer Error: ' . $mail->ErrorInfo;
-                    } else {
-                        return 'Se ha enviado la factura';
-                    }
-                } else {
-                    return "No se configuro correo de envio";
-                }
-            }
-
-            private function bodyMail($asunto, $saludo, $nombre, $msg, $logo) {
-                $archivo = "../com.sine.dao/configuracion.ini";
-                $ajustes = parse_ini_file($archivo, true);
-                if (!$ajustes) {
-                    throw new Exception("No se puede abrir el archivo " . $archivo);
-                }
-                $rfcfolder = $ajustes['cron']['rfcfolder'];
-
-                $txt = str_replace("<corte>", "</p><p style='font-size:18px; text-align: justify;'>", $msg);
-                $message = "<html>
+        $txt = str_replace("<corte>", "</p><p style='font-size:18px; text-align: justify;'>", $msg);
+        $message = "<html>
                                 <body>
                                     <table width='100%' bgcolor='#e0e0e0' cellpadding='0' cellspacing='0' border='0' style='border-radius: 25px;'>
                                         <tr>
@@ -3454,113 +3881,290 @@ class ControladorFactura {
                                     </table>
                                 </body>
                             </html>";
-                return $message;
-            }
+        return $message;
+    }
 
-            /* public function sendMSG($file, $cod, $number) {
-            $fullnumb = $cod . $number;
-            $sid = "AC6256c8483286f5e0fd804de145ba42bf";
-            $token = "aabd7bf61f0efdf18965ffbef4f261bd";
-            $twilio = new Client($sid, $token);
-            try {
-            $message = $twilio->messages->create("whatsapp:+$fullnumb", // to
-            ["from" => "whatsapp:+14155238886",
-            "body" => "Hola BB",
-            "mediaUrl" => ["https://q-ik.mx/SineFacturacion/pdf/facturaFAC20200025.pdf"]]);
-            return $message->sid;
-            } catch (Exception $e) {
-            header("Content-type: text/plain");
-            echo "0" . $e->getMessage();
-            }
-            } */
+    public function actualizarDiasHorario($primer, $ultimo)
+    {
+        Session::start();
+        $_SESSION[sha1("primerdomingo")] = $primer;
+        $_SESSION[sha1("ultimodomingo")] = $ultimo;
 
-            public function actualizarDiasHorario($primer, $ultimo) {
-                Session::start();
-                $_SESSION[sha1("primerdomingo")] = $primer;
-                $_SESSION[sha1("ultimodomingo")] = $ultimo;
+        $actualizado = false;
 
-                $actualizado = false;
-                $consultas = new Consultas();
-                $consulta = "UPDATE `horario_verano` SET primerdomingoabril=:primer, ultimodomingooctubre=:ultimo WHERE idhorario_verano=:id;";
-                $valores = array("id" => '1',
-                    "primer" => $primer,
-                    "ultimo" => $ultimo);
-                $actualizado = $consultas->execute($consulta, $valores);
-                return $actualizado;
-            }
+        $consulta = "UPDATE `horario_verano` SET primerdomingoabril=:primer, ultimodomingooctubre=:ultimo WHERE idhorario_verano=:id;";
+        $valores = array(
+            "id" => '1',
+            "primer" => $primer,
+            "ultimo" => $ultimo
+        );
+        $actualizado = $this->consultas->execute($consulta, $valores);
+        return $actualizado;
+    }
 
-            public function getInfoGlobal($clvp, $clvm) {
-                $periodo = "";
-                $datosP = $this->getPeriodicidadbyClvAux($clvp);
-                foreach ($datosP as $actualP) {
-                    $periodo = $actualP['descripcion_periodoglobal'];
-                }
-                
-                $mes = "";
-                $datosM = $this->getMesbyClvAux($clvm);
-                foreach ($datosM as $actualM) {
-                    $mes = $actualM['descripcion_meses'];
-                }
-
-                $datos = "$periodo</tr>$mes";
-                return $datos;
-            }
-
-            private function getPeriodicidadbyClvAux($clv) {
-                $consultado = false;
-                $con = new Consultas();
-                $consulta = "SELECT * FROM catalogo_periodoglobal WHERE c_periodoglobal=:clv;";
-                $val = array("clv" => $clv);
-                $consultado = $con->getResults($consulta, $val);
-                return $consultado;
-            }
-
-            private function getMesbyClvAux($clv) {
-                $consultado = false;
-                $con = new Consultas();
-                $consulta = "SELECT * FROM catalogo_meses WHERE c_meses=:clv;";
-                $val = array("clv" => $clv);
-                $consultado = $con->getResults($consulta, $val);
-                return $consultado;
-            }
-
-            public function checkStatusCFDI($idfactura) {
-                $datos = false;
-                $factura = $this->getFacturaById($idfactura);
-                foreach ($factura as $actual) {
-                    $emisor = $actual['factura_rfcemisor'];
-                    $receptor = $actual['rfcreceptor'];
-                    $total = $actual['totalfactura'];
-                    $uuid = $actual['uuid'];
-                    $cfdistring = $actual['cfdistring'];
-                }
-
-                $xml = simplexml_load_string($cfdistring);
-                $comprobante = $xml->xpath('/cfdi:Comprobante');
-                $attr = $comprobante[0]->attributes();
-                $sello = $attr['Sello'];
-                $subsello = substr($sello, -8);
-                //$soapUrl = "https://consultaqr.facturaelectronica.sat.gob.mx/ConsultaCFDIService.svc";
-                $soapUrl = "https://pruebacfdiconsultaqr.cloudapp.net/ConsultaCFDIService.svc";
-                $consultaCfdi = consultaCfdiSAT::ServicioConsultaSAT($soapUrl, $emisor, $receptor, $total, $uuid, $subsello);
-                $codstatus = $consultaCfdi->CodigoEstatus;
-                $estado = $consultaCfdi->Estado;
-                $cancelable = $consultaCfdi->EsCancelable;
-                $statusCancelacion = $consultaCfdi->EstatusCancelacion;
-
-                if (is_array($consultaCfdi->EsCancelable)) {
-                    $cancelable = "";
-                }
-
-                if (is_array($consultaCfdi->EstatusCancelacion)) {
-                    $statusCancelacion = "";
-                }
-                $reset = "";
-                if ($statusCancelacion === "Solicitud rechazada") {
-                    $reset = "<button class='button-modal' onclick='resetCfdi($idfactura)' id='btn-reset-cfdi'>Restaurar Factura <span class='glyphicon glyphicon-repeat'></span></button>";
-                }
-                $datos = "$codstatus</tr>$estado</tr>$cancelable</tr>$statusCancelacion</tr>$reset";
-                return $datos;
-            }
-
+    public function getInfoGlobal($clvp, $clvm)
+    {
+        $periodo = "";
+        $datosP = $this->getPeriodicidadbyClvAux($clvp);
+        foreach ($datosP as $actualP) {
+            $periodo = $actualP['descripcion_periodoglobal'];
         }
+
+        $mes = "";
+        $datosM = $this->getMesbyClvAux($clvm);
+        foreach ($datosM as $actualM) {
+            $mes = $actualM['descripcion_meses'];
+        }
+
+        $datos = "$periodo</tr>$mes";
+        return $datos;
+    }
+
+    private function getPeriodicidadbyClvAux($clv)
+    {
+        $consultado = false;
+        $consulta = "SELECT * FROM catalogo_periodoglobal WHERE c_periodoglobal=:clv;";
+        $val = array("clv" => $clv);
+        $consultado = $this->consultas->getResults($consulta, $val);
+        return $consultado;
+    }
+    //cambio NO
+    private function getMesbyClvAux($clv)
+    {
+        $consultado = false;
+        $consulta = "SELECT * FROM catalogo_meses WHERE c_meses=:clv;";
+        $val = array("clv" => $clv);
+        $consultado = $this->consultas->getResults($consulta, $val);
+        return $consultado;
+    }
+
+    public function checkStatusCFDI($idfactura)
+    {
+        $datos = false;
+        $factura = $this->getFacturaById($idfactura);
+        foreach ($factura as $actual) {
+            $emisor = $actual['factura_rfcemisor'];
+            $receptor = $actual['rfcreceptor'];
+            $total = $actual['totalfactura'];
+            $uuid = $actual['uuid'];
+            $cfdistring = $actual['cfdistring'];
+        }
+
+        $xml = simplexml_load_string($cfdistring);
+        $comprobante = $xml->xpath('/cfdi:Comprobante');
+        $attr = $comprobante[0]->attributes();
+        $sello = $attr['Sello'];
+        $subsello = substr($sello, -8);
+        //$soapUrl = "https://consultaqr.facturaelectronica.sat.gob.mx/ConsultaCFDIService.svc";
+        $soapUrl = "https://pruebacfdiconsultaqr.cloudapp.net/ConsultaCFDIService.svc";
+        $consultaCfdi = consultaCfdiSAT::ServicioConsultaSAT($soapUrl, $emisor, $receptor, $total, $uuid, $subsello);
+        $codstatus = $consultaCfdi->CodigoEstatus;
+        $estado = $consultaCfdi->Estado;
+        $cancelable = $consultaCfdi->EsCancelable;
+        $statusCancelacion = $consultaCfdi->EstatusCancelacion;
+
+        if (is_array($consultaCfdi->EsCancelable)) {
+            $cancelable = "";
+        }
+
+        if (is_array($consultaCfdi->EstatusCancelacion)) {
+            $statusCancelacion = "";
+        }
+        $reset = "";
+        if ($statusCancelacion === "Solicitud rechazada") {
+            $reset = "<button class='button-modal' onclick='resetCfdi($idfactura)' id='btn-reset-cfdi'>Restaurar factura <span class='glyphicon glyphicon-repeat'></span></button>";
+        }
+        $datos = "$codstatus</tr>$estado</tr>$cancelable</tr>$statusCancelacion</tr>$reset";
+        return $datos;
+    }
+
+    public function getUUIDRel($id, $type, $folio)
+    {
+        $uuid = "Factura sin timbrar";
+        if ($type == 'f') {
+            $query = "SELECT uuid FROM datos_factura WHERE iddatos_factura = :id AND uuid IS NOT NULL";
+        } else if ($type == 'c') {
+            $query = "SELECT uuid FROM factura_carta WHERE idfactura_carta = :id AND uuid IS NOT NULL";
+        }
+        $val = array("id" => $id);
+        $stmt = $this->consultas->getResults($query, $val);
+        foreach ($stmt as $rs) {
+            $uuid = $rs['uuid'];
+        }
+        return $uuid;
+    }
+
+    private function getOptionsEgresos($sid, $n, $idprod, $total, $disuuid)
+    {
+        $datos = "<select class='form-select text-center button-inpuesto' id='SCfdiRel$n' data-idtmpprod='$idprod' onchange='asignaMonto($n);' $disuuid>
+                          <option value=''> - - - </option>";
+
+        $query = "SELECT * FROM tmpegreso WHERE sessionid = :sid";
+        $val = array("sid" => $sid);
+        $stmt = $this->consultas->getResults($query, $val);
+        foreach ($stmt as $rs) {
+            $idegreso = $rs['idegreso'];
+            $tmpidprod = $rs['idproducto'];
+            $folio = $rs['folio_doc'];
+            $monto = $rs['monto_egreso'];
+            $selected = "";
+            if ($tmpidprod == $idprod || $monto == $total) {
+                $selected = "selected";
+            }
+            $datos .= "<option class='text-start' value='$idegreso' $selected >$folio</option>";
+        }
+        $datos .= "</select>";
+
+        return $datos;
+    }
+
+    public function asignarMontoCfdiRel($id_egreso, $total, $id_prod)
+    {
+        $mensaje = "";
+        $pagada = $this->VerificaStatusPago($id_egreso);
+        /*** Status de pago ***/
+        // 1 pagado
+        // 2 pendiente
+        // 3 cancelada
+        // 4 pago parcial
+        $asignado = $this->verificaCFDIAsignado($id_egreso);
+        if ($asignado > 0) {
+            $mensaje = "0Este CFDI ya tiene un monto asignado, no se puede volver a asignar.";
+        } else if ($pagada == 1) {
+            $mensaje = "0Este CFDI ya esta pagado. NO puedes asignarle un monto de egreso.";
+        } else if ($pagada == 3) {
+            $mensaje = "0Este CFDI ya esta cancelado. NO puedes asignarle un monto de egreso.";
+        } else if ($pagada == 2 || $pagada == 4) {
+            $restante = $this->VerificaMontoDoc($id_egreso, $pagada);
+            if ($total > $restante) {
+                $mensaje = "0El monto asignado es mayor al restante del CFDI. RESTANTE: $" . bcdiv($restante, '1', 2);
+            } else {
+                $query = "UPDATE tmpegreso SET monto_egreso = :monto, idproducto = :idprod WHERE idegreso = :id";
+                $val = array("monto" => $total, "idprod" => $id_prod, "id" => $id_egreso);
+                $insertado = $this->consultas->execute($query, $val);
+                if ($insertado) {
+                    echo "1Monto asignado correctamente al CFDI";
+                } else {
+                    echo "0Error al relacionar monto";
+                }
+            }
+        }
+        return $mensaje;
+    }
+
+    private function VerificaStatusPago($idegreso)
+    {
+        $status_pago = 0;
+        $div = explode('</tr>', $this->VerificaStatusPagoAux($idegreso));
+        $id_doc = $div[0];
+        $type = $div[1];
+
+        if ($type == 'f') {
+            $query = "SELECT status_pago FROM datos_factura WHERE iddatos_factura = :iddoc";
+        } else {
+            $query = "SELECT status_pago FROM factura_carta WHERE idfactura_carta = :iddoc";
+        }
+        $val = array("iddoc" => $id_doc);
+        $stmt = $this->consultas->getResults($query, $val);
+        foreach ($stmt as $rs) {
+            $status_pago = $rs['status_pago'];
+        }
+        return $status_pago;
+    }
+
+    private function verificaCFDIAsignado($id)
+    {
+        $query = "SELECT COUNT(*) maximo FROM tmpegreso WHERE idegreso=:id AND (monto_egreso > 0 OR idproducto > 0)";
+        $val = array("id" => $id);
+        $stmt = $this->consultas->getResults($query, $val);
+        foreach ($stmt as $rs) {
+            $existe = $rs['maximo'];
+        }
+        return $existe;
+    }
+
+    private function VerificaMontoDoc($idegreso, $status_pago)
+    {
+        $query = "";
+        $restante = 0;
+        $div = explode('</tr>', $this->VerificaStatusPagoAux($idegreso));
+        $id_doc = $div[0];
+        $type = $div[1];
+
+        if ($status_pago == 2) {
+            if ($type == 'f') {
+                $query = "SELECT totalfactura restante FROM datos_factura WHERE iddatos_factura = :iddoc";
+            } else {
+                $query = "SELECT totalfactura restante FROM factura_carta WHERE idfactura_carta = :iddoc";
+            }
+        } else if ($status_pago == 4) {
+            $query = "SELECT max(dp.iddetallepago) iddetalle, dp.montoinsoluto restante FROM detallepago dp INNER JOIN pagos p on p.tagpago = dp.detalle_tagencabezado WHERE dp.pago_idfactura = :iddoc AND dp.type = :type AND p.cancelado = 0";
+        }
+
+        $val = array("iddoc" => $id_doc, "type" => $type);
+        $stmt = $this->consultas->getResults($query, $val);
+        foreach ($stmt as $rs) {
+            $restante = $rs['restante'];
+        }
+
+        return $restante;
+    }
+
+    private function VerificaStatusPagoAux($id)
+    {
+        $id_doc = 0;
+        $type = "";
+
+        $query = "SELECT id_doc, type FROM tmpegreso WHERE idegreso = :id";
+        $val = array("id" => $id);
+        $stmt = $this->consultas->getResults($query, $val);
+        foreach ($stmt as $rs) {
+            $id_doc = $rs['id_doc'];
+            $type = $rs['type'];
+        }
+
+        return "$id_doc</tr>$type";
+    }
+
+    private function getCfdiEgresos($tag)
+    {
+        $consultado = false;
+
+        $consulta = "SELECT * FROM cfdiegreso WHERE tagfactura = :tag";
+        $val = array("tag" => $tag);
+        $consultado = $this->consultas->getResults($consulta, $val);
+        return $consultado;
+    }
+
+    public function cfdiEgreso($tag, $sessionid)
+    {
+        $n = 0;
+        $productos = $this->getCfdiEgresos($tag);
+        foreach ($productos as $productoactual) {
+            $n++;
+            $iddoc = $productoactual['iddoc'];
+            $foliodoc = $productoactual['foliodoc'];
+            $type = $productoactual['type'];
+            $uuid = $productoactual['uuid'];
+            $tiporel = $productoactual['tiporel'];
+            $descrel = $productoactual['descrel'];
+            $montoegreso = $productoactual['montoegreso'];
+
+            $consulta = "INSERT INTO tmpegreso VALUES (:id, :id_doc, :folio_doc, :type, :uuid, :tiporel, :descripcion, :monto, :idprod, :sessionid)";
+            $valores = array(
+                "id" => null,
+                "id_doc" => $iddoc,
+                "folio_doc" => $foliodoc,
+                "type" => $type,
+                "uuid" => $uuid,
+                "tiporel" => $tiporel,
+                "descripcion" => $descrel,
+                "monto" => $montoegreso,
+                "idprod" => 0,
+                "sessionid" => $sessionid
+            );
+            $this->consultas->execute($consulta, $valores);
+        }
+        return $n;
+    }
+}

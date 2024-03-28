@@ -816,11 +816,12 @@ function corteCaja(user = "") {
     cargandoHide();
     cargandoShow();
     var user = $("#usuario-corte").val() || '0';
-
+    (user == "0") ? $("#pago_factura").hide('slow') : $("#pago_factura").show('slow');
+    var pago = $("#pago").is(":checked") ? 1 : 0;
     $.ajax({
         url: 'com.sine.enlace/enlaceventa.php',
         type: 'POST',
-        data: {transaccion: 'cortecaja', user: user},
+        data: {transaccion: 'cortecaja', user: user, pago:pago},
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -932,11 +933,12 @@ function insertarCorte(idsupervisor = ""){
     var comentarios = $("#comentarios").val();
     var totalfaltantes = $("#total_faltantes").val();
     var totalsobrantes = $("#total_sobrantes").val();
+    var pago = $("#pago").is(":checked") ? 1 : 0;
 
     $.ajax({
         url: "com.sine.enlace/enlaceventa.php",
         type: "POST",
-        data: {transaccion: "insertarcorte", totalventas: totalventas, totalentradas: totalentradas, totalsalidas: totalsalidas, fondoinicio: fondoinicio, usuario: usuario, fechaventa: fechaventa, totalganancias: totalganancias, idsupervisor: idsupervisor, comentarios: comentarios, totalsobrantes: totalsobrantes, totalfaltantes: totalfaltantes},
+        data: {transaccion: "insertarcorte", totalventas: totalventas, totalentradas: totalentradas, totalsalidas: totalsalidas, fondoinicio: fondoinicio, usuario: usuario, fechaventa: fechaventa, totalganancias: totalganancias, idsupervisor: idsupervisor, comentarios: comentarios, totalsobrantes: totalsobrantes, totalfaltantes: totalfaltantes, pago:pago},
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);

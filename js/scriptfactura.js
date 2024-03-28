@@ -1,26 +1,9 @@
-function tests() {
-    $.ajax({
-        url: "com.sine.enlace/enlacecron.php",
-        type: "POST",
-        data: {transaccion: "refactura"},
-        success: function (datos) {
-            var texto = datos.toString();
-            var bandera = texto.substring(0, 1);
-            var res = texto.substring(1, 1000);
-            if (bandera == '0') {
-                alertify.error(res);
-            } else {
-                alert(datos);
-            }
-        }
-    });
-}
-
 function tablaProductos(uuid = "") {
+    var tcomprobante = $('#tipo-comprobante').val();
     $.ajax({
         url: "com.sine.enlace/enlacefactura.php",
         type: "POST",
-        data: {transaccion: "tablatmp", uuid: uuid},
+        data: { transaccion: "tablatmp", uuid: uuid, tcomprobante: tcomprobante },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -29,104 +12,18 @@ function tablaProductos(uuid = "") {
                 alertify.error(res);
             } else {
                 $("#resultados").html(datos);
-               
             }
         }
     });
 }
 
-/*function getTipoCambio(idmoneda = "") {
-    cargandoHide();
-    cargandoShow();
-    if (idmoneda == "") {
-        idmoneda = $("#id-moneda").val();
-    }
-    $.ajax({
-        url: 'com.sine.enlace/enlacepago.php',
-        type: 'POST',
-        data: {transaccion: 'gettipocambio', idmoneda: idmoneda},
-        success: function (datos) {
-            var texto = datos.toString();
-            var bandera = texto.substring(0, 1);
-            var res = texto.substring(1, 5000);
-            if (bandera == 0) {
-                alertify.error(res);
-            } else {
-                if (idmoneda != "1") {
-                    $("#tipo-cambio").removeAttr('disabled');
-                } else {
-                    $("#tipo-cambio").attr('disabled', true);
-                }
-                $("#tipo-cambio").val(datos);
-            }
-            cargandoHide();
-        }
-    });
-}*/
-
-
-/*function addCFDI() {
-    var rel = $("#tipo-relacion").val();
-    var cfdi = $("#cfdi-rel").val();
-    if (isnEmpty(rel, "tipo-relacion") && isnEmpty(cfdi, "cfdi-rel")) {
-        $.ajax({
-            url: "com.sine.enlace/enlacefactura.php",
-            type: "POST",
-            data: {transaccion: "addcfdi", rel: rel, cfdi: cfdi},
-            success: function (datos) {
-                var texto = datos.toString();
-                var bandera = texto.substring(0, 1);
-                var res = texto.substring(1, 1000);
-                if (bandera == '0') {
-                    alertify.error(res);
-                } else {
-                    $("#tipo-relacion").val('');
-                    $("#cfdi-rel").val('');
-                    cargandoHide();
-                    var array = datos.split("<corte>");
-                    var p2 = array[1];
-                    $("#body-lista-cfdi").html(p2);
-                   
-                }
-            }
-        });
-    }
-}*/
-function addCFDI() {
-    var rel = $("#tipo-relacion").val();
-    var cfdi = $("#cfdi-rel").val();
-    if (isnEmpty(rel, "tipo-relacion") && isnEmpty(cfdi, "cfdi-rel")) {
-        $.ajax({
-            url: "com.sine.enlace/enlacefactura.php",
-            type: "POST",
-            data: {transaccion: "addcfdi", rel: rel, cfdi: cfdi},
-            success: function (datos) {
-                var texto = datos.toString();
-                var bandera = texto.substring(0, 1);
-                var res = texto.substring(1, 1000);
-                if (bandera == '0') {
-                    alertify.error(res);
-                } else {
-                    $("#tipo-relacion").val('');
-                    $("#cfdi-rel").val('');
-                    cargandoHide();
-                    // Parsear la respuesta del servidor
-                    var array = datos.split("<corte>");
-                    var p2 = array[1];
-                    // Mostrar los datos en la tabla
-                    $("#body-lista-cfdi").html(p2);
-                }
-            }
-        });
-    }
-}
 
 function eliminarCFDI(idtmp) {
-    alertify.confirm("Esta seguro que desea eliminar este CFDI?", function () {
+    alertify.confirm("¿Estás seguro que deseas eliminar este CFDI?", function () {
         $.ajax({
             url: "com.sine.enlace/enlacefactura.php",
             type: "POST",
-            data: {transaccion: "eliminarcfdi", idtmp: idtmp},
+            data: { transaccion: "eliminarcfdi", idtmp: idtmp },
             success: function (datos) {
                 var texto = datos.toString();
                 var bandera = texto.substring(0, 1);
@@ -138,11 +35,22 @@ function eliminarCFDI(idtmp) {
                     var array = datos.split("<corte>");
                     var p1 = array[0];
                     var p2 = array[1];
-                    $("#body-lista-cfdi").html(p2);
+                    if (p2 != "") {
+                        $("#tablaresultados").show('slow');
+                        $("#body-lista-cfdi").html(p2);
+                        tablaProductos();
+                    }
                 }
             }
         });
-    }).set({title: "Q-ik"});
+    }).set({ title: "Q-ik" });
+}
+
+function limpiarCampos(){
+    $("#imagenproducto").hide();
+    $("#muestraimagenproducto").val("");
+    $("#filename").val("");
+    $("#imgactualizar").val("");
 }
 
 function checkIVA(idtmp) {
@@ -160,7 +68,7 @@ function checkIVA(idtmp) {
     $.ajax({
         url: "com.sine.enlace/enlacefactura.php",
         type: "POST",
-        data: {transaccion: "chivatmp", idtmp: idtmp, traslados: idtraslados, retenciones: idretenciones},
+        data: { transaccion: "chivatmp", idtmp: idtmp, traslados: idtraslados, retenciones: idretenciones },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -176,7 +84,6 @@ function checkIVA(idtmp) {
 }
 
 function setCamposProducto() {
-   
     $("#codigo-producto").val('');
     $("#producto").val('');
     $("#tipo").val('');
@@ -197,7 +104,7 @@ function setCamposProducto() {
 function calcularGanancia() {
     var preciocompra = $("#pcompra").val() || '0';
     var porcentaje = $("#porganancia").val() || '0';
-    
+
     var importeganancia = (parseFloat(preciocompra) * parseFloat(porcentaje)) / 100;
     $("#ganancia").val(importeganancia);
     var precioventa = parseFloat(preciocompra) + parseFloat(importeganancia);
@@ -207,7 +114,7 @@ function calcularGanancia() {
 function addinventario() {
     var tipo = $("#tipo").val();
     if (tipo == '1') {
-        $("#inventario").show('slow');
+        $("#inventarios").show('slow');
         if ($("#chinventario").prop('checked')) {
             $("#cantidad").removeAttr('disabled');
         } else {
@@ -217,66 +124,13 @@ function addinventario() {
         $("#clave-unidad").val('');
     } else {
         $("#chinventario").removeAttr('checked');
-        $("#inventario").hide('slow');
+        $("#inventarios").hide('slow');
         $("#cantidad").attr('disabled', true);
         $("#cantidad").val('0');
         $("#clave-unidad").val('E48-Unidad de servicio');
     }
 }
 
-/*function insertarProductoFactura() {
-    var codproducto = $("#codigo-producto").val();
-    var producto = $("#producto").val();
-    var descripcion = $("#descripcion").val();
-    var clavefiscal = $("#clave-fiscal").val();
-    var tipo = $("#tipo").val();
-    var unidad = $("#clave-unidad").val();
-    var pcompra = $("#pcompra").val();
-    var porcentaje = $("#porganancia").val();
-    var ganancia = $("#ganancia").val();
-    var pventa = $("#pventa").val();
-    var idproveedor = $("#id-proveedor").val() || '0';
-    var imagen = $('#filename').val();
-    var chinventario = 0;
-    var cantidad = $("#cantidad").val();
-    if ($("#chinventario").prop('checked')) {
-        chinventario = 1;
-    }
-    
-    if (
-        validarCodigoProducto (codproducto, "codigo-producto") && 
-        isnEmpty(producto, "producto") &&
-        isList(clavefiscal, "clave-fiscal") &&
-        isnEmpty(tipo, "tipo") && 
-        isListUnit(unidad, "clave-unidad") &&
-        isPositive(porcentaje, "porganancia") && 
-        isPositive(ganancia, "ganancia") && 
-        isPositive(pventa, "pventa")) {
-        //cargandoHide();
-        //cargandoShow();
-        $.ajax({
-            url: "com.sine.enlace/enlaceproducto.php",
-            type: "POST",
-            data: {transaccion: "insertarproducto", codproducto: codproducto, producto: producto, tipo: tipo, unidad: unidad, descripcion: descripcion, pcompra: pcompra, porcentaje: porcentaje, ganancia: ganancia, pventa: pventa, clavefiscal: clavefiscal, idproveedor: idproveedor, imagen: imagen, chinventario: chinventario, cantidad: cantidad, insert: 'f'},
-            success: function (datos) {
-                var texto = datos.toString();
-                var bandera = texto.substring(0, 1);
-                var res = texto.substring(1, 1000);
-                if (bandera == '0') {
-                    alertify.error(res);
-                } else {
-                    //loadView('listafactura');
-                    //alertify.success('cliente registrado')
-                    tablaProductos();
-                   
-                    $("#nuevo-producto").modal('hide');
-                    
-                }
-                cargandoHide();
-            }
-        });
-    }
-}*/
 function insertarProductoFactura() {
     var codproducto = $("#codigo-producto").val();
     var producto = $("#producto").val();
@@ -295,14 +149,19 @@ function insertarProductoFactura() {
     if ($("#chinventario").prop('checked')) {
         chinventario = 1;
     }
-    
-    if (validarCodigoProducto(codproducto, "codigo-producto") && isnEmpty(producto, "producto") && isList(clavefiscal, "clave-fiscal") && isnEmpty(tipo, "tipo") && isListUnit(unidad, "clave-unidad") && isPositive(porcentaje, "porganancia") && isPositive(ganancia, "ganancia") && isPositive(pventa, "pventa")) {
+
+    var imp_apl = "";
+    $("input[name=taxes]:checked").each(function () {
+        imp_apl += $(this).val() + "<tr>";
+    });
+
+    if (isnEmpty(codproducto, "codigo-producto") && isnEmpty(producto, "producto") && isList(clavefiscal, "clave-fiscal") && isnEmpty(tipo, "tipo") && isList(unidad, "clave-unidad") && isPositive(porcentaje, "porganancia") && isPositive(ganancia, "ganancia") && isPositive(pventa, "pventa")) {
         cargandoHide();
         cargandoShow();
         $.ajax({
             url: "com.sine.enlace/enlaceproducto.php",
             type: "POST",
-            data: {transaccion: "insertarproducto", codproducto: codproducto, producto: producto, tipo: tipo, unidad: unidad, descripcion: descripcion, pcompra: pcompra, porcentaje: porcentaje, ganancia: ganancia, pventa: pventa, clavefiscal: clavefiscal, idproveedor: idproveedor, imagen: imagen, chinventario: chinventario, cantidad: cantidad, insert: 'f'},
+            data: { transaccion: "insertarproducto", codproducto: codproducto, producto: producto, tipo: tipo, unidad: unidad, descripcion: descripcion, pcompra: pcompra, porcentaje: porcentaje, ganancia: ganancia, pventa: pventa, clavefiscal: clavefiscal, idproveedor: idproveedor, imagen: imagen, chinventario: chinventario, cantidad: cantidad, imp_apl: imp_apl, insert: 'f' },
             success: function (datos) {
                 var texto = datos.toString();
                 var bandera = texto.substring(0, 1);
@@ -329,31 +188,8 @@ function aucompletarRegimen() {
     });
 }
 
-/*function aucompletarCatalogo() {
-    $('#clave-fiscal').autocomplete({
-        source: "com.sine.enlace/enlaceautocompletar.php?transaccion=catfiscal",
-        appendTo: "#nuevo-producto",
-        select: function (event, ui) {
-            var a = ui.item.value;
-            var id = ui.item.id;
-        }
-    });
-}*/
-
-/*function aucompletarUnidad() {
-    $('#clave-unidad').autocomplete({
-        source: "com.sine.enlace/enlaceautocompletar.php?transaccion=catunidad",
-        appendTo: "#nuevo-producto",
-        select: function (event, ui) {
-
-            var a = ui.item.value;
-            var id = ui.item.id;
-        }
-    });
-}*/
-
 function autocompletarCliente() {
-    
+
     if ($("#nombre-cliente").val() == '') {
         $("#id-cliente").val('0');
     }
@@ -378,34 +214,10 @@ function autocompletarCliente() {
     });
 }
 
-/*function autocompletarCFiscal() {
-    $('#editar-cfiscal').autocomplete({
-        source: "com.sine.enlace/enlaceautocompletar.php?transaccion=catfiscal",
-        appendTo: "#editar-producto",
-        select: function (event, ui) {
-            var a = ui.item.value;
-            var id = ui.item.id;
-        }
-    });
-}*/
-
-/*function autocompletarCUnidad() {
-    $('#editar-cunidad').autocomplete({
-        source: "com.sine.enlace/enlaceautocompletar.php?transaccion=catunidad",
-        appendTo: "#editar-producto",
-        select: function (event, ui) {
-
-            var a = ui.item.value;
-            var id = ui.item.id;
-        }
-    });
-}*/
-//----------------------------------
-//calcular
 function calcularImporteEditar() {
     var cantidad = $("#editar-cantidad").val() || '';
     var precio = $("#editar-precio").val() || '';
-    
+
     var importe = parseFloat(cantidad) * parseFloat(precio);
     $("#editar-totuni").val(importe);
     calcularDescuentoEditar();
@@ -438,7 +250,7 @@ function editarConcepto(idtmp) {
     $.ajax({
         url: "com.sine.enlace/enlacefactura.php",
         type: "POST",
-        data: {transaccion: "editarconcepto", idtmp: idtmp},
+        data: { transaccion: "editarconcepto", idtmp: idtmp },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -513,7 +325,7 @@ function actualizarConceptoFactura() {
         $.ajax({
             url: "com.sine.enlace/enlacefactura.php",
             type: "POST",
-            data: {transaccion: "actualizarconcepto", idtmp: idtmp, descripcion: descripcion, clvfiscal: clvfiscal, clvunidad: clvunidad, cantidad: cantidad, precio: precio, totalunitario: totalunitario, descuento: descuento, impdescuento: impdescuento, total: total, observaciones: observaciones, idtraslados: idtraslados, idretencion: idretencion},
+            data: { transaccion: "actualizarconcepto", idtmp: idtmp, descripcion: descripcion, clvfiscal: clvfiscal, clvunidad: clvunidad, cantidad: cantidad, precio: precio, totalunitario: totalunitario, descuento: descuento, impdescuento: impdescuento, total: total, observaciones: observaciones, idtraslados: idtraslados, idretencion: idretencion },
             success: function (datos) {
                 var texto = datos.toString();
                 var bandera = texto.substring(0, 1);
@@ -534,7 +346,7 @@ function editarProductoFactura(idprod, idtmp) {
     $.ajax({
         url: "com.sine.enlace/enlaceproducto.php",
         type: "POST",
-        data: {transaccion: "editarproducto", idproducto: idprod},
+        data: { transaccion: "editarproducto", idproducto: idprod },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -643,13 +455,18 @@ function actualizarProductoFactura(idproducto, idtmp) {
         chinventario = 1;
     }
 
-    if (isnEmpty(codproducto, "codigo-producto") && isnEmpty(producto, "producto") && isList(clavefiscal, "clave-fiscal") && isnEmpty(tipo, "tipo") && isListUnit(unidad, "clave-unidad") && isPositive(porcentaje, "porganancia") && isPositive(ganancia, "ganancia") && isPositive(pventa, "pventa")) {
+    var imp_apl = "";
+    $("input[name=taxes]:checked").each(function () {
+        imp_apl += $(this).val() + "<tr>";
+    });
+
+    if (isnEmpty(codproducto, "codigo-producto") && isnEmpty(producto, "producto") && isList(clavefiscal, "clave-fiscal") && isnEmpty(tipo, "tipo") && isList(unidad, "clave-unidad") && isPositive(porcentaje, "porganancia") && isPositive(ganancia, "ganancia") && isPositive(pventa, "pventa")) {
         cargandoHide();
         cargandoShow();
         $.ajax({
             url: "com.sine.enlace/enlaceproducto.php",
             type: "POST",
-            data: {transaccion: "actualizarproducto", idproducto: idproducto, idtmp: idtmp, codproducto: codproducto, producto: producto, tipo: tipo, unidad: unidad, descripcion: descripcion, pcompra: pcompra, porcentaje: porcentaje, ganancia: ganancia, pventa: pventa, clavefiscal: clavefiscal, idproveedor: idproveedor, imagen: imagen, imgactualizar: imgactualizar, chinventario: chinventario, cantidad: cantidad, insert: 'f'},
+            data: { transaccion: "actualizarproducto", idproducto: idproducto, idtmp: idtmp, codproducto: codproducto, producto: producto, tipo: tipo, unidad: unidad, descripcion: descripcion, pcompra: pcompra, porcentaje: porcentaje, ganancia: ganancia, pventa: pventa, clavefiscal: clavefiscal, idproveedor: idproveedor, imagen: imagen, imgactualizar: imgactualizar, chinventario: chinventario, cantidad: cantidad,  imp_apl: imp_apl, insert: 'f' },
             success: function (datos) {
                 var texto = datos.toString();
                 var bandera = texto.substring(0, 1);
@@ -665,6 +482,7 @@ function actualizarProductoFactura(idproducto, idtmp) {
         });
     }
 }
+
 
 function getcheckFactura() {
     var val = 0;
@@ -691,7 +509,7 @@ function agregarObservaciones() {
     $.ajax({
         url: "com.sine.enlace/enlacefactura.php",
         type: "POST",
-        data: {transaccion: "agregarobservaciones", idtmp: idtmp, observaciones: txtbd, uuid: uuid},
+        data: { transaccion: "agregarobservaciones", idtmp: idtmp, observaciones: txtbd, uuid: uuid },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -712,11 +530,9 @@ function checkMetodopago() {
     var idmetodopago = $("#id-metodo-pago").val();
     if (idmetodopago == '2') {
         loadOpcionesFormaPago2(22);
-        //$('#formapago6').prop('selected', true);
         $("#id-forma-pago").prop('disabled', true);
     } else {
         $("#id-forma-pago").val("");
-        //$('#formapago6').removeAttr('selected');
         $("#id-forma-pago").removeAttr('disabled');
     }
 }
@@ -752,7 +568,7 @@ function calcularImporte(idproducto) {
 function calcularDescuento(idproducto) {
     var pordesc = $("#pordescuento_" + idproducto).val() || '0';
     var importe = $("#importe_" + idproducto).val() || '0';
-    
+
     var descuento = parseFloat(importe) * (parseFloat(pordesc) / 100);
     var subtotal = (parseFloat(importe) - parseFloat(descuento));
     var traslados = 0;
@@ -781,7 +597,7 @@ function showTelefono(idfactura) {
     $.ajax({
         url: "com.sine.enlace/enlacefactura.php",
         type: "POST",
-        data: {transaccion: "gettelefono", idfactura: idfactura},
+        data: { transaccion: "gettelefono", idfactura: idfactura },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -800,7 +616,7 @@ function getCorreos(idfactura) {
     $.ajax({
         url: "com.sine.enlace/enlacefactura.php",
         type: "POST",
-        data: {transaccion: "getcorreos", idfactura: idfactura},
+        data: { transaccion: "getcorreos", idfactura: idfactura },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -853,7 +669,7 @@ function registrarPago(idfactura) {
     $.ajax({
         url: "com.sine.enlace/enlacefactura.php",
         type: "POST",
-        data: {transaccion: "getdatospago", idfactura: idfactura},
+        data: { transaccion: "getdatospago", idfactura: idfactura },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -868,6 +684,7 @@ function registrarPago(idfactura) {
                 $('#pago-menu').children('div.marker').addClass("marker-active");
                 window.setTimeout("loadView('pago')", 300);
                 window.setTimeout("setvaloresRegistrarPago('" + datos + "')", 800);
+                $("#pagosfactura").modal('hide');
             }
         }
     });
@@ -875,6 +692,7 @@ function registrarPago(idfactura) {
 
 function setvaloresRegistrarPago(datos) {
     var array = datos.split("</tr>");
+    console.log(array[0]);
     var idfactura = array[0];
     var foliofactura = array[1];
     var idcliente = array[2];
@@ -897,11 +715,11 @@ function setvaloresRegistrarPago(datos) {
     $("#cp-cliente").val(cpreceptor);
     $("#option-default-datos").val(iddatosfacturacion);
     $("#option-default-datos").text(nombrecontribuyente);
-    
+
     $.ajax({
         url: "com.sine.enlace/enlacepago.php",
         type: "POST",
-        data: {transaccion: "expcomplementos", idformapago:idformapago, idmoneda:idmoneda, tcambio:tcambio, idfactura:idfactura, foliofactura:foliofactura},
+        data: { transaccion: "expcomplementos", idformapago: idformapago, idmoneda: idmoneda, tcambio: tcambio, idfactura: idfactura, foliofactura: foliofactura },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -912,9 +730,6 @@ function setvaloresRegistrarPago(datos) {
                 var array = datos.split("<comp>");
                 comp = array.length;
                 for (i = 0; i < array.length; i++) {
-                    if (array[array.length - 1] === "") {
-                        array.pop();
-                    }
                     var comps = array[i].split("<cut>");
                     $("#tabs").append(comps[0]);
                     $("#complementos").append(comps[1]);
@@ -944,6 +759,7 @@ function setvaloresRegistrarPago(datos) {
     loadFolioPago();
     cargandoHide();
 }
+
 function loadFolioPago(iddatos = "") {
     cargandoHide();
     cargandoShow();
@@ -954,7 +770,7 @@ function loadFolioPago(iddatos = "") {
     $.ajax({
         url: 'com.sine.enlace/enlacepago.php',
         type: 'POST',
-        data: {transaccion: 'emisor', iddatos: iddatos},
+        data: { transaccion: 'emisor', iddatos: iddatos },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -980,7 +796,7 @@ function tablaPagos(idfactura, estado) {
     $.ajax({
         url: "com.sine.enlace/enlacefactura.php",
         type: "POST",
-        data: {transaccion: "pagosfactura", idfactura: idfactura, estado: estado},
+        data: { transaccion: "pagosfactura", idfactura: idfactura, estado: estado },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -1004,83 +820,9 @@ function imprimirpago(idpago) {
     cargandoHide();
 }
 
-function insertarFactura() {
+function gestionarFactura(idfactura = null) {
     var folio = $("#folio").val();
     var fecha_creacion = $("#fecha-creacion").val();
-    var idcliente = $("#id-cliente").val() || '0';
-    var cliente = $("#nombre-cliente").val();
-    var rfccliente = $("#rfc-cliente").val();
-    var razoncliente = $("#razon-cliente").val();
-    var regfiscal = $("#regfiscal-cliente").val();
-    var dircliente = $("#direccion-cliente").val();
-    var codpostal = $("#cp-cliente").val();
-    var tipoComprobante = $("#tipo-comprobante").val();
-    var idformapago = $("#id-forma-pago").val();
-    var idmetodopago = $("#id-metodo-pago").val();
-    var idmoneda = $("#id-moneda").val();
-    var tcambio = $("#tipo-cambio").val();
-    var iduso = $("#id-uso").val();
-    var iddatosF = $("#datos-facturacion").val();
-    var periodicidad = $("#periodicidad-factura").val();
-    var mesperiodo = $("#mes-periodo").val();
-    var anhoperiodo = $("#anho-periodo").val();
-    var idcotizacion = $("#idcotizacion").val() || '0';
-    var cfdis = 0;
-    var chfirma = 0;
-    if ($("#chfirma").prop('checked')) {
-        chfirma = 1;
-    }
-    if ($("#cfdirel").hasClass('in')) {
-        alert(cfdis);
-        cfdis = 1;
-    }
-    if (
-        //isnEmpty(folio, "folio") &&
-    isnEmpty(iddatosF, "datos-facturacion") &&
-     isnEmpty(rfccliente, "rfc-cliente") &&
-     isnEmpty(cliente, "nombre-cliente") &&
-      isnEmpty(razoncliente, "razon-cliente") &&
-       isnEmpty(regfiscal, "regfiscal-cliente") &&
-        isnEmpty(codpostal, "cp-cliente") &&
-         isnEmpty(tipoComprobante, "tipo-comprobante") &&
-          isnEmpty(idformapago, "id-forma-pago") &&
-           isnEmpty(idmetodopago, "id-metodo-pago") &&
-            isnEmpty(idmoneda, "id-moneda") &&
-             isnEmpty(tcambio, "tipo-cambio") && 
-             isnEmpty(iduso, "id-uso")) {
-        $.ajax({
-            url: "com.sine.enlace/enlacefactura.php",
-            type: "POST",
-            data: {transaccion: "insertarfactura",
-             folio: folio, fecha_creacion: fecha_creacion,
-            idcliente: idcliente, cliente:cliente,
-             rfccliente: rfccliente, razoncliente: razoncliente,
-            regfiscal: regfiscal, dircliente: dircliente,
-             codpostal: codpostal, idformapago: idformapago,
-              idmetodopago: idmetodopago, idmoneda: idmoneda,
-               tcambio: tcambio, iduso: iduso, tipocomprobante: tipoComprobante,
-            iddatosF: iddatosF, chfirma: chfirma, cfdis: cfdis,
-             idcotizacion: idcotizacion, periodicidad: periodicidad,
-              mesperiodo: mesperiodo, anhoperiodo: anhoperiodo},
-            success: function (datos) {
-                var texto = datos.toString();
-                var bandera = texto.substring(0, 1);
-                var res = texto.substring(1, 1000);
-                if (bandera == '0') {
-                    alertify.error(res);
-                } else {
-                    alertify.success('Factura creada');
-                    loadView('listafactura');
-                }
-                cargandoHide();
-            }
-        });
-    }
-
-}
-
-function actualizarFactura(idfactura) {
-    var folio = $("#folio").val();
     var iddatosF = $("#datos-facturacion").val();
     var idcliente = $("#id-cliente").val();
     var cliente = $("#nombre-cliente").val();
@@ -1098,22 +840,79 @@ function actualizarFactura(idfactura) {
     var periodicidad = $("#periodicidad-factura").val();
     var mesperiodo = $("#mes-periodo").val();
     var anhoperiodo = $("#anho-periodo").val();
+    var idcotizacion = $("#idcotizacion").val() || '0';
     var tag = $("#tagfactura").val();
-    var chfirmar = 0;
+    var chfirma = 0;
     var cfdis = 0;
-    if ($("#chfirma").prop('checked')) {
-        chfirmar = 1;
-    }
+    // Nuevos campos
+    var nombremoneda = $("#id-moneda option:selected").text();
+    var nombremetodo = $("#id-metodo-pago option:selected").text();
+    var nombrecomprobante = $("#tipo-comprobante option:selected").text();
+    var nombrepago = $("#id-forma-pago option:selected").text();
+    var uso = $("#id-uso option:selected").text();
 
-    if ($("#cfdirel").hasClass('in')) {
+    if ($("#chfirma").prop('checked')) {
+        chfirma = 1;
+    }
+    if ($("#cfdirel").hasClass('show')) {
         cfdis = 1;
     }
 
-    if (isnEmpty(iddatosF, "datos-facturacion") && isnEmpty(rfccliente, "rfc-cliente") && isnEmpty(razoncliente, "razon-cliente") && isnEmpty(regfiscal, "regfiscal-cliente") && isnEmpty(codpostal, "cp-cliente") && isnEmpty(tipoComprobante, "tipo-comprobante") && isnEmpty(idformapago, "id-forma-pago") && isnEmpty(idmetodopago, "id-metodo-pago") && isnEmpty(idmoneda, "id-moneda") && isnEmpty(tcambio, "tipo-cambio") && isnEmpty(iduso, "id-uso")) {
+    if (
+        isnEmpty(iddatosF, "datos-facturacion") &&
+        isnEmpty(rfccliente, "rfc-cliente") &&
+        isnEmpty(cliente, "nombre-cliente") &&
+        isnEmpty(razoncliente, "razon-cliente") &&
+        isnEmpty(regfiscal, "regfiscal-cliente") &&
+        isnEmpty(codpostal, "cp-cliente") &&
+        isnEmpty(tipoComprobante, "tipo-comprobante") &&
+        isnEmpty(idformapago, "id-forma-pago") &&
+        isnEmpty(idmetodopago, "id-metodo-pago") &&
+        isnEmpty(idmoneda, "id-moneda") &&
+        isnEmpty(tcambio, "tipo-cambio") &&
+        isnEmpty(iduso, "id-uso")
+    ) {
+        cargandoHide();
+        cargandoShow();
+
+        var transaccion = idfactura ? "actualizarFactura" : "insertarfactura";
+        var data = {
+            transaccion: transaccion,
+            idfactura: idfactura,
+            folio: folio,
+            fecha_creacion: fecha_creacion,
+            idcliente: idcliente,
+            cliente: cliente,
+            rfccliente: rfccliente,
+            razoncliente: razoncliente,
+            regfiscal: regfiscal,
+            dircliente: dircliente,
+            codpostal: codpostal,
+            idformapago: idformapago,
+            idmetodopago: idmetodopago,
+            idmoneda: idmoneda,
+            tcambio: tcambio,
+            iduso: iduso,
+            tipocomprobante: tipoComprobante,
+            iddatosF: iddatosF,
+            chfirma: chfirma,
+            cfdis: cfdis,
+            idcotizacion: idcotizacion,
+            periodicidad: periodicidad,
+            mesperiodo: mesperiodo,
+            anhoperiodo: anhoperiodo,
+            tag: tag,
+            // Nuevos campos
+            nombremoneda: nombremoneda,
+            nombremetodo: nombremetodo,
+            nombrecomprobante: nombrecomprobante,
+            nombrepago: nombrepago,
+            uso: uso
+        };
         $.ajax({
             url: "com.sine.enlace/enlacefactura.php",
             type: "POST",
-            data: {transaccion: "actualizarFactura", folio: folio, idcliente: idcliente, cliente:cliente, rfccliente: rfccliente, razoncliente: razoncliente, regfiscal: regfiscal, dircliente: dircliente, codpostal: codpostal, idformapago: idformapago, idmetodopago: idmetodopago, idmoneda: idmoneda, tcambio: tcambio, iduso: iduso, tipocomprobante: tipoComprobante, idfactura: idfactura, iddatosF: iddatosF, chfirmar: chfirmar, cfdis: cfdis, periodicidad: periodicidad, mesperiodo: mesperiodo, anhoperiodo: anhoperiodo, tag: tag},
+            data: data,
             success: function (datos) {
                 var texto = datos.toString();
                 var bandera = texto.substring(0, 1);
@@ -1121,8 +920,11 @@ function actualizarFactura(idfactura) {
                 if (bandera == '0') {
                     alertify.error(res);
                 } else {
-                    //alert(datos);
-                    alertify.success('Factura Actualizada');
+                    if (idfactura) {
+                        alertify.success('Factura Actualizada');
+                    } else {
+                        alertify.success('Factura creada');
+                    }
                     loadView('listafactura');
                 }
                 cargandoHide();
@@ -1141,7 +943,7 @@ function buscarProducto(pag = "") {
     $.ajax({
         url: "com.sine.enlace/enlacefactura.php",
         type: "POST",
-        data: {transaccion: "filtrarproducto", NOM: NOM, pag: pag, numreg: numreg},
+        data: { transaccion: "filtrarproducto", NOM: NOM, pag: pag, numreg: numreg },
         success: function (datos) {
             //alert(datos);
             var texto = datos.toString();
@@ -1170,7 +972,7 @@ function filtrarProducto(pag = "") {
     $.ajax({
         url: "com.sine.enlace/enlacefactura.php",
         type: "POST",
-        data: {transaccion: "filtrarproducto", NOM: NOM, pag: pag, numreg: numreg},
+        data: { transaccion: "filtrarproducto", NOM: NOM, pag: pag, numreg: numreg },
         success: function (datos) {
             //alert(datos);
             var texto = datos.toString();
@@ -1198,7 +1000,7 @@ function editarFactura(idFactura) {
     $.ajax({
         url: "com.sine.enlace/enlacefactura.php",
         type: "POST",
-        data: {transaccion: "editarfactura", idFactura: idFactura},
+        data: { transaccion: "editarfactura", idFactura: idFactura },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -1213,8 +1015,9 @@ function editarFactura(idFactura) {
     });
 }
 
+
 function setValoresEditarFactura(datos) {
-    changeText("#contenedor-titulo-form-factura", "Editar Factura");
+    changeText("#contenedor-titulo-form-factura", "Editar factura");
     changeText("#btn-form-factura", "Guardar cambios <span class='fas fa-save'></span>");
 
     var array = datos.split("</tr>");
@@ -1234,7 +1037,6 @@ function setValoresEditarFactura(datos) {
     var iduso_cfdi = array[13];
     var idforma_pago = array[14];
     var idtipo_comprobante = array[15];
-    var status = array[16];
     var uuid = array[17];
     var iddatos = array[18];
     var chfirmar = array[19];
@@ -1249,13 +1051,13 @@ function setValoresEditarFactura(datos) {
     var periodoG = array[28];
     var mesperiodo = array[29];
     var anhoperiodo = array[30];
-	var cpemisor = array[31];
+    var cpemisor = array[31];
 
     var arfecha = fechacreacion.split("-");
     var fechacreacion = arfecha[2] + "/" + arfecha[1] + "/" + arfecha[0];
 
     if (uuid != "") {
-        $("#not-timbre").html("<div class='col-md-12'><label class='mark-required text-justify'>*</label> <label class='label-required text-justify'> Esta factura ya ha sido timbrada, por lo que solo puedes editar la direccion del cliente, las observaciones de productos y modificar la firma del contribuyente.</label></div>");
+        $("#not-timbre").html("<div class='alert alert-danger ps-4'><label class='label-required text-danger fw-bold'>* Esta factura ya ha sido timbrada, por lo que solo puedes editar la dirección del cliente, las observaciones de productos y modificar la firma del contribuyente.</label></div>");
         $("#folio").attr("disabled", true);
         $("#btn-agregar-cfdi").attr("disabled", true);
         $("#nombre-cliente").attr("disabled", true);
@@ -1274,25 +1076,24 @@ function setValoresEditarFactura(datos) {
         $("#periodicidad-factura").attr("disabled", true);
         $("#mes-periodo").attr('disabled', true);
         $("#anho-periodo").attr('disabled', true);
-    	$("#rfc-emisor").val(rfcemisor);
+        $("#rfc-emisor").val();
         $("#razon-emisor").val(rzsocial);
         $("#regimen-emisor").val(clvreg + "-" + regimen);
         $("#cp-emisor").val(cpemisor);
     } else {
-    	loadDatosFactura(iddatos);
+        loadDatosFactura(iddatos);
         if (idmoneda != "1") {
             $("#tipo-cambio").removeAttr('disabled');
         } else {
             $("#tipo-cambio").attr('disabled', true);
         }
     }
-	
+
     if (cfdisrel == '1') {
-    	
         $.ajax({
             url: "com.sine.enlace/enlacefactura.php",
             type: "POST",
-            data: {transaccion: "cfdisrelacionados", tag: tag, uuid: uuid},
+            data: { transaccion: "cfdisrelacionados", tag: tag, uuid: uuid },
             success: function (datos) {
                 var texto = datos.toString();
                 var bandera = texto.substring(0, 1);
@@ -1303,17 +1104,29 @@ function setValoresEditarFactura(datos) {
                     var array = datos.split("<corte>");
                     var p1 = array[0];
                     var p2 = array[1];
-                    $("#body-lista-cfdi").html(p2);
-                    $("#cfdirel").addClass('in');
+                    if (p2 != "") {
+                        $("#tablaresultados").show('slow');
+                        $("#body-lista-cfdi").html(p2);
+                        $("#cfdirel").addClass('show');
+                    }
                 }
             }
         });
-    }
 
+        if (idtipo_comprobante == 2) {
+            $.ajax({
+                url: "com.sine.enlace/enlacefactura.php",
+                type: "POST",
+                data: { transaccion: "cfdiEgreso", tag: tag },
+                success: function (datos) {
+                }
+            });
+        }
+    }
     $.ajax({
         url: "com.sine.enlace/enlacefactura.php",
         type: "POST",
-        data: {transaccion: "prodfactura", tag: tag},
+        data: { transaccion: "prodfactura", tag: tag },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -1321,13 +1134,12 @@ function setValoresEditarFactura(datos) {
             if (bandera == '0') {
                 alertify.error(res);
             } else {
-                //alert(datos);
                 tablaProductos(uuid);
             }
         }
     });
 
-    loadOpcionesFolios('0', serie, letra+folio);
+    loadOpcionesFolios('0', serie, letra + folio);
     loadOpcionesFacturacion(iddatos);
     $("#rfc-emisor").val(rfcemisor);
     $("#razon-emisor").val(rzsocial);
@@ -1340,14 +1152,14 @@ function setValoresEditarFactura(datos) {
     $("#regfiscal-cliente").val(regfiscalrec);
     $("#direccion-cliente").val(dirreceptor);
     $("#cp-cliente").val(cpreceptor);
-    loadOpcionesFormaPago(idforma_pago);
-    loadOpcionesMetodoPago(idmetodo_pago);
-    loadOpcionesMoneda(idmoneda);
+    loadOpcionesFormaPago2(idforma_pago);
+    loadOpcionesMetodoPago('id-metodo-pago', idmetodo_pago);
+    loadOpcionesMoneda('id-moneda', idmoneda);
     $("#tipo-cambio").val(tcambio);
-    loadOpcionesUsoCFDI(iduso_cfdi);
-    loadOpcionesComprobante(idtipo_comprobante);
-    opcionesPeriodoGlobal(periodoG);
-    opcionesMeses(mesperiodo);
+    loadOpcionesUsoCFDI('id-uso', iduso_cfdi);
+    loadOpcionesComprobante('tipo-comprobante', idtipo_comprobante);
+    opcionesPeriodoGlobal('periodicidad-factura', periodoG);
+    opcionesMeses('mes-periodo', mesperiodo);
     if (anhoperiodo != "") {
         $("#option-default-anho-periodo").val(anhoperiodo);
         $("#option-default-anho-periodo").text(anhoperiodo);
@@ -1359,9 +1171,8 @@ function setValoresEditarFactura(datos) {
 
     $("#form-factura").append("<input type='hidden' id='uuidfactura' name='uuidfactura' value='" + uuid + "'/>");
     $("#form-factura").append("<input type='hidden' id='tagfactura' name='tagfactura' value='" + tag + "'/>");
-    $("#btn-form-factura").attr("onclick", "actualizarFactura(" + idfactura + ");");
+    $("#btn-form-factura").attr("onclick", "gestionarFactura(" + idfactura + ");");
     cargandoHide();
-
 }
 
 
@@ -1372,7 +1183,7 @@ function eliminarFactura(idFactura) {
         $.ajax({
             url: "com.sine.enlace/enlacefactura.php",
             type: "POST",
-            data: {transaccion: "eliminarfactura", idfactura: idFactura},
+            data: { transaccion: "eliminarfactura", idfactura: idFactura },
             success: function (datos) {
                 var texto = datos.toString();
                 var bandera = texto.substring(0, 1);
@@ -1380,13 +1191,13 @@ function eliminarFactura(idFactura) {
                 if (bandera == '0') {
                     alertify.error(res);
                 } else {
-                    alertify.success('Se elimino correctamente una factura')
+                    alertify.success('Se eliminó correctamente una factura.')
                     loadListaFactura();
                 }
                 cargandoHide();
             }
         });
-    }).set({title: "Q-ik"});
+    }).set({ title: "Q-ik" });
 }
 
 function copiarFactura(idFactura) {
@@ -1395,7 +1206,7 @@ function copiarFactura(idFactura) {
     $.ajax({
         url: "com.sine.enlace/enlacefactura.php",
         type: "POST",
-        data: {transaccion: "editarfactura", idFactura: idFactura},
+        data: { transaccion: "editarfactura", idFactura: idFactura },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -1412,12 +1223,7 @@ function copiarFactura(idFactura) {
 }
 
 function setValoresCopiarFactura(datos) {
-    
     var array = datos.split("</tr>");
-    var idfactura = array[0];
-    var serie = array[1];
-    var letra = array[2];
-    var folio = array[3];
     var fechacreacion = array[4];
     var idcliente = array[5];
     var cliente = array[6];
@@ -1430,7 +1236,6 @@ function setValoresCopiarFactura(datos) {
     var iduso_cfdi = array[13];
     var idforma_pago = array[14];
     var idtipo_comprobante = array[15];
-    var status = array[16];
     var uuid = "";
     var iddatos = array[18];
     var chfirmar = array[19];
@@ -1440,18 +1245,17 @@ function setValoresCopiarFactura(datos) {
     var rzsocial = array[23];
     var clvreg = array[24];
     var regimen = array[25];
-    var tag = array[26];
-    var dirreceptor = array[27];
-    var periodoG = array[28];
-    var mesperiodo = array[29];
-    var anhoperiodo = array[30];
-    var cpemisor = array[31];
+    var tag = array[27];
+    var dirreceptor = array[28];
+    var periodoG = array[29];
+    var mesperiodo = array[30];
+    var anhoperiodo = array[31];
 
     if (cfdisrel == '1') {
         $.ajax({
             url: "com.sine.enlace/enlacefactura.php",
             type: "POST",
-            data: {transaccion: "cfdisrelacionados", tag: tag, uuid: uuid},
+            data: { transaccion: "cfdisrelacionados", tag: tag, uuid: uuid },
             success: function (datos) {
                 var texto = datos.toString();
                 var bandera = texto.substring(0, 1);
@@ -1462,8 +1266,11 @@ function setValoresCopiarFactura(datos) {
                     var array = datos.split("<corte>");
                     var p1 = array[0];
                     var p2 = array[1];
-                    $("#body-lista-cfdi").html(p2);
-                    $("#cfdirel").addClass('in');
+                    if (p2 != "") {
+                        $("#tablaresultados").show('slow');
+                        $("#body-lista-cfdi").html(p2);
+                        $("#cfdirel").addClass('show');
+                    }
                 }
             }
         });
@@ -1472,7 +1279,7 @@ function setValoresCopiarFactura(datos) {
     $.ajax({
         url: "com.sine.enlace/enlacefactura.php",
         type: "POST",
-        data: {transaccion: "prodfactura", tag: tag},
+        data: { transaccion: "prodfactura", tag: tag },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -1480,13 +1287,10 @@ function setValoresCopiarFactura(datos) {
             if (bandera == '0') {
                 alertify.error(res);
             } else {
-                //alert(datos);
                 tablaProductos();
             }
         }
     });
-
-    loadOpcionesFolios('0', serie, letra+folio);
     loadOpcionesFacturacion(iddatos);
     $("#rfc-emisor").val(rfcemisor);
     $("#razon-emisor").val(rzsocial);
@@ -1499,14 +1303,14 @@ function setValoresCopiarFactura(datos) {
     $("#regfiscal-cliente").val(regfiscalrec);
     $("#direccion-cliente").val(dirreceptor);
     $("#cp-cliente").val(cpreceptor);
-    loadOpcionesFormaPago(idforma_pago);
-    loadOpcionesMetodoPago(idmetodo_pago);
-    loadOpcionesMoneda(idmoneda);
+    loadOpcionesFormaPago2(idforma_pago);
+    loadOpcionesMetodoPago('id-metodo-pago', idmetodo_pago);
+    loadOpcionesMoneda('id-moneda', idmoneda);
     $("#tipo-cambio").val(tcambio);
-    loadOpcionesUsoCFDI(iduso_cfdi);
-    loadOpcionesComprobante(idtipo_comprobante);
-    opcionesPeriodoGlobal(periodoG);
-    opcionesMeses(mesperiodo);
+    loadOpcionesUsoCFDI('id-uso', iduso_cfdi);
+    loadOpcionesComprobante('tipo-comprobante', idtipo_comprobante);
+    opcionesPeriodoGlobal('periodicidad-factura', periodoG);
+    opcionesMeses('mes-periodo', mesperiodo);
     if (anhoperiodo != "") {
         $("#option-default-anho-periodo").val(anhoperiodo);
         $("#option-default-anho-periodo").text(anhoperiodo);
@@ -1515,9 +1319,6 @@ function setValoresCopiarFactura(datos) {
     if (chfirmar == '1') {
         $("#chfirma").attr('checked', true);
     }
-    $("#form-factura").append("<input type='hidden' id='uuidfactura' name='uuidfactura' value='" + uuid + "'/>");
-    $("#form-factura").append("<input type='hidden' id='tagfactura' name='tagfactura' value='" + tag + "'/>");
-    $("#btn-form-factura").attr("onclick", "insertarFactura(" + idfactura + ");");
 
     loadDatosFactura(iddatos);
     getTipoCambio(idmoneda);
@@ -1525,21 +1326,19 @@ function setValoresCopiarFactura(datos) {
 
 function checkFolios() {
     var comprobante = $("#tipo-comprobante").val();
-    var serie = ''; 
+    var serie = '';
     var folio = '';
     if (comprobante == '1' || comprobante == '2') {
         $.ajax({
             url: 'com.sine.enlace/enlaceopcion.php',
             type: 'POST',
-            data: {transaccion: 'opcionesfolio', id: comprobante, serie: serie, folio: folio},
+            data: { transaccion: 'opcionesfolio', id: comprobante, serie: serie, folio: folio },
             success: function (datos) {
                 var texto = datos.toString();
                 var bandera = texto.substring(0, 1);
                 var res = texto.substring(1, 5000);
                 if (bandera == 0) {
-                    alertify.error(res);
                 } else {
-
                     $(".contenedor-folios").html(datos);
                 }
                 cargandoHide();
@@ -1548,16 +1347,82 @@ function checkFolios() {
     }
 }
 
+function calcularImpuestosTotal() {
+    var id = "";
+    var div = [];
+    var porcentaje = 0.0;
+    var tipoImp = 0;
+    var costo = $("#pventa").val();
+    var total = $("#pventa").val();
+    var impuesto = 0;
+
+    $("input[name=taxes]:checked").each(function () {
+        id = $(this).attr("id");
+        div = $(this).val().split("-");
+        porcentaje = parseFloat(div[0]);
+        tipoImp = parseFloat(div[1]); //1 traslado //2retencion
+
+        impuesto = costo * porcentaje;
+        impuesto = impuesto.toString().match(/^-?\d+(?:\.\d{0,2})?/)[0];
+
+        if (tipoImp == 1) {
+            total = parseFloat(total) + parseFloat(impuesto);
+        }
+        else if (tipoImp == 2) {
+            total = parseFloat(total) - parseFloat(impuesto);
+        }
+        $('#p' + id).val(impuesto);
+    });
+    var preciopub = myRound(total, 2);
+    $("#ptotiva").val(preciopub);
+}
+
+function calcularImpuestosTotalReverse() {
+    var id = "";
+    var div = [];
+    var porcentaje = 0.0;
+    var tipoImp = 0;
+    var costo = $("#ptotiva").val();
+    var total = $("#ptotiva").val();
+    var impuesto = 0;
+
+    $("input[name=taxes]:checked").each(function () {
+        id = $(this).attr("id");
+        div = $(this).val().split("-");
+        porcentaje = parseFloat(div[0]);
+        tipoImp = parseFloat(div[1]); //1 traslado //2retencion
+
+        if (tipoImp == 1) {
+            costo = Math.round((total / (porcentaje + 1)) * 100) / 100;
+            impuesto = costo * porcentaje;
+            impuesto = impuesto.toString().match(/^-?\d+(?:\.\d{0,2})?/)[0];
+            total = parseFloat(total) - parseFloat(impuesto);
+        }
+        else if (tipoImp == 2) {
+            porcentaje = porcentaje * 100;
+            var restante = 100 - porcentaje;
+            impuesto = Math.round(((costo * porcentaje) / restante) * 100) / 100;
+            total = Math.round((parseFloat(total) + parseFloat(impuesto)) * 100) / 100;
+        }
+        $('#p' + id).val(impuesto);
+    });
+    $("#pventa").val(myRound(total, 2));
+}
+
+function myRound(num, dec) {
+    var exp = Math.pow(10, dec || 2); 
+    return parseInt(num * exp, 10) / exp;
+}
 
 function loadDatosFactura(iddatos = "") {
     cargandoShow();
-    if(iddatos == ""){
+    if (iddatos == "") {
         iddatos = $("#datos-facturacion").val();
     }
     $.ajax({
         url: 'com.sine.enlace/enlacefactura.php',
         type: 'POST',
-        data: {transaccion: 'emisor', iddatos: iddatos},
+        data: { transaccion: 'emisor', iddatos: iddatos },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -1565,7 +1430,6 @@ function loadDatosFactura(iddatos = "") {
             if (bandera == 0) {
                 alertify.error(res);
             } else {
-                //alert(datos);
                 var array = datos.split("</tr>");
                 var rfc = array[0];
                 var razon = array[1];
@@ -1584,12 +1448,29 @@ function loadDatosFactura(iddatos = "") {
     });
 }
 
+function loadFecha() {
+    $.ajax({
+        url: 'com.sine.enlace/enlacefactura.php',
+        type: 'POST',
+        data: { transaccion: 'fecha' },
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 5000);
+            if (bandera == '') {
+                alertify.error(res);
+            } else {
+                $("#fecha-creacion").val(datos);
+            }
+        }
+    });
+}
+
 function loadDocumento() {
-    ////cargandoShow();
     $.ajax({
         url: 'com.sine.enlace/enlacecarta.php',
         type: 'POST',
-        data: {transaccion: 'documento'},
+        data: { transaccion: 'documento' },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -1597,10 +1478,8 @@ function loadDocumento() {
             if (bandera == 0) {
                 alertify.error(res);
             } else {
-                //alert(datos);
                 $("#documento").val(datos);
             }
-            ////cargandoHide();
         }
     });
 }
@@ -1612,9 +1491,8 @@ function buscarFactura(pag = "") {
     $.ajax({
         url: "com.sine.enlace/enlacefactura.php",
         type: "POST",
-        data: {transaccion: "filtrarfolio", pag: pag, REF: REF, numreg: numreg},
+        data: { transaccion: "filtrarfolio", pag: pag, REF: REF, numreg: numreg },
         success: function (datos) {
-            //alert(datos);
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
             var res = texto.substring(1, 1000);
@@ -1636,7 +1514,7 @@ function loadListaFactura(pag = "") {
     $.ajax({
         url: "com.sine.enlace/enlacefactura.php",
         type: "POST",
-        data: {transaccion: "filtrarfolio", pag: pag, REF: REF, numreg: numreg},
+        data: { transaccion: "filtrarfolio", pag: pag, REF: REF, numreg: numreg },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -1678,7 +1556,7 @@ function agregarProducto(idproducto) {
         $.ajax({
             url: "com.sine.enlace/enlacefactura.php",
             type: "POST",
-            data: {transaccion: "agregarProducto", idproducto: idproducto, descripcion: descripcion, cantidad: cantidad, pventa: pventa, importe: importe, descuento: descuento, impdescuento: impdescuento, total: total, idtraslados: idtraslados, idretencion: idretencion},
+            data: { transaccion: "agregarProducto", idproducto: idproducto, descripcion: descripcion, cantidad: cantidad, pventa: pventa, importe: importe, descuento: descuento, impdescuento: impdescuento, total: total, idtraslados: idtraslados, idretencion: idretencion },
             success: function (datos) {
                 var texto = datos.toString();
                 var bandera = texto.substring(0, 1);
@@ -1698,7 +1576,7 @@ function incrementarCantidad(idtmp) {
     $.ajax({
         url: "com.sine.enlace/enlacefactura.php",
         type: "POST",
-        data: {transaccion: "incrementar", idtmp: idtmp},
+        data: { transaccion: "incrementar", idtmp: idtmp },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -1717,7 +1595,7 @@ function reducirCantidad(idtmp) {
     $.ajax({
         url: "com.sine.enlace/enlacefactura.php",
         type: "POST",
-        data: {transaccion: "reducir", idtmp: idtmp},
+        data: { transaccion: "reducir", idtmp: idtmp },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -1740,10 +1618,10 @@ function setCantidad(idtmp, cant) {
 function modificarCantidad() {
     var idtmp = $("#idcant").val();
     var cant = $("#cantidad-producto").val();
-     $.ajax({
+    $.ajax({
         url: "com.sine.enlace/enlacefactura.php",
         type: "POST",
-        data: {transaccion: "modificartmp", idtmp: idtmp, cant: cant},
+        data: { transaccion: "modificartmp", idtmp: idtmp, cant: cant },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -1756,19 +1634,18 @@ function modificarCantidad() {
                 $('#modal-cantidad').modal('hide');
             }
         }
-    
-     });
+
+    });
 }
 
-
 function eliminar(idtemp, cantidad, idproducto) {
-    alertify.confirm("Esta seguro que desea eliminar este producto?", function () {
+    alertify.confirm("¿Estás seguros que deseas eliminar este producto?", function () {
         cargandoHide();
         cargandoShow();
         $.ajax({
             url: "com.sine.enlace/enlacefactura.php",
             type: "POST",
-            data: {transaccion: "eliminar", idtemp: idtemp, cantidad: cantidad, idproducto: idproducto},
+            data: { transaccion: "eliminar", idtemp: idtemp, cantidad: cantidad, idproducto: idproducto },
             success: function (datos) {
                 var texto = datos.toString();
                 var bandera = texto.substring(0, 1);
@@ -1782,14 +1659,14 @@ function eliminar(idtemp, cantidad, idproducto) {
                 }
             }
         });
-    }).set({title: "Q-ik"});
+    }).set({ title: "Q-ik" });
 }
 
 function cancelarFactura() {
     $.ajax({
         url: "com.sine.enlace/enlacefactura.php",
         type: "POST",
-        data: {transaccion: "cancelar"},
+        data: { transaccion: "cancelar" },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -1798,11 +1675,11 @@ function cancelarFactura() {
                 alertify.error(res);
             } else {
                 loadView('listafactura');
-                
+
             }
         }
     });
-    
+
 }
 
 function imprimir_factura(id) {
@@ -1813,13 +1690,13 @@ function imprimir_factura(id) {
 }
 
 function timbrarFactura(fid) {
-    alertify.confirm("Esta seguro que desea timbrar esta factura?", function () {
+    alertify.confirm("¿Estás seguro que deseas timbrar esta factura?", function () {
         cargandoHide();
         cargandoShow();
         $.ajax({
             url: "com.sine.enlace/enlacefactura.php",
             type: "POST",
-            data: {transaccion: "xml", idfactura: fid},
+            data: { transaccion: "xml", idfactura: fid },
             success: function (datos) {
                 var texto = datos.toString();
                 var bandera = texto.substring(0, 1);
@@ -1827,13 +1704,13 @@ function timbrarFactura(fid) {
                 if (bandera == '0') {
                     alertify.error(res);
                 } else {
-                    alertify.success('Factura Timbrada');
+                    alertify.success('Factura timbrada correctamente.');
                     loadView('listafactura');
                 }
                 cargandoHide();
             }
         });
-    }).set({title: "Q-ik"});
+    }).set({ title: "Q-ik" });
 }
 
 function setCancelacion(fid) {
@@ -1856,13 +1733,13 @@ function cancelarTimbre(idfactura) {
         reemplazo = $("#uuid-reemplazo").val();
     }
     if (isnEmpty(motivo, "motivo-cancelacion") && isnEmpty(reemplazo, "uuid-reemplazo")) {
-        alertify.confirm("Esta seguro que desea cancelar esta factura?", function () {
+        alertify.confirm("¿Estás seguro que deseas cancelar esta factura?", function () {
             cargandoHide();
             cargandoShow();
             $.ajax({
                 url: "com.sine.enlace/enlacefactura.php",
                 type: "POST",
-                data: {transaccion: "cancelartimbre", idfactura: idfactura, motivo: motivo, reemplazo: reemplazo},
+                data: { transaccion: "cancelartimbre", idfactura: idfactura, motivo: motivo, reemplazo: reemplazo },
                 success: function (datos) {
                     var texto = datos.toString();
                     var bandera = texto.substring(0, 1);
@@ -1877,7 +1754,7 @@ function cancelarTimbre(idfactura) {
                     cargandoHide();
                 }
             });
-        }).set({title: "Q-ik"});
+        }).set({ title: "Q-ik" });
     }
 }
 
@@ -1927,7 +1804,7 @@ function enviarfactura() {
         $.ajax({
             url: "com.sine.imprimir/imprimirfactura.php",
             type: "POST",
-            data: {transaccion: "pdf", id: idfactura, ch1: chcorreo1, ch2: chcorreo2, ch3: chcorreo3, ch4: chcorreo4, ch5: chcorreo5, ch6: chcorreo6, mailalt1: mailalt1, mailalt2: mailalt2, mailalt3: mailalt3, mailalt4: mailalt4, mailalt5: mailalt5, mailalt6: mailalt6},
+            data: { transaccion: "pdf", id: idfactura, ch1: chcorreo1, ch2: chcorreo2, ch3: chcorreo3, ch4: chcorreo4, ch5: chcorreo5, ch6: chcorreo6, mailalt1: mailalt1, mailalt2: mailalt2, mailalt3: mailalt3, mailalt4: mailalt4, mailalt5: mailalt5, mailalt6: mailalt6 },
             success: function (datos) {
                 var texto = datos.toString();
                 var bandera = texto.substring(0, 1);
@@ -1936,7 +1813,7 @@ function enviarfactura() {
                     alertify.error(res);
                 } else {
                     $("#enviarmail").modal('hide');
-                    alertify.success('correo enviado correctamente');
+                    alertify.success('correo enviado correctamente.');
                 }
                 cargandoHide();
             }
@@ -1948,7 +1825,7 @@ function opcionesCorreo() {
     $.ajax({
         url: 'com.sine.enlace/enlaceconfig.php',
         type: 'POST',
-        data: {transaccion: 'opcionescorreo'},
+        data: { transaccion: 'opcionescorreo' },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -1958,7 +1835,6 @@ function opcionesCorreo() {
             } else {
                 $(".contenedor-correos").html(datos);
             }
-            //cargandoHide();
         }
     });
 }
@@ -1973,7 +1849,7 @@ function sendWhatsapp() {
     $.ajax({
         url: "com.sine.imprimir/imprimirfactura.php",
         type: "POST",
-        data: {transaccion: "pdf", idwp: idfactura, cod: cod, wpnumber: wpnumber},
+        data: { transaccion: "pdf", idwp: idfactura, cod: cod, wpnumber: wpnumber },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -1993,7 +1869,7 @@ function loadCliente(idcliente) {
     $.ajax({
         url: "com.sine.enlace/enlacefactura.php",
         type: "POST",
-        data: {transaccion: "loadcliente", idcliente: idcliente},
+        data: { transaccion: "loadcliente", idcliente: idcliente },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -2030,7 +1906,7 @@ function checkStatusCancelacion(fid) {
     $.ajax({
         url: "com.sine.enlace/enlacefactura.php",
         type: "POST",
-        data: {transaccion: "statuscfdi", fid: fid},
+        data: { transaccion: "statuscfdi", fid: fid },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -2057,13 +1933,13 @@ function checkStatusCancelacion(fid) {
 }
 
 function resetCfdi(idfactura) {
-    alertify.confirm("Este proceso devolvera la factura al estado de 'Pendiente' y borrara el acuse de cancelacion generado, ¿Desea continuar?", function () {
+    alertify.confirm("Este proceso devolverá la factura al estado de 'Pendiente' y borrará el acuse de cancelación generado, ¿Deseas continuar?", function () {
         cargandoHide();
         cargandoShow();
         $.ajax({
             url: "com.sine.enlace/enlacefactura.php",
             type: "POST",
-            data: {transaccion: "editarestado", idfactura: idfactura},
+            data: { transaccion: "editarestado", idfactura: idfactura },
             success: function (datos) {
                 var texto = datos.toString();
                 var bandera = texto.substring(0, 1);
@@ -2078,7 +1954,7 @@ function resetCfdi(idfactura) {
                 cargandoHide();
             }
         });
-    }).set({title: "Q-ik"});
+    }).set({ title: "Q-ik" });
 }
 
 function getClientebyRFC() {
@@ -2089,9 +1965,8 @@ function getClientebyRFC() {
         $.ajax({
             url: "com.sine.enlace/enlacecarta.php",
             type: "POST",
-            data: {transaccion: "getcliente", rfc: rfc},
+            data: { transaccion: "getcliente", rfc: rfc },
             success: function (datos) {
-                //alert("hola"+datos);
                 var texto = datos.toString();
                 var bandera = texto.substring(0, 1);
                 var res = texto.substring(1, 1000);
@@ -2099,7 +1974,7 @@ function getClientebyRFC() {
                     alertify.error(res);
                 } else {
                     var array = res.split("</tr>");
-                    
+
                     $("#id-cliente").val(array[0]);
                     $("#razon-cliente").val(array[1]);
                     $("#regfiscal-cliente").val(array[2]);
@@ -2109,4 +1984,105 @@ function getClientebyRFC() {
             }
         });
     }
+}
+
+/***************** CAMBIOS *****************/
+function addCFDI() {
+    var tcomp = $('#tipo-comprobante').val();
+    var id = $('#idfactura-rel').val();
+    var folio = $('#folio-relacion').val();
+    var type = $('#type-rel').val();
+    var rel = $("#tipo-relacion").val();
+    var cfdi = $("#cfdi-rel").val();
+    var descripcion = $('#tipo-relacion option:selected').text();
+    if (isnEmpty(rel, "tipo-relacion") && isnEmpty(cfdi, "cfdi-rel") && isnEmpty(folio, "folio-relacion") && isnEmpty(tcomp, "tipo-comprobante")) {
+        if (cfdi === "Factura sin timbrar") {
+            alertify.error("No se puede agregar un folio sin CFDI, debe timbrar primero dicha factura.");
+        } else {
+            $.ajax({
+                url: "com.sine.enlace/enlacefactura.php",
+                type: "POST",
+                data: {
+                    transaccion: "addcfdi",
+                    rel: rel,
+                    cfdi: cfdi,
+                    id: id,
+                    folio: folio,
+                    type: type,
+                    descripcion: descripcion,
+                    tcomp: tcomp
+                },
+                success: function (datos) {
+                    var texto = datos.toString();
+                    var bandera = texto.substring(0, 1);
+                    var res = texto.substring(1, 1000);
+                    if (bandera == '0') {
+                        alertify.error(res);
+                    } else {
+                        cargandoHide();
+                        var array = datos.split("<corte>");
+                        var p2 = array[1];
+                        if (p2 != "") {
+                            $("#tablaresultados").show('slow');
+                            $("#body-lista-cfdi").html(p2);
+                            $('#folio-relacion').val("");
+                            $('#cfdi-rel').val("");
+                            $('#tipo-relacion').val("");
+                            tablaProductos();
+                        }
+
+                    }
+                }
+            });
+        }
+    }
+}
+
+function aucompletarFacturaTimbrada() {
+    var idcliente = $("#id-cliente").val();
+    $('#folio-relacion').autocomplete({
+        source: "com.sine.enlace/enlaceautocompletar.php?transaccion=facturastimbradas&&iddatos=" + idcliente,
+        select: function (event, ui) {
+            var a = ui.item.value;
+            var id = ui.item.id;
+            var type = ui.item.type;
+            loadFactura(id, type, a);
+        }
+    });
+}
+
+function loadFactura(id, type, a) {
+    $.ajax({
+        data: { transaccion: 'cargarUUID', id: id, type: type, a: a },
+        url: 'com.sine.enlace/enlacefactura.php',
+        type: 'POST',
+        success: function (datos) {
+            $('#type-rel').val(type);
+            $('#idfactura-rel').val(id);
+            $('#cfdi-rel').val(datos);
+        }
+    });
+}
+
+function asignaMonto(no){
+    var total = $('#total'+no).val();
+    var id_egreso = $('#SCfdiRel'+no).val();
+    var id_prod = $("#SCfdiRel"+no).data("idtmpprod");
+    
+    $.ajax({
+        data : {transaccion: 'asignarmonto', total: total, id_egreso: id_egreso, id_prod: id_prod},
+        url  : "com.sine.enlace/enlacefactura.php",
+        type : "POST",
+        success : function(datos){
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 1000);
+            if (bandera == '0') {
+                alertify.error(res);
+                $('#SCfdiRel'+no).val('');
+            } else {
+                alertify.success(res);
+            }
+        }
+    });
 }

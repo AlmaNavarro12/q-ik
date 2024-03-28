@@ -441,7 +441,7 @@ class ControladorVenta
                     <div class='input-group'>
                         <div class='dropdown'>
                             <button type='button' class='button-impuesto dropdown-toggle' data-bs-toggle='dropdown' aria-expanded='true' data-bs-auto-close='outside'>Traslados</button>
-                            <ul class='dropdown-menu z-3'>
+                            <ul class='dropdown-menu ps-3 z-3 lh-sm'>
                                 $optraslados
                             </ul>
                         </div>
@@ -539,11 +539,12 @@ class ControladorVenta
             $porcentaje = $actual['porcentaje'];
             $impuesto = $actual['impuesto'];
 
-            $opciones .= "<li data-location='tabla' data-id='$tid'>
-            <label class='dropdown-menu-item checkbox ps-3 z-3'>
+            $opciones .= "
+            <li data-location='tabla' data-id='$tid'>
+            <div class='checkbox d-flex justify-content-start z-3'>
                 <input type='checkbox' $checked value='$porcentaje' name='ch{$tipo}tabla$tid' data-impuesto='$impuesto' data-tipo='$tipo' />
-                <span class='$icon me-2' id='chuso1span'></span>$nombre ($porcentaje%)
-            </label>
+                <span class='$icon me-2' id='chuso1span'></span><small>$nombre ($porcentaje%)</small>
+            </div>
         </li>";
         }
 
@@ -1146,7 +1147,7 @@ class ControladorVenta
         $datos = "<thead class='sin-paddding'>
                     <tr>
                         <th class='text-center'>Id. Venta </th>
-                        <th class='text-center col-md-3'>Persona Realizó </th>
+                        <th class='text-center col-md-3'>Persona realizó </th>
                         <th class='text-center'>Fecha de venta </th>
                         <th class='text-center'>Hora de venta </th>
                         <th class='text-center'>Forma de Pago </th>
@@ -1614,14 +1615,16 @@ class ControladorVenta
             $total += $actual['fondo'];
         }
 
-        $datos = "<ul class='list-group mb-3'>
-                    <input type='hidden' name='fondo_inicio' id='fondo_inicio' value=" . number_format($fondo, 2, '.', ',') . ">
+        $datos = "<ul class='list-group mb-3'>";
+        if($uid != "0"){
+            $datos .= " <input type='hidden' name='fondo_inicio' id='fondo_inicio' value=" . number_format($fondo, 2, '.', ',') . ">
                         <li class='list-group-item d-flex justify-content-between lh-sm'>
                             <div>
                             <h6 class='my-0 text-success'><i class='fas fa-arrow-up text-success me-1 small'></i>Inicio en caja</h6>
                             </div>
                             <span class='text-secondary fw-semibold'>$ " . number_format($fondo, 2, '.', ',') . "</span>
                         </li>";
+        }
         $entradas = $this->getMovEfectivo('1', $fecha, $uid, $hora);
         foreach ($entradas as $actual) {
             $concepto = iconv("utf-8", "windows-1252", $actual['conceptomov']);
@@ -1690,7 +1693,30 @@ class ControladorVenta
         return $datos;
     }
 
-    private function getDineroCaja($uid, $fecha, $hora = "")
+    public function obtenerPagos($uid, $fecha, $hora = "")
+    {
+        $user = "";
+        if ($uid != '0') {
+            $user = " AND sessionid=:uid";
+        }
+        $consulta = "SELECT cp.nombre_forma_pago, SUM(cp.total_complemento) as total_pagado
+        FROM pagos p
+        INNER JOIN complemento_pago cp ON p.tagpago = cp.tagpago WHERE fechacreacion=:fecha";
+
+        if (!empty($hora)) {
+            $consulta .= " AND (hora_creacion >= :hora)";
+        }
+        $consulta .= $user . " GROUP BY cp.nombre_forma_pago;";
+        $val = array(
+            "fecha" => $fecha,
+            "uid" => $uid,
+            "hora" => $hora
+        );
+        $datos = $this->consultas->getResults($consulta, $val);
+        return $datos;
+    }
+
+    private function getDineroCaja($uid, $fecha, $hora = "", $pago = "")
     {
         $efectivo = 0;
         $tarjeta = 0;
@@ -1698,6 +1724,7 @@ class ControladorVenta
         $entradas = 0;
         $salidas = 0;
         $total = 0;
+        $pagos = 0;
 
         $datf = $this->getFondoCaja($uid, $fecha, $hora);
         foreach ($datf as $actual) {
@@ -1734,16 +1761,21 @@ class ControladorVenta
             $salidas += $actual['montomov'];
             $total -= $actual['montomov'];
         }
+        $pagos = $this->obtenerPagos($uid, $fecha, $hora);
 
-        $datos = "<ul class='list-group mb-3 h-100'>
+        $datos = "<ul class='list-group mb-3 h-100'>";
+
+        if ($efectivo > 0 && $uid != "0") {
+            $datos .= "
         <li class='list-group-item d-flex justify-content-between lh-sm'>
             <div class='col-8 px-0 text-start'>
             <h6 class='my-0 text-success'><i class='fas fa-arrow-up text-success me-1 small'></i>Ventas en efectivo </h6>
             </div>
             <span class='text-success fw-semibold'>$ " . number_format($efectivo, 2, '.', ',') . "</span>
         </li>";
+        }
 
-        if ($tarjeta > 0) {
+        if ($tarjeta > 0 && $uid != "0") {
             $datos .= "<li class='list-group-item d-flex justify-content-between lh-sm'>
             <div class='col-8 px-0 text-start'>
             <h6 class='my-0 text-success'><i class='fas fa-arrow-up text-success me-1 small'></i>Ventas en tarjeta </h6>
@@ -1752,7 +1784,7 @@ class ControladorVenta
         </li>";
         }
 
-        if ($vales > 0) {
+        if ($vales > 0 && $uid != "0") {
             $datos .= "<li class='list-group-item d-flex justify-content-between lh-sm'>
             <div class='col-8 px-0 text-start'>
             <h6 class='my-0 text-success'><i class='fas fa-arrow-up text-success me-1 small'></i>Ventas en vales </h6>
@@ -1761,28 +1793,51 @@ class ControladorVenta
         </li>";
         }
 
-        $datos .= "
-            <li class='list-group-item d-flex justify-content-between lh-sm'>
-                <div class='col-8 px-0 text-start'>
-                <h6 class='my-0 text-success'><i class='fas fa-arrow-up text-success me-1 small'></i>Entradas </h6>
-                </div>
-                <span class='text-success fw-semibold'>$ " . number_format($entradas, 2, '.', ',') . "</span>
-            </li>
-            <li class='list-group-item d-flex justify-content-between lh-sm'>
-                <div class='col-8 px-0 text-start'>
-                <h6 class='my-0 text-danger'><i class='fas fa-arrow-down text-danger me-1 small'></i>Salidas </h6>
-                </div>
-                <span class='text-danger fw-semibold'>$ " . number_format($salidas, 2, '.', ',') . "</span>
-            </li>
-            <li class='list-group-item d-flex justify-content-between'>
-            <span class='fw-bold text-muted'>Total (MXN)</span>
-            <strong>$ " . number_format($total, 2, '.', ',') . "</strong>
-            </li></ul>";
+        if ($pago != "0" && $uid != "0") {
+            foreach ($pagos as $pago) {
+                $forma_pago = $pago['nombre_forma_pago'];
+                $total_pagado = $pago['total_pagado'];
+        
+                $datos .= "
+                <li class='list-group-item d-flex justify-content-between lh-sm'>
+                    <div class='col-8 px-0 text-start'>
+                        <h6 class='my-0 text-success'><i class='fas fa-arrow-up text-success me-1 small'></i>Pagos de facturas ($forma_pago)</h6>
+                    </div>
+                    <span class='text-success fw-semibold'>$ " . number_format($total_pagado, 2, '.', ',') . "</span>
+                </li>";
+            }
+        }
+        
+        if ($uid != "0") {
+            $datos .= "
+        <li class='list-group-item d-flex justify-content-between lh-sm'>
+            <div class='col-8 px-0 text-start'>
+            <h6 class='my-0 text-success'><i class='fas fa-arrow-up text-success me-1 small'></i>Entradas </h6>
+            </div>
+            <span class='text-success fw-semibold'>$ " . number_format($entradas, 2, '.', ',') . "</span>
+        </li>
+        <li class='list-group-item d-flex justify-content-between lh-sm'>
+            <div class='col-8 px-0 text-start'>
+            <h6 class='my-0 text-danger'><i class='fas fa-arrow-down text-danger me-1 small'></i>Salidas </h6>
+            </div>
+            <span class='text-danger fw-semibold'>$ " . number_format($salidas, 2, '.', ',') . "</span>
+        </li>
+        <li class='list-group-item d-flex justify-content-between'>
+       <span class='fw-bold text-muted'>Total (MXN)</span>
+       <strong>$ " . number_format($total, 2, '.', ',') . "</strong>
+       </li></ul>";
+        }
+
+        if ($uid == "0") {
+            $datos .= "<li class='list-group-item d-flex justify-content-between'>
+       <span class='fw-bold text-muted'>Total (MXN)</span>
+       <strong>$ " . number_format(0, 2, '.', ',') . "</strong>
+       </li></ul>";
+        }
         return $datos;
     }
 
-    public function getCorteCaja($user)
-    {
+    public function getCorteCaja($user, $pago){
         $totventas = 0;
         $totganancia = 0;
         $entefec = 0;
@@ -1802,7 +1857,9 @@ class ControladorVenta
 
                     $ventas = $this->getTotalVentas($fecha, $user, $horaCorte);
                     foreach ($ventas as $actual) {
-                        $totventas += $actual['totalventa'];
+                        if($user != 0){
+                            $totventas += $actual['totalventa'];
+                        }
                     }
 
                     $ganancias = $this->getGanancias($fecha, $user, $horaCorte);
@@ -1811,11 +1868,13 @@ class ControladorVenta
                         $cant = $actual['venta_cant'];
                         $importe = $actual['venta_importe'];
                         $impcompra = floatval($cant) * floatval($pcompra);
+                        if($user != 0){
                         $totganancia += $importe - $impcompra;
+                        }
                     }
 
                     $entefec = $this->getEntradasEfectivo($user, $fecha, $horaCorte);
-                    $dinerocaja = $this->getDineroCaja($user, $fecha, $horaCorte);
+                    $dinerocaja = $this->getDineroCaja($user, $fecha, $horaCorte, $pago);
                     $salidaefectivo = $this->getSalidaEfectivo($user, $fecha, $horaCorte);
                 }
             }
@@ -1824,7 +1883,9 @@ class ControladorVenta
 
             $ventas = $this->getTotalVentas($fecha, $user);
             foreach ($ventas as $actual) {
-                $totventas += $actual['totalventa'];
+                if($user != 0){
+                    $totventas += $actual['totalventa'];
+                }
             }
 
             $ganancias = $this->getGanancias($fecha, $user);
@@ -1833,11 +1894,13 @@ class ControladorVenta
                 $cant = $actual['venta_cant'];
                 $importe = $actual['venta_importe'];
                 $impcompra = floatval($cant) * floatval($pcompra);
+                if($user != 0){
                 $totganancia += $importe - $impcompra;
+                }
             }
 
             $entefec = $this->getEntradasEfectivo($user, $fecha);
-            $dinerocaja = $this->getDineroCaja($user, $fecha);
+            $dinerocaja = $this->getDineroCaja($user, $fecha, "", $pago);
             $salidaefectivo = $this->getSalidaEfectivo($user, $fecha);
         }
 
@@ -1890,14 +1953,14 @@ class ControladorVenta
         return $bandera;
     }
 
-    public function insertarCorte($c)
+    public function insertarCorte($c, $pagos)
     {
         $insertado = false;
-        $insertado = $this->gestionarCorte($c);
+        $insertado = $this->gestionarCorte($c, $pagos);
         return $insertado;
     }
 
-    private function gestionarCorte($c)
+    private function gestionarCorte($c, $pagos)
     {
         $insertado = false;
         $hoy = date('Y-m-d');
@@ -1926,7 +1989,7 @@ class ControladorVenta
         if ($insertado) {
             $id = $this->obtenerUltimoID();
             $datos =  $idusuario . "<tr>" . $hoy . "<tr>" . $hora . "<tr>" . $tag . "<tr>" . $id . "<tr>" .  $c->getIdSupervisor() . "<tr>";
-            $this->registrarDetallesCorte($hoy, $tag, $hora, $idusuario);
+            echo $this->registrarDetallesCorte($hoy, $tag, $hora, $idusuario, $pagos);
         }
         return $datos;
     }
@@ -1961,7 +2024,6 @@ class ControladorVenta
         $consultado = $this->consultas->getResults($consulta, $valores);
         return $consultado;
     }
-
 
     private function obtenerIdFondoInicio($fecha_corte, $hora, $idusuario)
     {
@@ -2003,20 +2065,44 @@ class ControladorVenta
         return $consultado;
     }
 
-    private function registrarDetallesCorte($fecha_corte, $tag, $hora, $idusuario)
+    private function obtenerIdPago($fecha_corte, $hora, $idusuario)
+    {
+        $ultimoCorte = $this->getUltimoCorteCajaHoy($idusuario);
+
+        if (!empty($ultimoCorte['hora_formato'])) {
+            $horaCorte = $ultimoCorte['hora_formato'];
+            $consulta = "SELECT idpago FROM pagos WHERE (fechacreacion = :fecha_venta AND hora_creacion >= :hora_corte  AND sessionid = :uid);";
+        } else {
+            $horaCorte = $hora;
+            $consulta = "SELECT idpago FROM pagos WHERE (fechacreacion = :fecha_venta AND hora_creacion < :hora_corte AND sessionid = :uid);";
+        }
+        $valores = array(
+            "fecha_venta" => $fecha_corte,
+            "hora_corte" => $horaCorte,
+            "uid" => $idusuario,
+
+        );
+        $consultado = $this->consultas->getResults($consulta, $valores);
+        return $consultado;
+    }
+
+    private function registrarDetallesCorte($fecha_corte, $tag, $hora, $idusuario, $pagos)
     {
         $idsDatosVenta = $this->obtenerIdDatosVenta($fecha_corte, $hora, $idusuario);
         $idsFondo = $this->obtenerIdFondoInicio($fecha_corte, $hora, $idusuario);
         $idsMovefectivo = $this->obtenerIdMovEfectivo($fecha_corte, $hora, $idusuario);
+        $idsPagos = $this->obtenerIdPago($fecha_corte, $hora, $idusuario);
 
-        $consultaInsert = "INSERT INTO detalle_corte (id_datosventa, idfondo, idmovefectivo, tagcorte)
-                       VALUES (:id_datosventa, :idfondo, :idmovefectivo, :tagcorte)";
+        $consultaInsert = "INSERT INTO detalle_corte (id_datosventa, idfondo, idmovefectivo, idpago, detalle_complemento, tagcorte)
+                       VALUES (:id_datosventa, :idfondo, :idmovefectivo, :idpago, :detalle_complemento, :tagcorte)";
 
         foreach ($idsDatosVenta as $idDatosVenta) {
             $valoresInsert = array(
                 "id_datosventa" => $idDatosVenta["iddatos_venta"],
                 "idfondo" => null,
                 "idmovefectivo" => null,
+                "idpago" => null,
+                "detalle_complemento" => null,
                 "tagcorte" => $tag,
             );
 
@@ -2028,6 +2114,8 @@ class ControladorVenta
                 "id_datosventa" => null,
                 "idfondo" => $idfondo["idfondo"],
                 "idmovefectivo" => null,
+                "idpago" => null,
+                "detalle_complemento" => null,
                 "tagcorte" => $tag,
             );
 
@@ -2039,12 +2127,57 @@ class ControladorVenta
                 "id_datosventa" => null,
                 "idfondo" => null,
                 "idmovefectivo" => $idmovefectivo["idmovefectivo"],
+                "idpago" => null,
+                "detalle_complemento" => null,
                 "tagcorte" => $tag,
             );
 
             $this->consultas->execute($consultaInsert, $valoresInsert);
         }
+
+        if($pagos != "0"){
+            foreach ($idsPagos as $idpago) {
+                $complementos = $this->generarDetallesComplementos($idpago['idpago']);
+                $valoresInsert = array(
+                    "id_datosventa" => null,
+                    "idfondo" => null,
+                    "idmovefectivo" => null,
+                    "idpago" => $idpago["idpago"],
+                    "detalle_complemento" => $complementos,
+                    "tagcorte" => $tag,
+                );
+    
+                $this->consultas->execute($consultaInsert, $valoresInsert);
+            }
+        }
     }
+
+    function generarDetallesComplementos($idPago)
+    {
+        $detalles_complementos = "";
+        $consulta_tagpago = "SELECT tagpago FROM pagos WHERE idpago = :id_pago";
+        $valores_tagpago = array("id_pago" => $idPago);
+        $resultado_tagpago = $this->consultas->getResults($consulta_tagpago, $valores_tagpago);
+
+        if ($resultado_tagpago) {
+            $tagpago = $resultado_tagpago[0]['tagpago'];
+
+            $consulta_complementos = "SELECT * FROM complemento_pago WHERE tagpago = :tagpago";
+            $valores_complementos = array("tagpago" => $tagpago);
+            $resultado_complementos = $this->consultas->getResults($consulta_complementos, $valores_complementos);
+
+            if ($resultado_complementos) {
+                $detalles_fila = array();
+                foreach ($resultado_complementos as $complemento) {
+                    $detalles_fila[] = "{$complemento['ordcomplemento']}-{$complemento['nombre_forma_pago']}-{$complemento['total_complemento']}";
+                }
+                $detalles_complementos = implode("<tr>", $detalles_fila);
+            }
+        }
+        return $detalles_complementos;
+    }
+
+
 
     //-------------------------------LISTADO DE CORTES DE CAJA
     private function getCortes($condicion)
@@ -2181,12 +2314,12 @@ class ControladorVenta
                     INNER JOIN datos_venta v ON d.tagdetallev=v.tagventa
                     WHERE v.tagventa = :tagventa
                     AND v.fecha_venta = :fecha AND NOT EXISTS (
-    SELECT 1
-    FROM datos_venta cv
-    WHERE cv.iddatos_venta = v.iddatos_venta
-      AND cv.fecha_cancelado = :fecha
-      AND cv.hora_cancelada < :hora
-  );";
+                    SELECT 1
+                    FROM datos_venta cv
+                    WHERE cv.iddatos_venta = v.iddatos_venta
+                    AND cv.fecha_cancelado = :fecha
+                    AND cv.hora_cancelada < :hora
+                );";
 
             $valores = array(
                 "tagventa" => $tagVenta,
@@ -2324,24 +2457,6 @@ class ControladorVenta
         return $consultado;
     }
 
-    private function obtenerTagsVentas($tag)
-    {
-        $idsDatosVenta = $this->obtenerIdVentaByTag($tag);
-        $tagsVenta = array();
-        $consulta = "SELECT tagventa FROM datos_venta WHERE iddatos_venta = :iddatos_venta";
-        foreach ($idsDatosVenta as $idactual) {
-            $valores = array(
-                "iddatos_venta" => $idactual["id_datosventa"]
-            );
-            $resultado = $this->consultas->getResults($consulta, $valores);
-
-            foreach ($resultado as $resultado) {
-                $tagsVenta[] = $resultado['tagventa'];
-            }
-        }
-        return $tagsVenta;
-    }
-
     public function obtenerComentariosCorte($id)
     {
         $consultado = false;
@@ -2385,6 +2500,129 @@ class ControladorVenta
         }
         return $ventas;
     }
+
+    private function obtenerTagsVentas($tag)
+    {
+        $idsDatosVenta = $this->obtenerIdVentaByTag($tag);
+        $tagsVenta = array();
+        $consulta = "SELECT tagventa FROM datos_venta WHERE iddatos_venta = :iddatos_venta";
+        foreach ($idsDatosVenta as $idactual) {
+            $valores = array(
+                "iddatos_venta" => $idactual["id_datosventa"]
+            );
+            $resultado = $this->consultas->getResults($consulta, $valores);
+
+            foreach ($resultado as $resultado) {
+                $tagsVenta[] = $resultado['tagventa'];
+            }
+        }
+        return $tagsVenta;
+    }
+
+    private function obtenerIdPagoByTag($tag)
+    {
+        $consultado = false;
+        $consulta = "SELECT idpago, detalle_complemento FROM detalle_corte WHERE tagcorte = :tag AND idpago IS NOT NULL;";
+        $valores = array(
+            "tag" => $tag
+        );
+        $consultado = $this->consultas->getResults($consulta, $valores);
+
+        $idPagosAgrupados = array();
+        foreach ($consultado as $row) {
+            $idpago = $row['idpago'];
+            $detalle_complementos = $row['detalle_complemento'];
+            $filas = explode('<tr>', $detalle_complementos);
+
+            foreach ($filas as $fila) {
+                if (!empty(trim($fila))) {
+                    $columnas = explode('-', $fila);
+
+                    $orden = trim($columnas[0]);
+                    $forma_pago = trim($columnas[1]); 
+                    $total = trim($columnas[2]);
+
+                    $detalle_com = array(
+                        'idpago' => $idpago,
+                        'orden' => $orden,
+                        'total' => $total,
+                    );
+
+                    if (!isset($idPagosAgrupados[$forma_pago])) {
+                        $idPagosAgrupados[$forma_pago] = array();
+                    }
+                    $idPagosAgrupados[$forma_pago][] = $detalle_com;
+                }
+            }
+        }
+        return $idPagosAgrupados;
+    }
+
+
+    public function obtenerDetallesPagosPorForma($tag, $fecha, $hora, $uid)
+{
+    $idPagosAgrupados = $this->obtenerIdPagoByTag($tag);
+    $ventasPorForma = array();
+    $consulta = "SELECT
+        p.idpago, p.razonemisor, p.razonreceptor, p.letra, p.foliopago, p.hora_creacion,
+        dp.nombre_moneda, dp.type, dp.montoinsoluto
+        FROM
+            detallepago dp
+        INNER JOIN
+            pagos p ON dp.detalle_tagencabezado = p.tagpago
+        WHERE
+            p.idpago = :idpago 
+            AND p.sessionid = :uid 
+            AND p.hora_creacion <= :hora 
+            AND p.fechacreacion = :fecha";
+    
+    foreach ($idPagosAgrupados as $formaPago => $pagos) {
+        foreach ($pagos as $pago) {
+            $valores = array(
+                "idpago" => $pago["idpago"],
+                "fecha" => $fecha,
+                "hora" => $hora,
+                "uid" => $uid,
+            );
+
+            $resultado = $this->consultas->getResults($consulta, $valores);
+
+            foreach ($resultado as $row) {
+                $venta = array(
+                    'idpago' => $row['idpago'],
+                    'razonemisor' => $row['razonemisor'],
+                    'razonreceptor' => $row['razonreceptor'],
+                    'letra' => $row['letra'],
+                    'foliopago' => $row['foliopago'],
+                    'hora_creacion' => $row['hora_creacion'],
+                    'nombre_moneda' => $row['nombre_moneda'],
+                    'type' => $row['type'],
+                    'montoinsoluto' => $row['montoinsoluto'],
+                    'forma_pago' => $formaPago,
+                    'orden' => $pago["orden"],
+                    'total' => $pago["total"],
+                );
+
+                if (!isset($ventasPorForma[$formaPago])) {
+                    $ventasPorForma[$formaPago] = array();
+                }
+                $ventaExiste = false;
+                foreach ($ventasPorForma[$formaPago] as $v) {
+                    if ($v['idpago'] === $venta['idpago'] && $v['orden'] === $venta['orden']) {
+                        $ventaExiste = true;
+                        break;
+                    }
+                }
+                if (!$ventaExiste) {
+                    $ventasPorForma[$formaPago][] = $venta;
+                }
+            }
+        }
+    }
+    return $ventasPorForma;
+}
+
+
 
     public function obtenerDetallesVentasCanceladas($tag, $fecha, $hora, $uid)
     {

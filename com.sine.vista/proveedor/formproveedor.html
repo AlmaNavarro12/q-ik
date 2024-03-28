@@ -57,7 +57,7 @@
                 class="mark-required text-danger fw-bold">&nbsp;</label>
             <div class="form-group">
                 <input class="form-control text-center input-form" id="cuenta" minlength="18" maxlength="20"
-                    name="cuenta" placeholder="N&uacute;mero de cuenta bancaria" />
+                    name="cuenta" placeholder="N&uacute;mero de cuenta bancaria" oninput="validarLet(this)"/>
                 <div id="cuenta-errors"></div>
             </div>
         </div>
@@ -67,7 +67,7 @@
                 class="mark-required text-danger fw-bold">&nbsp;</label>
             <div class="form-group">
                 <input class="form-control text-center input-form" id="clabe" name="clabe"
-                    placeholder="Clabe interbancaria" minlength="18" maxlength="20" />
+                    placeholder="Clabe interbancaria" minlength="18" maxlength="20" oninput="validarLet(this)"/>
                 <div id="clabe-errors"></div>
             </div>
         </div>

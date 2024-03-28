@@ -31,6 +31,8 @@ class Pago {
     private $orden;
     private $nombremoneda;
     private $nombreforma;
+    private $cforma;
+
 
 
             
@@ -138,6 +140,10 @@ class Pago {
         return $this->nombreforma;
     }
 
+    function getCForma() {
+        return $this->cforma;
+    }
+
     function getActualizarfiscales() {
         return $this->actualizarfiscales;
     }
@@ -224,6 +230,10 @@ class Pago {
 
     function setNombreForma($nombreforma) {
         $this->nombreforma = $nombreforma;
+    }
+
+    function setCForma($cforma) {
+        $this->cforma = $cforma;
     }
 
     function setNooperacion($nooperacion) {

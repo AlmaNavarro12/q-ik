@@ -41,10 +41,10 @@ function gestionarCliente(idcliente = null) {
     var cuenta3 = $("#cuenta3").val();
     var clabe3 = $("#clabe3").val();
 
-    var nombre_banco1 = $("#id-banco option:selected").text().substring(6);
-    var nombre_banco2 = $("#id-banco1 option:selected").text().substring(6);
-    var nombre_banco3 = $("#id-banco2 option:selected").text().substring(6);
-    var nombre_banco4 = $("#id-banco3 option:selected").text().substring(6);
+    var nombre_banco1 = $("#id-banco option:selected").text().substring(4);
+    var nombre_banco2 = $("#id-banco1 option:selected").text().substring(4);
+    var nombre_banco3 = $("#id-banco2 option:selected").text().substring(4);
+    var nombre_banco4 = $("#id-banco3 option:selected").text().substring(4);
 
     if ($("#datosficales").prop('checked')) {
         rfc = $("#rfc").val();
@@ -54,7 +54,7 @@ function gestionarCliente(idcliente = null) {
         interior = $("#num_interior").val();
         exterior = $("#num_exterior").val();
         estado = $("#id-estado").val();
-        var nombreestado = $("#id-estado option:selected").text().substring(6);
+        var nombreestado = $("#id-estado option:selected").text().substring(4);
         municipio = $("#id-municipio").val();
         var nombremunicipio = $("#id-municipio option:selected").text();
         localidad = $("#localidad").val();

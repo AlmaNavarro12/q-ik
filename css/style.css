@@ -1121,8 +1121,8 @@ table.table-row tr td {
 }
 
 .button-modal:hover{
-    background: #EDEDF4;
-    color: #17177C;
+    background: #EDEDF4 !important;
+    color: #17177C !important;
 }
 
 .button-ventas{

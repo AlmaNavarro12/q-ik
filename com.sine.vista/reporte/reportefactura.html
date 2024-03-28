@@ -1,0 +1,100 @@
+<div class="col-md-12"><div class="titulo-lista fijo z-2">Reportes de facturas </div> </div>
+
+<div class="row ps-3 pe-1 py-2" >
+    <div class="col-md-3 text-left">
+        <input id="date-inicio" class="form-select input-search" style="height: 60px;" type="date" onchange="buscarReporte();"/>
+        <div id="date-inicio-errors"></div>
+    </div>
+
+    <div class="col-md-3 text-left">
+        <input id="date-fin" class="form-select input-search" style="height: 60px;" type="date" onchange="buscarReporte();"/>
+        <div id="date-fin-errors"></div>
+    </div>
+
+    <div class="col-md-2 text-left">
+        <select class="form-select input-search" style="height: 60px;" id="id-cliente" name="id-cliente" onchange="buscarReporte();">
+            <option value="" id="option-default-cliente" class="option-list">Clientes</option>
+            <optgroup id="optioncliente" class="contenedor-cliente option-list"> </optgroup>
+        </select>
+    </div>
+
+    <div class="col-md-2 text-left">
+        <select class="form-select input-search" style="height: 60px;" id="datos-facturacion" name="datos-facturacion" onchange="buscarReporte();">
+            <option value="" class="option-list" id="option-default-cliente">Datos de facturación</option>
+            <optgroup id="opcionesdatos" class="contenedor-datos option-list"> </optgroup>
+        </select>
+    </div>
+<!--NUEVOS CAMBIOS-->
+    <div class="col-md-2 text-left">
+        <select class="form-select input-search" style="height: 60px;" id="metodo-factura" name="metodo-factura" onchange="buscarReporte();">
+            <option class="option-list" value="" id="option-default-metodo">Método de pago</option>
+            <option class="option-list" value="1" id="metodo1">Pago en una sola exhibición</option>
+            <option class="option-list" value="2" id="metodo2">Pago en parcialidades o diferido</option>
+        </select>
+    </div>
+</div>
+
+
+<div class="row ps-3 pe-1 py-2">
+    <div class="col-md-3 text-left">
+        <select class="form-select input-search" style="height: 60px;" id="tipo-factura" name="tipo-factura" onchange="buscarReporte();">
+            <option class="option-list" value="1" id="tipo1">Buscar factura</option>
+            <option class="option-list" value="2" id="tipo1">Carta Porte</option>
+            <option class="option-list" value="3" id="tipo1">Factura y Carta</option>
+        </select>
+    </div>
+    <div class="col-md-3 text-left">
+        <select class="form-select input-search" style="height: 60px;" id="estado-historial" name="estado-historial" onchange="buscarReporte();">
+            <option class="option-list" value="" id="option-default-estado">Estado</option>
+            <option class="option-list" value="1" id="estado1">Pagada</option>
+            <option class="option-list" value="4" id="estado2">Pago Parcial</option>
+            <option class="option-list" value="2" id="estado3">Pendiente</option>
+            <option class="option-list" value="3" id="estado4">Cancelada</option>
+        </select>
+    </div>
+    <div class="col-md-2 text-left">
+        <select class="form-select input-search" style="height: 60px;" id="moneda-calculo" name="moneda-calculo" onchange="buscarReporte();">
+            <option value="" id="option-default-moneda-calculo" class="option-list">Moneda de calculo</option>
+            <optgroup id="optionmoneda" class="contenedor-moneda option-list"> </optgroup>
+        </select>
+    </div>
+<!--NUEVOS CAMBIOS-->
+    <div class="col-md-2 text-left">
+        <select class="form-select input-search" style="height: 60px;" id="id-forma-pago" name="id-forma-pago" onchange="buscarReporte();">
+            <option value="" id="option-default-forma-pago" class="option-list">Forma pago</option>
+            <optgroup id="forma-pago" class="contenedor-forma-pago text-left"> </optgroup> 
+        </select>
+        <div id="id-forma-pago-errors"></div>
+    </div>
+
+    <div class="col-md-2 text-right">
+        <div class='dropdown'>
+            <button class='input-search label-button dropdown-bs-toggle ' title='Imprimir Reporte'  type='button' data-bs-toggle='dropdown'>Imprimir <span class='lnr lnr-chevron-down pull-right'></span></button>
+            <ul class='dropdown-menu list-button '>
+                <li class="notification-link py-1 ps-3"><a class="text-decoration-none text-secondary-emphasis" onclick='imprimir_reporte();'> PDF <span class=' text-muted small fas fa-file'></span></a></li>
+                <li class="notification-link py-1 ps-3"><a class="text-decoration-none text-secondary-emphasis" onclick='imprimirFacturaReporte();'> Facturas <span class='text-muted small fas fa-file'></span></a></li>
+                <li class="notification-link py-1 ps-3"><a class="text-decoration-none text-secondary-emphasis" onclick='imprimirRepExcl();'>Descargar excel <span class=' text-muted small fas fa-file'></span></a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="scrollX div-form mw-100 bg-light mx-3 border border-secondary-subtle">
+    <table class="table tab-hover table-condensed table-responsive table-row table-head" id="body-lista-reporte-factura">
+        <thead>
+            <tr>
+                <th>No.Folio </th>
+                <th>Fecha </th>
+                <th>Cliente</th>
+                <th>Estado </th>
+                <th>Total </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td colspan="6" class="text-left">Ningún  registro encontrado</td></tr>
+        </tbody>
+    </table>
+</div>
+<br/>
+
+<script type="text/javascript" src="js/scriptreportes.js"></script>
