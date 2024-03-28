@@ -1649,6 +1649,16 @@ class ControladorPago{
         return $consultado;
     }
 
+    public function getPagoByIdReportes($idpago) {
+        $consultado = false;
+        $consulta = "SELECT p.*, df.*, dp.*, cp.* FROM pagos p INNER JOIN datos_facturacion df ON df.id_datos = p.pago_idfiscales
+        INNER JOIN detallepago dp ON dp.detalle_tagencabezado = p.tagpago
+        INNER JOIN complemento_pago cp ON cp.tagpago = p.tagpago WHERE idpago=:idpago;";
+        $val = array("idpago" => $idpago);
+        $consultado = $this->consultas->getResults($consulta, $val);
+        return $consultado;
+    }
+
     public function getDatosPago($idpago) {
         $datos = "";
         $pago = $this->getPagoById($idpago);

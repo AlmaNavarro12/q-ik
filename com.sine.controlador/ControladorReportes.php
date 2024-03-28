@@ -219,17 +219,16 @@ class ControladorReportes {
 
     public function buscarFactura($f) {
         $datos = "<thead>
-            <tr>
-                <th>No.Folio </th>
-                <th>Folio Fiscal </th>
-                <th>Fecha </th>
-                <th>Emisor</th>
-                <th>Cliente</th>
-                <th>Estado </th>
-                
-                <th>Método de pago</th>
-                <th>Forma de pago</th>
-                <th>Total </th>
+            <tr class='align-middle'>
+                <th class='text-center col-md-2'>No. Folio </th>
+                <th class='text-center col-md-3'>Folio Fiscal </th>
+                <th class='text-center col-md-2'>Fecha </th>
+                <th class='text-center col-md-3'>Emisor</th>
+                <th class='text-center col-md-3'>Cliente</th>
+                <th class='text-center col-md-3'>Estado </th>
+                <th class='text-center col-md-3'>Método de pago</th>
+                <th class='text-center col-md-3'>Forma de pago</th>
+                <th class='text-center col-md-3'>Total ($)</th>
 
             </tr>
         </thead>
@@ -264,31 +263,30 @@ class ControladorReportes {
                 $divm = explode('-', $reporteactual['moneda']);
                 $cmoneda = $divm[0];
                 $uuid = $reporteactual['uuid'];
-                //n
-                $metodopago = $reporteactual['metodo_pago'];
-                $formapago = $reporteactual['forma_pago'];
+                $metodopago = substr($reporteactual['metodo_pago'], 4);
+                $formapago = substr($reporteactual['forma_pago'], 3);
 
                 $estadoF = "";
                 $color = "";
                 $divideF = explode("-", $fecha);
 
                 $mes = $this->translateMonth($divideF[1]);
-                $fecha = $divideF[2] . ' - ' . $mes;
+                $fecha = $divideF[2] . ' / ' . $mes;
 
                 if ($estado == "1") {
                     $estadoF = "Pagada";
                     $color = "#34A853";
-                    $title = "Factura Pagada";
+                    $title = "Factura pagada";
                 } else if ($estado == "2") {
                     $estadoF = "Pendiente";
                     $color = "#ED495C";
-                    $title = "Pago de factura aun pendiente";
+                    $title = "Pago de factura aún pendiente";
                 } else if ($estado == "3") {
                     $estadoF = "Cancelada";
                     $color = "#FBBC05";
-                    $title = "Factura Cancelada";
+                    $title = "Factura cancelada";
                 } else if ($estado == "4") {
-                    $estadoF = "Pago Parcial (Restante)";
+                    $estadoF = "Pago parcial (Restante)";
                     $color = "#02E7EF";
                     $title = "Factura pagada parcialmente";
                     $total = $this->restanteParcial($idfactura, $total, 'f');
@@ -324,7 +322,7 @@ class ControladorReportes {
 
                 $datos .= "
                     <tr>
-                        <td><a href='#' title='Ver factura' onclick=\"imprimirFactura($idfactura); return false;\">$folio <span class='fas fa-file'></span></a></td>
+                        <td class='text-center'><a href='#' title='Ver factura' class='text-decoration-none' style='cursor:pointer;' onclick=\"imprimirFactura($idfactura); return false;\">$folio <span class='fas fa-file'></span></a></td>
                         <td class='text-center'>$uuid</td>
                         <td class='text-center'>$fecha</td>
                         <td class='text-center'>$emisor</td>
@@ -334,7 +332,7 @@ class ControladorReportes {
                         <td class='text-center'>$metodopago</td>
                         <td class='text-center'>$formapago</td>
 
-                        <td class='text-center'>$ " . number_format($total, 2, '.', ',') . " $cmoneda</td>
+                        <td class='text-center'> $". number_format($total, 2, '.', ',') . "$cmoneda </td>
                     </tr>
                      ";
                
@@ -409,35 +407,35 @@ class ControladorReportes {
                 $totalperiodo += $this->totalDivisa($total, $tcambio, $idmoneda, $monedaF);
 
                 $datos .= "
-                    <tr>
-                        <td><a href='#' title='Ver factura' onclick=\"imprimirCarta($idfactura); return false;\">$folio <span class='glyphicon glyphicon-file'></span></a></td>
-                        <td>$uuid</td>
-                        <td>$fecha</td>
-                        <td>$emisor</td>
-                        <td>$nombre_cliente</td>
-                        <td><a class='state-link' style='color: $color;' title='$title'><span>$estadoF</span></a></td>
-                        <td>$ " . number_format($total, 2, '.', ',') . " $cmoneda</td>
+                    <tr class='align-middle'>
+                        <td class='text-center'><a href='#' title='Ver factura' onclick=\"imprimirCarta($idfactura); return false;\">$folio <span class='glyphicon glyphicon-file'></span></a></td>
+                        <td class='text-center'>$uuid</td>
+                        <td class='text-center'>$fecha</td>
+                        <td class='text-center'>$emisor</td>
+                        <td class='text-center'>$nombre_cliente</td>
+                        <td class='text-center'><a class='state-link' style='color: $color;' title='$title'><span>$estadoF</span></a></td>
+                        <td class='text-center'>$ " . number_format($total, 2, '.', ',') . " $cmoneda</td>
                     </tr>
                      ";
             }
         }
 
         $datos .= "</tbody><tfoot>"
-                . "<tr><th colspan='7'></th><th align='right'><b>Subtotal</b></td><th><b>$ " . number_format($subtotalperiodo, 2, '.', ',') . "</b></th></tr>";
+                . "<tr><th colspan='7'></th><th class='text-end'><b>Subtotal</b></td><th><b class='text-end'>$ " . number_format($subtotalperiodo, 2, '.', ',') . "</b></th></tr>";
 
         if ($ivaperiodo > 0) {
-            $datos .= "<tr><th colspan='7'></th><th align='right'><b>Traslados</b></td><th><b>$ " . number_format($ivaperiodo, 2, '.', ',') . "</b></th></tr>";
+            $datos .= "<tr><th colspan='7'></th><th class='text-end'><b>Traslados</b></td><th><b class='text-end'>$ " . number_format($ivaperiodo, 2, '.', ',') . "</b></th></tr>";
         }
 
         if ($retperiodo > 0) {
-            $datos .= "<tr><th colspan='7'></th><th align='right'><b>Retenciones</b></td><th><b>$ " . number_format($retperiodo, 2, '.', ',') . "</b></th></tr>";
+            $datos .= "<tr><th colspan='7'></th><th class='text-end'><b>Retenciones</b></td><th><b class='text-end'>$ " . number_format($retperiodo, 2, '.', ',') . "</b></th></tr>";
         }
 
         if ($descperiodo > 0) {
-            $datos .= "<tr><th colspan='7'></th><th align='right'><b>Descuentos</b></td><th><b>$ " . number_format($descperiodo, 2, '.', ',') . "</b></th></tr>";
+            $datos .= "<tr><th colspan='7'></th><th class='text-end'><b>Descuentos</b></td><th><b class='text-end'>$ " . number_format($descperiodo, 2, '.', ',') . "</b></th></tr>";
         }
 
-        $datos .= "<tr><th colspan='7'></th><th align='right' ><b>Total </b></th><th><b>$ " . number_format($totalperiodo, 2, '.', ',') . "</b></th></tr></tfoot>";
+        $datos .= "<tr><th colspan='7'></th><th class='text-end' ><b>Total </b></th><th><b class='text-end'>$ " . number_format($totalperiodo, 2, '.', ',') . "</b></th></tr></tfoot>";
         return $datos;
     }
 
@@ -652,15 +650,15 @@ class ControladorReportes {
             $foliofactura = $actual['foliodoc'];
 
             if ($type == "f") {
-                $function = "onclick=\"imprimirFactura($idfactura); return false;\"";
+                $function = "class='text-decoration-none' style='cursor: pointer;' onclick=\"imprimirFactura($idfactura); return false;\"";
             } else if ($type == 'c') {
-                $function = "onclick=\"imprimirCarta($idfactura); return false;\"";
+                $function = "class='text-decoration-none' style='cursor: pointer;' onclick=\"imprimirCarta($idfactura); return false;\"";
             }
 
             if ($contador >= 1) {
-                $consulta .= " - <a href='#' title='Ver factura' $function>$foliofactura <span class='fas fa-file'></span></a>";
+                $consulta .= " - <a href='#' class='text-decoration-none' style='cursor: pointer;' title='Ver factura' $function>$foliofactura <span class='fas fa-file'></span></a>";
             } else {
-                $consulta .= "<a href='#' title='Ver factura' $function>$foliofactura <span class='fas fa-file'></span></a>";
+                $consulta .= "<a href='#' class='text-decoration-none' style='cursor: pointer;' title='Ver factura' $function>$foliofactura <span class='fas fa-file'></span></a>";
             }
             $contador++;
         }
@@ -682,62 +680,7 @@ class ControladorReportes {
         }
         return $consulta;
     }
-/*
-    public function getReportePagos($f) {
-        $datos = "";
-        $cliente = "";
-        $formapago = "";
-        if ($f->getDatos() != "") {
-            $datos = " AND pago_idfiscales = :iddatos";
-        }
-        if ($f->getIdcliente() != "") {
-            $cliente = "AND (pago_idcliente = :idcliente)";
-        }
-        if ($f->getFormapago() !=="") {
-            $formapago = "AND id_forma_pago = :formapago";
-        }
-        $consultado = false;
-        //$consulta = "SELECT p.*, c.razon_social cliente, c.rfc, df.razon_social emisor, m.c_moneda FROM pagos p INNER JOIN cliente c ON (p.pago_idcliente=c.id_cliente) INNER JOIN datos_facturacion df ON (p.pago_idfiscales=df.id_datos) INNER JOIN catalogo_moneda m ON (p.pago_idmoneda=m.idcatalogo_moneda) WHERE (fechacreacion BETWEEN :dinicio AND :dfin) $cliente $datos ORDER BY idpago DESC";
-        //falso
-        //$consulta = "SELECT p.*, c.razon_social cliente, c.rfc, df.razon_social emisor  FROM pagos p INNER JOIN cliente c ON (p.pago_idcliente=c.id_cliente) INNER JOIN datos_facturacion df ON (p.pago_idfiscales=df.id_datos) INNER JOIN datos_factura df ON (p.moneda=df.moneda p.forma_pago=df.formapago) WHERE (fechacreacion BETWEEN :dinicio AND :dfin) $cliente $datos $formapago ORDER BY idpago DESC";
 
-        //$consulta = "SELECT p.*, c.razon_social cliente, c.rfc, df.razon_social emisor  FROM pagos p INNER JOIN cliente c ON (p.pago_idcliente=c.id_cliente) INNER JOIN datos_facturacion df ON (p.pago_idfiscales=df.id_datos)  WHERE (fechacreacion BETWEEN :dinicio AND :dfin) $cliente $datos $formapago ORDER BY idpago DESC";
-
-        $consulta="SELECT 
-        p.*,
-        c.razon_social AS cliente,
-        c.rfc,
-        df.razon_social AS emisor,
-        dp.nombre_moneda AS nombremoneda,
-        cmp.nombre_forma_pago AS nombre_forma_pago
-        FROM 
-            pagos p
-        INNER JOIN 
-            cliente c ON p.pago_idcliente = c.id_cliente
-        INNER JOIN 
-            datos_facturacion df ON p.pago_idfiscales = df.id_datos
-        INNER JOIN 
-            detallepago dp ON p.id_pago = dp.pago_idfactura
-        INNER JOIN 
-            complemento_pago cmp ON dp.tagpago = cmp.tagpago
-        WHERE 
-            (p.fechacreacion BETWEEN :dinicio AND :dfin) $cliente $datos $formapago
-        ORDER BY 
-            p.idpago DESC;
-        ";
-
-        $val = array("dinicio" => $f->getFechainicio(),
-            "dfin" => $f->getFechafin(),
-            "iddatos" => $f->getDatos(),
-            "idcliente" => $f->getIdcliente(),
-            "formapago" => $f->getFormapago());
-            
-
-        $consultas = new Consultas();
-        $consultado = $consultas->getResults($consulta, $val);
-        return $consultado;
-    }
-*/
     public function getReportePagos($f) {
         $datos = "";
         $cliente = "";
@@ -796,15 +739,15 @@ class ControladorReportes {
     
     public function buscarPagos($f) {
         $datos = "<thead>
-            <tr>
-                <th>No. Folio</th>
-                <th>Folio Fiscal</th>
-                <th class='col-md-2'>Facturas Pagadas</th>
-                <th>Emisor</th>
-                <th>Cliente</th>
-                <th>Forma de pago</th>
-                <th>Fecha de pago</th>
-                <th>Total Pagado</th>
+            <tr class='align-middle'>
+                <th class='text-center col-md-2'>No. Folio</th>
+                <th class='text-center col-md-2'>Folio Fiscal</th>
+                <th class='col-md-2 text-center'>Facturas Pagadas</th>
+                <th class='text-center col-md-2'>Emisor</th>
+                <th class='text-center col-md-2'>Cliente</th>
+                <th class='text-center col-md-2'>Forma de pago</th>
+                <th class='text-center col-md-2'>Fecha de pago</th>
+                <th class='text-center col-md-2'>Total Pagado</th>
             </tr>
         </thead>
         <tbody>";
@@ -839,23 +782,23 @@ class ControladorReportes {
 
             $divFP = explode("-", $fechapago);
             $mes = $this->translateMonth($divFP[1]);
-            $fechapago = $divFP[2] . ' - ' . $mes;
+            $fechapago = $divFP[2] . '-' . $mes;
             $totalpagado += $this->totalDivisa($total, $tcambio, $idmoneda, $monedaF);
             $cfdis = $this->getCfdis($idpago);
             $datos .= "
-                    <tr>
-                        <td><a href='#' title='Ver pago' onclick=\"imprimirPago($idpago); return false;\">$folio <span class='fas fa-file'></span></a></td>
-                        <td>$uuid</td>
-                        <td>$cfdis</td>
-                        <td>$emisor</td>
-                        <td>$nombre_cliente</td>
-                        <td>$formapago</td>
-                        <td>$fechapago - $horapago</td>
-                        <td>$ " . number_format($total, 2, '.', ',') . " $cmoneda</td>
+                    <tr class='align-middle'> 
+                        <td class='text-center'><a href='#' title='Ver pago' class='text-decoration-none' style='cursor: pointer;' onclick=\"imprimirPago($idpago); return false;\">$folio <span class='fas fa-file'></span></a></td>
+                        <td class='text-center'>$uuid</td>
+                        <td class='text-center'>$cfdis</td>
+                        <td class='text-center'>$emisor</td>
+                        <td class='text-center'>$nombre_cliente</td>
+                        <td class='text-center'>$formapago</td>
+                        <td class='text-center text-wrap'>$fechapago / ".date('h:i A', strtotime($horapago))."</td>
+                        <td class='text-center'>$" . number_format($total, 2, '.', ',') . "$cmoneda</td>
                     </tr>
                      ";
         }
-        $foot = "</tbody><tfoot><tr><th colspan='6'></th><th align='right'><b>Total en $cmoneda </b></th><th><b>$ " . number_format($totalpagado, 2, '.', ',') . "</b></th></tr></tfoot>";
+        $foot = "</tbody><tfoot><tr><th colspan='7' class='text-end'><b>Total en $cmoneda </b></th><th colspan='2' class='text-start'><b>$" . number_format($totalpagado, 2, '.', ',') . "</b></th></tr></tfoot>";
     }
         return $datos . $foot;
     }
@@ -1660,7 +1603,17 @@ class ControladorReportes {
 
     public function getDetallePago($idpago) {
         $consultado = false;
-        $consulta = "select p.*, f.serie, f.letra,f.folio_interno_fac,f.uuid,f.status_pago, f.tcambio,mp.c_metodopago, mp.descripcion_metodopago, m.c_moneda from detallepago p inner join datos_factura f on (f.iddatos_factura=p.pago_idfactura) inner join catalogo_metodo_pago mp on (mp.idmetodo_pago=f.id_metodo_pago) inner join catalogo_moneda m on (m.idcatalogo_moneda=f.id_moneda) where foliopago=:folio";
+        $consulta = "SELECT p.*, 
+        f.serie, 
+        f.letra, 
+        f.folio_interno_fac, 
+        f.uuid, 
+        f.status_pago, 
+        f.tcambio
+ FROM detallepago p
+ INNER JOIN datos_factura f ON f.iddatos_factura = p.pago_idfactura
+ INNER JOIN pagos pa ON (p.detalle_tagencabezado = pa.tagpago)
+ WHERE pa.idpago =:folio";
         $val = array("folio" => $idpago);
         $consultas = new Consultas();
         $consultado = $consultas->getResults($consulta, $val);

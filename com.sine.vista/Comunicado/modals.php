@@ -7,7 +7,7 @@
                 <button type="button" id="btn-close-modal" class="btn-close" data-bs-dismiss="modal" onclick="cerrarModal()" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div class="row">
+                <div class="row" id="contenido">
                     <div class="col-md-4">
                         <div class="col-12">
                             <table class="table table-responsive table-secondary border border-start-0 border-dark" id="listaarchivo">

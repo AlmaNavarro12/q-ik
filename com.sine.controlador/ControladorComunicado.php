@@ -735,10 +735,7 @@ class ControladorComunicado
 
     public function getIMGList($tag)
     {
-        $datos = "<thead>
-                   
-                </thead>
-                <tbody>";
+        $datos = "<tbody>";
 
         $archivos = "";
         $imgs = $this->getImgComAux($tag);

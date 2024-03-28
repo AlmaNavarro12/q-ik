@@ -891,7 +891,7 @@ class ControladorFactura
 
             $datos .= " <li class='list-group-item d-flex justify-content-between lh-sm'>
             <div>
-                <h6 class='my-0 titulo-lista fs-6 fw-semibold'>SUBDESCUENTO:</h6>
+                <h6 class='my-0 titulo-lista fs-6 fw-semibold'>SUBTOTAL - DESCUENTO:</h6>
             </div>
             <span class='titulo-lista fw-semibold fs-6 pe-0 me-0'>$" . number_format(bcdiv($subdescuento, '1', 2), 2, '.', ',') . " </span>
         </li>";

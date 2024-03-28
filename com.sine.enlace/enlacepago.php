@@ -48,7 +48,7 @@ if (isset($_POST['transaccion'])) {
             echo $insertado ? $insertado : "0Error al eliminar el complemento.";
             break;
         case 'insertarpago':
-            $insertado = $cp->validarPago(obtenerDatosPago(), $_POST['objimpuesto'], session_id());
+            $insertado = $cp->validarPago(obtenerDatosPago(), $_POST['objimpuesto']);
             echo $insertado ? $insertado : "0Error: no insertó el registro";
             break;
         case 'insertarcomplementos':
@@ -120,7 +120,7 @@ if (isset($_POST['transaccion'])) {
             echo $datos != "" ? $datos : "0No hay clientes registrados.";
             break;
         case 'aplicarEgreso':
-            $datos = $cp->aplicarEgreso($_POST['uuid'], $_POST['monto'], $_POST['montoant_tmp']);
+            $datos = $cp->aplicarEgreso($_POST['uuid'], $_POST['montoant_tmp'], $_POST['monto'],);
             echo $datos;
             break;
             /*case 'cfdipago':

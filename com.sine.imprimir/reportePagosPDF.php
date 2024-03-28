@@ -3,6 +3,7 @@
 require_once '../com.sine.modelo/Reportes.php';
 require_once '../com.sine.modelo/TMP.php';
 require_once '../com.sine.controlador/ControladorReportes.php';
+require_once '../com.sine.controlador/ControladorPago.php';
 require '../pdf/fpdf/fpdf.php';
 
 class PDF extends FPDF {
@@ -618,6 +619,8 @@ class PDF extends FPDF {
 setlocale(LC_MONETARY, 'es_MX.UTF-8');
 
 $cf = new ControladorReportes();
+$cp = new ControladorPago();
+
 $f = new Reportes();
 $fechainicio = $_GET['fechainicio'];
 $fechafin = $_GET['fechafin'];
@@ -657,53 +660,53 @@ foreach ($pagos as $reporteactual) {
     $idpago = $reporteactual['idpago'];
     $nombre_cliente = $reporteactual['cliente'];
 
-    $pagos = $cf->getPagos($idpago);
+    $pagos = $cp->getPagoByIdReportes($idpago);
     foreach ($pagos as $pagoactual) {
         $idpago = $pagoactual['idpago'];
         $folio = $pagoactual['foliopago'];
         $foliopago = $pagoactual['letra'] . $folio;
         $fechaemision = $pagoactual['fechacreacion'];
         $idcliente = $pagoactual['pago_idcliente'];
-        $razonemisor = $pagoactual['rzemisor'];
+        $razonemisor = $pagoactual['razonemisor'];
         $rfcemisor = $pagoactual['rfcemisor'];
         $firmaemisor = $pagoactual['firma'];
         $regimen = $pagoactual['c_regimenfiscal'] . " " . $pagoactual['regimen_fiscal'];
-        $calleemisor = $pagoactual['calleemi'];
-        $numemisor = $pagoactual['numemisor'];
+        $calleemisor = $pagoactual['calle'];
+        $numemisor = $pagoactual['numero_exterior'];
         $colemisor = $pagoactual['colonia'];
-        $idmunemisor = $pagoactual['idmunemisor'];
-        $idestemisor = $pagoactual['idestemisor'];
+        $idmunemisor = $pagoactual['idmunicipio'];
+        $idestemisor = $pagoactual['idestado'];
         $munemisor = "";
         $estadoemisor = "";
         if ($idmunemisor != "0") {
-            $munemisor = $cf->getMunicipioAux($idmunemisor);
+            $munemisor = $pagoactual['municipio'];
         }
 
         if ($idestemisor != "0") {
-            $estadoemisor = $cf->getEstadoAux($idestemisor);
+            $estadoemisor = $pagoactual['estado'];
         }
 
         $rfc = $pagoactual['rfc'];
         $razonsocial = $pagoactual['razon_social'];
         $calle = $pagoactual['calle'];
         $num = $pagoactual['numero_exterior'];
-        $col = $pagoactual['localidad'];
+        $col = $pagoactual['colonia'];
         $idmunicipio = $pagoactual['idmunicipio'];
         $idestadodir = $pagoactual['idestado'];
         $municipio = "";
         $estadodir = "";
         if ($idmunicipio != "0") {
-            $municipio = $pagoactual['nombre_municipio'];
+            $municipio = $pagoactual['municipio'];
         }
 
         if ($idestadodir != "0") {
-            $estadodir = $pagoactual['nombre_estado'];
+            $estadodir = $pagoactual['estado'];
         }
-        $c_formapago = $pagoactual['c_pago'];
-        $formapago = $pagoactual['descripcion_pago'];
-        $fechapago = $pagoactual['fechapago'];
+        $c_formapago = $pagoactual['c_forma_pago'];
+        $formapago = $pagoactual['nombre_forma_pago'];
+        $fechapago = $pagoactual['fechacreacion'];
         $c_monedapago = $pagoactual['nombre_moneda'];
-        $horapago = $pagoactual['horapago'];
+        $horapago = $pagoactual['hora_creacion'];
         $horapago = date('g:i a', strtotime($horapago));
         $totalpagado = $pagoactual['totalpagado'];
         $cadenaoriginal = $pagoactual['cadenaoriginalpago'];
@@ -717,6 +720,8 @@ foreach ($pagos as $reporteactual) {
         $iddatosfacturacion = $pagoactual['pago_idfiscales'];
         $chfirmar = $pagoactual['chfirmar'];
         $cancelado = $pagoactual['cancelado'];
+
+        
     }
 
     $divfecha = explode("-", $fechaemision);
@@ -920,14 +925,14 @@ foreach ($pagos as $reporteactual) {
     foreach ($detallepago as $actualcfdi) {
         $uuidfactura = $actualcfdi['uuid'];
         $foliofactura = $actualcfdi['letra'] . $actualcfdi['folio_interno_fac'];
-        $c_metodopago = $actualcfdi['c_metodopago'];
-        $metodopago = $actualcfdi['descripcion_metodopago'];
+        $c_metodopago = $actualcfdi['cmetododoc'];
+        $metodopago = $actualcfdi['cmetododoc'] == "1" ? "PUE-Pago en una sola exhibición" : "PPD-Pago en parcialidades o diferido";
         $totalfactura = $actualcfdi['totalfactura'];
         $parcialidad = $actualcfdi['noparcialidad'];
         $montoanterior = $actualcfdi['montoanterior'];
         $monto = $actualcfdi['monto'];
         $montoinsoluto = $actualcfdi['montoinsoluto'];
-        $monedaF = $actualcfdi['c_moneda'];
+        $monedaF = $actualcfdi['idmonedadoc'];
         $tcambioF = $actualcfdi['tcambio'];
         $totalanteriores += $montoanterior;
         $totalrestante += $montoinsoluto;

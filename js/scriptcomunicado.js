@@ -527,7 +527,11 @@ function tablamodal(tag) {
             if (bandera == '0') {
                 alertify.error(res);
             } else {
-                $("#listaarchivo").html(datos);
+                if(datos == "<tbody></tbody>"){
+                    $("#listaarchivo").html("<div class='col-12 text-center py-3'>Este comunicado no contiene archivos.</div>");
+                } else {
+                    $("#listaarchivo").html(datos);
+                }
             }
         }
     });
