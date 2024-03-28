@@ -69,7 +69,7 @@ function getNombreMoneda($idMoneda)
             return "Desconocido";
     }
 }
-$cmonedaT = getNombreMoneda($idmonedaC);
+
 
 $divFI = explode("-", $fechainicio);
 $mI = $controlador_reporte->translateMonth($divFI[1]);
@@ -104,14 +104,14 @@ $drawing->setWorksheet($spreadsheet->getActiveSheet());
 $sheet->mergeCells('A3:I3');
 $sheet->setCellValue('A3', 'Facturas generadas en el periodo : ' . $fechainicio2 . ' al ' . $fechafin2);
 
-$sheet->getStyle('A5:T5')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB($rgbht[1]);
-$sheet->getStyle('A5:T5')->getFont()->getColor()->setARGB($rgbtt[1]);
-$sheet->getStyle('A5:T5')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
-$sheet->getStyle('A5:T5')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-$sheet->getStyle('A5:T5')->getAlignment()->setWrapText(true);
-$sheet->getStyle('A5:T5')->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
-$sheet->getStyle('A5:T5')->getFont()->setSize(12);
-$sheet->getStyle('A5:T5')->getFont()->setBold(true);
+$sheet->getStyle('A5:V5')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB($rgbht[1]);
+$sheet->getStyle('A5:V5')->getFont()->getColor()->setARGB($rgbtt[1]);
+$sheet->getStyle('A5:V5')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+$sheet->getStyle('A5:V5')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+$sheet->getStyle('A5:V5')->getAlignment()->setWrapText(true);
+$sheet->getStyle('A5:V5')->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+$sheet->getStyle('A5:V5')->getFont()->setSize(12);
+$sheet->getStyle('A5:V5')->getFont()->setBold(true);
 
 $sheet->getColumnDimension('A')->setWidth(15);
 $sheet->getColumnDimension('B')->setWidth(21);
@@ -133,6 +133,9 @@ $sheet->getColumnDimension('Q')->setWidth(18);
 $sheet->getColumnDimension('R')->setWidth(18);
 $sheet->getColumnDimension('S')->setWidth(18);
 $sheet->getColumnDimension('T')->setWidth(10);
+$sheet->getColumnDimension('U')->setWidth(10);
+$sheet->getColumnDimension('V')->setWidth(10);
+
 
 $sheet->setCellValue('A5', 'Folio Factura');
 $sheet->setCellValue('B5', 'Folio Fiscal');
@@ -143,17 +146,19 @@ $sheet->setCellValue('F5', 'RFC');
 $sheet->setCellValue('G5', 'Tipo');
 $sheet->setCellValue('H5', 'Estado');
 $sheet->setCellValue('I5', 'Primer Concepto');
-$sheet->setCellValue('J5', 'Observaciones');
-$sheet->setCellValue('K5', 'Cantidad');
-$sheet->setCellValue('L5', 'Clave Fiscal');
-$sheet->setCellValue('M5', 'Precio');
-$sheet->setCellValue('N5', 'Importe');
-$sheet->setCellValue('O5', 'Subtotal');
-$sheet->setCellValue('P5', 'Traslados');
-$sheet->setCellValue('Q5', 'Retenciones');
-$sheet->setCellValue('R5', 'Descuentos');
-$sheet->setCellValue('S5', 'Total');
-$sheet->setCellValue('T5', 'Moneda');
+$sheet->setCellValue('J5', 'Metodo pago');
+$sheet->setCellValue('K5', 'Forma pago');
+$sheet->setCellValue('L5', 'Observaciones');
+$sheet->setCellValue('M5', 'Cantidad');
+$sheet->setCellValue('N5', 'Clave fiscal');
+$sheet->setCellValue('O5', 'Precio');
+$sheet->setCellValue('P5', 'Importe');
+$sheet->setCellValue('Q5', 'Subtotal');
+$sheet->setCellValue('R5', 'Traslados');
+$sheet->setCellValue('S5', 'Retenciones');
+$sheet->setCellValue('T5', 'Descuentos');
+$sheet->setCellValue('U5', 'Total');
+$sheet->setCellValue('V5', 'Moneda');
 
 $subtotalperiodo = 0;
 $ivaperiodo = 0;
@@ -183,9 +188,13 @@ if ($tipofactura == "" || $tipofactura == '1' || $tipofactura == '3') {
         $uuid = $reporteactual['uuid'];
         $tcambio = $reporteactual['tcambio'];
         $monedaF = $reporteactual['id_moneda'];
-        $cmoneda = $reporteactual['c_moneda'];
+         $divm = explode('-', $reporteactual['moneda']);
+        $cmoneda = $divm[0];
         $tagfactura = $reporteactual['tagfactura'];
-        
+        //n
+        $metodopago = $reporteactual['metodo_pago'];
+        $formapago = $reporteactual['forma_pago'];
+
         switch ($estado) {
             case '1':
                 $estadoF = "Pagada";
@@ -209,11 +218,11 @@ if ($tipofactura == "" || $tipofactura == '1' || $tipofactura == '3') {
                 break;
         }
 
-        $sheet->getStyle('A' . $row . ':T' . $row)->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
-        $sheet->getStyle('A' . $row . ':T' . $row)->getAlignment()->setWrapText(true);
-        $sheet->getStyle('A' . $row . ':T' . $row)->getFont()->setSize(12);
-        $sheet->getStyle('A' . $row . ':T' . $row)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
-        $sheet->getStyle('A' . $row . ':T' . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('A' . $row . ':V' . $row)->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+        $sheet->getStyle('A' . $row . ':V' . $row)->getAlignment()->setWrapText(true);
+        $sheet->getStyle('A' . $row . ':V' . $row)->getFont()->setSize(12);
+        $sheet->getStyle('A' . $row . ':V' . $row)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+        $sheet->getStyle('A' . $row . ':V' . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
         $sheet->getStyle('H' . $row)->getFont()->setBold(true);
         $sheet->getStyle('H' . $row)->getFont()->getColor()->setARGB($rgbt[1]);
         $sheet->getStyle('H' . $row)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB($colorE);
@@ -245,7 +254,9 @@ if ($tipofactura == "" || $tipofactura == '1' || $tipofactura == '3') {
         $sheet->setCellValue('E' . $row, $nombre_cliente);
         $sheet->setCellValue('F' . $row, $rfc);
         $sheet->setCellValue('G' . $row, "Factura");
+
         $sheet->setCellValue('H' . $row, $estadoF);
+       
 
         $detallefactura = $controlador_reporte->getPrimerConcepto($tagfactura);
         foreach ($detallefactura as $primero) {
@@ -258,19 +269,22 @@ if ($tipofactura == "" || $tipofactura == '1' || $tipofactura == '3') {
             $obser = str_replace("<ent>", "\n", $observacionesprod);
 
             $sheet->setCellValue('I' . $row, $descripcion);
-            $sheet->setCellValue('J' . $row, $obser);
-            $sheet->setCellValue('K' . $row, $cantidad);
-            $sheet->setCellValue('L' . $row, $clvfiscal);
-            $sheet->setCellValue('M' . $row, $precio);
-            $sheet->setCellValue('N' . $row, $importe);
+            $sheet->setCellValue('J' . $row, $metodopago);
+            $sheet->setCellValue('K' . $row, $formapago);
+            $sheet->setCellValue('L' . $row, $obser);
+            $sheet->setCellValue('M' . $row, $cantidad);
+            $sheet->setCellValue('N' . $row, $clvfiscal);
+            $sheet->setCellValue('O' . $row, $precio);
+            $sheet->setCellValue('P' . $row, $importe);
         }
 
-        $sheet->setCellValue('O' . $row, number_format($subtotal, 2, '.', ''));
-        $sheet->setCellValue('P' . $row, number_format($trasreg, 2, '.', ''));
-        $sheet->setCellValue('Q' . $row, number_format($retreg, 2, '.', ''));
-        $sheet->setCellValue('R' . $row, number_format($totaldescuentos, 2, '.', ''));
-        $sheet->setCellValue('S' . $row, number_format($total, 2, '.', ''));
-        $sheet->setCellValue('T' . $row, $cmoneda);
+        $sheet->setCellValue('Q' . $row, number_format($subtotal, 2, '.', ''));
+        $sheet->setCellValue('R' . $row, number_format($trasreg, 2, '.', ''));
+        $sheet->setCellValue('S' . $row, number_format($retreg, 2, '.', ''));
+        $sheet->setCellValue('T' . $row, number_format($totaldescuentos, 2, '.', ''));
+        $sheet->setCellValue('U' . $row, number_format($total, 2, '.', ''));
+        $sheet->setCellValue('V' . $row, $cmoneda);
+
 
         $descperiodo += $controlador_reporte->totalDivisa($totaldescuentos, $tcambio, $monedaC, $monedaF);
         $totalPeriodo += $controlador_reporte->totalDivisa($total, $tcambio, $monedaC, $monedaF);
@@ -622,7 +636,7 @@ if ($tipofactura == '2' || $tipofactura == '3') {
 
 $row2 = $row;
 $sheet->mergeCells('M' . $row . ':N' . $row2);
-$sheet->setCellValue('M' . ($row), 'Totales en ' . $cmonedaT . ':');
+$sheet->setCellValue('M' . ($row), 'Totales en ' . $cmoneda . ':');
 $sheet->setCellValue('O' . ($row), number_format($subtotalperiodo, 2, '.', ''));
 $sheet->setCellValue('P' . ($row), number_format($ivaperiodo, 2, '.', ''));
 $sheet->setCellValue('Q' . ($row), number_format($retperiodo, 2, '.', ''));

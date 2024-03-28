@@ -315,7 +315,7 @@ class ControladorCliente {
         $finales += $inicios - 1;
         $function = "buscarCliente";
         if ($finales == 0) {
-            $datos .= "<tr><td class='text-center' colspan='12'>No se encontraron registros</td></tr>";
+            $datos .= "<tr><td colspan='12'>No se encontraron registros</td></tr>";
         }
         $datos .= "</tbody><tfoot><tr><th colspan='3' class='align-top'>Mostrando $inicios al $finales de $numrows registros</th>";
         $datos .= "<th colspan='6'>" . paginate($page, $total_pages, $adjacents, $function) . "</th></tr></tfoot>";

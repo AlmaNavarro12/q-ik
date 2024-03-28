@@ -41,7 +41,7 @@ if (isset($_POST['transaccion'])) {
                 if ($insertado) {
                     echo $insertado;
                 } else {
-                    echo "0Error: no inserto el registro ";
+                    echo "0Error: no insertó el registro ";
                 }
                 break;
         case 'eliminarcfdi':
@@ -53,7 +53,7 @@ if (isset($_POST['transaccion'])) {
             if ($insertado) {
                 echo $insertado;
             } else {
-                echo "0Error: no inserto el registro ";
+                echo "0Error: no insertó el registro ";
             }
             break;
         case 'editarfactura':
@@ -62,7 +62,7 @@ if (isset($_POST['transaccion'])) {
             if ($datos != "") {
                 echo $datos;
             } else {
-                echo "0No se han econtrado datos";
+                echo "0No se han encontrado datos";
             }
             break;
         case 'editarpago':
@@ -71,7 +71,7 @@ if (isset($_POST['transaccion'])) {
             if ($datos != "") {
                 echo $datos;
             } else {
-                echo "0No se han econtrado datos";
+                echo "0No se han encontrado datos";
             }
             break;
         case 'editarconcepto':
@@ -80,7 +80,7 @@ if (isset($_POST['transaccion'])) {
             if ($datos != "") {
                 echo $datos;
             } else {
-                echo "0No se han econtrado datos";
+                echo "0No se han encontrado datos";
             }
             break;
         case 'actualizarconcepto':
@@ -120,7 +120,7 @@ if (isset($_POST['transaccion'])) {
             if ($datos != "") {
                 echo 'datos';
             } else {
-                echo "0No se han econtrado datos";
+                echo "0No se han encontrado datos";
             }
             break;
         case 'tipocambio':
@@ -128,7 +128,7 @@ if (isset($_POST['transaccion'])) {
             if ($datos != "") {
                 echo $datos;
             } else {
-                echo "No se han econtrado datos";
+                echo "No se han encontrado datos";
             }
             break;
         case 'getdatospago':
@@ -137,7 +137,7 @@ if (isset($_POST['transaccion'])) {
             if ($datos != "") {
                 echo $datos;
             } else {
-                echo "0No se han econtrado datos";
+                echo "0No se han encontrado datos";
             }
             break;
         case 'editarestado':
@@ -170,7 +170,7 @@ if (isset($_POST['transaccion'])) {
             if ($folio) {
                 echo $folio;
             } else {
-                echo "No se han econtrado datos";
+                echo "No se han encontrado datos";
             }
             break;
         case 'fecha':
@@ -235,7 +235,7 @@ if (isset($_POST['transaccion'])) {
             if ($eliminado) {
                 echo '$eliminado';
             } else {
-                echo "No se encontro datos";
+                echo "No se encontron datos";
             }
             break;
         case 'agregarobservaciones':
@@ -279,7 +279,7 @@ if (isset($_POST['transaccion'])) {
             if ($datos != "") {
                 echo "datos";
             } else {
-                echo "0No hay productos registrados en esta factura.";
+                echo "0No hay productos registrados en está factura.";
             }
             break;
         case 'eliminar':
@@ -291,7 +291,7 @@ if (isset($_POST['transaccion'])) {
             if ($eliminado) {
                 echo $eliminado;
             } else {
-                echo "No se encontro datos";
+                echo "No se encontron datos";
             }
             break;
         case 'incrementar':
@@ -328,7 +328,7 @@ if (isset($_POST['transaccion'])) {
             if ($eliminado) {
                 echo "1Registro eliminado";
             } else {
-                echo "factura cancelada";
+                echo "Factura cancelada";
             }
             break;
         case 'pagosfactura':
@@ -359,7 +359,7 @@ if (isset($_POST['transaccion'])) {
             if ($cadena != "") {
                 echo 'timbre cancelado';
             } else {
-                echo "error al cancelar el timbrado";
+                echo "Error al cancelar el timbrado";
             }
             break;
         case 'filtrarproducto':
@@ -431,7 +431,7 @@ if (isset($_POST['transaccion'])) {
             if ($datos != "") {
                 echo $datos;
             } else {
-                echo "0Boton Activo";
+                echo "0Boton activo";
             }
             break;
         //nuevos cAMBIOS

@@ -246,6 +246,9 @@ class ControladorReportes {
         $totalperiodo = 0;
         if ($f->getTipo() == "" || $f->getTipo() == '1' || $f->getTipo() == '3') {
             $resultados = $this->getReporteFactura($f);
+            if (empty($resultados)) {
+                $datos .= "<tr><td colspan='8'>No se encontraron registros.</td></tr>";
+            } else {
             foreach ($resultados as $reporteactual) {
                 $idfactura = $reporteactual['iddatos_factura'];
                 $folio = $reporteactual['letra'] . $reporteactual['folio_interno_fac'];
@@ -337,6 +340,7 @@ class ControladorReportes {
                      ";
                
             }
+        }
         }
 
         if ($f->getTipo() == '2' || $f->getTipo() == '3') {

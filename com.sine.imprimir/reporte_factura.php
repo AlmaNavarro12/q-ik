@@ -666,8 +666,8 @@ $pdf->SetTextColor($rgbtt[0], $rgbtt[1], $rgbtt[2]);
 $pdf->SetFont('Arial', 'B', 9); 
 $pdf->SetWidths(Array(12, 20, 20, 25, 25, 16, 16, 18, 20, 20)); 
 $pdf->SetLineHeight(5);
-$pdf->RoundedRect(10, $pdf->GetY(), 190, 9, 4, 'FD');
-$pdf->RowNBC(Array("Folio", "Fecha creacion", "Emisor", "Cliente", "RFC", "Tipo", iconv("utf-8", "windows-1252", "Estado"), "Met.pago", "For.pago","Total"));
+$pdf->RoundedRect(10, $pdf->GetY(), 195, 9, 4, 'FD');
+$pdf->RowNBC(Array("Folio", "Fecha creacion", "Emisor", "Cliente", "RFC", "Tipo", iconv("utf-8", "windows-1252", "Estado"), "Metodo pago", "Forma pago","Total"));
 $pdf->SetTextColor(0, 0, 0);
 $pdf->SetFont('Arial', '', 9); 
 

@@ -2329,12 +2329,10 @@ class ControladorPago{
     }
 
     function actualizarEstadoFacturas($idpago) {
-        echo $idpago;
         $consulta_tag = "SELECT tagpago FROM `pagos` WHERE idpago=:id;";
         $valores_tag = array("id" => $idpago);
         $result_tag = $this->consultas->getResults($consulta_tag, $valores_tag);
     
-        echo print_r($result_tag);
         foreach ($result_tag as $tagfactura) {
             $tag = $tagfactura['tagpago'];
     
@@ -2342,8 +2340,6 @@ class ControladorPago{
             $valores_facturas = array("tag" => $tag);
             $result_facturas = $this->consultas->getResults($consulta_facturas, $valores_facturas);
     
-            echo print_r($result_facturas);
-
                 foreach ($result_facturas as $factura) {
                     $idfactura = $factura['pago_idfactura'];
                     $type = 'f'; 

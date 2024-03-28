@@ -193,25 +193,26 @@ class ControladorFactura
         return $tabla;
     }
 
-    public function eliminarCFDI($idtmp, $sessionid) {
+    public function eliminarCFDI($idtmp, $sessionid)
+    {
         $insertado = false;
         $con = new Consultas();
 
         $query = "SELECT * FROM tmpcfdi WHERE idtmpcfdi = :id";
         $val = array("id" => $idtmp);
         $stmt = $con->getResults($query, $val);
-        foreach($stmt as $rs){
+        foreach ($stmt as $rs) {
             $uuid = $rs['uuid'];
         }
 
         $consulta = "DELETE FROM `tmpcfdi` WHERE idtmpcfdi=:id;";
         $valores = array("id" => $idtmp);
         $con->execute($consulta, $valores);
-        
-        
+
+
         $consulta = "DELETE FROM tmpegreso WHERE uuid=:uuid";
         $valores = array("uuid" => $uuid);
-        $con->execute($consulta, $valores);  
+        $con->execute($consulta, $valores);
 
 
         $datos = $this->tablaCFDI($sessionid);
@@ -627,7 +628,6 @@ class ControladorFactura
             if ($restante < 0) {
                 $datos = "0El inventario no es suficiente para agregar este producto";
             } else {
-                echo print_r($t);
                 $datos = $this->agregar($t, $chinv);
                 $inventario = $this->removerInventario($idproducto, $cantidad);
             }
@@ -768,9 +768,9 @@ class ControladorFactura
                         $checkedT = "";
                     }
                 }
-                $optraslados = $optraslados . 
-                
-                "<li data-location='tabla' data-id='$id_tmp'>
+                $optraslados = $optraslados .
+
+                    "<li data-location='tabla' data-id='$id_tmp'>
                 <div class='checkbox d-flex justify-content-start z-3'>
                 <input type='checkbox' $checkedT value='" . $tactual['porcentaje'] . "' name='chtrastabla$id_tmp' data-impuesto='" . $tactual['impuesto'] . "' data-tipo='" . $tactual['tipoimpuesto'] . "' />
                 <span class='$iconT me-2' id='chuso1span'></span><small>
@@ -2705,7 +2705,7 @@ class ControladorFactura
     {
         $datos = "<corte><thead class='sin-paddding'>
             <tr class='align-middle'>
-                <th class='text-center'>FOLIO DE PAGO $idfactura</th>
+                <th class='text-center'>FOLIO DE PAGO</th>
                 <th class='text-center'>FECHA DE PAGO</th>
                 <th class='text-center'>FORMA DE PAGO</th>
                 <th class='text-center'>TOTAL PAGADO</th>

@@ -59,7 +59,7 @@
                     </div>
                     <div class="row">
                         <div class="col-md-6 py-2 form-group">
-                            <label class="label-form text-right mb-2" for="correo3">Correo gerencía</label>
+                            <label class="label-form text-right mb-2" for="correo3">Correo gerencia</label>
                             <div class="input-group">
                                 <input class="form-control text-center input-form" id="correo3" name="nombre_empresa" placeholder="Correo de Facturacion" type="text"/>
                                 <div class="input-group-text"><input class="input-check" id="chcorreo3" name="chcorreo3" type="checkbox"/></div>

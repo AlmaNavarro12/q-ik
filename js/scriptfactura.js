@@ -921,9 +921,9 @@ function gestionarFactura(idfactura = null) {
                     alertify.error(res);
                 } else {
                     if (idfactura) {
-                        alertify.success('Factura Actualizada');
+                        alertify.success('Factura actualizada correctamente.');
                     } else {
-                        alertify.success('Factura creada');
+                        alertify.success('Factura creada correctamente.');
                     }
                     loadView('listafactura');
                 }
