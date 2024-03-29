@@ -13,8 +13,6 @@ class ControladorAuto {
 
     function __construct() {
         $this->consultas = new consultas(); 
-        $this->controladorMunicipio = new ControladorMunicipio();
-        $this->controladorEstado = new ControladorEstado();
     }
 
     public function getCoincidenciasBusquedaCliente($referencia) {
@@ -23,8 +21,8 @@ class ControladorAuto {
         $resultados = $this->consultas->getResults($consulta, null);
         $contador = 0;
         foreach ($resultados as $resultado) {
-            $estado = $this->controladorEstado->getEstadoAux($resultado['idestado']);
-            $municipio = $this->controladorMunicipio->getMunicipioAux($resultado['idmunicipio']);
+            $estado =  $resultado["nombre_estado"];
+            $municipio =  $resultado["nombre_municipio"];
             $int = "";
             if($resultado['numero_interior'] != ""){
                 $int = " Int. ".$resultado['numero_interior'];
@@ -161,6 +159,24 @@ class ControladorAuto {
                 "id" => $resultado["idempleado"],
                 "nombre" => $resultado['nombreempleado'],
                 "rfc" => $resultado['rfcempleado']);
+            $contador++;
+        }
+        if ($contador == 0) {
+            $datos [] = array("value" => "No se encontraron registros", "id" => "Ninguno");
+        }
+        return $datos;
+    }
+
+    public function getCoincidenciasProducto($referencia) {
+        $datos = array();
+        $consulta = "SELECT * FROM productos_servicios WHERE ((codproducto LIKE '%$referencia%') OR (nombre_producto LIKE '%$referencia%') OR (descripcion_producto LIKE '%$referencia%') OR (clave_fiscal LIKE '%$referencia%')) LIMIT 15;";
+        $resultados = $this->consultas->getResults($consulta, null);
+        $contador = 0;
+        foreach ($resultados as $resultado) {
+            $datos[] = array("value" => $resultado['clave_fiscal']."-".$resultado['nombre_producto'],
+                "id" => $resultado["idproser"],
+                "nombre" => $resultado['nombre_producto'],
+                "peligro" => $this->getPeligroByCFiscal($resultado['clave_fiscal']));
             $contador++;
         }
         if ($contador == 0) {

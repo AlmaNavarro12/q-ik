@@ -118,6 +118,8 @@ function loadOpcionesTasa() {
 function setPorcentajes(datos){
     var array = datos.split("</tr>");
     var tipo = array[0];
+    console.log("tipo" + array[0]);
+    console.log("valores" + array[1]);
     if(tipo == 'fijo'){
         $("#tipo").val(tipo);
         $("#tasa-num").attr('hidden',true);

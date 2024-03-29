@@ -15,6 +15,11 @@ class ComposerStaticInit62e10e6c8df9afc192311b196c75bb33
         array (
             'tests\\' => 6,
         ),
+        'c' => 
+        array (
+            'chillerlan\\Settings\\' => 20,
+            'chillerlan\\QRCode\\' => 18,
+        ),
         'Z' => 
         array (
             'ZipStream\\' => 10,
@@ -50,6 +55,14 @@ class ComposerStaticInit62e10e6c8df9afc192311b196c75bb33
         'tests\\' => 
         array (
             0 => __DIR__ . '/..' . '/lunasoft/sw-sdk-php/tests',
+        ),
+        'chillerlan\\Settings\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/chillerlan/php-settings-container/src',
+        ),
+        'chillerlan\\QRCode\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/chillerlan/php-qrcode/src',
         ),
         'ZipStream\\' => 
         array (

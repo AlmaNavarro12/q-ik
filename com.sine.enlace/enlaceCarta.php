@@ -14,7 +14,6 @@ require_once '../com.sine.modelo/Session.php';
 Session::start();
 $cc = new ControladorCarta();
 
-
 if (isset($_POST['transaccion'])) {
     $transaccion = $_POST['transaccion'];
     switch ($transaccion) {
@@ -133,16 +132,11 @@ if (isset($_POST['transaccion'])) {
             break;
         case 'eliminarcfdi':
             $t = new TMPCFDI();
-            $cf = new ControladorFactura();
-            $idtmp = $_POST['idtmp'];
-            $sessionid = session_id();
-            $insertado = $cf->eliminarCFDI($idtmp, $sessionid);
-            if ($insertado) {
-                echo $insertado;
-            } else {
-                echo "0Error: no inserto el registro ";
-            }
+            $insertado = $cf->eliminarCFDI($_POST['idtmp'], session_id());
+            echo $insertado ? $insertado : "0Error: No se insertó el registro.";
             break;
+            //----------------------------------------EXTRAÑA RELACION CON PAGOS
+        
     }
 }
 

@@ -197,7 +197,7 @@ include("buscarProductos.php");
                 <label class="label-form text-right" for="id-moneda">Moneda</label> <label class="mark-required text-danger fw-bold">*</label>
                 <div class="form-group">
                     <div>
-                        <select class="form-select text-center input-form" id="id-moneda" name="id-moneda" onchange="getTipoCambio()">
+                        <select class="form-select text-center input-form" id="id-moneda" name="id-moneda" onchange="getTipoCambioSinTag()">
                             <option value="" id="option-default-moneda">- - - -</option>
                             <optgroup id="metodo-pago" class="contenedor-moneda text-start"> </optgroup>
                         </select>
@@ -315,10 +315,11 @@ include("buscarProductos.php");
             </div>
             <div class="col-md-8 text-end" id="btnprod">
                 <button id="btn-nuevo-producto" type="button" class="button-modal" data-bs-toggle="modal" data-bs-target="#nuevo-producto" onclick="setCamposProducto();">
-                    <span class="fas fa-plus"></span> Nuevo Producto
+                    <span class="fas fa-plus"></span> Nuevo producto
                 </button>
                 <button id="btn-agregar-productos" type="button" class="button-modal" data-bs-toggle="modal" data-bs-target="#myModal">
-                    Agregar Conceptos <span class="fas fa-search "></span>
+                    Agregar 
+                    conceptos <span class="fas fa-search "></span>
                 </button>
             </div>
         </div>

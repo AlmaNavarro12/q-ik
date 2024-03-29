@@ -2,10 +2,13 @@
 
 require_once '../com.sine.modelo/Impuesto.php';
 require_once '../com.sine.controlador/ControladorImpuesto.php';
+require_once '../com.sine.controlador/ControladorSat.php';
+
 if (isset($_POST['transaccion'])) {
 
     $cf = new Impuesto();
     $ci = new ControladorImpuesto();
+    $cs = new ControladorSat();
     $transaccion = $_POST['transaccion'];
 
     switch ($transaccion) {
@@ -32,7 +35,7 @@ if (isset($_POST['transaccion'])) {
             echo $datos != "" ? $datos : "0No se han encontrado datos.";
             break;
         case 'opcionestasa':
-            $datos = $ci->getPorcentajes($_POST['tipo'], $_POST['impuesto'], $_POST['factor']);
+            $datos = $cs->getPorcentajes($_POST['tipo'], $_POST['impuesto'], $_POST['factor']);
             echo $datos != "" ? $datos : "0No se han encontrado datos.";
             break;
         default:

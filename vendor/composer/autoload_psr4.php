@@ -7,6 +7,8 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'tests\\' => array($vendorDir . '/lunasoft/sw-sdk-php/tests'),
+    'chillerlan\\Settings\\' => array($vendorDir . '/chillerlan/php-settings-container/src'),
+    'chillerlan\\QRCode\\' => array($vendorDir . '/chillerlan/php-qrcode/src'),
     'ZipStream\\' => array($vendorDir . '/maennchen/zipstream-php/src'),
     'Twilio\\' => array($vendorDir . '/twilio/sdk/src/Twilio'),
     'SWServices\\' => array($vendorDir . '/lunasoft/sw-sdk-php/SWServices'),

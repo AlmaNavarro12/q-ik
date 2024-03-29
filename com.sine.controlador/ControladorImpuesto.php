@@ -1,15 +1,18 @@
 <?php
 
 require_once '../com.sine.dao/Consultas.php';
+require_once '../com.sine.controlador/ControladorSat.php';
 require_once '../com.sine.modelo/Session.php';
 
 
 class ControladorImpuesto {
 
     private $consultas;
+    private $controladorSat;
 
     function __construct() {
         $this->consultas = new Consultas();
+        $this->controladorSat = new ControladorSat();
     }
 
     public function listaImpuesto($pag, $REF, $numreg) {
@@ -155,48 +158,9 @@ class ControladorImpuesto {
         return $consultado;
     }
 
-    private function getPorcentajesAux($tipo, $impuesto, $factor) {
-        switch ($tipo) {
-            case '1':
-                $traslado = "traslado";
-                break;
-            case '2':
-                $traslado = "retencion";
-                break;
-            default:
-                $traslado = "";
-                break;
-        }
-
-        $consultado = false;
-        $consulta = "SELECT * FROM catalogo_impuestos WHERE impuesto=:impuesto AND factor=:factor AND $traslado=:traslado ORDER BY maximo;";
-        $valores = array("impuesto" => $impuesto,
-            "factor" => $factor,
-            "traslado" => '1');
-        $consultado = $this->consultas->getResults($consulta, $valores);
-        return $consultado;
-    }
-
-    private function checkImpuestoAux($cf) {
-        $valido = false;
-        $impuestos = $this->getPorcentajesAux($cf->getTipo(), $cf->getImpuesto(), $cf->getFactor());
-        foreach ($impuestos as $actual) {
-            $tipo = $actual['tipo'];
-            if ($tipo == 'rango') {
-                $min = $actual['minimo'];
-                $max = $actual['maximo'];
-                if ($cf->getTasa() < $min || $cf->getTasa() > $max) {
-                    $valido = TRUE;
-                    echo "0El valor ingresado esta fuera de rango";
-                }
-            }
-        }
-        return $valido;
-    }
-
     public function checkImpuesto($cf) {
         $datos = false;
-        $check = $this->checkImpuestoAux($cf);
+        $check = $this->controladorSat->checkImpuestoAux($cf);
         if (!$check) {
             $datos = $this->guardarImpuesto($cf);
         }
@@ -225,7 +189,7 @@ class ControladorImpuesto {
 
     public function checkUpdImpuesto($cf) {
         $datos = false;
-        $check = $this->checkImpuestoAux($cf);
+        $check = $this->controladorSat->checkImpuestoAux($cf);
         if (!$check) {
             $datos = $this->guardarImpuesto($cf);
         }

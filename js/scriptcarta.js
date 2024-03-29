@@ -37,7 +37,7 @@ $(function () {
             $("#sub-" + tab).show();
             $("#tab-" + tab).addClass("sub-tab-active");
         }
-        $("#div-" + tab).scrollTop(0);
+        $("html,body").scrollTop(0);
     });
 }); 
 
@@ -289,6 +289,61 @@ function loadFolioCarta(iddatos = "") {
                 $("#cp-emisor").val(codpos);
             }
             cargandoHide();
+        }
+    });
+}
+
+//---------------------------------------------AUTOACOMPLETADO
+function autocompletarMercancia() {
+    var chbus = $("input[name=busqueda]:checked").val();
+    $('#clv-producto').autocomplete({
+        source: "com.sine.enlace/enlaceautocompletar.php?transaccion=mercancia&&b=" + chbus,
+        select: function (event, ui) {
+            var a = ui.item.value;
+            var nombre = ui.item.nombre;
+            var peligro = ui.item.peligro;
+
+            $("#descripcion-mercancia").val(nombre);
+            $("#peligro-mercancia").val(peligro);
+            if (peligro === '0-1' || peligro === '1') {
+                if (peligro === '1') {
+                    $("#material-peligroso").val(peligro);
+                } else {
+                    $("#material-peligroso").val('');
+                }
+                $("#material-peligroso").removeAttr('disabled');
+                $("#clv-peligro").removeAttr('disabled');
+                $("#clv-embalaje").removeAttr('disabled');
+            } else if (peligro == '0') {
+                $("#material-peligroso").attr('disabled', true);
+                $("#clv-peligro").attr('disabled', true);
+                $("#clv-embalaje").attr('disabled', true);
+            }
+        }
+    });
+}
+
+function autocompletarCliente() {
+    if ($("#nombre-cliente").val() == '') {
+        $("#id-cliente").val('0');
+    }
+    $('#nombre-cliente').autocomplete({
+        source: "com.sine.enlace/enlaceautocompletar.php?transaccion=nombrecliente",
+        select: function (event, ui) {
+            var a = ui.item.value;
+            var id = ui.item.id;
+            var rfc = ui.item.rfc;
+            var razon = ui.item.razon;
+            var regfiscal = ui.item.regfiscal;
+            var codpostal = ui.item.codpostal;
+            var direccion = ui.item.direccion;
+
+            $("#id-cliente").val(id);
+            $("#rfc-cliente").val(rfc);
+            $("#razon-cliente").val(razon);
+            $("#regfiscal-cliente").val(regfiscal);
+            $("#cp-cliente").val(codpostal);
+            $("#direccion-cliente").val(direccion);
         }
     });
 }

@@ -23,9 +23,19 @@ if (isset($_GET['transaccion'])) {
         case 'empleado':
             echo json_encode($cp->getCoincidenciasEmpleado($_GET['term']));
             break;
-            case 'facturastimbradas':
-                echo json_encode($cp->getCoincidenciasFacturasTimbradas($_GET['term'], $_GET['iddatos']));
-                break;
+        case 'facturastimbradas':
+            echo json_encode($cp->getCoincidenciasFacturasTimbradas($_GET['term'], $_GET['iddatos']));
+            break;
+        case 'mercancia':
+            $b = $_GET['b'];
+            $result = "";
+            if ($b == '1') {
+                $result = json_encode($cp->getCoincidenciasProducto($_GET['term']));
+            } else if ($b == '2') {
+                $result = json_encode($cp->getCoincidenciasCatalogoFiscal($_GET['term']));
+            }
+            echo $result;
+            break;
             /*
         case 'emailcliente':
             echo json_encode($cp->getCoincidenciasBusquedaMail($_GET['term']));
@@ -63,16 +73,7 @@ if (isset($_GET['transaccion'])) {
         case 'subtiporemolque':
             echo json_encode($cp->getCoincidenciasTipoRemolque($_GET['term']));
             break;
-        case 'mercancia':
-            $b = $_GET['b'];
-            $result = "";
-            if ($b == '1') {
-                $result = json_encode($cp->getCoincidenciasProducto($_GET['term']));
-            } else if ($b == '2') {
-                $result = json_encode($cp->getCoincidenciasCatalogoFiscal($_GET['term']));
-            }
-            echo $result;
-            break;
+        
         case 'peligro':
             echo json_encode($cp->getCoincidenciasMaterialPeligroso($_GET['term']));;
             break;
