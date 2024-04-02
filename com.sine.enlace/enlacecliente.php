@@ -78,6 +78,5 @@ function obtenerDatosCliente(){
     $c->setNombreBanco2($_POST['nombrebanco2']);
     $c->setNombreBanco3($_POST['nombrebanco3']);
     $c->setNombreBanco4($_POST['nombrebanco4']);
-    
     return $c;
 }

@@ -1005,10 +1005,9 @@ function exportarTicket(id) {
     $('.marker').removeClass("marker-active");
     $('#factura-menu').addClass("menu-active");
     $('#factura-menu').children('div.marker').addClass("marker-active");
-    loadView('factura');
     cargandoHide();
     cargandoShow();
-    window.setTimeout("prodTickets('" + id + "')", 700);
+    window.setTimeout("prodTickets('" + id + "')", 100);
 }
 
 function prodTickets(id) {
@@ -1020,7 +1019,28 @@ function prodTickets(id) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
             var res = texto.substring(1, 5000);
-            if (bandera == '') {
+            if (bandera == '0') {
+                alertify.error(res);
+            } else {
+                loadView('factura');
+                window.setTimeout("mostrarDatosVenta('" + datos + "')", 800);
+                window.setTimeout("exportarProductos('" + id + "')", 800);
+            }
+            cargandoHide();
+        }
+    });
+}
+
+function exportarProductos(id){
+    $.ajax({
+        url: 'com.sine.enlace/enlaceventa.php',
+        type: 'POST',
+        data: {transaccion: 'exportarproductos', id: id},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 5000);
+            if (bandera == '0') {
                 alertify.error(res);
             } else {
                 tablaProductos();
@@ -1028,6 +1048,23 @@ function prodTickets(id) {
             cargandoHide();
         }
     });
+}
+
+function mostrarDatosVenta(datos) {
+    var idformapago = 0;
+    var array = datos.split("</tr>");
+    idventa = array[0];
+    forma = array[1];
+    idformapago = (forma == 'cash') ? 1 : ((forma == 'card') ? 4 : ((forma == 'val') ? 8 : 0));
+    $("#id-metodo-pago").attr('disabled', true);
+    loadOpcionesMetodoPago('id-metodo-pago', 1);
+    loadOpcionesFormaPago2(idformapago);
+    if (idformapago !== 4) {
+        $("#id-forma-pago").attr('disabled', true);
+    }
+    $("#idticket").val(idventa);
+    $("#btn-nuevo-producto").attr('disabled', true);
+    $("#btn-agregar-productos").attr('disabled', true);
 }
 
 function cobrarCotizacion(sid){

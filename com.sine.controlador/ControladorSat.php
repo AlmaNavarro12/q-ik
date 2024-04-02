@@ -2,17 +2,21 @@
 require_once '../../CATSAT/CATSAT/com.sine.controlador/controladorBanco.php';
 require_once '../../CATSAT/CATSAT/com.sine.controlador/controladorMonedas.php';
 require_once '../../CATSAT/CATSAT/com.sine.controlador/controladorImpuestos.php'; 
+require_once '../../CATSAT/CATSAT/com.sine.controlador/controladorMaterialPeligroso.php'; 
+
 
 class ControladorSat{
     
     private $banco;
     private $catalogoimpuestos;
+    private $materialpeligroso;
 
 
     function __construct(){
         $this->banco = new ControladorBanco();
         $this->monedas = new ControladorMonedas();
         $this->catalogoimpuestos = new ControladorImpuestos();
+        $this->materialpeligroso = new ControladorMaterial();
     }
 
     public function getRFCBancoOrdenante($id) {
@@ -76,5 +80,19 @@ class ControladorSat{
             }
         }
         return $tipoimp . "</tr>" . $datos;
+    }
+
+    public function getPeligroByCFiscal($cfiscal){
+        $peligro = "";
+        $datos = $this->materialpeligroso->getPeligroByCFiscalAux($cfiscal);
+        foreach($datos as $actual){
+            $peligro = $actual['material_peligroso'];
+        }
+        return $peligro;
+    }
+
+    public function getCoincidenciasCatalogoFiscal($term){
+        $datos = $this->materialpeligroso->getCoincidenciasCatalogoFiscal($term);
+        return $datos;
     }
 }

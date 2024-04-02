@@ -46,6 +46,7 @@ if (isset($_POST['transaccion'])) {
         case 'actualizarproducto':
             $p = obtenerDatosProducto();
             $p->setIdProducto($_POST['idproducto']);
+            $p->setIdtmp($_POST['idtmp']);
             $p->setImgactualizar($_POST['imgactualizar']);
             $p->setNameImg($_POST['nameimg']);
             $actualizado = $cp->valCodigoActualizar($p);

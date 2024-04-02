@@ -306,6 +306,7 @@ include("buscarProductos.php");
                 </div>
             </div>
         </div>
+        <input type="hidden" name="idticket" id="idticket">
         <div class="row mt-5">
             <div class="col-md-4">
                 <label class="label-sub">Conceptos</label>
@@ -331,7 +332,7 @@ include("buscarProductos.php");
             </div>
         </div>
     </div>
-    </form>
+</div>
     <script src="js/scriptfactura.js"></script>
     <script>
         $(document).ready(function() {

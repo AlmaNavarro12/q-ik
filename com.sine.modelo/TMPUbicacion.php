@@ -15,6 +15,9 @@ class TMPUbicacion {
     private $fecha;
     private $hora;
     private $sid;
+    private $nombreestado;
+    private $nombremunicipio;
+
     
     function __construct() {
         
@@ -42,6 +45,14 @@ class TMPUbicacion {
 
     function getEstado() {
         return $this->estado;
+    }
+
+    function getNombreEstado() {
+        return $this->nombreestado;
+    }
+
+    function getNombreMunicipio() {
+        return $this->nombremunicipio;
     }
 
     function getCodpos() {
@@ -115,6 +126,15 @@ class TMPUbicacion {
     function getIdmunicipio() {
         return $this->idmunicipio;
     }
+
+    function setNombreEstado($nombreestado) {
+        $this->nombreestado = $nombreestado;
+    }
+
+    function setNombreMunicipio($nombremunicipio) {
+        $this->nombremunicipio = $nombremunicipio;
+    }
+
 
     function setDireccion($direccion) {
         $this->direccion = $direccion;

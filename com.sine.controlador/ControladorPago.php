@@ -178,7 +178,7 @@ class ControladorPago{
             $lista = $actual['listapago'];
             $editar = $actual['editarpago'];
             $eliminar = $actual['eliminarpago'];
-            $timbrar = $actual['pago'];
+            $timbrar = $actual['timbrarpago'];
             $datos .= "$lista</tr>$editar</tr>$eliminar</tr>$timbrar";
         }
         return $datos;
@@ -1062,55 +1062,6 @@ class ControladorPago{
         return $actualizado;
     }
 
-    public function checkCancelados($idpago) {
-        $datos = $this->guardarXML($idpago);
-        return $datos;
-    }
-
-    /*private function getTotalesImpuestos($tag){
-        $subtotal = 0;
-        $traslado = 0;
-        $retencionIVA = 0;
-        $retencionISR = 0;
-        $retencionIEPS = 0;
-        $consulta = "SELECT dp.*, df.subtotal, df.subtotaliva, df.subtotalret FROM detallepago dp
-                    INNER JOIN datos_factura df ON df.uuid = dp.uuiddoc WHERE dp.detalle_tagencabezado=:tag
-                    UNION ALL SELECT dp.*, fc.subtotal, fc.subtotaliva, fc.subtotalret FROM detallepago dp INNER JOIN factura_carta fc ON fc.uuid = dp.uuiddoc
-                    WHERE dp.detalle_tagencabezado=:tag ORDER BY iddetallepago";
-        $val = array("tag" => $tag);
-        $consultado = $this->consultas->getResults($consulta, $val);
-        
-        foreach ($consultado as $actual) {
-            $subtotal += $actual['subtotal'];
-            if ($actual['subtotaliva'] != "") {
-                $imp_tras = explode("<impuesto>", $actual['subtotaliva']);
-                foreach ($imp_tras as $im_tras) {
-                    $divIVA = explode("-", $im_tras);
-                    $traslado += $divIVA[0];
-                }
-            }
-
-            if ($actual['subtotalret'] != "") {
-                $imp_ret = explode("<impuesto>", $actual['subtotalret']);
-                foreach ($imp_ret as $im_ret) {
-                    $divRET = explode("-", $im_ret);
-                    switch ($divRET[2]) {
-                        case 1:
-                            $retencionISR += $divRET[0];
-                            break;
-                        case 2:
-                            $retencionIVA += $divRET[0];
-                            break;
-                        case 3:
-                            $retencionIEPS += $divRET[0];
-                            break;
-                    }
-                }
-            }
-        }
-        return "$subtotal</tr>$traslado</tr>$retencionIVA</tr>$retencionISR</tr>$retencionIEPS";
-    }*/
-
     public function getComplementoPago($tag) {
         $consultado = false;
         $consulta = "SELECT * FROM complemento_pago WHERE tagpago=:tag ORDER BY ordcomplemento ASC;";
@@ -1172,6 +1123,35 @@ class ControladorPago{
             $base += $rs['base'];
         }
         return $base;
+    }
+
+    private function getSaldoAux() {
+        $consultado = false;
+        $consulta = "SELECT * FROM contador_timbres WHERE idtimbres=:id;";
+        $valores = array("id" => '1');
+        $consultado = $this->consultas->getResults($consulta, $valores);
+        return $consultado;
+    }
+
+    private function checkSaldoAux() {
+        $restantes = "0";
+        $saldo = $this->getSaldoAux();
+        foreach ($saldo as $actual) {
+            $restantes = $actual['timbresRestantes'];
+        }
+        return $restantes;
+    }
+
+    public function checkSaldo($idfactura)
+    {
+        $timbrar = "";
+        $saldo = $this->checkSaldoAux();
+        if ($saldo > 0) {
+            $timbrar = $this->guardarXML($idfactura);
+        } else {
+            $timbrar = "0Su saldo de timbres se ha agotado";
+        }
+        return $timbrar;
     }
 
     private function guardarXML($idpago) { 

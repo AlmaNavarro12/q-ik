@@ -255,6 +255,27 @@ function loadOpcionesMunicipio(idmun = "", idestado = "") {
     });
 }
 
+
+//Por cruce de funciones hay que hacer una para operador
+function loadOpcionesMunicipioOperador(idmun = "", idestado = "") {
+    cargandoHide();
+    cargandoShow();
+    if(idestado == ''){
+        idestado = $("#estado-operador").val();
+    }
+    $.ajax({
+        url: rutaPrincipal + "com.sine.enlace/enlaceCodigopostal.php",
+        type: 'POST',
+        dataType: 'JSON',
+        data: {transaccion: 'opcionesmunicipio', idestado: idestado, idmunicipio:idmun},
+        success: function (datos) {
+            $(".contenedor-municipio-op").html(datos.datos);
+            cargandoHide();
+        }
+       
+    });
+}
+
 //----------------------------------REGIMEN FISCAL
 function aucompletarRegimen(){
     $('#regimen-fiscal').autocomplete({
@@ -397,8 +418,8 @@ function aucompletarConfigTransporte() {
 }
 
 //---------------------------------TIPO REMOLQUE
-function aucompletarTipoRemolque() {
-    $('#tipo-remolque').autocomplete({
+function aucompletarTipoRemolque(number = "") {
+    $('#tipo-remolque' + number).autocomplete({
         source: rutaPrincipal + "com.sine.enlace/enlaceTipoRemolque.php?transaccion=autocompleta",
         select: function (event, ui) {
             var a = ui.item.value;
@@ -418,6 +439,38 @@ function opcionesMotivoCancelar() {
             if (res.status > 0) {
                 $('.contenedor-motivos').html(res.datos);
             }
+        }
+    });
+}
+
+//----------------------------------- MATERIAL PELIGROSO
+function autocompletarMaterialPeligroso() {
+    $('#clv-peligro').autocomplete({
+        source: rutaPrincipal + "com.sine.enlace/enlaceMaterialPeligroso.php?transaccion=autocompleta",
+        select: function (event, ui) {
+            var a = ui.item.value;
+
+        }
+    });
+}
+
+//-------------------------------------UNIDAD CARTA PORTE
+function aucompletarUnitMercancia() {
+    $('#unidad-mercancia').autocomplete({
+        source: rutaPrincipal + "com.sine.enlace/enlaceUnidadCarta.php?transaccion=autocompleta",
+        select: function (event, ui) {
+            var a = ui.item.value;
+            var id = ui.item.id;
+        }
+    });
+}
+
+//--------------------------------------EMBALAJE
+function autocompletarEmbalaje() {
+    $('#clv-embalaje').autocomplete({
+        source: rutaPrincipal +  "com.sine.enlace/enlaceEmbalaje.php?transaccion=autocompleta",
+        select: function (event, ui) {
+            var a = ui.item.value;
         }
     });
 }

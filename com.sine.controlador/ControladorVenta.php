@@ -115,9 +115,9 @@ class ControladorVenta
         $taxes_traslados = "''";
         $taxes_retencion = "''";
 
-        $div = explode("-", $cod);
-        $cod = $div[0];
-        $prod = $this->getProductobyCod($cod);
+        $div = explode("|", $cod);
+        $codi = $div[0];
+        $prod = $this->getProductobyCod($codi);
 
         if ($prod) {
             $div = explode("</tr>", $prod);
@@ -174,7 +174,6 @@ class ControladorVenta
         } else {
             $insertar = "0No se encontró el producto";
         }
-
         return $insertar;
     }
 
@@ -983,7 +982,7 @@ class ControladorVenta
             $cambio = '0';
         }
 
-        $consulta = "INSERT INTO datos_venta VALUES (:id, :serie, :letra, :folio, :tag, :fecha, :hora, :percentDescuento, :descuento, :total, :fmpago, :pago, :cambio, :refventa, :uid, :status, :idcancelado, :fecha_cancelado, :hora_cancelada);";
+        $consulta = "INSERT INTO datos_venta VALUES (:id, :serie, :letra, :folio, :tag, :fecha, :hora, :percentDescuento, :descuento, :total, :fmpago, :pago, :cambio, :refventa, :uid, :status, :idcancelado, :fecha_cancelado, :hora_cancelada, :idfactura);";
         $val = array(
             "id" => null,
             "serie" => $serie,
@@ -1004,6 +1003,7 @@ class ControladorVenta
             "idcancelado" => '0',
             "fecha_cancelado" => null,
             "hora_cancelada" => null,
+            "id:factura" => null
         );
         $insertar = $this->consultas->execute($consulta, $val);
         $this->detalleVenta($v->getTagventa(), $v->getSid());
@@ -1474,30 +1474,40 @@ class ControladorVenta
         return $cortes;
     }
 
-    private function getTotalVentas($fecha, $user = "", $hora = "")
+    private function getTotalVentas($fecha, $user = "", $hora = "", $pago = "")
     {
-        $datos = false;
-        $condicion = "";
-        if ($user != '0') {
-            $condicion = " AND (uid_venta=:uid)";
-        }
-        $consulta = "SELECT * FROM datos_venta WHERE (fecha_venta=:fecha)";
+        $consulta = "SELECT totalventa FROM datos_venta WHERE fecha_venta = :fecha";
 
         if (!empty($hora)) {
-            $consulta .= " AND (hora_venta >= :hora)";
+            $consulta .= " AND hora_venta >= :hora";
         }
 
-        $consulta .= $condicion . ";";
+        if (!empty($user) && $user != '0') {
+            $consulta .= " AND uid_venta = :uid";
+        }
+
+        if ($pago == 1) {
+            $consulta .= " UNION ALL SELECT totalpagado FROM pagos WHERE fechacreacion = :fecha";
+
+            if (!empty($hora)) {
+                $consulta .= " AND hora_creacion < :hora";
+            }
+
+            if (!empty($user) && $user != '0') {
+                $consulta .= " AND sessionid = :uid";
+            }
+        }
 
         $val = array(
             "fecha" => $fecha,
-            "uid" => $user,
-            "hora" => $hora
+            "hora" => $hora,
+            "uid" => $user
         );
 
         $datos = $this->consultas->getResults($consulta, $val);
         return $datos;
     }
+
 
     public function getUserbyID($uid)
     {
@@ -1797,6 +1807,7 @@ class ControladorVenta
             foreach ($pagos as $pago) {
                 $forma_pago = $pago['nombre_forma_pago'];
                 $total_pagado = $pago['total_pagado'];
+                $total += $total_pagado;
         
                 $datos .= "
                 <li class='list-group-item d-flex justify-content-between lh-sm'>
@@ -1855,7 +1866,7 @@ class ControladorVenta
                 if ($horaCorte <= $horaActual) {
                     $fecha = date('Y-m-d');
 
-                    $ventas = $this->getTotalVentas($fecha, $user, $horaCorte);
+                    $ventas = $this->getTotalVentas($fecha, $user, $horaCorte, $pago);
                     foreach ($ventas as $actual) {
                         if($user != 0){
                             $totventas += $actual['totalventa'];
@@ -1881,7 +1892,7 @@ class ControladorVenta
         } else {
             $fecha = date('Y-m-d');
 
-            $ventas = $this->getTotalVentas($fecha, $user);
+            $ventas = $this->getTotalVentas($fecha, $user, "", $pago);
             foreach ($ventas as $actual) {
                 if($user != 0){
                     $totventas += $actual['totalventa'];
@@ -2661,7 +2672,7 @@ class ControladorVenta
     private function getTagbyIDAux($id)
     {
         $datos = false;
-        $consulta = "SELECT tagventa FROM datos_venta WHERE iddatos_venta=:id";
+        $consulta = "SELECT iddatos_venta, tagventa, formapago, tagfactura FROM datos_venta WHERE iddatos_venta=:id";
         $val = array("id" => $id);
         $datos = $this->consultas->getResults($consulta, $val);
         return $datos;
@@ -2669,46 +2680,106 @@ class ControladorVenta
 
     private function getTagbyID($id)
     {
-        $tag = "";
         $datos = $this->getTagbyIDAux($id);
+        $tag = "";
+        $idventa = "";
+        $formapago = "";
+        $tagventa = "";
+
         foreach ($datos as $actual) {
             $tag = $actual['tagventa'];
-        }
-        return $tag;
+            $idventa = $actual['iddatos_venta'];
+            $formapago = $actual['formapago'];
+            $tagventa = $actual['tagfactura'];
+         }
+        return array("tag" => $tag, "idventa" => $idventa, "forma" => $formapago, "tagfactura" => $tagventa);
     }
 
     public function exportarProductos($id, $sid)
     {
         $datos = false;
-        $tag = $this->getTagbyID($id);
-        $detalle = $this->getDetalleTicket($tag);
-        foreach ($detalle as $actual) {
-            $consulta = "INSERT INTO tmp VALUES (:id, :idprod, :nm, :cant, :precio, :totun, :desc, :impdesc, :imptotal, :tras, :ret, :observaciones, :chinv, :clvfiscal, :clvunit, :sid);";
-            $val = array(
-                "id" => null,
-                "idprod" => $actual['venta_idprod'],
-                "nm" => $actual['venta_producto'],
-                "cant" => $actual['venta_cant'],
-                "precio" => $actual['venta_precio'],
-                "totun" => $actual['venta_importe'],
-                "desc" => '0',
-                "impdesc" => '0',
-                "imptotal" => $actual['venta_importe'],
-                "tras" => $actual['venta_traslados'],
-                "ret" => $actual['venta_retencion'],
-                "observaciones" => '',
-                "chinv" => '0',
-                "clvfiscal" => $actual['venta_clvfiscal'],
-                "clvunit" => $actual['venta_cunidad'],
-                "sid" => $sid
-            );
-            $datos = $this->consultas->execute($consulta, $val);
+        $datosVenta = $this->getTagbyID($id);
+        $tag = $datosVenta['tag']; 
+
+            $detalle = $this->getDetalleTicket($tag);
+            foreach ($detalle as $actual) {
+                $consulta = "INSERT INTO tmp VALUES (:id, :idprod, :nm, :cant, :precio, :totun, :desc, :impdesc, :imptotal, :tras, :ret, :observaciones, :chinv, :clvfiscal, :clvunit, :sid);";
+                $val = array(
+                    "id" => null,
+                    "idprod" => $actual['venta_idprod'],
+                    "nm" => $actual['venta_producto'],
+                    "cant" => $actual['venta_cant'],
+                    "precio" => $actual['venta_precio'],
+                    "totun" => $actual['venta_importe'],
+                    "desc" => '0',
+                    "impdesc" => '0',
+                    "imptotal" => $actual['venta_importe'],
+                    "tras" => $actual['venta_traslados'],
+                    "ret" => $actual['venta_retencion'],
+                    "observaciones" => '',
+                    "chinv" => '0',
+                    "clvfiscal" => $actual['venta_clvfiscal'],
+                    "clvunit" => $actual['venta_cunidad'],
+                    "sid" => $sid
+                );
+                $datos = $this->consultas->execute($consulta, $val);
+                echo "inserta tmp " . $datos;
+            }
+        
+        return $datos;
+    }
+
+    private function validarTicket($id){
+        $cadenaDatos = "";
+        $datosVenta = $this->getTagbyID($id);
+        $idventa = $datosVenta['idventa']; 
+        $forma = $datosVenta['forma']; 
+        $cadenaDatos = $idventa ."</tr>". $forma;
+        return $cadenaDatos;
+    }
+
+    public function validarExistenciaFacturaVenta($id, $sid)
+    {
+        $datos = "";
+        $datosVenta = $this->getTagbyID($id);
+        $idventa = $datosVenta['idventa'];
+        $existeFactura = $this->validarExportacionVentas($idventa);
+        if ($existeFactura) {
+            $datos = "0Ya existe una factura relacionada a este ticket de venta, con folio " . $existeFactura . ".";
+        } else {
+            $datos = $this->validarTicket($id);
         }
         return $datos;
     }
 
-    public function asignarTAG($tag, $sid)
-    {
+
+    private function validarExportacionVentas($id) {
+        $folio_interno = "";
+        $validar = $this->getTagFacturaById($id);
+    
+        foreach ($validar as $actual) {
+            $tagPago = $actual['tagfactura'];
+            $consulta = "SELECT CONCAT(letra, folio_interno_fac) AS folio_interno FROM datos_factura WHERE tagfactura = :tag_pago";
+            $params = array("tag_pago" => $tagPago);
+            $resultado = $this->consultas->getResults($consulta, $params);
+            if ($resultado) {
+                foreach ($resultado as $reactual) {
+                $folio_interno = $reactual['folio_interno'];
+                }
+            }
+        }
+        return $folio_interno;
+    }
+    
+    private function getTagFacturaById($idventa){
+        $consulta = false;
+        $consulta = "SELECT tagfactura FROM datos_venta WHERE iddatos_venta = :idventa";
+        $valores = array("idventa" => $idventa);
+        $resultado = $this->consultas->getResults($consulta, $valores);
+        return $resultado;
+    }
+
+    public function asignarTAG($tag, $sid){
         $consulta =  "UPDATE tmpticket SET tagtab = :tag WHERE sid = :sid AND tagtab IS NULL";
         $val = array("tag" => $tag, "sid" => $sid);
         $insertado = $this->consultas->execute($consulta, $val);

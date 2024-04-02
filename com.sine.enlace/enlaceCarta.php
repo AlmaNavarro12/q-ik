@@ -8,15 +8,22 @@ require_once '../com.sine.modelo/TMPUbicacion.php';
 require_once '../com.sine.modelo/TMPOperador.php';
 require_once '../com.sine.modelo/TMPCFDI.php';
 require_once '../com.sine.controlador/ControladorCarta.php';
+require_once '../com.sine.controlador/ControladorFactura.php';
 require_once '../com.sine.modelo/Usuario.php';
 require_once '../com.sine.modelo/Session.php';
 
 Session::start();
 $cc = new ControladorCarta();
+$cf = new ControladorFactura();
 
 if (isset($_POST['transaccion'])) {
     $transaccion = $_POST['transaccion'];
     switch ($transaccion) {
+        //---------------------------------------CARTA PORTE
+        case 'filtrarfolio':
+            $datos = $cc->listaServiciosHistorial($_POST['pag'], $_POST['REF'], $_POST['numreg']);
+            echo $datos != "" ? $datos : "0No se han encontrado datos.";
+            break;
             //-----------------------------------MERCANCIA
         case 'agregarmercancia':
             $insertado = $cc->agregarMercancia(obtenerDatosMercancia());
@@ -44,7 +51,7 @@ if (isset($_POST['transaccion'])) {
             break;
         case 'actualizarmercancia':
             $m = obtenerDatosMercancia();
-            $m->setTmpid($tid);
+            $m->setTmpid($_POST['tid']);
             $datos = $cc->actualizarMercancia($m);
             echo $datos != "" ? $datos : "0No se actualizó el registro.";
             break;
@@ -107,6 +114,10 @@ if (isset($_POST['transaccion'])) {
             echo $eliminado ? $eliminado : "0No se han encontrado datos.";
             break;
             //--------------------------------------CARTA PORTE
+        case 'cancelar':
+            $eliminado = $cc->cancelar(session_id());
+            echo $eliminado ? $eliminado : "0No se han encontrado datos.";
+            break;
         case 'emisor':
             $folio = $cc->getDatosEmisor($_POST['iddatos']);
             echo $folio != "" ? $folio : "0No se han encontrado datos.";
@@ -131,11 +142,37 @@ if (isset($_POST['transaccion'])) {
             echo $eliminado != "" ? "1Registro eliminado." : "0No se han encontrado datos.";
             break;
         case 'eliminarcfdi':
-            $t = new TMPCFDI();
             $insertado = $cf->eliminarCFDI($_POST['idtmp'], session_id());
             echo $insertado ? $insertado : "0Error: No se insertó el registro.";
             break;
-            //----------------------------------------EXTRAÑA RELACION CON PAGOS
+        case 'addcfdi':
+            $t = new TMPCFDI();
+            $t->setTiporel($_POST['rel']);
+            $t->setUuid($_POST['cfdi']);
+            $t->setDescripcion($_POST['descripcion']);
+            $t->setSessionid(session_id());
+            $insertado = $cc->agregarCFDI($t);
+            echo $insertado ? $insertado : "0Error: No se insertó el registro.";
+            break;
+            //----------------------------------------RELACION CON LOS OTROS MODULOS
+        case 'valvehiculo':
+            $placa = strtoupper(str_replace(['-', ' ', '.', '/', ',', '_'], "", $_POST['placa']));
+            echo $cc->checkVehiculo($placa);
+            break;
+        case 'valremolque':
+            $placa = strtoupper(str_replace(['-', ' ', '.', '/', ',', '_'], "", $_POST['placa']));
+            echo $cc->checkRemolque($placa);
+            break;
+        case 'valoperador':
+            $datos = $cc->checkOperador($_POST['rfc']);
+            echo $datos;
+            break;
+        //----------------------------------------------PAGOS
+        case 'getdatospago':
+            $datos = $cc->getDatosFacPago($_POST['idcarta']);
+            echo $datos != "" ? $datos : "0No se han encontrado datos.";
+            break;
+            
         
     }
 }
@@ -168,7 +205,9 @@ function obtenerDatosUbicacion()
     $u->setTipo($_POST['tipo']);
     $u->setDireccion($_POST['direccion']);
     $u->setEstado($_POST['idestado']);
+    $u->setNombreEstado($_POST['nombreestado']);
     $u->setIdmunicipio($_POST['idmunicipio']);
+    $u->setNombreMunicipio($_POST['nombremunicipio']);
     $u->setCodpos(str_replace($search, "", $_POST['cp']));
     $u->setDistancia($_POST['distancia']);
     $u->setFecha($_POST['fecha']);
@@ -185,11 +224,13 @@ function obtenerDatosOperador()
     $o->setTmprfc($_POST['rfc']);
     $o->setTmplic($_POST['licencia']);
     $o->setEstado($_POST['estado']);
+    $o->setNombreEstado($_POST['nombreestado']);
     $o->setCalle($_POST['direccion']);
     $search = array('-', ' ', '.', '/', ',', '_');
     $codpostal = str_replace($search, "", $_POST['codpostal']);
     $o->setCodpostal($codpostal);
     $o->setIdmunicipio($_POST['idmunicipio']);
+    $o->setNombreMunicipio($_POST['nombremunicipio']);
     $o->setSid(session_id());
     return $o;
 }

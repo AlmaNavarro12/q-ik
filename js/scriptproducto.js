@@ -418,7 +418,6 @@ function setValoresEditarProducto(datos) {
     changeText("#btn-form-producto-guardar", "Guardar cambios <span class='fas fa-save'></span></a>");
 
     var array = datos.split("</tr>");
-    console.log(array);
     var tipo = array[10];
     var imagen = array[14];
     var chinventario = array[15];

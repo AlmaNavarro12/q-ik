@@ -826,9 +826,9 @@ class ControladorFactura
                     </div>
                 </td>
                 <td>$nombre</td>
-                <td class='text-center'>$ " . number_format(bcdiv($pventa, '1', 2), 2, '.', ',') . "</td>
-                <td class='text-center'>$ " . number_format(bcdiv($ptotal, '1', 2), 2, '.', ',') . (($tcomp == 2) ? "<input id='total$n' type='hidden' value='$ptotal'>" : "") . "</td>
-                <td class='text-center'>$ " . number_format(bcdiv($descuento, '1', 2), 2, '.', ',') . "</td>
+                <td class='text-center'>$" . number_format(bcdiv($pventa, '1', 2), 2, '.', ',') . "</td>
+                <td class='text-center'>$" . number_format(bcdiv($ptotal, '1', 2), 2, '.', ',') . (($tcomp == 2) ? "<input id='total$n' type='hidden' value='$ptotal'>" : "") . "</td>
+                <td class='text-center'>$" . number_format(bcdiv($descuento, '1', 2), 2, '.', ',') . "</td>
                 <td>
                     <div class='input-group'>
                         <div class='dropdown'>
@@ -1165,12 +1165,12 @@ class ControladorFactura
         return $validar;
     }
 
-    public function nuevoFactura($c)
+    public function nuevoFactura($c, $idticket)
     {
         $insertado = false;
         $validar = $this->validarFactura($c->getSessionid());
         if (!$validar) {
-            $insertado = $this->insertarFactura($c);
+            $insertado = $this->insertarFactura($c, $idticket);
         }
         return $insertado;
     }
@@ -1216,7 +1216,7 @@ class ControladorFactura
         return $datos;
     }
 
-    private function insertarFactura($f)
+    private function insertarFactura($f, $idticket)
     {
         $insertado = false;
         $hoy = date("Y-m-d");
@@ -1228,13 +1228,15 @@ class ControladorFactura
         $letra = $Fdiv[1];
         $nfolio = $Fdiv[2];
 
+        $status = "";
+        $status = empty($idticket) ? 2 : 1;
+
         $consulta = "INSERT INTO `datos_factura` VALUES (:id, :fecha, :rfcemisor, :rzsocial, :clvregimen, :regimen, :codp, :serie, 
         :letra, :folio, :idcliente, :cliente, :rfcreceptor, :rzreceptor, :dirreceptor, :cpreceptor, :regfiscalreceptor, :chfirmar, 
         :cadena, :certSAT, :certCFDI, :uuid, :selloSAT, :sellocfdi, :fechatimbrado, :qrcode, :cfdistring, :cfdicancel, :status, 
         :idmetodopago, :nombremetodo, :idformapago, :nombrepago, :idmoneda, :nombremoneda, :tcambio, :iduso, :nombrecfdi, 
         :tipocomprobante, :nombrecomprobante, :tipofactura, :iddatosfacturacion, :cfdis, :subtotal, :subiva, :subret, :totdescuentos, 
-        :total, :chperiodo, :periodocobro, :tag, :periodo, :mes, :anho);";
-
+        :total, :chperiodo, :periodocobro, :tag, :periodo, :mes, :anho, :idticket);";
         $valores = array(
             "id" => null,
             "fecha" => $hoy,
@@ -1264,7 +1266,7 @@ class ControladorFactura
             "qrcode" => null,
             "cfdistring" => null,
             "cfdicancel" => null,
-            "status" => '2',
+            "status" => $status,
             "idmetodopago" => $f->getIdmetodopago(),
             "nombremetodo" => $f->getNombremetodo(),
             "idformapago" => $f->getIdformapago(),
@@ -1290,11 +1292,15 @@ class ControladorFactura
             "periodo" => $f->getPeriodicidad(),
             "mes" => $f->getMesperiodo(),
             "anho" => $f->getAnoperiodo(),
+            "idticket" => $idticket
         );
 
 
         $insertado = $this->consultas->execute($consulta, $valores);
 
+        if($insertado){
+            $this->actualizarTagFactura($idticket, $tag);
+        }
 
         $this->detalleFactura($f->getSessionid(), $tag);
         if ($f->getCfdisrel() == '1') {
@@ -1309,6 +1315,13 @@ class ControladorFactura
 
         $datos = '<corte>' . $tag . '<corte>';
         return $datos;
+    }
+
+    function actualizarTagFactura($idticket, $tag) {
+        $update = false;
+        $update = "UPDATE datos_venta SET tagfactura = :tag WHERE iddatos_venta = :idticket";
+        $valores = array("tag" => $tag, "idticket" => $idticket);
+        return $update = $this->consultas->execute($update, $valores); 
     }
 
 
@@ -1539,17 +1552,9 @@ class ControladorFactura
     public function getFecha()
     {
         $datos = "";
-        $fecha = getdate();
-        $d = $fecha['mday'];
-        $m = $fecha['mon'];
-        $y = $fecha['year'];
-        if ($d < 10) {
-            $d = "0$d";
-        }
-        if ($m < 10) {
-            $m = "0$m";
-        }
-        $datos = "$d/$m/$y";
+        $hoy = date("d/m/Y");
+        $hora = date("H:i:s");
+        $datos = $hoy . " a " . date('h:i A', strtotime($hora));
         return $datos;
     }
 
@@ -2121,7 +2126,16 @@ class ControladorFactura
         $this->eliminarFacturaAux($tag);
         $this->eliminarCFDIAux($tag);
         $this->eliminarCfdiEgresoAux($tag);
+        $this->modificarVenta($tag);
         return $eliminado;
+    }
+
+    private function modificarVenta($idFactura){
+        $modificado = false;
+        $consulta = "UPDATE datos_venta SET tagfactura = NULL WHERE tagfactura = :tagAntiguo";
+        $valores = array("tagAntiguo" => $idFactura);
+        $modificado = $this->consultas->execute($consulta, $valores);
+        return $modificado;
     }
 
     private function eliminarFacturaAux($idFactura)
@@ -2359,13 +2373,12 @@ class ControladorFactura
     private function getPermisoById($idusuario)
     {
         $consultado = false;
-        $consulta = "SELECT p.crearfactura,p.editarfactura, p.eliminarfactura FROM usuariopermiso p where permiso_idusuario=:idusuario;";
-        $c = new Consultas();
+        $consulta = "SELECT p.crearfactura,p.editarfactura, p.eliminarfactura, p.timbrarfactura FROM usuariopermiso p where permiso_idusuario=:idusuario;";
         $valores = array("idusuario" => $idusuario);
-        $consultado = $c->getResults($consulta, $valores);
+        $consultado = $this->consultas->getResults($consulta, $valores);
         return $consultado;
     }
-    //cambio no
+
     private function getNumrowsAux($condicion)
     {
         $consultado = false;
@@ -2408,7 +2421,8 @@ class ControladorFactura
             $crearfactura = $actual['crearfactura'];
             $editar = $actual['editarfactura'];
             $eliminar = $actual['eliminarfactura'];
-            $datos .= "$editar</tr>$eliminar</tr>$crearfactura";
+            $timbrar = $actual['timbrarfactura'];
+            $datos .= "$editar</tr>$eliminar</tr>$crearfactura</tr>$timbrar";
         }
         return $datos;
     }
@@ -2584,9 +2598,9 @@ class ControladorFactura
                                 <span class='tiptext' style='color: $colorB;'>$titbell</span>
                             </div>
                         </td>
-                        <td class='text-center'>$ " . number_format($subtotal, 2, '.', ',') . "</td>
-                        <td class='text-center'>$ " . number_format($iva, 2, '.', ',') . "</td>
-                        <td class='text-center'>$ " . number_format($ret, 2, '.', ',') . "</td>
+                        <td class='text-center'>$" . number_format($subtotal, 2, '.', ',') . "</td>
+                        <td class='text-center'>$" . number_format($iva, 2, '.', ',') . "</td>
+                        <td class='text-center'>$" . number_format($ret, 2, '.', ',') . "</td>
                         <td class='text-center'>$" . number_format($total, 2, '.', ',') . "</td>
                         <td class='text-center'>$cmoneda</td>
                         <td align='center'><div class='dropdown dropend z-1'>
@@ -2597,25 +2611,22 @@ class ControladorFactura
             if ($div[0] == '1') {
                 $datos .= "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' onclick='editarFactura($idfactura);'>Editar factura <span class='text-muted small fas fa-edit'></span></a></li>";
             }
+
             if ($div[1] == '1' && $uuid == "") {
                 $datos .= "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' onclick=\"eliminarFactura('$idfactura');\">Eliminar factura <span class=' text-muted small fas fa-times'></span></a></li>";
             }
 
-            $opciones = "";
-            if ($uuid != "" && $estadoF != "Cancelada") {
-                $opciones .= "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' onclick=\"imprimir_factura($idfactura);\">Ver factura <span class=' text-muted small fas fa-eye'></span></a></li>";
-                $opciones .= "<div class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' href='./com.sine.imprimir/imprimirxml.php?f=$idfactura&t=a' target='_blank'>Ver XML <span class=' text-muted small fas fa-download'></span></a></div>";
-                $opciones .= "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' $timbre>$tittimbre <span class='text-muted small fas fa-bell'></span></a></li>";
-                $opciones .= "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' data-bs-toggle='modal' data-bs-target='#enviarmail' onclick='showCorreos($idfactura);'>Enviar <span class=' text-muted small fas fa-envelope'></span></a></li>";
-            } else if ($estadoF == "Cancelada") {
-                $opciones .= "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' onclick=\"imprimir_factura($idfactura);\">Ver factura <span class=' text-muted small fas fa-eye'></span></a></li>";
-                $opciones .= "<div class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' $timbre>$tittimbre <span class='text-muted small fas fa-bell'></span></a></div>";
-                $opciones .= "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' data-bs-toggle='modal' data-bs-target='#enviarmail' onclick='showCorreos($idfactura);'>Enviar <span class=' text-muted small fas fa-envelope'></span></a></li>";
-            } else {
-                $opciones .= "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' onclick='imprimir_factura($idfactura);'>Ver factura <span class=' text-muted small fas fa-eye'></span></a></li>";
-                $opciones .= "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' onclick='timbrarFactura($idfactura);'>Timbrar factura <span class=' text-muted small fas fa-bell'></span></a></li>";
+            $datos .= "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' onclick=\"imprimir_factura($idfactura);\">Ver factura <span class=' text-muted small fas fa-eye'></span></a></li>";
+            
+            if($uuid != "" && $estadoF != "Cancelada"){
+                $datos .= "<div class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' href='./com.sine.imprimir/imprimirxml.php?f=$idfactura&t=a' target='_blank'>Ver XML <span class=' text-muted small fas fa-download'></span></a></div>";
             }
-            $datos .= $opciones;
+
+            if($div[3] == '1'){
+                $datos .= "<div class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' $timbre>$tittimbre <span class='text-muted small fas fa-bell'></span></a></div>";
+            }
+
+            $datos .= "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' data-bs-toggle='modal' data-bs-target='#enviarmail' onclick='showCorreos($idfactura);'>Enviar <span class=' text-muted small fas fa-envelope'></span></a></li>";
 
             if ($div[2] == '1') {
                 $datos .= "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' onclick='copiarFactura($idfactura);'>Copiar factura <span class='text-muted small fas fa-clipboard'></span></a></li>";
@@ -2665,21 +2676,15 @@ class ControladorFactura
     public function getPagosReg($folio, $idfactura)
     {
         $consultado = false;
-        $consultas = "SELECT DISTINCT p.foliopago, p.idpago, p.letra, cp.complemento_fechapago, cp.complemento_horapago,
-        (SELECT cp_inner.nombre_forma_pago FROM complemento_pago cp_inner WHERE cp_inner.tagpago = p.tagpago ORDER BY cp_inner.complemento_fechapago LIMIT 1
-        ) AS nombre_forma_pago,p.totalpagado,p.uuidpago,p.cancelado, 'p' AS type
-        FROM pagos p 
-        INNER JOIN complemento_pago cp ON cp.tagpago = p.tagpago
-        INNER JOIN detallepago dp ON dp.detalle_tagencabezado = cp.tagpago AND dp.detalle_tagcomplemento = cp.tagcomplemento
-        WHERE p.tagpago = :pid 
-        AND dp.pago_idfactura = :fid
-                    UNION ALL
-                    SELECT df.iddatos_factura idpago, df.letra, df.folio_interno_fac foliopago, df.fecha_creacion complemento_fechapago, '' complemento_horapago, df.forma_pago,
-                     df.totalfactura totalpagado, df.uuid uuidpago, CASE WHEN df.cfdicancel IS NULL THEN '0' ELSE '1' END cancelado, 'e' type
-                    FROM cfdiegreso ce
-                    INNER JOIN datos_factura df ON df.tagfactura = ce.tagfactura
-                    WHERE ce.iddoc = :fid AND ce.type = 'f'
-                    ORDER BY complemento_fechapago";
+        echo $folio . $idfactura;
+        $consultas = "SELECT * FROM (SELECT p.idpago, p.letra, p.foliopago, cp.complemento_fechapago, cp.complemento_horapago, cp.c_forma_pago AS c_pago, cp.nombre_forma_pago AS descripcion_pago, p.totalpagado, p.uuidpago, p.cancelado, 'p' AS type FROM pagos p INNER JOIN complemento_pago cp ON cp.tagpago = p.tagpago INNER JOIN
+                    detallepago dp ON dp.detalle_tagencabezado = cp.tagpago AND dp.detalle_tagcomplemento = cp.tagcomplemento WHERE p.tagpago = :pid AND dp.pago_idfactura = :fid ORDER BY descripcion_pago DESC LIMIT 1) AS sub1
+                    UNION ALL 
+                    SELECT * FROM (SELECT df.iddatos_factura AS idpago, df.letra, df.folio_interno_fac AS foliopago, df.fecha_creacion AS complemento_fechapago, '' AS complemento_horapago, cp.c_forma_pago AS c_pago, cp.nombre_forma_pago AS descripcion_pago, df.totalfactura AS totalpagado, df.uuid AS uuidpago,
+                    CASE WHEN df.cfdicancel IS NULL THEN '0' ELSE '1' END AS cancelado, 'e' AS type
+                    FROM cfdiegreso ce INNER JOIN datos_factura df ON df.tagfactura = ce.tagfactura
+                    INNER JOIN detallepago dp ON dp.pago_idfactura = df.iddatos_factura INNER JOIN complemento_pago cp ON cp.tagcomplemento = dp.detalle_tagcomplemento WHERE
+                        ce.iddoc = :fid AND ce.type = 'f' ORDER BY descripcion_pago LIMIT 1) AS sub2 ORDER BY idpago, type DESC;";
         $val = array("pid" => $folio, "fid" => $idfactura);
         $consultado = $this->consultas->getResults($consultas, $val);
         return $consultado;
@@ -2701,6 +2706,21 @@ class ControladorFactura
         return $consultado;
     }
 
+    public function getPagosVentas($idfac)
+    {
+        $consultaTagFactura = "SELECT tagfactura FROM datos_factura WHERE iddatos_factura = :idfac";
+        $paramsTagFactura = array("idfac" => $idfac);
+        $resultadoTagFactura = $this->consultas->getResults($consultaTagFactura, $paramsTagFactura);
+
+        $tagFactura = $resultadoTagFactura[0]['tagfactura'];
+        $consultaDatosVenta = "SELECT * FROM datos_venta WHERE tagfactura = :tagFactura";
+        $paramsDatosVenta = array("tagFactura" => $tagFactura);
+        $resultadoDatosVenta = $this->consultas->getResults($consultaDatosVenta, $paramsDatosVenta);
+
+        return $resultadoDatosVenta;
+    }
+
+
     public function tablaPagosReg($idfactura, $status)
     {
         $datos = "<corte><thead class='sin-paddding'>
@@ -2713,44 +2733,81 @@ class ControladorFactura
                 <th class='text-center'>RECIBO</th>
                 </thead><tbody>";
         $productos = $this->getPagosDetalle($idfactura);
-        foreach ($productos as $productoactual) {
-            $folio = $productoactual['detalle_tagencabezado'];
-            $pagos = $this->getPagosReg($folio, $idfactura);
-            foreach ($pagos as $pagoactual) {
-                $idpago = $pagoactual['idpago'];
-                $foliopago = $pagoactual['letra'] . $pagoactual['foliopago'];
-                $fechapago = $pagoactual['complemento_fechapago'];
-                $div = explode("-", $fechapago);
-                $mes = $this->translateMonth($div[1]);
-
-                $fechapago = $div[2] . ' de ' . $mes;
-                $horapago = $pagoactual['complemento_horapago'];
-                $horapago = date('g:i a', strtotime($horapago));
-                $totalpagado = $pagoactual['totalpagado'];
-                $c_pago = $pagoactual['nombre_forma_pago'] ?? $pagoactual['forma_pago'] ?? "Indefinido";
-
-                if ($pagoactual['cancelado'] == '0') {
-                    $estado = "Activo";
-                    $class = "text-success fw-bold";
-                    if ($pagoactual['uuidpago'] != '') {
-                        $estado = "Timbrado";
-                        $class = "text-success fw-bold";
-                    }
-                } else if ($pagoactual['cancelado'] == '1') {
-                    $estado = "Cancelado";
-                    $class = "text-warning fw-bold";
+        if (!$productos) {
+            $ventas = $this->getPagosVentas($idfactura);
+            foreach ($ventas as $ventapago){
+                $tagventa = $ventapago['tagventa'];
+                $folioventa = $ventapago['letra'] . $ventapago['folio'];
+                $fechaventa = $ventapago['fecha_venta'];
+                $horaventa = $ventapago['hora_venta'];
+                $formapago = $ventapago['formapago'];
+                switch ($formapago) {
+                    case "cash":
+                        $formapago = "Efectivo";
+                        break;
+                    case "card":
+                        $formapago = "Tarjeta";
+                        break;
+                    case "val":
+                        $formapago = "Vales";
+                        break;
+                    default:
+                        $formapago = "Efectivo";
                 }
+                $totalventa = $ventapago['totalventa'];
+            }
 
-                $datos .= "
-                    <tr>
-                        <td class='text-center'>$foliopago</td>
-                        <td class='text-center'>$fechapago a " . date("g:i A", strtotime($horapago)) . "</td>
-                        <td class='text-center'>$c_pago</td>
-                        <td class='text-center'>$ " . number_format(bcdiv($totalpagado, '1', 2), 2) . "</td>
-                        <td class='text-center $class'>$estado</td>
-                        <td align='center'><a class='btn button-list' title='Descagar PDF' onclick=\"imprimirpago($idpago);\"><span class='fas fa-list-alt mt-1'></span></a></td>
-                    </tr>
-                     ";
+            $sello = "";
+            $datos .= "
+            <tr>
+                <td class='text-center'>$folioventa</td>
+                <td class='text-center'>$fechaventa a " . date("g:i A", strtotime($horaventa)) . "</td>
+                <td class='text-center'>$formapago</td>
+                <td class='text-center'>$" . number_format(bcdiv($totalventa, '1', 2), 2) . "</td>
+                <td class='text-center text-success fw-semibold'>Pagado</td>
+                <td align='center'><a class='btn button-list' title='Descagar PDF' onclick=\"imprimirTicket('$tagventa','$sello');\"><span class='fas fa-list-alt mt-1'></span></a></td>
+            </tr>
+             ";
+        } else {
+            foreach ($productos as $productoactual) {
+                $folio = $productoactual['detalle_tagencabezado'];
+                $pagos = $this->getPagosReg($folio, $idfactura);
+                foreach ($pagos as $pagoactual) {
+                    $idpago = $pagoactual['idpago'];
+                    $foliopago = $pagoactual['letra'] . $pagoactual['foliopago'];
+                    $fechapago = $pagoactual['complemento_fechapago'];
+                    $div = explode("-", $fechapago);
+                    $mes = $this->translateMonth($div[1]);
+    
+                    $fechapago = $div[2] . ' de ' . $mes;
+                    $horapago = $pagoactual['complemento_horapago'];
+                    $horapago = date('g:i a', strtotime($horapago));
+                    $totalpagado = $pagoactual['totalpagado'];
+                    $c_pago = $pagoactual['descripcion_pago'];
+    
+                    if ($pagoactual['cancelado'] == '0') {
+                        $estado = "Activo";
+                        $class = "text-success fw-bold";
+                        if ($pagoactual['uuidpago'] != '') {
+                            $estado = "Timbrado";
+                            $class = "text-success fw-bold";
+                        }
+                    } else if ($pagoactual['cancelado'] == '1') {
+                        $estado = "Cancelado";
+                        $class = "text-warning fw-bold";
+                    }
+    
+                    $datos .= "
+                        <tr>
+                            <td class='text-center'>$foliopago</td>
+                            <td class='text-center'>$fechapago a " . date("g:i A", strtotime($horapago)) . "</td>
+                            <td class='text-center'>$c_pago</td>
+                            <td class='text-center'>$" . number_format(bcdiv($totalpagado, '1', 2), 2) . "</td>
+                            <td class='text-center $class'>$estado</td>
+                            <td align='center'><a class='btn button-list' title='Descagar PDF' onclick=\"imprimirpago($idpago);\"><span class='fas fa-list-alt mt-1'></span></a></td>
+                        </tr>
+                         ";
+                }
             }
         }
 
@@ -3859,7 +3916,7 @@ class ControladorFactura
                                                 <table align='center' width='100%' border='0' cellpadding='0' cellspacing='0' style='max-width:650px; border-radius: 20px; background-color:#fff; font-family:sans-serif;'>
                                                     <thead>
                                                         <tr height='80'>
-                                                            <th align='left' colspan='4' style='padding: 6px; background-color:#f5f5f5; border-radius: 20px; border-bottom:solid 1px #bdbdbd;' ><img src='https://q-ik.mx/$rfcfolder/img/$logo' height='100px'/></th>
+                                                            <th align='left' colspan='4' style='padding: 6px; background-color:#f5f5f5; border-radius: 20px; border-bottom:solid 1px #bdbdbd;' ><img src='https://localhost/$rfcfolder/img/$logo' height='100px'/></th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>

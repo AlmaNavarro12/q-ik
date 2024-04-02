@@ -314,7 +314,7 @@ include("buscarProductos.php");
                 <label class="label-sub">Conceptos</label>
             </div>
             <div class="col-md-8 text-end" id="btnprod">
-                <button id="btn-nuevo-producto" type="button" class="button-modal" data-bs-toggle="modal" data-bs-target="#nuevo-producto" onclick="setCamposProducto();">
+                <button id="btn-nuevo-producto" type="button" class="button-modal" data-bs-toggle="modal" data-bs-target="#nuevo-producto" onclick="limpiarCampos(); setCamposProducto();">
                     <span class="fas fa-plus"></span> Nuevo producto
                 </button>
                 <button id="btn-agregar-productos" type="button" class="button-modal" data-bs-toggle="modal" data-bs-target="#myModal">
@@ -497,7 +497,7 @@ include("buscarProductos.php");
                     </div>
                 </div>
                 <div class="col-md-4 py-2">
-                    <label class="label-form text-right" for="btn-agregar-mercancia">Agregar </label> <label class="mark-required text-danger fw-bold">&nbsp;</label>
+                    <label class="label-form text-right" id="label-mercancia" for="btn-agregar-mercancia">Agregar </label> <label class="mark-required text-danger fw-bold">&nbsp;</label>
                     <div class="form-group">
                         <button title="Agregar mercancia" id="btn-agregar-mercancia" class='btn button-list-add col-12' onclick='agregarMercancia();'><span class='fas fa-plus'></span></button>
                     </div>
@@ -553,7 +553,7 @@ include("buscarProductos.php");
                 <div class="col-md-4 py-2">
                     <label class="label-form text-right" for="anho-modelo">A&ntilde;o modelo vehículo</label> <label class="mark-required text-danger fw-bold">*</label>
                     <div class="form-group">
-                        <input type="text" class="form-control input-form" id="anho-modelo" placeholder="Año del modelo del vehículo" />
+                        <input type="text" class="form-control input-form" id="anho-modelo" placeholder="Año del modelo del vehículo" maxlength="4" oninput="validarNum(this);"/>
                         <div id="anho-modelo-errors"></div>
                     </div>
                 </div>
@@ -589,18 +589,18 @@ include("buscarProductos.php");
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-2">
+                <div class="col-md-2 py-2">
                     <div class="new-tooltip icon tip">
                         <label class="label-form text-right" for="peso-vehiculo"> <span class="fas fa-question-circle small text-primary-emphasis"></span> Peso vehicular</label><label class="mark-required text-danger fw-bold">*</label>
                         <span class="tiptext">Es el peso del vehículo en toneladas (t).</span>
                     </div>
                     <div class="form-group">
                         <!--<input type="float" class="form-control input-form" id="peso-vehiculo" onchange="obtenerPesoBrutoVehicular()"/>-->
-                        <input type="text" onkeypress="return filterFloat(event,this);" class="form-control input-form" placeholder="Peso en toneladas" id="peso-vehiculo" onchange="obtenerPesoBrutoVehicular()" />
+                        <input type="number" onkeypress="return filterFloat(event,this);" class="form-control input-form" placeholder="Peso en toneladas" id="peso-vehiculo" onchange="obtenerPesoBrutoVehicular()" />
                         <div id="peso-vehiculo-errors"></div>
                     </div>
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-2 py-2">
                     <div class="new-tooltip icon tip">
                         <label class="label-form text-right" for="peso-bruto"> <span class="fas fa-question-circle small text-primary-emphasis"></span> Peso bruto</label><label class="mark-required text-danger fw-bold">*</label>
                         <span class="tiptext">Es la suma del peso vehicular y el peso de la carga, en el caso de vehículos de carga de acuerdo a la NOMSCT-012-2017.</span>
@@ -631,21 +631,21 @@ include("buscarProductos.php");
                     </div>
                     <div class="form-group">
                         <input type="hidden" value="" id="id-remolque1" name="id-remolque1" />
-                        <input type="text" class="form-control input-form" id="nombre-remolque1" placeholder="Buscar remolque" oninput="autocompletarRemolque1()" />
+                        <input type="text" class="form-control input-form" id="nombre-remolque1" placeholder="Buscar remolque" oninput="autocompletarRemolque(1)" />
                         <div id="nombre-vehiculo1-errors"></div>
                     </div>
                 </div>
                 <div class="col-md-4 py-2">
                     <label class="label-form text-right" for="tipo-remolque1">Tipo remolque No.1</label> <label class="mark-required text-danger fw-bold">&nbsp;</label>
                     <div class="form-group">
-                        <input type="text" class="form-control input-form" id="tipo-remolque1" placeholder="Clave del tipo de Remolque" oninput="aucompletarTipoRemolque()" />
+                        <input type="text" class="form-control input-form" id="tipo-remolque1" placeholder="Clave del tipo de Remolque" oninput="aucompletarTipoRemolque(1)" />
                         <div id="tipo-remolque1-errors"></div>
                     </div>
                 </div>
                 <div class="col-md-4 py-2">
                     <label class="label-form text-right" for="placa-remolque1">Placa Remolque No.1</label> <label class="mark-required text-danger fw-bold">&nbsp;</label>
                     <div class="form-group">
-                        <input type="text" class="form-control input-form" id="placa-remolque1" placeholder="Placa del remolque (sin espacios ni guiones)" onblur="checkRemolque1();" />
+                        <input type="text" class="form-control input-form" id="placa-remolque1" placeholder="Placa del remolque (sin espacios ni guiones)" onblur="checkRemolque(1);" />
                         <div id="placa-remolque1-errors"></div>
                     </div>
                 </div>
@@ -658,21 +658,21 @@ include("buscarProductos.php");
                     </div>
                     <div class="form-group">
                         <input type="hidden" value="" id="id-remolque2" name="id-remolque2" />
-                        <input type="text" class="form-control input-form" id="nombre-remolque2" placeholder="Buscar remolque" oninput="autocompletarRemolque2()" />
+                        <input type="text" class="form-control input-form" id="nombre-remolque2" placeholder="Buscar remolque" oninput="autocompletarRemolque(2)" />
                         <div id="nombre-vehiculo2-errors"></div>
                     </div>
                 </div>
                 <div class="col-md-4 py-2">
                     <label class="label-form text-right" for="tipo-remolque2">Tipo remolque No.2</label> <label class="mark-required text-danger fw-bold">&nbsp;</label>
                     <div class="form-group">
-                        <input type="text" class="form-control input-form" id="tipo-remolque2" placeholder="Clave del tipo de remolque" oninput="aucompletarTipoRemolque()" />
+                        <input type="text" class="form-control input-form" id="tipo-remolque2" placeholder="Clave del tipo de remolque" oninput="aucompletarTipoRemolque(2)" />
                         <div id="tipo-remolque2-errors"></div>
                     </div>
                 </div>
                 <div class="col-md-4 py-2">
                     <label class="label-form text-right" for="placa-remolque2">Placa remolque No.2</label> <label class="mark-required text-danger fw-bold">&nbsp;</label>
                     <div class="form-group">
-                        <input type="text" class="form-control input-form" id="placa-remolque2" placeholder="Placa del remolque (sin espacios ni guíones)" onblur="checkRemolque2();" />
+                        <input type="text" class="form-control input-form" id="placa-remolque2" placeholder="Placa del remolque (sin espacios ni guíones)" onblur="checkRemolque(2);" />
                         <div id="placa-remolque2-errors"></div>
                     </div>
                 </div>
@@ -685,21 +685,21 @@ include("buscarProductos.php");
                     </div>
                     <div class="form-group">
                         <input type="hidden" value="" id="id-remolque3" name="id-remolque3" />
-                        <input type="text" class="form-control input-form" id="nombre-remolque3" placeholder="Buscar remolque" oninput="autocompletarRemolque3()" />
+                        <input type="text" class="form-control input-form" id="nombre-remolque3" placeholder="Buscar remolque" oninput="autocompletarRemolque(3)" />
                         <div id="nombre-vehiculo3-errors"></div>
                     </div>
                 </div>
                 <div class="col-md-4 py-2">
                     <label class="label-form text-right" for="tipo-remolque3">Tipo remolque No.3</label> <label class="mark-required text-danger fw-bold">&nbsp;</label>
                     <div class="form-group">
-                        <input type="text" class="form-control input-form" id="tipo-remolque3" placeholder="Clave del tipo de Remolque" oninput="aucompletarTipoRemolque()" />
+                        <input type="text" class="form-control input-form" id="tipo-remolque3" placeholder="Clave del tipo de Remolque" oninput="aucompletarTipoRemolque(3)" />
                         <div id="tipo-remolque3-errors"></div>
                     </div>
                 </div>
                 <div class="col-md-4 py-2">
                     <label class="label-form text-right" for="placa-remolque3">Placa remolque No.3</label> <label class="mark-required text-danger fw-bold">&nbsp;</label>
                     <div class="form-group">
-                        <input type="text" class="form-control input-form" id="placa-remolque3" placeholder="Placa del remolque (sin espacios ni guiones)" onblur="checkRemolque3();" />
+                        <input type="text" class="form-control input-form" id="placa-remolque3" placeholder="Placa del remolque (sin espacios ni guiones)" onblur="checkRemolque(3);" />
                         <div id="placa-remolque3-errors"></div>
                     </div>
                 </div>
@@ -744,14 +744,14 @@ include("buscarProductos.php");
                     </div>
                     <div class="form-group">
                         <input type="hidden" value="" id="id-ubicacion" name='id-ubicacion' />
-                        <input class='form-control text-center input-form' id="nombre-ubicacion" name='nombre-ubicacion' placeholder='Buscar Ubicacion' type='text' oninput="autocompletarUbicacion();" />
+                        <input class='form-control text-center input-form' id="nombre-ubicacion" name='nombre-ubicacion' placeholder='Buscar ubicación' type='text' oninput="autocompletarUbicacion();" />
                         <div id="nombre-ubicacion-errors"></div>
                     </div>
                 </div>
                 <div class="col-md-4 py-2">
                     <label class="label-form text-right" for="rfc-ubicacion">RFC </label> <label class="mark-required text-danger fw-bold">*</label>
                     <div class="form-group">
-                        <input class='form-control text-center input-form' id="rfc-ubicacion" name='rfc-ubicacion' placeholder='RFC de la ubicacion' type='text' onblur="valRFCUbicacion()" />
+                        <input class='form-control text-center input-form' id="rfc-ubicacion" name='rfc-ubicacion' maxlength="13" placeholder='RFC de la ubicación' type='text'/>
                         <div id="rfc-ubicacion-errors"></div>
                     </div>
                 </div>
@@ -778,16 +778,20 @@ include("buscarProductos.php");
                     </div>
                 </div>
                 <div class="col-md-4 py-2">
-                    <label class="label-form text-right" for="cp-ubicacion">Código postal </label> <label class="mark-required text-danger fw-bold">*</label>
+                <div class="new-tooltip icon tip me-2">
+                    <span class="fas fa-question-circle small text-primary-emphasis"></span>
+                    <span class="tiptext">Al ingresar el código postal se selecciona el estado y municipio correspondiente. Si no es el estado o municipio deseados puedes seleccionarlos del listado manualmente.</span>
+                </div>
+                    <label class="label-form text-right" for="codigo_postal">Código postal </label> <label class="mark-required text-danger fw-bold">*</label>
                     <div class="form-group">
-                        <input class='form-control text-center input-form' id="cp-ubicacion" name='cp-ubicacion' placeholder='Código postal de la ubicación' type='text' onblur="getEstadoUbicacion();" />
-                        <div id="cp-ubicacion-errors"></div>
+                        <input class='form-control text-center input-form' id="codigo_postal" name='codigo_postal' placeholder='Código postal de la ubicación' type='text' maxlength="5" minlength="5" onblur="getEstadoMunicipioByCodP();" oninput="validarNum(this)"/>
+                        <div id="codigo_postal-errors"></div>
                     </div>
                 </div>
                 <div class="col-md-4 py-2">
                     <label class="label-form text-right" for="id-estado">Estado</label><label class="mark-required text-danger fw-bold">*</label>
                     <div class="form-group">
-                        <select class="form-select text-center input-form" id="id-estado" name="id-estado" onchange="loadMunicipioUbicacion()">
+                        <select class="form-select text-center input-form" id="id-estado" name="id-estado" onchange="loadOpcionesMunicipio()">
                             <option value="" id="option-default-estado">- - - -</option>
                             <optgroup id="estados-ubicacion" class="contenedor-estado text-start"> </optgroup>
                         </select>
@@ -828,13 +832,13 @@ include("buscarProductos.php");
                     </div>
                 </div>
                 <div class="col-md-2 py-2">
-                    <label class="label-form text-right" for="distancia-ubicacion">Agregar </label> <label class="mark-required text-danger fw-bold">&nbsp;</label>
+                    <label class="label-form text-right" id="label-distancia" for="distancia-ubicacion">Agregar </label> <label class="mark-required text-danger fw-bold">&nbsp;</label>
                     <div class="form-group">
                         <button title="Agregar ubicacion" id="btn-agregar-ubicacion" class='button-list-add col-12' onclick='agregarUbicacion();'><span class='fas fa-plus'></span></button>
                     </div>
                 </div>
             </div>
-            <div class="row">
+            <div class="row mt-2">
                 <div class="col-md-12">
                     <div class="scroll-table">
                         <table id="resultubicacion" class="table tab-hover table-condensed table-responsive table-row table-head">
@@ -854,7 +858,7 @@ include("buscarProductos.php");
                 <input type="hidden" value="" id="flag-operador" name='flag-operador' />
                 <div class="col-md-4 py-2">
                     <div class="new-tooltip icon tip">
-                        <label class="label-form text-right" for="nombre-operador">Nombre pperador <span class="fas fa-question-circle small text-primary-emphasis"></span></label> <label class="mark-required text-danger fw-bold">&nbsp;</label>
+                        <label class="label-form text-right" for="nombre-operador">Nombre operador <span class="fas fa-question-circle small text-primary-emphasis"></span></label> <label class="mark-required text-danger fw-bold">&nbsp;</label>
                         <span class="tiptext">Puede realizar la búsqueda por nombre o RFC de un operador que haya registrado previamente y el sistema cargará los datos de forma automática, si no realizó registro del operador puede dejar este campo en blanco e ingresar los datos.</span>
                     </div>
                     <div class="form-group">
@@ -889,7 +893,7 @@ include("buscarProductos.php");
                 <div class="col-md-4 py-2">
                     <label class="label-form text-right" for="estado-operador">Estado</label> <label class="mark-required text-danger fw-bold">*</label>
                     <div class="form-group">
-                        <select class="form-select text-center input-form" id="estado-operador" name="estado-operador" onchange="loadMunicipioOperador()">
+                        <select class="form-select text-center input-form" id="estado-operador" name="estado-operador" onchange="loadOpcionesMunicipioOperador()">
                             <option value="" id="option-default-estado">- - - -</option>
                             <optgroup id="estados-operador" class="contenedor-estado text-start"> </optgroup>
                         </select>
@@ -931,7 +935,7 @@ include("buscarProductos.php");
             <div class="row">
                 <div class="form-group col-md-6">
                     <label class="label-sub text-right" for="observaciones-carta">Observaciones</label>
-                    <textarea rows="10" cols="60" id="observaciones-carta" name="observaciones-carta" class="form-control input-form" placeholder="Observaciones sobre el servicio"></textarea>
+                    <textarea rows="10" cols="60" id="observaciones-carta" name="observaciones-carta" class="form-control input-form" placeholder="Observaciones sobre el servicio" style="height: 100px;"></textarea>
                     <div id="observaciones-carta-errors">
                     </div>
                 </div>

@@ -107,7 +107,7 @@ class ControladorOpcion {
 
     private function getFoliosAux($id) {
         $consultado = false;
-        $consulta = "SELECT * FROM folio WHERE usofolio =:uso ORDER BY serie;";
+        $consulta = "SELECT * FROM folio WHERE usofolio =:uso ORDER BY idfolio DESC;";
         $valores = array("uso" => $id);
         $consultado = $this->consultas->getResults($consulta, $valores);
         return $consultado;

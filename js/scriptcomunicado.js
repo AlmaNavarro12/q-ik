@@ -564,8 +564,6 @@ function displayIMG(id) {
                 var t = array[0];
                 var data = array[1];
                 if (t == 'd') {
-
-
                     var newTab = window.open('com.sine.imprimir/img.php?doc=' + id, '_blank');
                     newTab.document.body.innerHTML = data;
                 } else {

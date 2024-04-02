@@ -18,9 +18,9 @@ function gestionarCliente(idcliente = null) {
     var correoalt1 = $("#correo_alt1").val();
     var correoalt2 = $("#correo_alt2").val();
     var correoalt3 = $("#correo_alt3").val();
-    var rfc = 'XAXX010101000';
-    var razon = nombre + ' ' + apellidopaterno + ' ' + apellidomaterno;
-    var regimenfiscal = "616 - Sin obligaciones fiscales";
+    var rfc = null;
+    var razon = null;
+    var regimenfiscal = null;
     var calle = null;
     var interior = null;
     var exterior = null;
@@ -28,19 +28,20 @@ function gestionarCliente(idcliente = null) {
     var municipio = null;
     var localidad = null;
     var postal = null;
+    var nombreestado = null
+    var nombremunicipio = null;
     var idbanco = $("#id-banco").val();
     var cuenta = $("#cuenta").val();
     var clabe = $("#clabe").val();
-    var idbanco1 = $("#id-banco1").val();
+    var idbanco1 = $("#id-banco1").val() || 0;
     var cuenta1 = $("#cuenta1").val();
     var clabe1 = $("#clabe1").val();
-    var idbanco2 = $("#id-banco2").val();
+    var idbanco2 = $("#id-banco2").val() || 0;
     var cuenta2 = $("#cuenta2").val();
     var clabe2 = $("#clabe2").val();
-    var idbanco3 = $("#id-banco3").val();
+    var idbanco3 = $("#id-banco3").val() || 0;
     var cuenta3 = $("#cuenta3").val();
     var clabe3 = $("#clabe3").val();
-
     var nombre_banco1 = $("#id-banco option:selected").text().substring(4);
     var nombre_banco2 = $("#id-banco1 option:selected").text().substring(4);
     var nombre_banco3 = $("#id-banco2 option:selected").text().substring(4);
@@ -54,9 +55,9 @@ function gestionarCliente(idcliente = null) {
         interior = $("#num_interior").val();
         exterior = $("#num_exterior").val();
         estado = $("#id-estado").val();
-        var nombreestado = $("#id-estado option:selected").text().substring(4);
+        nombreestado = $("#id-estado option:selected").text().substring(4);
         municipio = $("#id-municipio").val();
-        var nombremunicipio = $("#id-municipio option:selected").text();
+        nombremunicipio = $("#id-municipio option:selected").text();
         localidad = $("#localidad").val();
         postal = $("#codigo_postal").val();
     }
@@ -145,7 +146,6 @@ function gestionarCliente(idcliente = null) {
         });
     }
 }
-
 
 function buscarCliente(pag = "") {
     var REF = $("#buscar-cliente").val();

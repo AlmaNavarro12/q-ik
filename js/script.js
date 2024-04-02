@@ -375,7 +375,7 @@ function changeText(elemento, texto) {
 }
 
 function validarLet(input) {
-    input.value = input.value.replace(/[^A-Za-z. ]/g, '');
+    input.value = input.value.replace(/[^A-Za-zñÑáéíóúüÁÉÍÓÚÜ. ]/g,'');
 }
 
 function validarFol(input) {
@@ -811,9 +811,9 @@ function loadView(vista) {
         'operador': ["loadOpcionesEstado()", 320],
         'listaoperador': ["loadBtnCrear('operador')", 300, "filtrarOperador()", 320],
         
-        'carta': ["truncateTmpCarta()", 300, "truncateTmpIMG()", 320, "loadOpcionesFolios('4')", 350, "loadFecha()", 370, "loadOpcionesEstado()", 400, "filtrarProducto()", 420, "loadOpcionesFormaPago2()", 450, "loadOpcionesMetodoPago()", 470, "loadOpcionesMoneda()", 500, "loadOpcionesUsoCFDI()", 520, "loadOpcionesComprobante()", 550, "loadOpcionesFacturacion()", 570, "loadOpcionesProveedor()", 600, "opcionesPeriodoGlobal()", 620, "opcionesMeses()", 650, "opcionesAnoGlobal()", 670, "loadOpcionesTipoRelacion()", 300],
+        'carta': ["truncateTmpCarta()", 300, "truncateTmpIMG()", 320, "getOptionsTaxes()", 300, "loadOpcionesFolios('4')", 350, "loadFecha()", 370, "loadOpcionesEstado()", 400, "filtrarProducto()", 420, "loadOpcionesFormaPago2()", 450, "loadOpcionesMetodoPago()", 470, "loadOpcionesMoneda()", 500, "loadOpcionesUsoCFDI()", 520, "loadOpcionesComprobante()", 550, "loadOpcionesFacturacion()", 570, "loadOpcionesProveedor()", 600, "opcionesPeriodoGlobal()", 620, "opcionesMeses()", 650, "opcionesAnoGlobal()", 670, "loadOpcionesTipoRelacion()", 300],
         
-        'listacarta': ["truncateTmpCarta()", 300, "truncateTmpIMG()", 300, "loadBtnCrear('carta')", 300, "filtrarCarta()", 320, "opcionesMotivoCancelar()", 350],
+        'listacarta': ["truncateTmp()", 300, "truncateTmpCarta()", 300, "truncateTmpIMG()", 300, "loadBtnCrear('carta')", 300, "filtrarCarta()", 320, "opcionesMotivoCancelar()", 350],
         'puntodeventa': ["newVenta()", 300, "checkFondo()", 300, "loadBtnVentas('puntodeventa')", 300, "truncateTickets()", 300],
         'listaticket': ["loadBtnCrear('ventas')", 300, "loadOpcionesUsuario()", 300, "filtrarVentas()", 300],
         'cortecaja': ["loadOpcionesUsuario()", 300, "loadFecha()", 300, "loadBtnCrear('listacortes')"],

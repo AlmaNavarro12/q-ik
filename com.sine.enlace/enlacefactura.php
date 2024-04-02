@@ -9,13 +9,14 @@ require_once '../com.sine.modelo/Session.php';
 Session::start();
 if (isset($_POST['transaccion'])) {
     $transaccion = $_POST['transaccion'];
+
     $f = new Factura();
     $cf = new ControladorFactura();
 
     switch ($transaccion) {
         case 'insertarfactura':
             $datosFactura = obtenerdatosFactura();
-            $insertado = $cf->nuevoFactura($datosFactura);
+            $insertado = $cf->nuevoFactura($datosFactura, $_POST['idticket']);
             echo $insertado;    
             break;
         case 'addcfdi':
@@ -410,7 +411,7 @@ if (isset($_POST['transaccion'])) {
         case 'tablatmp':
             $sid = session_id();
             $uuid = $_POST['uuid'];
-            $tcomprobante = $_POST['tcomprobante'];
+            $tcomprobante = $_POST['tcomprobante'] ?? "";
             $tabla = $cf->tablaProd($sid, $uuid, $tcomprobante );
             echo $tabla;
             break;

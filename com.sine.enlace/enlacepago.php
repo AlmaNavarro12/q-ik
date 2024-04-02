@@ -56,7 +56,7 @@ if (isset($_POST['transaccion'])) {
             echo $insertado ? $insertado : "0Error al insertar el complemento.";
             break;
         case 'xml':
-            $cadena = $cp->checkCancelados($_POST['idpago']);
+            $cadena = $cp->checkSaldo($_POST['idpago']);
             echo $cadena ? $cadena : "0Error.";
             break;
         case 'editarpago':

@@ -1,18 +1,16 @@
 <?php
-require_once  '../../CATSAT/CATSAT/com.sine.controlador/controladorMunicipio.php';
-require_once  '../../CATSAT/CATSAT/com.sine.controlador/controladorEstado.php';
 require_once '../com.sine.dao/Consultas.php';
+require_once '../com.sine.controlador/ControladorSat.php';
 require_once '../vendor/autoload.php';
 
 class ControladorAuto {
 
     private $consultas;
-    private $controladorMunicipio;
-    private $controladorEstado;
-
+    private $controladorSat;
 
     function __construct() {
         $this->consultas = new consultas(); 
+        $this->controladorSat = new ControladorSat();
     }
 
     public function getCoincidenciasBusquedaCliente($referencia) {
@@ -119,7 +117,7 @@ class ControladorAuto {
         $resultados = $this->consultas->getResults($consulta, null);
         $contador = 0;
         foreach ($resultados as $resultado) {
-            $datos[] = array("value" => $resultado['codproducto']."-".$resultado['nombre_producto'],
+            $datos[] = array("value" => $resultado['codproducto']."|".$resultado['nombre_producto'],
                 "id" => $resultado["idproser"],
                 "codigo" => $resultado['codproducto'],
                 "nombre" => $resultado['nombre_producto']);
@@ -176,7 +174,97 @@ class ControladorAuto {
             $datos[] = array("value" => $resultado['clave_fiscal']."-".$resultado['nombre_producto'],
                 "id" => $resultado["idproser"],
                 "nombre" => $resultado['nombre_producto'],
-                "peligro" => $this->getPeligroByCFiscal($resultado['clave_fiscal']));
+                "peligro" => $this->controladorSat->getPeligroByCFiscal($resultado['clave_fiscal']));
+            $contador++;
+        }
+        if ($contador == 0) {
+            $datos [] = array("value" => "No se encontraron registros", "id" => "Ninguno");
+        }
+        return $datos;
+    }
+
+    public function getCoincidenciasVehiculo($referencia) {
+        $datos = array();
+        $consulta = "SELECT * FROM transporte WHERE ((nombrevehiculo LIKE '%$referencia%') OR (placavehiculo LIKE '%$referencia%')) and status ='1' LIMIT 15;";
+        $resultados = $this->consultas->getResults($consulta, null);
+        $contador = 0;
+        foreach ($resultados as $resultado) {
+            $datos[] = array("value" => $resultado['nombrevehiculo'],
+                "id" => $resultado["idtransporte"],
+                "numpermiso" => $resultado["numeropermiso"],
+                "tipopermiso" => $resultado["tipopermiso"],
+                "conftransporte" => $resultado['conftransporte'],
+                "anhomodelo" => $resultado['anhomodelo'],
+                "placavehiculo" => $resultado['placavehiculo'],
+                "segurocivil" => $resultado['seguroCivil'],
+                "polizaCivil" => $resultado['polizaCivil'],
+                "seguroambiente" => $resultado['seguroAmbiente'],
+                "polizaambiente" => $resultado['polizaambiente']);
+            $contador++;
+        }
+        if ($contador == 0) {
+            $datos [] = array("value" => "No se encontraron registros", "id" => "Ninguno");
+        }
+        return $datos;
+    }
+
+    public function getCoincidenciasRemolque($referencia) {
+        $datos = array();
+        $consulta = "SELECT * FROM remolque WHERE ((nombreremolque LIKE '%$referencia%') OR (placaremolque LIKE '%$referencia%')) and status ='1' LIMIT 15;";
+        $resultados = $this->consultas->getResults($consulta, null);
+        $contador = 0;
+        foreach ($resultados as $resultado) {
+            $datos[] = array("value" => $resultado['nombreremolque'],
+                "id" => $resultado['idremolque'],
+                "tiporemolque" => $resultado["tiporemolque"],
+                "placaremolque" => $resultado["placaremolque"]);
+            $contador++;
+        }
+        if ($contador == 0) {
+            $datos [] = array("value" => "No se encontraron registros", "id" => "Ninguno");
+        }
+        return $datos;
+    }
+
+    public function getCoincidenciasUbicacion($referencia, $tipo) {
+        $datos = array();
+        $consulta = "SELECT u.* FROM ubicacion u WHERE ((u.nombre LIKE '%$referencia%') OR (u.rfcubicacion LIKE '%$referencia%') OR (u.nombre_estado LIKE '%$referencia%')) AND u.status ='1'  AND u.tipoubicacion='$tipo' LIMIT 15;";
+        $resultados = $this->consultas->getResults($consulta, null);
+        $contador = 0;
+        foreach ($resultados as $resultado) {
+            $datos[] = array("value" => $resultado['nombre'],
+                "id" => $resultado['idubicacion'],
+                "rfc" => $resultado['rfcubicacion'],
+                "tipo" => $resultado["tipoubicacion"],
+                "calle" => $resultado['calle'],
+                "numext" => $resultado['numext'],
+                "numint" => $resultado['numint'],
+                "colonia" => $resultado['colonia'],
+                "idestado" => $resultado["ubicacion_idestado"],
+                "idmunicipio" => $resultado['ubicacion_idmunicipio'],
+                "cp" => $resultado['codpostal']);
+            $contador++;
+        }
+        if ($contador == 0) {
+            $datos [] = array("value" => "No se encontraron registros", "id" => "Ninguno");
+        }
+        return $datos;
+    }
+
+    public function getCoincidenciasOperador($referencia) {
+        $datos = array();
+        $consulta = "SELECT * FROM operador o WHERE ((concat(o.nombreoperador,' ',o.apaternooperador,' ',o.amaternooperador) LIKE '%$referencia%') OR (o.rfcoperador LIKE '%$referencia%')) and opstatus ='1' LIMIT 15;";
+        $resultados = $this->consultas->getResults($consulta, null);
+        $contador = 0;
+        foreach ($resultados as $resultado) {
+            $datos[] = array("value" => $resultado['nombreoperador'].' '.$resultado['apaternooperador'].' '.$resultado['amaternooperador'],
+                "id" => $resultado['idoperador'],
+                "rfc" => $resultado['rfcoperador'],
+                "licencia" => $resultado['numlicencia'],
+                "idestado" => $resultado["operador_idestado"],
+                "idmunicipio" => $resultado['operador_idmunicipio'],
+                "calle" => $resultado["calle"],
+                "codpostal" => $resultado["cpoperador"]);
             $contador++;
         }
         if ($contador == 0) {

@@ -99,6 +99,9 @@ if (isset($_POST['transaccion'])) {
             echo $datos != "" ? $datos : "0Ha ocurrido un error.";
             break;
         case 'exportarticket':
+            $insertado = $cv->validarExistenciaFacturaVenta($_POST['id'], session_id());
+            break;
+        case 'exportarproductos':
             $insertado = $cv->exportarProductos($_POST['id'], session_id());
             break;
         case 'asignatagcotizacion':

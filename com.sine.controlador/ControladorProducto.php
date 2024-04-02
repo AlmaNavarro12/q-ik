@@ -419,7 +419,7 @@ class ControladorProducto
 
         $insertado = $this->consultas->execute($consulta, $valores);
 
-        if ($p->getInsert() != "") {
+        if ($p->getInsert() != "" && $p->getIdProducto() == 0) {
             session_start();
             $sid = session_id();
             $idproducto = $this->getIDProducto($p->getCodproducto());
@@ -430,7 +430,119 @@ class ControladorProducto
                 $agregar = $this->agregarProductoCotizacion($idproducto, $sid, $p);
             }
         }
+
+        if ($p->getInsert() == 'f' && $p->getIdProducto() != 0) {
+            $concepto = $this->actualizarConcepto2($p);
+        } else if ($p->getInsert() == 'c' || $p->getInsert() == 'ct') {
+            $concepto = $this->actualizarConceptoCot($p);
+        }
         return $insertado;
+    }
+
+    private function checkProductoAux($idtmp) {
+        $consultado = false;
+        $consulta = "SELECT t.*,p.cantinv,p.chinventario FROM tmp t inner join productos_servicios p on (t.id_productotmp=p.idproser) where t.idtmp=:id;";
+        $val = array("id" => $idtmp);
+        $consultado = $this->consultas->getResults($consulta, $val);
+        return $consultado;
+    }
+
+    private function reBuildArray($importe, $array) {
+        $div = explode("<impuesto>", $array);
+        $row = array();
+        $Timp = 0;
+        foreach ($div as $d) {
+            $div2 = explode("-", $d);
+            $imp = $importe * $div2[1];
+            $Timp += $imp;
+            if ($Timp > 0) {
+                $row[] = bcdiv($imp, '1', 2) . '-' . $div2[1] . '-' . $div2[2];
+            }
+        }
+        $rearray = implode("<impuesto>", $row);
+        return $rearray . "<cut>" . $Timp;
+    }
+    
+    private function actualizarConcepto2($t) {
+        $check = $this->checkProductoAux($t->getIdtmp());
+        foreach ($check as $actual) {
+            $canttmp = $actual['cantidad_tmp'];
+            $descuento_tmp = $actual['descuento_tmp'];
+            $traslados = $actual['trasladotmp'];
+            $retenciones = $actual['retenciontmp'];
+            $idproducto = $actual['id_productotmp'];
+        }
+        $totuni = $canttmp * $t->getPrecio_venta();
+        $impdescuento = $t->getPrecio_venta() * ($descuento_tmp / 100);
+        $importe = bcdiv($totuni, '1', 2) - bcdiv($impdescuento, '1', 2);
+
+        $rebuildT = $this->reBuildArray($importe, $traslados);
+        $divT = explode("<cut>", $rebuildT);
+        $traslados = $divT[0];
+        $Timp = $divT[1];
+
+        $rebuildR = $this->reBuildArray($importe, $retenciones);
+        $divR = explode("<cut>", $rebuildR);
+        $retenciones = $divR[0];
+        $Tret = $divR[1];
+
+        $total = (( bcdiv($importe, '1', 2) + bcdiv($Timp, '1', 2)) - bcdiv($Tret, '1', 2));
+
+        $actualizado = false;
+        $consulta = "UPDATE `tmp` SET tmpnombre=:nombre, precio_tmp=:precio, totunitario_tmp=:totunitario, impdescuento_tmp=:impdesc, imptotal_tmp=:total, trasladotmp=:traslado, retenciontmp=:retencion, clvfiscaltmp=:cfiscal, clvunidadtmp=:cunidad  WHERE idtmp=:id;";
+        $valores = array("id" => $t->getIdtmp(),
+            "nombre" => $t->getProducto(),
+            "precio" => $t->getPrecio_venta(),
+            "totunitario" => $totuni,
+            "impdesc" => $impdescuento,
+            "total" => $total,
+            "traslado" => $traslados,
+            "retencion" => $retenciones,
+            "cfiscal" => $t->getClavefiscal() . "-" . $t->getDescripcionfiscal(),
+            "cunidad" => $t->getClvunidad() . "-" . $t->getDescripcionunidad());
+        $actualizado = $this->consultas->execute($consulta, $valores);
+        return $actualizado;
+    }
+
+    private function actualizarConceptoCot($t) {
+        $check = $this->checkProductoCotAux($t->getIdtmp());
+        foreach ($check as $actual) {
+            $canttmp = $actual['cantidad_tmp'];
+            $descuento_tmp = $actual['descuento_tmp'];
+            $traslados = $actual['trasladotmp'];
+            $retenciones = $actual['retenciontmp'];
+            $idproducto = $actual['id_productotmp'];
+        }
+        $totuni = $canttmp * $t->getPrecio_venta();
+        $impdescuento = $t->getPrecio_venta() * ($descuento_tmp / 100);
+        $importe = bcdiv($totuni, '1', 2) - bcdiv($impdescuento, '1', 2);
+
+        $rebuildT = $this->reBuildArray($importe, $traslados);
+        $divT = explode("<cut>", $rebuildT);
+        $traslados = $divT[0];
+        $Timp = $divT[1];
+
+        $rebuildR = $this->reBuildArray($importe, $retenciones);
+        $divR = explode("<cut>", $rebuildR);
+        $retenciones = $divR[0];
+        $Tret = $divR[1];
+
+        $total = (bcdiv($importe, '1', 2) + bcdiv($Timp, '1', 2)) - bcdiv($Tret, '1', 2);
+
+        $actualizado = false;
+        $consulta = "UPDATE `tmpcotizacion` SET tmpnombre=:nombre, precio_tmp=:precio, totunitario_tmp=:totunitario, impdescuento_tmp=:impdesc, imptotal_tmp=:total, trasladotmp=:traslado, retenciontmp=:retencion, clvfiscaltmp=:cfiscal, clvunidadtmp=:cunidad WHERE idtmpcotizacion=:id;";
+        $valores = array("id" => $t->getIdtmp(),
+            "nombre" => $t->getProducto(),
+            "precio" => $t->getPrecio_venta(),
+            "totunitario" => $totuni,
+            "impdesc" => $impdescuento,
+            "total" => $total,
+            "traslado" => $traslados,
+            "retencion" => $retenciones,
+            "cfiscal" => $t->getClavefiscal() . "-" . $t->getDescripcionfiscal(),
+            "cunidad" => $t->getClvunidad() . "-" . $t->getDescripcionunidad());
+        $actualizado = $this->consultas->execute($consulta, $valores);
+        return $actualizado;
     }
 
     private function getIDProductoAux($datos)

@@ -28,21 +28,14 @@ include("modals.php");
                     <div id="fecha-creacion-errors"></div>
                 </div>
             </div>
-            <div class="col-md-4 py-1 mt-2" id="pago_factura" style="display: none;">
-                    <label class="label-radio d-flex align-items-center col-12">
-                        <input class="input-check-sm me-2" type="checkbox" id="pago" name="pago" onchange="corteCaja()"> <span class="fw-semibold lh-sm" style="color: #0d0d91;">¿Incluir pagos de facturas? </span> 
-                </label>
-            </div>
-            <!--
-            <div class="col-md-4 py-1">
-                <label class="label-space"></label>
-                <div class="form-group">
-                    <button id="btn-print-corte" type="button" class="button-modal col-12" onclick="imprimirCorteCaja();">
-                        <span class="fas fa-file"></span> Imprimir Corte
-                    </button>
+            <div class="col-md-12 py-1 mt-2" id="pago_factura" style="display: none;">
+                <div class="form-group d-flex aling-items-center">
+                    <input class="input-check me-2" type="checkbox" id="pago" checked name="pago" onchange="corteCaja()">
+                    <label class="ms-3 text-uppercase label-sub-tit fw-semibold fs-5" for="pago">¿Incluir pagos de facturas?</label>
+                    <div id="pago-errors">
+                    </div>
                 </div>
             </div>
-            -->
         </div>
         <div class="row">
             <div class="col-6 text-center">
@@ -50,7 +43,12 @@ include("modals.php");
                 <input type="hidden" name="ventas_totales" id="ventas_totales">
             </div>
             <div class="col-6 text-center">
-                <label class="label-sub-tit fw-semibold fs-5 mt-4">GANANCIAS: </label> <label class="label-sub-tit fw-semibold fs-5 mt-4" id="lbl-ganancia">$0.00</label>
+                <label class="label-sub-tit fw-semibold fs-5 mt-4">
+                            <div class="new-tooltip icon tip">
+                                <span class="fas fa-question-circle small text-primary-emphasis"></span>
+                                <span class="tiptext">El total de ganancias solo hace referencia a las ventas realizadas en Punto de Venta.</span>
+                            </div>
+                    GANANCIAS: </label> <label class="label-sub-tit fw-semibold fs-5 mt-4" id="lbl-ganancia">$0.00</label>
                 <input type="hidden" name="ganancias_totales" id="ganancias_totales">
             </div>
         </div>

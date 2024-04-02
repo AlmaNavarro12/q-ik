@@ -12,6 +12,8 @@ class TMPOperador {
     private $codpostal;
     private $sid;
     private $idmunicipio;
+    private $nombreestado;
+    private $nombremunicipio;
     
     function __construct() {
         
@@ -49,6 +51,14 @@ class TMPOperador {
         return $this->codpostal;
     }
 
+    function getNombreEstado() {
+        return $this->nombreestado;
+    }
+
+    function getNombreMunicipio() {
+        return $this->nombremunicipio;
+    }
+
     function getSid() {
         return $this->sid;
     }
@@ -76,6 +86,15 @@ class TMPOperador {
     function setEstado($estado) {
         $this->estado = $estado;
     }
+
+    function setNombreEstado($nombreestado) {
+        $this->nombreestado = $nombreestado;
+    }
+
+    function setNombreMunicipio($nombremunicipio) {
+        $this->nombremunicipio = $nombremunicipio;
+    }
+
 
     function setCalle($calle) {
         $this->calle = $calle;

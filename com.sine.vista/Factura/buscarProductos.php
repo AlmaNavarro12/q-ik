@@ -104,7 +104,7 @@
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
             <div class="modal-header py-0">
-                <div class="label-sub fs-5 py-0" id="titulo-alerta">
+                <div class="label-sub fs-5 py-0" id="titulo-alerta-editar-producto">
                     Agregar nuevo producto
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" onclick="limpiarCampos();" aria-label="Close"></button>
@@ -209,11 +209,13 @@
                         </div>
                         <div class="col-md-4">
                             <label class="mark-required text-danger fw-bold mb-1">&nbsp;</label><br>
-                            <label class="button-file text-right col-12" for="imagen"><span class="fas fa-image"></span> Imagen del producto</label><label class="mark-required text-danger fw-bold">&nbsp;</label>
+                            <label class="button-file text-right col-12 mt-1" for="imagen"><span class="fas fa-image"></span> Imagen del producto</label><label class="mark-required text-danger fw-bold">&nbsp;</label>
                             <div class="form-group">
                                 <input class="form-control text-center upload" id="imagen" name="imagen" type="file" onchange="cargarImgProducto();" hidden accept=".jpg, .png, .jgep" />
                                 <input id="filename" name="filename" type="hidden" />
                                 <input id="imgactualizar" name="imgactualizar" type="hidden" />
+                                
+                                <input type='hidden' id='imgactualizar' name='imgactualizar'>
                                 <div id="imagen-errors">
                                 </div>
                             </div>
@@ -252,7 +254,7 @@
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
             <div class="modal-header py-0">
-                <div class="label-sub fs-5 py-0" id="titulo-alerta">
+                <div class="label-sub fs-5 py-0" id="titulo-alerta-editar">
                     Editar producto en factura
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>

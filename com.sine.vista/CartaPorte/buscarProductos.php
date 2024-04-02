@@ -91,7 +91,7 @@
                     <div id="observaciones-producto-errors">
                     </div>
                 </div>
-                <div class="row">
+                <div class="row mt-3">
                     <div class="col-md-12 text-end">
                         <button class="button-modal" onclick="agregarObservaciones();" id="btn-observaciones">Agregar <span class="fas fa-pencil"></span></button>
                     </div>
@@ -109,7 +109,7 @@
                 <div class="label-sub fs-5 py-0" id="titulo-alerta">
                     Agregar nuevo producto
                 </div>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" onclick="limpiarCampos();" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form id="form-producto" onsubmit="return false;">
@@ -201,6 +201,14 @@
                             <div id="pventa-errors">
                             </div>
                         </div>
+                        <div>
+                            <label class="label-form">Impuestos aplicables</label>
+                            <div id="imp-apli" class="row"></div>
+                        </div>
+                        <div class="row mt-2 mb-2">
+                            <div id="input-imp-apli" class="row col-12">
+                            </div>
+                        </div>
                         <div class="col-md-4">
                             <label class="mark-required text-danger fw-bold mb-1">&nbsp;</label><br>
                             <label class="button-file text-right col-12" for="imagen"><span class="fas fa-image"></span> Imagen del producto</label><label class="mark-required text-danger fw-bold">&nbsp;</label>
@@ -222,17 +230,14 @@
                             </div>
                         </div>
                         <div class="row py-2">
-                            <div class='col-md-8'>
-                            <div class="col-md-12 mt-3 border rounded-2 border-secondary-subtle shadow position-relative" id="imagenproducto" style="display: none;">
-                                <div class="col-md-3 d-flex justify-content-center aling-items-center" id="muestraimagenproducto">
+                            <div class='col-md-6'>
+                                <div class="col-md-12 mt-3 border rounded-2 border-secondary-subtle shadow position-relative" id="imagenproducto" style="display: none;">
+                                    <div class="col-md-3 d-flex justify-content-center aling-items-center" id="muestraimagenproducto">
 
+                                    </div>
                                 </div>
-                                <button class="btn button-file position-absolute bottom-0 end-0 m-3" id="eliminarimagen" onclick="eliminarImagen('nuevo');" type="button">
-                                    <i class="fas fa-trash"></i>
-                                </button>
                             </div>
-                            </div>
-                            <div class="col-md-4 text-end">
+                            <div class="col-md-6 text-end">
                                 <button class="button-modal" onclick="insertarProductoCarta()" id="btn-form-producto-factura">Guardar producto <span class="fas fa-save"></span></button>
                             </div>
                         </div>
@@ -246,10 +251,14 @@
 
 
 <div class="modal fade bs-example-modal-lg" id="editar-producto" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-    <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
-            <button type="button" class="close-modal" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="titulo-modal" id="myModalLabel">Editar Producto en Factura</h4>
+            <div class="modal-header py-0">
+                <div class="label-sub fs-5 py-0" id="titulo-alerta-editar">
+                    Editar producto en factura
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
             <div class="modal-body">
                 <form id="form-producto-editar" onsubmit="return false;">
                     <div class="row scrollX">
@@ -259,25 +268,23 @@
                                     <tr>
                                         <td colspan="2">
                                             <input id="editar-idtmp" name="editar-idtmp" type="hidden" />
-                                            <label class="label-form text-right" for="descripcion-mano">Descripcion</label>
+                                            <label class="label-form text-right mb-2" for="descripcion-mano">Descripción</label>
                                             <input class="form-control text-center input-form" id="editar-descripcion" name="editar-descripcion" placeholder="Descripcion" type="text" />
                                             <div id="editar-descripcion-errors">
                                             </div>
                                         </td>
                                         <td colspan="2">
-                                            <label class="label-form text-right" for="editar-cfiscal">Clave Fiscal</label>
+                                            <label class="label-form text-right mb-2" for="editar-cfiscal">Clave fiscal</label>
                                             <input class='form-control text-center input-form' id='editar-cfiscal' name='editar-cfiscal' placeholder='Clave Fiscal del producto' type='text' oninput="autocompletarCFiscal()" />
-                                            <div id="editar-cfiscal-errors">
-                                            </div>
+                                            <div id="editar-cfiscal-errors"></div>
                                         </td>
                                         <td colspan="2">
-                                            <label class="label-form text-right" for="editar-cunidad">Clave Unidad</label>
+                                            <label class="label-form text-right mb-2" for="editar-cunidad">Clave unidad</label>
                                             <input class='form-control text-center input-form' id='editar-cunidad' name='editar-cunidad' placeholder='Clave de la unidad del producto' type='text' oninput="autocompletarCUnidad()" />
-                                            <div id="editar-cunidad-errors">
-                                            </div>
+                                            <div id="editar-cunidad-errors"></div>
                                         </td>
                                         <td>
-                                            <label class="label-form text-right" for="cant-obra">Cantidad</label>
+                                            <label class="label-form text-right mb-2" for="cant-obra">Cantidad</label>
                                             <input class="form-control text-center input-form" id="editar-cantidad" name="editar-cantidad" placeholder="Cantidad" type="number" oninput="calcularImporteEditar();" />
                                             <div id="editar-cantidad-errors">
                                             </div>
@@ -285,51 +292,51 @@
                                     </tr>
                                     <tr>
                                         <td>
-                                            <label class="label-form text-right" for="precio-venta">Precio de Venta</label>
+                                            <label class="label-form text-right mb-2" for="precio-venta">Precio de venta</label>
                                             <input class="form-control text-center input-form" id="editar-precio" name="editar-precio" placeholder="Precio" type="number" oninput="calcularImporteEditar();" />
                                             <div id="editar-precio-errors">
                                             </div>
                                         </td>
                                         <td>
-                                            <label class="label-form text-right" for="importe-obra">Importe</label>
+                                            <label class="label-form text-right mb-2" for="importe-obra">Importe</label>
                                             <input class="form-control text-center input-form" id="editar-totuni" name="editar-totuni" placeholder="Precio" type="text" disabled />
                                             <div id="editar-totuni-errors">
                                             </div>
                                         </td>
                                         <td>
-                                            <label class="label-form text-right" for="por-descuento">% descuento</label>
+                                            <label class="label-form text-right mb-2" for="por-descuento">Descuento %</label>
                                             <input class="form-control text-center input-form" id="editar-descuento" name="editar-descuento" placeholder="Descuento" type="number" oninput="calcularDescuentoEditar();" />
                                             <div id="editar-descuento-errors">
                                             </div>
                                         </td>
                                         <td>
-                                            <label class="label-form text-right" for="por-descuento">Importe descuento</label>
+                                            <label class="label-form text-right mb-2" for="por-descuento">Importe descuento</label>
                                             <input class="form-control text-center input-form" id="editar-impdesc" name="editar-impdesc" placeholder="Descuento" type="text" disabled />
                                             <div id="editar-impdesc-errors">
                                             </div>
                                         </td>
                                         <td>
-                                            <label class="label-form text-right" for="traslados">Traslados</label>
+                                            <label class="label-form text-right mb-2" for="traslados">Traslados</label>
                                             <div class='input-group'>
                                                 <div class='dropdown'>
-                                                    <button type='button' class='button-impuesto dropdown-toggle' data-toggle='dropdown'>Traslados <span class='caret'></span></button>
+                                                    <button type='button' class='input-form dropdown-toggle' data-bs-toggle='dropdown' data-bs-auto-close="false">Traslados <span class='caret'></span></button>
                                                     <ul class='dropdown-menu' id="editar-traslados">
                                                     </ul>
                                                 </div>
                                             </div>
                                         </td>
                                         <td>
-                                            <label class="label-form text-right" for="retencion">Retenciones</label>
+                                            <label class="label-form text-right mb-2" for="retencion">Retenciones</label>
                                             <div class='input-group'>
                                                 <div class='dropdown'>
-                                                    <button type='button' class='button-impuesto dropdown-toggle' data-toggle='dropdown'>Retenciones <span class='caret'></span></button>
+                                                    <button type='button' class='input-form dropdown-toggle' data-bs-toggle='dropdown' data-bs-auto-close="false">Retenciones <span class='caret'></span></button>
                                                     <ul class='dropdown-menu' id="editar-retencion">
                                                     </ul>
                                                 </div>
                                             </div>
                                         </td>
                                         <td>
-                                            <label class="label-form text-right" for="total-obra">Total</label>
+                                            <label class="label-form text-right mb-2" for="total-obra">Total</label>
                                             <input class="form-control text-center input-form" id="editar-total" name="editar-total" placeholder="Precio de Compra" type="text" oninput="calcularGanancia()" disabled />
                                             <div id="editar-total-errors">
                                             </div>
@@ -337,14 +344,14 @@
                                     </tr>
                                     <tr>
                                         <td colspan="4">
-                                            <label class="label-form text-right" for="editar-observaciones">Observaciones</label>
-                                            <textarea rows="5" cols="60" id="editar-observaciones" class="form-control input-form" placeholder="Observaciones sobre el Producto" maxlength="120"></textarea>
+                                            <label class="label-form text-right mb-2" for="editar-observaciones">Observaciones</label>
+                                            <textarea rows="9" cols="60" id="editar-observaciones" class="form-control input-form" placeholder="Observaciones sobre el producto" maxlength="120"></textarea>
                                             <div id="editar-observaciones-errors">
                                             </div>
                                         </td>
                                         <td></td>
                                         <td colspan="2">
-                                            <button class="button-modal" onclick="actualizarConceptoFactura()" id="btn-form-producto-editar">Guardar <span class="glyphicon glyphicon-floppy-disk"></span></button>
+                                            <button class="button-modal col-12" onclick="actualizarConceptoFactura()" id="btn-form-producto-editar">Guardar <span class="fas fa-save"></span></button>
                                         </td>
                                     </tr>
                                 </tbody>
