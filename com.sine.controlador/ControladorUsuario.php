@@ -20,7 +20,7 @@ class ControladorUsuario
         "datosfacturacion", "creardatos", "editardatos", "listadatos", "eliminardatos", "descargardatos", //Eliminar, descargar archivos
         "contrato", "crearcontrato", "editarcontrato", "eliminarcontrato", "listacontrato",
         "usuario", "crearusuario", "listausuario", "eliminarusuario", "asignarpermiso",
-        "reporte", "reportefactura", "reportepago", "reportegrafica", "reporteiva", "datosiva", "reporteventa",
+        "reporte", "reportefactura", "reportepago", "reportegrafica", "reporteiva", "datosiva", "reporteventa", "reporteinventario", "reportepuntoventa",
         "configuracion", "addfolio", "listafolio", "editarfolio", "eliminarfolio", "addcomision", "encabezados", "confcorreo", "importar", 
         "ventas", "crearventa", "cancelarventa", "exportarventa", "listaventa", "registrarentrada", "registrarsalida", "cortedecaja"
     ];

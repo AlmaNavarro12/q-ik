@@ -12,7 +12,7 @@
                     <div class="row py-2">
                         <div class="form-group">
                             <label class="label-form text-start" for="monto-entrada">Cantidad</label> <label class="mark-required text-danger fw-bold">*</label>
-                            <input class="input-form text-center form-control" type="text" placeholder="Monto" id="monto-entrada" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"/>
+                            <input class="input-form text-center form-control" type="text" placeholder="Monto" id="monto-entrada" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" />
                             <div id="monto-entrada-errors"></div>
                         </div>
                     </div>
@@ -124,11 +124,34 @@
                                 <td class="text-start">
                                     <div class="div-forma" id="cash-div">
                                         <label class="text-start fw-bold text-muted mb-2">Pago con:</label>
-                                        <input class="input-form text-center form-control mt-0" id="monto-pagado" name="monto-pagado" placeholder="Cantidad pagada" type="number" oninput="calcularCambio();" />
+                                        <input class="input-form text-center form-control mt-0" id="monto-pagado" name="monto-pagado" placeholder="Cantidad pagada" type="text" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1'); calcularCambio();" />
                                     </div>
                                     <div class="div-forma" id="ref-div" style="display: none;">
                                         <label class="text-start fw-bold text-muted mb-2">Referencia:</label>
                                         <input class="input-form text-center form-control" id="referencia-pago" name="referencia-pago" placeholder="No. Referencia de la transacción" type="text" />
+                                        <div class="col-md-12 mt-3" id="tipo-tarjeta">
+                                            <fieldset>
+                                                <div class="form-group ps-5">
+                                                    <div class="row d-flex justify-content-center">
+                                                        <div class="col-sm-6">
+                                                            <div class="form-group">
+                                                                <label class="label-radio d-flex align-items-center">
+                                                                    <input class="input-radio me-2" type="radio" id="tarjetacredito" name="tarjeta" value="credito" checked=""> <label class="text-start fw-bold text-muted" for="tarjetacredito">Crédito</label>
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-6">
+                                                            <div class="form-group">
+                                                                <label class="label-radio d-flex align-items-center">
+                                                                    <input class="input-radio me-2" type="radio" id="tarjetadebito" name="tarjeta" value="debito"> <label class="text-start fw-bold text-muted" for="tarjetadebito">Débito</label>
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </fieldset>
+                                        </div>
+                                        <div id="tarjeta-errors"></div>
                                     </div>
                                 </td>
                                 <td class="text-center">
@@ -136,13 +159,13 @@
                                         Descuento: <span id="Spndescuento" class="far fa-square fs-6"></span>
                                         <input id="ChkDescuento" type="checkbox" value="1" onclick="habilitarDescuento()" style="display: none;">
                                     </label>
-                                   <div id="groupDesc" style="display: none;"> 
-                                   <div class="input-group" >
-                                        <input type="number" class="input-form text-center form-control" id="PercentDescuento" min="0" max="100" value="5">
-                                        <div class="input-group-text">%</div>
+                                    <div id="groupDesc" style="display: none;">
+                                        <div class="input-group">
+                                            <input type="number" class="input-form text-center form-control" id="PercentDescuento" min="0" max="100" value="5">
+                                            <div class="input-group-text">%</div>
+                                        </div>
+                                        <div id="PercentDescuento-errors" class='text-start'></div>
                                     </div>
-                                    <div id="PercentDescuento-errors" class='text-start'></div>
-                                   </div>
                                 </td>
                             </tr>
                             <tr class="border border-light">
@@ -182,7 +205,7 @@
                     <div class="row">
                         <label class="label-form text-start mb-1" for="monto-inicial">Dinero en caja <label class="mark-required text-danger fw-bold">*</label></label>
                         <div class="form-group">
-                            <input class="input-form text-center form-control" type="text" placeholder="Monto" id="monto-inicial" name="monto-inicial" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"/>
+                            <input class="input-form text-center form-control" type="text" placeholder="Monto" id="monto-inicial" name="monto-inicial" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" />
                             <div id="monto-inicial-errors"></div>
                         </div>
                     </div>
@@ -274,7 +297,7 @@
                 <button type="button" id="btn-close-modal" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                
+
                 <div class="row py-2">
                     <div class="col-md-6">
                         <label class="label-form text-right" for="supervisor">Nombre de supervisor</label> <label class="mark-required text-danger fw-bold">*</label>

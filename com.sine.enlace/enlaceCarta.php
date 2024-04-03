@@ -167,10 +167,35 @@ if (isset($_POST['transaccion'])) {
             $datos = $cc->checkOperador($_POST['rfc']);
             echo $datos;
             break;
+        case 'prodfactura':
+            $datos = $cc->productosFactura($_POST['tag'], session_id());
+            echo $datos != "" ? $datos : "0No se han productos para esta factura.";
+            break;
+        case 'mercanciacarta':
+            $datos = $cc->mercanciaCarta($_POST['tag'], session_id());
+            echo $datos != "" ? $datos : "0No se han encontrado los datos de mercancía para esta factura.";
+            break;
+        case 'ubicacioncarta':
+            $datos = $cc->ubicacionCarta($_POST['tag'], session_id());
+            echo $datos != "" ? $datos : "0No se han encontrado datos de ubicación para esta factura.";
+            break;
+        case 'operadorcarta':
+            $datos = $cc->operadorCarta($_POST['tag'], session_id());
+            echo $datos != "" ? $datos : "0No se han encontrado datos de operador para esta factura.";
+            break;
+        case 'doccarta':
+            $datos = $cc->documentoCarta($_POST['tag'], session_id());
+            echo $datos != "" ? $datos : "0No hay evidencias agregadas datos.";
+            break;
         //----------------------------------------------PAGOS
         case 'getdatospago':
             $datos = $cc->getDatosFacPago($_POST['idcarta']);
             echo $datos != "" ? $datos : "0No se han encontrado datos.";
+            break;
+        //-------------------------------------------GET CLIENTES
+        case 'getcliente':
+            $datos = $cc->checkCliente($_POST['rfc']);
+            echo $datos;
             break;
             
         
@@ -290,5 +315,10 @@ function obtenerDatosCartaPorte()
     $cp->setPesoMercancia($_POST['p_mercancia']);
     $cp->setPesoVehicular($_POST['p_vehiculo']);
     $cp->setPesoBruto($_POST['p_bruto']);
+    $cp->setNombreComprobante($_POST['nombre_comprobante']);
+    $cp->setNombreMetodo($_POST['nombre_metodo']);
+    $cp->setNombreForma($_POST['nombre_forma']);
+    $cp->setNombreMoneda($_POST['nombre_moneda']);
+    $cp->setNombrecfdi($_POST['nombre_cdfi']);
     return $cp;
 }

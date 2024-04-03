@@ -871,6 +871,26 @@ class ControladorCarta {
         return $base64;
     }
     
+    private function getIdccpQR($tag){
+        $idccp = "";
+        $qridccp = "";
+        $query = "SELECT idccp, qridccp FROM factura_carta where tagfactura = :tag";
+        $val = array("tag" => $tag);
+        $stmt = $this->consultas->getResults($query, $val);
+        foreach($stmt as $rs){
+            $idccp = $rs['idccp'];
+            $qridccp = $rs['qridccp'];
+        }
+
+        if($idccp == "" && $qridccp == ""){
+            $idccp = $this->generateIdCCP();
+            $qridccp = $this->generateQRIdCCP($idccp);
+        }
+
+        return "$idccp</tr>$qridccp";
+
+    }
+
     private function insertarFacturaCarta($f) {
         $insertado = false;
         $hoy = date("Y-m-d");
@@ -884,7 +904,7 @@ class ControladorCarta {
         $idCCP = $this->generateIdCCP();
         $QrIdCCP = $this->generateQRIdCCP($idCCP);
 
-        $consulta = "INSERT INTO `factura_carta` VALUES (:id, :fecha, :rfc, :rzsocial, :clvreg, :regimen, :cpemisor, :serie, :letra, :folio, :idcliente, :rfcreceptor, :rzreceptor, :dircliente, :cpreceptor, :regfiscalreceptor, :chfirmar, :cadena, :certSAT, :certCFDI, :uuid, :selloSAT, :sellocfdi, :fechatimbrado, :qrcode, :cfdistring, :cfdicancel, :status, :idmetodopago, :idformapago, :idmoneda, :tcambio, :iduso, :tipocomprobante, :periodo, :mes, :anho, :iddatosfacturacion, :cfdisrel, :subtotal, :subiva, :subret, :totdescuentos, :total, :tag, :pesomercancia, :pesovehicular, :pesobruto, :idccp, :qridccp);";
+        $consulta = "INSERT INTO `factura_carta` VALUES (:id, :fecha, :rfc, :rzsocial, :clvreg, :regimen, :cpemisor, :serie, :letra, :folio, :idcliente, :rfcreceptor, :rzreceptor, :dircliente, :cpreceptor, :regfiscalreceptor, :chfirmar, :cadena, :certSAT, :certCFDI, :uuid, :selloSAT, :sellocfdi, :fechatimbrado, :qrcode, :cfdistring, :cfdicancel, :status, :idmetodopago, :nombre_metodo, :idformapago, :nombre_forma, :idmoneda, :nombre_moneda, :tcambio, :iduso, :nombre_cfdi, :tipocomprobante, :nombre_comprobante, :periodo, :mes, :anho, :iddatosfacturacion, :cfdisrel, :subtotal, :subiva, :subret, :totdescuentos, :total, :tag, :pesomercancia, :pesovehicular, :pesobruto, :idccp, :qridccp);";
         $valores = array("id" => null,
             "fecha" => $hoy,
             "rfc" => '',
@@ -914,11 +934,16 @@ class ControladorCarta {
             "cfdicancel" => null,
             "status" => '2',
             "idmetodopago" => $f->getIdmetodopago(),
+            "nombre_metodo" => $f->getNombreMetodo(),
             "idformapago" => $f->getIdformapago(), //30
+            "nombre_forma" => $f->getNombreForma(),
             "idmoneda" => $f->getIdmoneda(),
+            "nombre_moneda" => $f->getNombreMoneda(),
             "tcambio" => $f->getTcambio(),
             "iduso" => $f->getIdusocfdi(),
+            "nombre_cfdi" => $f->getNombreCfdi(),
             "tipocomprobante" => $f->getTipocomprobante(),
+            "nombre_comprobante" => $f->getNombreComprobante(),
             "periodo" => $f->getPeriodicidad(),
             "mes" => $f->getMesperiodo(),
             "anho" => $f->getAnoperiodo(),
@@ -937,7 +962,6 @@ class ControladorCarta {
             "qridccp" => $QrIdCCP
         );
         $insertado = $this->consultas->execute($consulta, $valores);
-        echo "Primera insercion " . $insertado;
 
         $idremolque1 = $f->getIdremolque1() ?: '0';
         $idremolque2 = $f->getIdremolque2() ?: '0';
@@ -977,18 +1001,233 @@ class ControladorCarta {
             "observaciones" => $f->getObservaciones(),
             "tag" => $tag);
         $insertado2 = $this->consultas->execute($consulta2, $valores2);
-        echo "Segunda insercion " . $insertado2;
-
         $detfactura = $this->detalleFactura($f->getSessionid(), $tag);
-        echo "Tercera insercion " . $detfactura;
 
 		if ($f->getCFDISrel() == '1') {
             $this->detalleCFDIS($f->getSessionid(), $tag);
         }
         $detcarta = $this->detalleCarta($f->getSessionid(), $tag);
-        echo "Cuarta insercion " . $detcarta;
-
         return $insertado . "<tag>$tag<tag>";
+    }
+
+    public function modificarCarta($f) {
+        $insertado = false;
+        $validar = $this->validarFacturaCarta($f->getSessionid());
+        if (!$validar) {
+            $insertado = $this->actualizarCarta($f);
+        }
+        return $insertado;
+    }
+
+    private function actualizarCarta($f) {
+        $actualizado = false;
+        $updfolio = "";
+        $serie = "";
+        $letra = "";
+        $nfolio = "";
+        if ($f->getFolio() != '0') {
+            $updfolio = "serie=:serie, letra=:letra, foliocarta=:folio,";
+            $folios = $this->getFolio($f->getFolio());
+            $Fdiv = explode("</tr>", $folios);
+            $serie = $Fdiv[0];
+            $letra = $Fdiv[1];
+            $nfolio = $Fdiv[2];
+        }
+
+        $Fdividccp = $this->getIdccpQR($f->getTag());
+        $dividccp = explode('</tr>', $Fdividccp);
+        $idccp = $dividccp[0];
+        $qridccp = $dividccp[1];
+
+        $consulta = "UPDATE factura_carta SET $updfolio idcliente=:idcliente, rfcreceptor=:rfcreceptor, rzreceptor=:rzreceptor, dircliente=:dircliente, cpreceptor=:cpreceptor, regfiscalreceptor=:regfiscalreceptor, chfirmar=:chfirmar, id_metodo_pago=:idmetodopago, nombre_metodo_pago=:nombre_metodo, id_forma_pago=:idformapago, nombre_forma_pago =:nombre_forma, id_moneda=:idmoneda, nombre_moneda=:nombre_moneda, tcambio=:tcambio, id_uso_cfdi=:iduso, nombre_uso_cfdi=:nombre_cfdi, id_tipo_comprobante=:tipocomprobante, nombre_comprobante=:nombre_comprobante, periodoglobal=:periodoglobal, mesperiodo=:mesperiodo, anhoperiodo=:anhoperiodo, iddatosfacturacion=:iddatos, cfdisrel=:cfdisrel, pesomercancia = :peso_mercancia, pesovehicular = :peso_vehicular, pesobruto = :peso_bruto, idccp = :idccp, qridccp = :qridccp WHERE tagfactura=:tag;";
+        $valores = array("tag" => $f->getTag(),
+            "serie" => $serie,
+            "letra" => $letra,
+            "folio" => $nfolio,
+            "idcliente" => $f->getIdcliente(),
+            "rfcreceptor" => $f->getRfccliente(),
+            "rzreceptor" => $f->getRzcliente(),
+            "dircliente" => $f->getDircliente(),
+            "cpreceptor" => $f->getCodpostal(),
+            "regfiscalreceptor" => $f->getRegfiscalcliente(),
+            "chfirmar" => $f->getChfirmar(),
+            "idmetodopago" => $f->getIdmetodopago(),
+            "nombre_metodo" => $f->getNombreMetodo(),
+            "idformapago" => $f->getIdformapago(),
+            "nombre_forma" => $f->getNombreForma(),
+            "idmoneda" => $f->getIdmoneda(),
+            "nombre_moneda" => $f->getNombreMoneda(),
+            "tcambio" => $f->getTcambio(),
+            "iduso" => $f->getIdusocfdi(),
+            "nombre_cfdi" => $f->getNombreCfdi(),
+            "tipocomprobante" => $f->getTipocomprobante(),
+            "nombre_comprobante" => $f->getNombreComprobante(),
+            "periodoglobal" => $f->getPeriodicidad(),
+            "mesperiodo" => $f->getMesperiodo(),
+            "anhoperiodo" => $f->getAnoperiodo(),
+            "iddatos" => $f->getIddatosfacturacion(),
+			"cfdisrel" => $f->getCFDISrel(),
+            "peso_mercancia" => $f->getPesoMercancia(),
+            "peso_vehicular" => $f->getPesoVehicular(),
+            "peso_bruto" => $f->getPesoBruto(),            
+            "idccp" => $idccp,
+            "qridccp" => $qridccp
+        );
+        $actualizado = $this->consultas->execute($consulta, $valores);
+        
+        $updfolio2 = "";
+        if ($f->getFolio() != '0') {
+            $updfolio2 = "carta_serie=:serie, carta_letra=:letra, cartafolio=:folio,";
+        }
+
+        if ($f->getUuid() == "") {
+            $actualizar2 = false;
+            $consulta2 = "UPDATE `datos_carta` SET $updfolio2 tipomovimiento=:tipomov, carta_idvehiculo=:idvehiculo, nombrevehiculo=:vehiculo, carta_numpermiso=:numpermiso, carta_tipopermiso=:tipopermiso, carta_conftransporte=:conftransporte, carta_anhomod=:modelo, carta_placa=:placa, carta_segurocivil=:segurocivil, carta_polizaseguro=:polizaseguro, carta_idremolque1=:idremolque1, carta_nmremolque1=:nmremolque1, carta_tiporemolque1=:tiporemolque1, carta_placaremolque1=:placaremolque1, carta_idremolque2=:idremolque2, carta_nmremolque2=:nmremolque2, carta_tiporemolque2=:tiporemolque2, carta_placaremolque2=:placaremolque2, carta_idremolque3=:idremolque3, carta_nmremolque3=:nmremolque3, carta_tiporemolque3=:tiporemolque3, carta_placaremolque3=:placaremolque3, carta_seguroambiente=:seguroambiente, carta_polizaambiente=:polizaambiente, carta_observaciones=:observaciones WHERE tagcarta=:tag;";
+            $valores2 = array("tag" => $f->getTag(),
+                "serie" => $serie,
+                "letra" => $letra,
+                "folio" => $nfolio,
+                "tipomov" => $f->getTipomovimiento(),
+                "idvehiculo" => $f->getIdvehiculo(),
+                "vehiculo" => $f->getNombrevehiculo(),
+                "numpermiso" => $f->getNumpermiso(),
+                "tipopermiso" => $f->getTipopermiso(),
+                "conftransporte" => $f->getTipotransporte(),
+                "modelo" => $f->getModelo(),
+                "placa" => $f->getPlacavehiculo(),
+                "segurocivil" => $f->getSegurorespcivil(),
+                "polizaseguro" => $f->getPolizarespcivil(),
+                "idremolque1" => $f->getIdremolque1(),
+                "nmremolque1" => $f->getNombreremolque1(),
+                "tiporemolque1" => $f->getTiporemolque1(),
+                "placaremolque1" => $f->getPlacaremolque1(),
+                "idremolque2" => $f->getIdremolque2(),
+                "nmremolque2" => $f->getNombreremolque2(),
+                "tiporemolque2" => $f->getTiporemolque2(),
+                "placaremolque2" => $f->getPlacaremolque2(),
+                "idremolque3" => $f->getIdremolque3(),
+                "nmremolque3" => $f->getNombreremolque3(),
+                "tiporemolque3" => $f->getTiporemolque3(),
+                "placaremolque3" => $f->getPlacaremolque3(),
+                "seguroambiente" => $f->getSeguroambiente(),
+                "polizaambiente" => $f->getPolizaambiente(),
+                "observaciones" => $f->getObservaciones());
+            $actualizar2 = $this->consultas->execute($consulta2, $valores2);
+            $this->actualizardetalleCarta($f->getSessionid(), $f->getTag());
+        }
+    	$this->actualizarDetalle($f->getSessionid(), $f->getTag());
+		$this->actualizarCFDIS($f->getSessionid(), $f->getTag());
+        return $actualizado;
+    }
+
+    public function actualizarDetalle($idsession, $tag) {
+        $sumador_total = 0;
+        $sumador_iva = 0;
+        $sumador_ret = 0;
+        $sumador_descuento = 0;
+        $this->eliminarFacturaAux($tag);
+        $productos = $this->getTMP($idsession);
+        foreach ($productos as $productoactual) {
+            $id_tmp = $productoactual['idtmp'];
+            $idproducto = $productoactual['id_productotmp'];
+            $cantidad = $productoactual['cantidad_tmp'];
+            $pventa = $productoactual['precio_tmp'];
+            $nombre = $productoactual['tmpnombre'];
+            $ptotal = $productoactual['totunitario_tmp'];
+            $descuento = $productoactual['descuento_tmp'];
+            $impdescuento = $productoactual['impdescuento_tmp'];
+            $imptotal = $productoactual['imptotal_tmp'];
+            $observaciones = $productoactual['observaciones_tmp'];
+            $traslados = $productoactual['trasladotmp'];
+            $retencion = $productoactual['retenciontmp'];
+            $chinv = $productoactual['chinventariotmp'];
+            $clvfiscal = $productoactual['clvfiscaltmp'];
+            $clvunidad = $productoactual['clvunidadtmp'];
+
+            $tras = 0;
+            $divT = explode("<impuesto>", $traslados);
+            foreach ($divT as $tactual) {
+                $impuestos = $tactual;
+                $div = explode("-", $impuestos);
+                $tras += (bcdiv($div[0], '1', 2));
+            }
+
+            $ret = 0;
+            $divR = explode("<impuesto>", $retencion);
+            foreach ($divR as $ractual) {
+                $impuestos = $ractual;
+                $div = explode("-", $impuestos);
+                $ret += (bcdiv($div[0], '1', 2));
+            }
+
+            $sumador_iva += bcdiv($tras, '1', 2);
+            $sumador_ret += bcdiv($ret, '1', 2);
+            $sumador_total += bcdiv($ptotal, '1', 2);
+            $sumador_descuento += bcdiv($impdescuento, '1', 2);
+            $consulta2 = "INSERT INTO `detallefcarta` VALUES (:id, :cantidad, :precio, :subtotal, :descuento, :impdescuento, :totdescuento, :traslados, :retenciones, :observaciones, :idproducto, :nombreprod, :chinv, :cfiscal, :cunidad, :tag);";
+            $valores2 = array("id" => null,
+                "cantidad" => $cantidad,
+                "precio" => bcdiv($pventa, '1', 2),
+                "subtotal" => bcdiv($ptotal, '1', 2),
+                "descuento" => bcdiv($descuento, '1', 2),
+                "impdescuento" => bcdiv($impdescuento, '1', 2),
+                "totdescuento" => bcdiv($imptotal, '1', 2),
+                "traslados" => $traslados,
+                "retenciones" => $retencion,
+                "observaciones" => $observaciones,
+                "idproducto" => $idproducto,
+                "nombreprod" => $nombre,
+                "chinv" => $chinv,
+                "cfiscal" => $clvfiscal,
+                "cunidad" => $clvunidad,
+                "tag" => $tag);
+
+            $insertado = $this->consultas->execute($consulta2, $valores2);
+        }
+        $totaltraslados = $this->checkArray($idsession, '1');
+        $totalretencion = $this->checkArray($idsession, '2');
+        $borrar = "DELETE FROM `tmp` WHERE session_id=:id;";
+        $valores3 = array("id" => $idsession);
+        $eliminado = $this->consultas->execute($borrar, $valores3);
+
+        $total_factura = ((bcdiv($sumador_total, '1', 2) + bcdiv($sumador_iva, '1', 2)) - bcdiv($sumador_ret, '1', 2)) - bcdiv($sumador_descuento, '1', 2);
+        $update = "UPDATE `factura_carta` SET subtotal=:subtotal, subtotaliva=:iva, subtotalret=:ret, totaldescuentos=:totdesc, totalfactura=:total WHERE tagfactura=:tag;";
+        $valores4 = array("tag" => $tag,
+            "subtotal" => bcdiv($sumador_total, '1', 2),
+            "iva" => $totaltraslados,
+            "ret" => $totalretencion,
+            "totdesc" => bcdiv($sumador_descuento, '1', 2),
+            "total" => bcdiv($total_factura, '1', 2));
+        $insertado = $this->consultas->execute($update, $valores4);
+        return $insertado;
+    }
+
+    private function actualizarCFDIS($idsession, $tag) {
+        $insertado = false;
+        $this->eliminarCFDIAux($tag);
+
+        $cfdi = $this->getTMPCFDIS($idsession);
+        foreach ($cfdi as $actual) {
+            $tiporel = $actual['tiporel'];
+            $uuid = $actual['uuid'];
+
+            $consulta2 = "INSERT INTO `cfdirelacionado` VALUES (:id, :tiporel, :uuid, :tag);";
+            $valores2 = array("id" => null,
+                "tiporel" => $tiporel,
+                "uuid" => $uuid,
+                "tag" => $tag);
+            $insertado = $this->consultas->execute($consulta2, $valores2);
+        }
+        $cfdi = $this->deleteTMPCFDI($idsession);
+        return $insertado;
+    }
+
+    private function eliminarCFDIAux($tag) {
+        $eliminado = false;
+        $borrar = "DELETE FROM `cfdirelacionado` WHERE cfditag=:tag;";
+        $borrarvalores = array("tag" => $tag);
+        $eliminado = $this->consultas->execute($borrar, $borrarvalores);
+        return $eliminado;
     }
 
     private function detalleCFDIS($idsession, $tag) {
@@ -1055,7 +1294,7 @@ class ControladorCarta {
             }
         }
 
-        $trasarray = implode("<impuesto>", $row);
+        $trasarray = join("<impuesto>", $row);
         return $trasarray;
     }
 
@@ -1140,12 +1379,14 @@ class ControladorCarta {
         return $insertado;
     }
 
-    private function detalleCarta($sid, $tag) {
+    private function insertarDetalleMercancia($sid, $tag) {
         $insertado = false;
         $mercancia = $this->getTMPMercancia($sid);
+        
         foreach ($mercancia as $actual) {
             $consulta = "INSERT INTO `detallemercancia` VALUES (:id, :clv, :descripcion, :cant, :unidad, :peso, :tag, :condicion, :peligro, :clvmaterial, :embalaje);";
-            $val = array("id" => null,
+            $val = array(
+                "id" => null,
                 "clv" => $actual['tmpclave'],
                 "descripcion" => $actual['tmpdescripcion'],
                 "cant" => $actual['tmpcant'],
@@ -1155,60 +1396,129 @@ class ControladorCarta {
                 "condicion" => $actual['tmpcondpeligro'],
                 "peligro" => $actual['tmppeligro'],
                 "clvmaterial" => $actual['tmpclvmaterial'],
-                "embalaje" => $actual['tmpembalaje']);
+                "embalaje" => $actual['tmpembalaje']
+            );
             $insertado .= $this->consultas->execute($consulta, $val);
         }
-
+        return $insertado;
+    }
+    
+    private function insertarDetalleUbicacion($sid, $tag) {
+        $insertado = false;
         $ubicacion = $this->getTMPUbicacion($sid);
+        
         foreach ($ubicacion as $actual) {
-            $consulta = "INSERT INTO `detalleubicacion` VALUES (:id, :ubid, :nombre, :rfc, :tipo, :idestado, :codp, :distancia, :fecha, :hora, :tag, :direccion, :idmunicipio);";
-            $val = array("id" => null,
-                "ubid" => $actual['tmpidubicacion'],
+            $consulta = "INSERT INTO `detalleubicacion` VALUES (:id, :idub, :nombre, :rfc, :tipo, :idestado, :nombre_estado, :codp, :distancia, :fecha, :hora, :tag, :direccion, :idmunicipio, :nombre_municipio);";
+            $val = array(
+                "id" => null,
+                "idub" => $actual['tmpidubicacion'],
                 "nombre" => $actual['tmpnombre'],
                 "rfc" => $actual['tmprfc'],
                 "tipo" => $actual['tmpidtipo'],
                 "idestado" => $actual['tmpidestado'],
+                "nombre_estado" => $actual['tmpnombre_estado'],
                 "codp" => $actual['tmpcodpostal'],
                 "distancia" => $actual['tmpdistancia'],
                 "fecha" => $actual['tmpfecha'],
                 "hora" => $actual['tmphora'],
                 "tag" => $tag,
                 "direccion" => $actual['tmpdireccion'],
-                "idmunicipio" => $actual['tmpidmunicipio']);
+                "idmunicipio" => $actual['tmpidmunicipio'],
+                "nombre_municipio" => $actual['tmpnombre_municipio'],
+            );
             $insertado .= $this->consultas->execute($consulta, $val);
         }
+        
+        return $insertado;
+    }
 
+    private function insertarDetalleOperador($sid, $tag) {
+        $insertado = false;
         $operador = $this->getTMPOperador($sid);
+        
         foreach ($operador as $actual) {
-            $consulta = "INSERT INTO `detalleoperador` VALUES (:id, :oid, :nombre, :rfc, :lic, :estado, :calle, :cp, :tag, :idmunicipio);";
-            $val = array("id" => null,
+            $consulta = "INSERT INTO `detalleoperador` VALUES (:id, :oid, :nombre, :rfc, :lic, :estado, :nombre_estado, :calle, :cp, :tag, :idmunicipio, :nombre_municipio);";
+            $val = array(
+                "id" => null,
                 "oid" => $actual['tmpidoperador'],
                 "nombre" => $actual['tmpnombre'],
                 "rfc" => $actual['tmprfc'],
                 "lic" => $actual['tmplicencia'],
                 "estado" => $actual['tmp_idestado'],
+                "nombre_estado" => $actual['tmpnombre_estado'],
                 "calle" => $actual['tmp_calle'],
                 "cp" => $actual['tmp_cp'],
                 "tag" => $tag,
-                "idmunicipio" => $actual['tmpidmunicipio']);
+                "idmunicipio" => $actual['tmpidmunicipio'],
+                "nombre_municipio" => $actual['tmpnombre_municipio'],
+            );
             $insertado .= $this->consultas->execute($consulta, $val);
         }
-
+        
+        return $insertado;
+    }
+    
+    private function insertarDetalleEvidencias($sid, $tag) {
+        $insertado = false;
         $evidencias = $this->getTMPEvidencias($sid);
+        
         foreach ($evidencias as $evactual) {
             $consulta = "INSERT INTO `detalledoccarta` VALUES (:id, :orignm, :imgnm, :ext, :descripcion, :tag);";
-            $val = array("id" => null,
+            $val = array(
+                "id" => null,
                 "orignm" => $evactual['tmpname'],
                 "imgnm" => $evactual['imgtmp'],
                 "ext" => $evactual['ext'],
                 "descripcion" => $evactual['tmpdescripcion'],
-                "tag" => $tag);
+                "tag" => $tag
+            );
             $insertado .= $this->consultas->execute($consulta, $val);
             rename('../temporal/tmp/' . $evactual['imgtmp'], '../cartaporte/' . $evactual['imgtmp']);
         }
-
+        
         return $insertado;
     }
+    
+    private function detalleCarta($sid, $tag) {
+        $insertado = false;
+        $insertado .= $this->insertarDetalleMercancia($sid, $tag);
+        $insertado .= $this->insertarDetalleUbicacion($sid, $tag);
+        $insertado .= $this->insertarDetalleOperador($sid, $tag);
+        $insertado .= $this->insertarDetalleEvidencias($sid, $tag);
+        return $insertado;
+    }
+
+    private function actualizardetalleCarta($sid, $tag) {
+        $insertado = false;
+
+        $borrar = "DELETE FROM `detallemercancia` WHERE tagmercancia=:tag;";
+        $borrarvalores = array("tag" => $tag);
+        $eliminado = $this->consultas->execute($borrar, $borrarvalores);
+
+        $insertado .= $this->insertarDetalleMercancia($sid, $tag);
+
+        $borrar = "DELETE FROM `detalleubicacion` WHERE tagubicacion=:tag;";
+        $borrarval = array("tag" => $tag);
+        $eliminado = $this->consultas->execute($borrar, $borrarval);
+
+        $insertado .= $this->insertarDetalleUbicacion($sid, $tag);
+
+        $borrar = "DELETE FROM `detalleoperador` WHERE tagoperador=:tag;";
+        $borrarval = array("tag" => $tag);
+        $eliminado = $this->consultas->execute($borrar, $borrarval);
+
+        $insertado .= $this->insertarDetalleOperador($sid, $tag);
+        
+
+        $borrar = "DELETE FROM `detalledoccarta` WHERE tagimg=:tag;";
+        $borrarval = array("tag" => $tag);
+        $eliminado = $this->consultas->execute($borrar, $borrarval);
+
+        $insertado .= $this->insertarDetalleEvidencias($sid, $tag);
+        return $insertado;
+    }
+    
+
     private function getTMPEvidencias($sid) {
         $consultado = false;
         $consulta = "SELECT * FROM tmpimg WHERE sessionid=:sid ORDER BY idtmpimg;";
@@ -1219,7 +1529,7 @@ class ControladorCarta {
 
     private function getPermisoById($idusuario) {
         $consultado = false;
-        $consulta = "SELECT p.crearcarta, p.editarcarta, p.eliminarcarta FROM usuariopermiso p WHERE permiso_idusuario=:idusuario;";
+        $consulta = "SELECT p.crearcarta, p.editarcarta, p.eliminarcarta, p.timbrarcarta FROM usuariopermiso p WHERE permiso_idusuario=:idusuario;";
         $valores = array("idusuario" => $idusuario);
         $consultado = $this->consultas->getResults($consulta, $valores);
         return $consultado;
@@ -1232,7 +1542,8 @@ class ControladorCarta {
             $crear = $actual['crearcarta'];
             $editar = $actual['editarcarta'];
             $eliminar = $actual['eliminarcarta'];
-            $datos .= "$editar</tr>$eliminar</tr>$crear";
+            $timbrar = $actual['timbrarcarta'];
+            $datos .= "$editar</tr>$eliminar</tr>$crear</tr>$timbrar";
         }
         return $datos;
     }
@@ -1442,16 +1753,19 @@ class ControladorCarta {
 
             $datos .= "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' onclick=\"imprimirCarta($idfactura);\">Ver carta porte <span class='text-muted fas fa-eye'></span></a></li>";
 
-            if($uuid != ""){
+            if($uuid != "" && $uuid != ""){
                 $datos .= "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' $xml>Ver XML <span class='text-muted fas fa-download'></span></a></li>";
             }
 
-            $datos .= "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' $timbre>$tittimbre <span class='text-muted fas fa-bell'></span></a></li>
-                        <li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' data-toggle='modal' data-target='#modal-evidencia' onclick=\"verEvidencias($idfactura);\">Ver evidencias <span class='text-muted fas fa-save'></span></a></li>
-                        <li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' data-toggle='modal' data-target='#enviarmail' onclick='showCorreosCarta($idfactura);'>Enviar <span class='text-muted fas fa-envelope'></span></a></li>";
+            if($div[3] == '1'){
+                $datos .= "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' $timbre>$tittimbre <span class='text-muted fas fa-bell'></span></a></li>";
+            }
+
+            $datos .= "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' data-bs-toggle='modal' data-bs-target='#modal-evidencia' onclick=\"verEvidencias($idfactura);\">Ver evidencias <span class='text-muted fas fa-save'></span></a></li>
+                        <li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' data-bs-toggle='modal' data-bs-target='#enviarmail' onclick='showCorreosCarta($idfactura);'>Enviar <span class='text-muted fas fa-envelope'></span></a></li>";
 
             if ($uuid != "") {
-                $datos .= "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' data-toggle='modal' data-target='#modal-stcfdi' onclick='statusCancelacionCarta($idfactura);'>Comprobar estado de la factura <span class='glyphicon glyphicon-ok-sign'></span></a></li>";
+                $datos .= "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis lh-base' data-toggle='modal' data-target='#modal-stcfdi' onclick='statusCancelacionCarta($idfactura);'>Comprobar estado de <br> la factura <span class='fas fa-check-circle text-muted'></span></a></li>";
             }
             $datos .= "</ul>
                         </div></td>
@@ -1463,19 +1777,74 @@ class ControladorCarta {
         $finales += $inicios - 1;
         $function = "buscarCarta";
         if ($finales == 0) {
-            $datos .= "<tr><td class='text-center' colspan='11'>No se encontraron registros</td></tr>";
+            $datos .= "<tr><td colspan='11'>No se encontraron registros</td></tr>";
         }
         $datos .= "</tbody><tfoot><tr><th colspan='11'>Mostrando $inicios al $finales de $numrows registros " . paginate($page, $total_pages, $adjacents, $function) . "</th></tr></tfoot>";
         return $datos;
     }
 
+    private function getTagCartaAux($cid) {
+        $consultado = false;
+        $consulta = "SELECT * FROM factura_carta WHERE idfactura_carta=:id";
+        $val = array("id" => $cid);
+        $consultado = $this->consultas->getResults($consulta, $val);
+        return $consultado;
+    }
+
+    private function getTagCartabyID($cid) {
+        $tag = "";
+        $datos = $this->getTagCartaAux($cid);
+        foreach ($datos as $actual) {
+            $tag = $actual['tagfactura'];
+        }
+        return $tag;
+    }
+
+    public function eliminarFactura($cid) {
+        $tag = $this->getTagCartabyID($cid);
+        $eliminado = false;
+        $consulta = "DELETE FROM `factura_carta` WHERE idfactura_carta=:id;";
+        $valores = array("id" => $cid);
+        $eliminado = $this->consultas->execute($consulta, $valores);
+
+        $del = false;
+        $consulta = "DELETE FROM `datos_carta` WHERE tagcarta=:tag;";
+        $val = array("tag" => $tag);
+        $del = $this->consultas->execute($consulta, $val);
+
+        $eliminado2 = $this->eliminarFacturaAux($tag);
+        $carta = $this->eliminarDetalleCarta($tag);
+        return $eliminado;
+    }
+
+    private function eliminarFacturaAux($tag) {
+        $eliminado = false;
+        $consulta = "DELETE FROM `detallefcarta` WHERE tagdetfactura=:tag;";
+        $valores = array("tag" => $tag);
+        $eliminado = $this->consultas->execute($consulta, $valores);
+        return $eliminado;
+    }
+
+    private function eliminarDetalleCarta($tag) {
+        $borrar = "DELETE FROM `detallemercancia` WHERE tagmercancia=:tag;";
+        $borrarvalores = array("tag" => $tag);
+        $eliminado = $this->consultas->execute($borrar, $borrarvalores);
+
+        $borrar = "DELETE FROM `detalleubicacion` WHERE tagubicacion=:tag;";
+        $borrarval = array("tag" => $tag);
+        $eliminado = $this->consultas->execute($borrar, $borrarval);
+
+        $borrar = "DELETE FROM `detalleoperador` WHERE tagoperador=:tag;";
+        $borrarval = array("tag" => $tag);
+        $eliminado = $this->consultas->execute($borrar, $borrarval);
+        return $eliminado;
+    }
     //------------------------------------------------- PAGOS
     private function getFacturaPagoById($idfactura) {
         $consultado = false;
-        $consulta = "SELECT f.*, df.nombre_contribuyente, p.*, m.c_moneda, m.descripcion_moneda FROM factura_carta f INNER JOIN datos_facturacion df ON (f.iddatosfacturacion=df.id_datos) INNER JOIN catalogo_pago p ON (f.id_forma_pago=p.idcatalogo_pago) INNER JOIN catalogo_moneda m ON (m.idcatalogo_moneda=f.id_moneda) WHERE f.idfactura_carta=:id;";
+        $consulta = "SELECT f.*, df.nombre_contribuyente FROM factura_carta f INNER JOIN datos_facturacion df ON (f.iddatosfacturacion=df.id_datos) WHERE f.idfactura_carta=:id;";
         $val = array("id" => $idfactura);
-        $consultas = new Consultas();
-        $consultado = $consultas->getResults($consulta, $val);
+        $consultado = $this->consultas->getResults($consulta, $val);
         return $consultado;
     }
 
@@ -1494,17 +1863,378 @@ class ControladorCarta {
             $iddatosfacturacion = $facturaactual['iddatosfacturacion'];
             $nombrecontribuyente = $facturaactual['nombre_contribuyente'];
             $idformapago = $facturaactual['id_forma_pago'];
-            $c_pago = $facturaactual['c_pago'];
-            $forma_pago = $facturaactual['descripcion_pago'];
             $idmoneda = $facturaactual['id_moneda'];
             $tcambio = $facturaactual['tcambio'];
-            $c_moneda = $facturaactual['c_moneda'];
-            $dmoneda = $facturaactual['descripcion_moneda'];
 
-            $datos = "$idfactura</tr>$folio</tr>$idcliente</tr>$nombrecliente</tr>$rfcreceptor</tr>$rzreceptor</tr>$cpreceptor</tr>$regfiscalreceptor</tr>$iddatosfacturacion</tr>$nombrecontribuyente</tr>$idformapago</tr>$c_pago</tr>$forma_pago</tr>$idmoneda</tr>$tcambio</tr>$c_moneda</tr>$dmoneda";
+            $datos = "$idfactura</tr>$folio</tr>$idcliente</tr>$nombrecliente</tr>$rfcreceptor</tr>$rzreceptor</tr>$cpreceptor</tr>$regfiscalreceptor</tr>$iddatosfacturacion</tr>$nombrecontribuyente</tr>$idformapago</tr>$idmoneda</tr>$tcambio";
             break;
         }
         return $datos;
     }
 
+    private function getCartaEditar($idfactura) {
+        $consultado = false;
+        $consulta = "SELECT dat.*, dc.* FROM factura_carta dat INNER JOIN datos_carta dc ON (dat.tagfactura=dc.tagcarta) WHERE dat.idfactura_carta=:cid;";
+        $val = array("cid" => $idfactura);
+        $consultado = $this->consultas->getResults($consulta, $val);
+        return $consultado;
+    }
+
+    public function getEditarCarta($cid) {
+        $factura = $this->getCartaEditar($cid);
+        $datos = "";
+        foreach ($factura as $facturaactual) {
+            $idfactura = $facturaactual['idfactura_carta'];
+            $fecha_creacion = $facturaactual['fecha_creacion'];
+            $rfcemisor = $facturaactual['factura_rfcemisor'];
+            $rzsocial = $facturaactual['factura_rzsocial'];
+            $clvreg = $facturaactual['factura_clvregimen'];
+            $regimen = $facturaactual['factura_regimen'];
+            $codpostal = $facturaactual['factura_cpemisor'];
+            $serie = $facturaactual['serie'];
+            $letra = $facturaactual['letra'];
+            $folio = $facturaactual['foliocarta'];
+            $idcliente = $facturaactual['idcliente'];
+            $cliente = $this->getNombreCliente($idcliente);
+            $rfccliente = $facturaactual['rfcreceptor'];
+            $rzreceptor = $facturaactual['rzreceptor'];
+            $dircliente = $facturaactual['dircliente'];
+            $cpreceptor = $facturaactual['cpreceptor'];
+            $regfiscalrec = $facturaactual['regfiscalreceptor'];
+            $chfirmar = $facturaactual['chfirmar'];
+            $idforma_pago = $facturaactual['id_forma_pago'];
+            $idmetodo_pago = $facturaactual['id_metodo_pago'];
+            $idmoneda = $facturaactual['id_moneda'];
+            $tcambio = $facturaactual['tcambio'];
+            $iduso_cfdi = $facturaactual['id_uso_cfdi'];
+            $idtipo_comprobante = $facturaactual['id_tipo_comprobante'];
+            $uuid = $facturaactual['uuid'];
+            $iddatos = $facturaactual['iddatosfacturacion'];
+            $iddatos_carta = $facturaactual['iddatos_carta'];
+            $tipomovimiento = $facturaactual['tipomovimiento'];
+            $idvehiculo = $facturaactual['carta_idvehiculo'];
+            $nombrevehiculo = $facturaactual['nombrevehiculo'];
+            $numpermiso = $facturaactual['carta_numpermiso'];
+            $tipopermiso = $facturaactual['carta_tipopermiso'];
+            $tipotrans = $facturaactual['carta_conftransporte'];
+            $anhomod = $facturaactual['carta_anhomod'];
+            $placa = $facturaactual['carta_placa'];
+            $segurocivil = $facturaactual['carta_segurocivil'];
+            $polizaseguro = $facturaactual['carta_polizaseguro'];
+            $idremolque1 = $facturaactual['carta_idremolque1'];
+            $nmremolque1 = $facturaactual['carta_nmremolque1'];
+            $tiporemolque1 = $facturaactual['carta_tiporemolque1'];
+            $placaremolque1 = $facturaactual['carta_placaremolque1'];
+            $idremolque2 = $facturaactual['carta_idremolque2'];
+            $nmremolque2 = $facturaactual['carta_nmremolque2'];
+            $tiporemolque2 = $facturaactual['carta_tiporemolque2'];
+            $placaremolque2 = $facturaactual['carta_placaremolque2'];
+            $idremolque3 = $facturaactual['carta_idremolque3'];
+            $nmremolque3 = $facturaactual['carta_nmremolque3'];
+            $tiporemolque3 = $facturaactual['carta_tiporemolque3'];
+            $placaremolque3 = $facturaactual['carta_placaremolque3'];
+            $tag = $facturaactual['tagfactura'];
+            $seguroambiente = $facturaactual['carta_seguroambiente'];
+            $polizaambiente = $facturaactual['carta_polizaambiente'];
+            $periodoglobal = $facturaactual['periodoglobal'];
+            $mesperiodo = $facturaactual['mesperiodo'];
+            $anhoperiodo = $facturaactual['anhoperiodo'];
+            $observaciones = addslashes($facturaactual['carta_observaciones']);
+			$cfdisrel = $facturaactual['cfdisrel'];
+            $peso_vehicular = $facturaactual['pesovehicular'];
+			$peso_bruto = $facturaactual['pesobruto'];
+
+            $datos = "$idfactura</tr>$fecha_creacion</tr>$rfcemisor</tr>$rzsocial</tr>$clvreg</tr>$regimen</tr>$codpostal</tr>$serie</tr>$letra</tr>$folio</tr>$idcliente</tr>$cliente</tr>$rfccliente</tr>$rzreceptor</tr>$cpreceptor</tr>$regfiscalrec</tr>$chfirmar</tr>$idforma_pago</tr>$idmetodo_pago</tr>$idmoneda</tr>$tcambio</tr>$iduso_cfdi</tr>$idtipo_comprobante</tr>$uuid</tr>$iddatos</tr>$iddatos_carta</tr>$tipomovimiento</tr>$idvehiculo</tr>$nombrevehiculo</tr>$numpermiso</tr>$tipopermiso</tr>$tipotrans</tr>$anhomod</tr>$placa</tr>$segurocivil</tr>$polizaseguro</tr>$idremolque1</tr>$nmremolque1</tr>$tiporemolque1</tr>$placaremolque1</tr>$idremolque2</tr>$nmremolque2</tr>$tiporemolque2</tr>$placaremolque2</tr>$idremolque3</tr>$nmremolque3</tr>$tiporemolque3</tr>$placaremolque3</tr>$tag</tr>$seguroambiente</tr>$polizaambiente</tr>$periodoglobal</tr>$mesperiodo</tr>$anhoperiodo</tr>$dircliente</tr>$observaciones</tr>$cfdisrel</tr>$peso_vehicular</tr>$peso_bruto";
+            break;
+        }
+        return $datos;
+    }
+
+    public function getMercancias($tag) {
+        $consultado = false;
+        $consulta = "SELECT * FROM detallemercancia WHERE tagmercancia=:tag";
+        $val = array("tag" => $tag);
+        $consultado = $this->consultas->getResults($consulta, $val);
+        return $consultado;
+    }
+
+    public function mercanciaCarta($tag, $sid) {
+        $insertado = false;
+        $productos = $this->getMercancias($tag);
+        foreach ($productos as $productoactual) {
+            $clv = $productoactual["clave_mercanca"];
+            $descripcion = $productoactual["descripcion_mercancia"];
+            $cant = $productoactual["cant_mercancia"];
+            $unidad = $productoactual['unidad_mercancia'];
+            $peso = $productoactual['peso_mercancia'];
+            $condicional = $productoactual['condicion'];
+            $peligro = $productoactual['peligro'];
+            $clvmaterial = $productoactual['clvmaterial'];
+            $embalaje = $productoactual['embalaje'];
+
+            $consulta = "INSERT INTO `tmpmercancia` VALUES (:id, :clv, :descripcion, :cant, :unidad, :peso, :sid, :condpeligro, :peligro, :clvmaterial, :tmpembalaje);";
+            $valores = array("id" => null,
+                "clv" => $clv,
+                "descripcion" => $descripcion,
+                "cant" => $cant,
+                "unidad" => $unidad,
+                "peso" => $peso,
+                "sid" => $sid,
+                "condpeligro" => $condicional,
+                "peligro" => $peligro,
+                "clvmaterial" => $clvmaterial,
+                "tmpembalaje" => $embalaje);
+
+            $insertado = $this->consultas->execute($consulta, $valores);
+        }
+        return $insertado;
+    }
+
+    public function getUbicacionesEditar($tag) {
+        $consultado = false;
+        $consulta = "SELECT * FROM detalleubicacion WHERE tagubicacion=:tag;";
+        $val = array("tag" => $tag);
+        $consultado = $this->consultas->getResults($consulta, $val);
+        return $consultado;
+    }
+
+    public function ubicacionCarta($tag, $sid) {
+        $insertado = false;
+        $ubicaciones = $this->getUbicacionesEditar($tag);
+        foreach ($ubicaciones as $actual) {
+            $idub = $actual['ubicacion_id'];
+            $nombre = $actual["ubicacion_nombre"];
+            $rfc = $actual['ubicacion_rfc'];
+            $tipo = $actual["ubicacion_tipo"];
+            $estado = $actual["ubicacion_idestado"];
+            $nombreestado = $actual["nombre_estado"];
+            $cp = $actual['ubicacion_codpostal'];
+            $distancia = $actual['ubicacion_distancia'];
+            $fechallegada = $actual['fechallegada'];
+            $hora = $actual['horallegada'];
+            $direccion = $actual['direccion'];
+            $idmunicipio = $actual['idmunicipio'];
+            $nombremunicipio = $actual["nombre_municipio"];
+
+            $consulta = "INSERT INTO `tmpubicacion` VALUES (:id, :idub, :nombre, :rfc, :idtipo, :idestado, :nombreestado, :codp, :distancia, :fecha, :hora, :sid, :direccion, :idmunicipio,:nombre_municipio);";
+            $valores = array("id" => null,
+                "idub" => $idub,
+                "nombre" => $nombre,
+                "rfc" => $rfc,
+                "idtipo" => $tipo,
+                "idestado" => $estado,
+                "nombre_estado" => $nombreestado,
+                "codp" => $cp,
+                "distancia" => $distancia,
+                "fecha" => $fechallegada,
+                "hora" => $hora,
+                "sid" => $sid,
+                "direccion" => $direccion,
+                "idmunicipio" => $idmunicipio,
+                "nombre_municipio" => $nombremunicipio
+            );
+            $insertado = $this->consultas->execute($consulta, $valores);
+        }
+        return $insertado;
+    }
+
+    public function getOperadores($tag) {
+        $consultado = false;
+        $consulta = "SELECT * FROM detalleoperador u WHERE tagoperador=:tag;";
+        $val = array("tag" => $tag);
+        $consultado = $this->consultas->getResults($consulta, $val);
+        return $consultado;
+    }
+
+    public function operadorCarta($tag, $sid) {
+        $insertado = false;
+        $ubicaciones = $this->getOperadores($tag);
+        foreach ($ubicaciones as $actual) {
+            $idop = $actual['operador_id'];
+            $nombreop = $actual['operador_nombre'];
+            $rfc = $actual["operador_rfc"];
+            $lic = $actual['operador_numlic'];
+            $idestado = $actual["operador_idestado"];
+            $nombre_estado = $actual["nombre_estado"];
+            $calle = $actual["operador_calle"];
+            $cp = $actual['operador_cp'];
+            $idmunicipio = $actual['operador_idmunicipio'];
+            $nombre_municipio = $actual["nombre_municipio"];
+
+            $consulta = "INSERT INTO `tmpoperador` VALUES (:id, :idop, :nombre, :rfc, :lic, :idestado, :nombre_estado, :calle, :cp, :sid, :idmunicipio, :nombre_municipio);";
+            $valores = array("id" => null,
+                "idop" => $idop,
+                "nombre" => $nombreop,
+                "rfc" => $rfc,
+                "lic" => $lic,
+                "idestado" => $idestado,
+                "nombre_estado" => $nombre_estado,
+                "calle" => $calle,
+                "cp" => $cp,
+                "sid" => $sid,
+                "idmunicipio" => $idmunicipio,
+                "nombre_municipio" => $nombre_municipio,
+            );
+            $insertado = $this->consultas->execute($consulta, $valores);
+        }
+        return $insertado;
+    }
+
+    
+    //----------------------------------RELACION CON OTROS MODULOS
+    public function getProductosFactura($tag) {
+        $consultado = false;
+        $consulta = "SELECT * FROM detallefcarta WHERE tagdetfactura=:tag";
+        $val = array("tag" => $tag);
+        $consultado = $this->consultas->getResults($consulta, $val);
+        return $consultado;
+    }
+
+    public function productosFactura($id, $sid) {
+        $insertado = false;
+        $productos = $this->getProductosFactura($id);
+        foreach ($productos as $productoactual) {
+            $cantidad = $productoactual["cantidad"];
+            $precio = $productoactual["precio"];
+            $totunitario = $productoactual["totalunitario"];
+            $descuento = $productoactual['descuento'];
+            $impdescuento = $productoactual['impdescuento'];
+            $totdescuento = $productoactual['totaldescuento'];
+            $traslados = $productoactual['traslados'];
+            $retenciones = $productoactual['retenciones'];
+            $observaciones = $productoactual['observacionesproducto'];
+            $idproducto = $productoactual["id_producto_servicio"];
+            $nombre = $productoactual['carta_producto'];
+            $chinventario = $productoactual['chinv'];
+            $clvfiscal = $productoactual['clvfiscal'];
+            $clvunidad = $productoactual['clvunidad'];
+
+            $consulta = "INSERT INTO `tmp` VALUES (:id, :idproducto, :nombre, :cantidad, :precio, :importe, :descuento, :impdescuento, :imptotal, :tras, :ret, :observaciones, :chinv, :cfiscal, :cunidad, :session);";
+            $valores = array("id" => null,
+                "idproducto" => $idproducto,
+                "nombre" => $nombre,
+                "cantidad" => $cantidad,
+                "precio" => $precio,
+                "importe" => $totunitario,
+                "descuento" => $descuento,
+                "impdescuento" => $impdescuento,
+                "imptotal" => $totdescuento,
+                "tras" => $traslados,
+                "ret" => $retenciones,
+                "observaciones" => $observaciones,
+                "chinv" => $chinventario,
+                "cfiscal" => $clvfiscal,
+                "cunidad" => $clvunidad,
+                "session" => $sid);
+            $insertado = $this->consultas->execute($consulta, $valores);
+        }
+        return $insertado;
+    }
+    //----------------------------------CLIENTES
+    public function checkCliente($rfc) {
+        $cliente = '';
+        $datos = $this->getClientebyRFC($rfc);
+        foreach ($datos as $actual) {
+            $idcliente = $actual['id_cliente'];
+            $razon = $actual['razon_social'];
+            $regimen = $actual['regimen_cliente'];
+            $cp = $actual['codigo_postal'];
+            $cliente .= "$idcliente</tr>$razon</tr>$regimen</tr>$cp";
+        }
+        return 'x' . $cliente;
+    }
+
+    private function getClientebyRFC($rfc) {
+        $consultado = false;
+        $consulta = "SELECT * FROM cliente WHERE rfc=:rfc;";
+        $val = array("rfc" => $rfc);
+        $consultado = $this->consultas->getResults($consulta, $val);
+        return $consultado;
+    }
+
+    private function getClientebyID($idcliente) {
+        $consultado = false;
+        $consulta = "SELECT * FROM cliente WHERE id_cliente=:cid;";
+        $val = array("cid" => $idcliente);
+        $consultado = $this->consultas->getResults($consulta, $val);
+        return $consultado;
+    }
+
+    private function getNombreCliente($idcliente) {
+        $nombre = "";
+        $datos = $this->getClientebyID($idcliente);
+        foreach ($datos as $actual) {
+            $nombre = $actual['nombre'] . " " . $actual['apaterno'] . "-" . $actual['nombre_empresa'];
+        }
+        return $nombre;
+    }
+
+    //----------------------------------------IMPRIMIR
+    public function getFacturas($idfactura) {
+        $consultado = false;
+        $consulta = "SELECT * FROM factura_carta dat 
+        WHERE dat.idfactura_carta=:id";
+        $val = array("id" => $idfactura);
+        $consultado = $this->consultas->getResults($consulta, $val);
+        return $consultado;
+    }
+
+    public function getDetalle($tag) {
+        $consultado = false;
+        $consulta = "SELECT * FROM detallefcarta det WHERE tagdetfactura=:tag";
+        $val = array("tag" => $tag);
+        $consultado = $this->consultas->getResults($consulta, $val);
+        return $consultado;
+    }
+
+    public function getDatosCarta($tag) {
+        $consultado = false;
+        $consulta = "SELECT * FROM datos_carta WHERE tagcarta=:tag;";
+        $val = array("tag" => $tag);
+        $consultado = $this->consultas->getResults($consulta, $val);
+        return $consultado;
+    }
+
+    private function getDistanciaTotalAux($tag) {
+        $consultado = false;
+        $consulta = "SELECT sum(ubicacion_distancia) distancia FROM detalleubicacion u WHERE tagubicacion=:tag";
+        $val = array("tag" => $tag);
+        $consultado = $this->consultas->getResults($consulta, $val);
+        return $consultado;
+    }
+
+    public function getDistanciaTotal($tag) {
+        $distancia = 0;
+        $datos = $this->getDistanciaTotalAux($tag);
+        foreach ($datos as $actual) {
+            $distancia = $actual['distancia'];
+        }
+        return $distancia;
+    }
+
+    public function getUbicaciones($tag, $tipo) {
+        $consultado = false;
+        $consulta = "SELECT * FROM detalleubicacion u WHERE tagubicacion=:tag and ubicacion_tipo=:tipo";
+        $val = array("tag" => $tag,
+            "tipo" => $tipo);
+        $consultado = $this->consultas->getResults($consulta, $val);
+        return $consultado;
+    }
+
+    private function getOperadorbyRFC($rfc) {
+        $consultado = false;
+        $consulta = "SELECT * FROM operador WHERE rfcoperador=:rfc;";
+        $val = array("rfc" => $rfc);
+        $consultado = $this->consultas->getResults($consulta, $val);
+        return $consultado;
+    }
+
+    public function getNombreOperador($rfc) {
+        $nombre = "";
+        $operador = $this->getOperadorbyRFC($rfc);
+        foreach ($operador as $actual) {
+            $nombre = $actual['nombreoperador'] . ' ' . $actual['apaternooperador'] . ' ' . $actual['amaternooperador'];
+        }
+        return $nombre;
+    }
 }

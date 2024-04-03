@@ -977,12 +977,15 @@ class ControladorVenta
             $referencia = '';
             $cambio = ($v->getMontopagado() - $v->getTotalventa());
         } else if ($v->getFormapago() == 'card' || $v->getFormapago() == 'val') {
-            $pagado = '0';
+            $pagado = '0.0';
             $referencia = $v->getReferencia();
-            $cambio = '0';
+            $cambio = '0.0';
         }
 
-        $consulta = "INSERT INTO datos_venta VALUES (:id, :serie, :letra, :folio, :tag, :fecha, :hora, :percentDescuento, :descuento, :total, :fmpago, :pago, :cambio, :refventa, :uid, :status, :idcancelado, :fecha_cancelado, :hora_cancelada, :idfactura);";
+        $consulta = "INSERT INTO datos_venta VALUES 
+        (:id, :serie, :letra, :folio, :tag, :fecha, :hora, :percentDescuento, :descuento, :total, 
+        :fmpago, :tarjeta, :pago, :cambio, :refventa, :uid, :status, :idcancelado, :fecha_cancelado, :hora_cancelada, 
+        :tagfactura);";
         $val = array(
             "id" => null,
             "serie" => $serie,
@@ -995,6 +998,7 @@ class ControladorVenta
             "descuento" => $v->getDescuento(),
             "total" => $v->getTotalventa(),
             "fmpago" => $v->getFormapago(),
+            "tarjeta" => $v->getTarjeta(),
             "pago" => $pagado,
             "cambio" => $cambio,
             "refventa" => $referencia,
@@ -1003,7 +1007,7 @@ class ControladorVenta
             "idcancelado" => '0',
             "fecha_cancelado" => null,
             "hora_cancelada" => null,
-            "id:factura" => null
+            "tagfactura" => null
         );
         $insertar = $this->consultas->execute($consulta, $val);
         $this->detalleVenta($v->getTagventa(), $v->getSid());
@@ -2672,7 +2676,7 @@ class ControladorVenta
     private function getTagbyIDAux($id)
     {
         $datos = false;
-        $consulta = "SELECT iddatos_venta, tagventa, formapago, tagfactura FROM datos_venta WHERE iddatos_venta=:id";
+        $consulta = "SELECT iddatos_venta, tagventa, formapago, tagfactura, tarjeta FROM datos_venta WHERE iddatos_venta=:id";
         $val = array("id" => $id);
         $datos = $this->consultas->getResults($consulta, $val);
         return $datos;
@@ -2685,14 +2689,16 @@ class ControladorVenta
         $idventa = "";
         $formapago = "";
         $tagventa = "";
+        $tarjeta = "";
 
         foreach ($datos as $actual) {
             $tag = $actual['tagventa'];
             $idventa = $actual['iddatos_venta'];
             $formapago = $actual['formapago'];
             $tagventa = $actual['tagfactura'];
+            $tarjeta = $actual['tarjeta'];
          }
-        return array("tag" => $tag, "idventa" => $idventa, "forma" => $formapago, "tagfactura" => $tagventa);
+        return array("tag" => $tag, "idventa" => $idventa, "forma" => $formapago, "tagfactura" => $tagventa, "tarjeta" => $tarjeta);
     }
 
     public function exportarProductos($id, $sid)
@@ -2734,7 +2740,8 @@ class ControladorVenta
         $datosVenta = $this->getTagbyID($id);
         $idventa = $datosVenta['idventa']; 
         $forma = $datosVenta['forma']; 
-        $cadenaDatos = $idventa ."</tr>". $forma;
+        $tarjeta = $datosVenta['tarjeta']; 
+        $cadenaDatos = $idventa ."</tr>". $forma."</tr>". $tarjeta;
         return $cadenaDatos;
     }
 

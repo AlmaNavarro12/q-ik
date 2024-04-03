@@ -2741,19 +2741,14 @@ class ControladorFactura
                 $fechaventa = $ventapago['fecha_venta'];
                 $horaventa = $ventapago['hora_venta'];
                 $formapago = $ventapago['formapago'];
-                switch ($formapago) {
-                    case "cash":
-                        $formapago = "Efectivo";
-                        break;
-                    case "card":
-                        $formapago = "Tarjeta";
-                        break;
-                    case "val":
-                        $formapago = "Vales";
-                        break;
-                    default:
-                        $formapago = "Efectivo";
-                }
+                $tarjeta = $ventapago['tarjeta'];
+
+                $formapago = ($formapago == "cash") ? "Efectivo" :
+                ($formapago == "card" ? "Tarjeta" . " " . 
+                    ($tarjeta == "credito" ? "de crédito" : 
+                    ($tarjeta == "debito" ? "de débito" : "")) :
+                ($formapago == "val" ? "Vales" : "Efectivo"));
+                
                 $totalventa = $ventapago['totalventa'];
             }
 

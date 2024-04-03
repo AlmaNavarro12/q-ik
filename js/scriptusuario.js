@@ -336,7 +336,7 @@ function setValoresAsignarPermisos(datos) {
         "datosfacturacion", "creardatos", "editardatos", "listadatos", "eliminardatos", "descargardatos", //Eliminar, descargar archivos
         "contrato", "crearcontrato", "editarcontrato", "eliminarcontrato", "listacontrato",
         "usuarios", "crearusuario", "listausuario", "eliminarusuario", "asignarpermiso",
-        "reporte", "reportefactura", "reportepago", "reportegrafica", "reporteiva", "datosiva", "reporteventas",
+        "reporte", "reportefactura", "reportepago", "reportegrafica", "reporteiva", "datosiva", "reporteventas", "reporteinventario", "reportepuntoventa",
         "configuracion", "addfolio", "listafolio", "editarfolio", "eliminarfolio", "addcomision", "encabezados", "confcorreo", "importar", 
         "ventas", "crearventa", "cancelarventa", "exportarventa", "listaventa", "registrarentrada", "registrarsalida", "cortedecaja",
         "accion", "idlogin"
@@ -389,7 +389,7 @@ function actualizarPermisos(idusuario) {
         datosfacturacion: ["creardatos", "editardatos", "listadatos", "eliminardatos", "descargardatos"],
         contrato: ["crearcontrato", "editarcontrato", "eliminarcontrato", "listacontrato"],
         usuarios: ["crearusuario", "listausuario", "eliminarusuario", "asignarpermiso"],
-        reporte: ["reportefactura", "reportepago", "reportegrafica", "reporteiva", "datosiva", "reporteventas"],
+        reporte: ["reportefactura", "reportepago", "reportegrafica", "reporteiva", "datosiva", "reporteventas", "reporteinventario", "reportepuntoventa"],
         configuracion: ["addfolio", "listafolio", "editarfolio", "eliminarfolio", "addcomision", "encabezados", "confcorreo", "importar"],
         ventas: ["crearventa", "cancelarventa", "exportarventa", "listaventa", "registrarentrada", "registrarsalida", "cortedecaja"],
     };

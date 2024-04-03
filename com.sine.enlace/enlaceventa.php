@@ -122,6 +122,7 @@ function obtenerDatosTicket()
     $v->setFormapago($_POST['fmpago']);
     $v->setMontopagado($_POST['pagado']);
     $v->setReferencia($_POST['referencia']);
+    $v->setTarjeta($_POST['tarjeta']);
     $v->setSid(session_id());
     $v->setDescuento($_POST['descuento']);
     $v->setPercentDescuento($_POST['percent_descuento']);

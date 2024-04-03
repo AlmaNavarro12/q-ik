@@ -57,6 +57,12 @@ class CartaPorte{
     private $p_bruto;
     private $p_vehiculo;
 
+    private $nombrecomprobante;
+    private $nombremetodo;
+    private $nombreforma;
+    private $nombremoneda;
+    private $nombrecfdi;
+
     function __construct() {
         
     }
@@ -167,6 +173,26 @@ class CartaPorte{
 
     function getPolizarespcivil() {
         return $this->polizarespcivil;
+    }
+
+    function getNombreComprobante() {
+        return $this->nombrecomprobante;
+    }
+
+    function getNombreMetodo() {
+        return $this->nombremetodo;
+    }
+
+    function getNombreForma() {
+        return $this->nombreforma;
+    }
+
+    function getNombreMoneda() {
+        return $this->nombremoneda;
+    }
+
+    function getNombreCfdi() {
+        return $this->nombrecfdi;
     }
 
     function getIdremolque1() {
@@ -400,7 +426,27 @@ class CartaPorte{
     function setUuid($uuid) {
         $this->uuid = $uuid;
     }
-    
+
+    function setNombreComprobante($nombrecomprobante) {
+        $this->nombrecomprobante = $nombrecomprobante;
+    }
+
+    function setNombreMetodo($nombremetodo) {
+        $this->nombremetodo = $nombremetodo;
+    }
+
+    function setNombreForma($nombreforma) {
+        $this->nombreforma = $nombreforma;
+    }
+
+    function setNombreMoneda($nombremoneda) {
+        $this->nombremoneda = $nombremoneda;
+    }
+
+    function setNombrecfdi($nombrecfdi) {
+        $this->nombrecfdi = $nombrecfdi;
+    }
+
     function getSeguroambiente() {
         return $this->seguroambiente;
     }

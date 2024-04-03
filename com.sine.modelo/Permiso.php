@@ -119,8 +119,8 @@ class Permiso {
     private $registrarentrada;
     private $registrarsalida;
     private $cortedecaja;
-
-
+    private $reporteinventario;
+    private $reportepuntoventa;
 
     function __construct() {
         
@@ -538,6 +538,14 @@ class Permiso {
         return $this->reporteventas;
     }
 
+    function getReporteInventario() {
+        return $this->reporteinventario;
+    }
+
+    function getReportePuntoVenta() {
+        return $this->reportepuntoventa;
+    }
+
     function getConfiguracion() {
         return $this->configuracion;
     }
@@ -672,6 +680,14 @@ class Permiso {
 
     function setEliminarnomina($eliminarnomina) {
         $this->eliminarnomina = $eliminarnomina;
+    }
+
+    function setReporteInventario($reporteinventario) {
+        $this->reporteinventario = $reporteinventario;
+    }
+
+    function setReportePuntoVenta($reportepuntoventa) {
+        $this->reportepuntoventa = $reportepuntoventa;
     }
 
     function setCartaporte($cartaporte) {

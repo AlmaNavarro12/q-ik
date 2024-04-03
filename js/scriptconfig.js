@@ -267,6 +267,10 @@ function loaddatosUsuario() {
     });
 }
 
+function loadOpcionesComisiones() {
+    alert("hola");
+}
+
 function setValoresUsuarioComision(datos) {
     var array = datos.split("</tr>");
     var tipo = array[0];

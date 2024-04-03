@@ -45,11 +45,18 @@ $(function () {
             $("#cambio-label").show();
             $("#cambio-descuento").show();
             $("#referencia-pago").val("");
-        } else if (tab == 'card' || tab == 'val') {
+        } else if (tab == 'card') {
             tab = 'ref';
             $("#cambio-descuento").show();
             $("#cambio-label").hide();
             $("#referencia-pago").val("");
+            $("#tipo-tarjeta").show();
+        } else if(tab == 'val'){
+            tab = 'ref';
+            $("#cambio-descuento").show();
+            $("#cambio-label").hide();
+            $("#referencia-pago").val("");
+            $("#tipo-tarjeta").hide();
         }
         $("#" + tab + "-div").show('slow');
     });
@@ -647,7 +654,8 @@ function guardarVenta(p, nprod) {
     var fmpago = $("#btn-fmpago").find('.button-venta-active').attr("pago-tab");
     var referencia = "null";
     var validado = 0;
-    var pagado = $("#monto-pagado").val();
+    var pagado = $("#monto-pagado").val() || 0.0;
+    var tarjeta = "null";
 
     if (fmpago == 'cash') {
         pagado = parseFloat(pagado);
@@ -655,8 +663,13 @@ function guardarVenta(p, nprod) {
         if (pagado >= total){
             validado = 1;
         }
+    } else if(fmpago == 'card') {
+        var pagado = "1.0";
+        validado = 1;
+        referencia = $("#referencia-pago").val();
+        tarjeta = $("input[name=tarjeta]:checked").val();
     } else {
-        var pagado = "1";
+        var pagado = "1.0";
         validado = 1;
         referencia = $("#referencia-pago").val();
     }
@@ -669,7 +682,7 @@ function guardarVenta(p, nprod) {
                     $.ajax({
                         url: 'com.sine.enlace/enlaceventa.php',
                         type: 'POST',
-                        data: {transaccion: 'insertarticket', tab: tab, total: total, pagado: pagado, referencia: referencia, fmpago: fmpago, descuento: descuento, percent_descuento:percent_descuento},
+                        data: {transaccion: 'insertarticket', tab: tab, total: total, pagado: pagado, referencia: referencia, fmpago: fmpago, tarjeta:tarjeta, descuento: descuento, percent_descuento:percent_descuento},
                         success: function (datos) {
                             var texto = datos.toString();
                             var bandera = texto.substring(0, 1);
@@ -709,7 +722,7 @@ function guardarVenta(p, nprod) {
                     $.ajax({
                         url: 'com.sine.enlace/enlaceventa.php',
                         type: 'POST',
-                        data: {transaccion: 'insertarticket', tab: tab, total: total, pagado: pagado, referencia: referencia, fmpago: fmpago, descuento: descuento, percent_descuento:percent_descuento},
+                        data: {transaccion: 'insertarticket', tab: tab, total: total, pagado: pagado, referencia: referencia, tarjeta:tarjeta, fmpago: fmpago, descuento: descuento, percent_descuento:percent_descuento},
                         success: function (datos) {
                             var texto = datos.toString();
                             var bandera = texto.substring(0, 1);
@@ -743,8 +756,6 @@ function guardarVenta(p, nprod) {
             }
         }
     }
-
-    
     $('#btn-print').prop('disabled', false);
     $('#btn-form-reg').prop('disabled', false);
 }
@@ -1055,13 +1066,21 @@ function mostrarDatosVenta(datos) {
     var array = datos.split("</tr>");
     idventa = array[0];
     forma = array[1];
-    idformapago = (forma == 'cash') ? 1 : ((forma == 'card') ? 4 : ((forma == 'val') ? 8 : 0));
+    tarjeta = array[2];
+    if (forma == 'card') {
+        if (tarjeta == 'credito') {
+            idformapago = 4; // Crédito
+        } else if (tarjeta == 'debito') {
+            idformapago = 18; // Débito
+        }
+    } else {
+        idformapago = (forma == 'cash') ? 1 : ((forma == 'val') ? 7 : 0);
+    }
+
     $("#id-metodo-pago").attr('disabled', true);
     loadOpcionesMetodoPago('id-metodo-pago', 1);
     loadOpcionesFormaPago2(idformapago);
-    if (idformapago !== 4) {
-        $("#id-forma-pago").attr('disabled', true);
-    }
+    $("#id-forma-pago").attr('disabled', true);
     $("#idticket").val(idventa);
     $("#btn-nuevo-producto").attr('disabled', true);
     $("#btn-agregar-productos").attr('disabled', true);

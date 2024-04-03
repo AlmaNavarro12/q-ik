@@ -194,6 +194,9 @@ function obtenerDatosPermisos()
     $p->setReporteiva($_POST['reporteiva']);
     $p->setDatosiva($_POST['datosiva']);
     $p->setReporteventas($_POST['reporteventas']);
+    $p->setReporteInventario($_POST['reporteinventario']);
+    $p->setReportePuntoVenta($_POST['reportepuntoventa']);
+
 
     $p->setConfiguracion($_POST['configuracion']);
     $p->setAddfolio($_POST['addfolio']);

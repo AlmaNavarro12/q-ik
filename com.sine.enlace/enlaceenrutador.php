@@ -50,6 +50,8 @@ if (isset($_POST['transaccion'], $_POST['view'])) {
             case 'reportefactura':
             case 'reportepago':
             case 'reportegrafica':
+            case 'reporteinventario':
+            case 'reportepuntoventa':
             case 'reportesat':
             case 'reporteventas':
             case 'datosiva':

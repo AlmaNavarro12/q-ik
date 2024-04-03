@@ -10,6 +10,7 @@ class Venta {
     private $montopagado;
     private $cambio;
     private $referencia;
+    private $tarjeta;
     private $tipomov;
     private $montomov;
     private $conceptomov;
@@ -86,6 +87,10 @@ class Venta {
         return $this->descuento;
     }
 
+    function getTarjeta(){
+        return $this->tarjeta;
+    }
+
     function getPercentDescuento(){
         return $this->percent_descuento;
     }
@@ -104,6 +109,10 @@ class Venta {
 
     function setHoraventa($horaventa) {
         $this->horaventa = $horaventa;
+    }
+
+    function setTarjeta($tarjeta) {
+        $this->tarjeta = $tarjeta;
     }
 
     function setTotalventa($totalventa) {

@@ -664,27 +664,25 @@ class ControladorPago{
         return "1";
     }
 
-    private function getParcialidadCartaAux($idfactura, $idpago)
-    {
+    private function getParcialidadCartaAux($idfactura, $idpago) {
+        $consultado = false;
         $consulta = "SELECT (noparcialidad)+1 par FROM detallepago dt INNER JOIN pagos p ON (p.tagpago=dt.detalle_tagencabezado) WHERE pago_idfactura=:id AND cancelado != '1' AND p.tagpago != :idpago AND type=:tipo;";
-        $valores = array(
-            "id" => $idfactura,
+        $valores = array("id" => $idfactura,
             "idpago" => $idpago,
-            "tipo" => 'c'
-        );
-        return $this->consultas->getResults($consulta, $valores) ?: false;
+            "tipo" => 'c');
+        $consultado = $this->consultas->getResults($consulta, $valores);
+        return $consultado;
     }
 
-    private function getParcialidadCartaAux2($idfactura)
-    {
+    private function getParcialidadCartaAux2($idfactura) {
+        $consultado = false;
         $sessionid = session_id();
         $consulta = "SELECT (noparcialidadtmp)+1 as par FROM tmppago WHERE idfacturatmp=:id and sessionid=:sid AND type=:tipo";
-        $valores = array(
-            "id" => $idfactura,
+        $valores = array("id" => $idfactura,
             "sid" => $sessionid,
-            "tipo" => 'c'
-        );
-        return $this->consultas->getResults($consulta, $valores) ?: false;
+            "tipo" => 'c');
+        $consultado = $this->consultas->getResults($consulta, $valores);
+        return $consultado;
     }
 
     private function getMontoAnteriorCartaAux2($noparcialidad_tmp, $idfactura_tmp)

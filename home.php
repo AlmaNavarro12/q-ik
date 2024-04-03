@@ -45,15 +45,17 @@ require_once 'Enrutador.php';
     $reporteiva = $div[27];
     $datosiva = $div[28];
     $reporteventa = $div[29];
-    $configuracion = $div[30];
-    $ventas = $div[31];
-    $crearventa = $div[32];
-    $listaventa = $div[33];
-    $registrarentrada = $div[34];
-    $registrarsalida = $div[35];
-    $acceso = $div[36];
-    $imgperfil = $div[37];
-    $modulos = $div[38];
+    $reporteinventario = $div[30];
+    $reportepuntoventa = $div[31];
+    $configuracion = $div[32];
+    $ventas = $div[33];
+    $crearventa = $div[34];
+    $listaventa = $div[35];
+    $registrarentrada = $div[36];
+    $registrarsalida = $div[37];
+    $acceso = $div[38];
+    $imgperfil = $div[39];
+    $modulos = $div[40];
 
     $notificaciones = $cp->getNotificacion();
     $divN = explode("<corte>", $notificaciones);
@@ -352,12 +354,22 @@ require_once 'Enrutador.php';
                                                 }
                                                 if ($datosiva == '1') {
                                                 ?>
-                                                    <li class="lista-submenu-elemento ps-5 list-menu" data-submenu='datosiva'> Datos Impuestos</li>
+                                                    <li class="lista-submenu-elemento ps-5 list-menu" data-submenu='datosiva'> Datos impuestos</li>
                                                 <?php
                                                 }
                                                 if ($reporteventa == '1') {
                                                 ?>
                                                     <li class="lista-submenu-elemento ps-5 list-menu" data-submenu='reporteventas'> Ventas</li>
+                                                <?php
+                                                }
+                                                if ($reporteinventario == '1') {
+                                                ?>
+                                                    <li class="lista-submenu-elemento ps-5 list-menu" data-submenu='reporteinventario'> Inventario</li>
+                                                <?php
+                                                }
+                                                if ($reportepuntoventa == '1') {
+                                                ?>
+                                                    <li class="lista-submenu-elemento ps-5 list-menu" data-submenu='reportepuntoventa'> Punto de venta</li>
                                                 <?php
                                                 }
                                                 ?>
@@ -374,7 +386,7 @@ require_once 'Enrutador.php';
                                             <div class="marker"></div>
                                             <div class="pad"></div><label> Punto de venta</label>
                                         </li>
-                                    <?php
+                        <?php
                                     }
                                     break;
                             }
