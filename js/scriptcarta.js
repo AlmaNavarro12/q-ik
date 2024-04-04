@@ -112,11 +112,37 @@ function incrementarCantidad(idtmp) {
     });
 }
 
+function setCantidad(idtmp, cant) {
+    $("#idcant").val(idtmp);
+    $("#cantidad-producto").val(cant);
+}
+
 function reducirCantidad(idtmp) {
     $.ajax({
         url: "com.sine.enlace/enlacefactura.php",
         type: "POST",
         data: {transaccion: "reducir", idtmp: idtmp},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 1000);
+            if (bandera == '0') {
+                alertify.error(res);
+            } else {
+                tablaProductos();
+                cargandoHide();
+            }
+        }
+    });
+}
+
+function modificarCantidad() {
+    var idtmp = $("#idcant").val();
+    var cant = $("#cantidad-producto").val();
+    $.ajax({
+        url: "com.sine.enlace/enlacefactura.php",
+        type: "POST",
+        data: {transaccion: "modificartmp", idtmp: idtmp, cant: cant},
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -365,7 +391,6 @@ function setValoresEditarProducto(datos, idtmp) {
     $("#muestraimagen").html('');
     changeText("#titulo-alerta-editar-producto", "Editar producto en factura");
     var array = datos.split("</tr>");
-    console.log(array);
     var tipo = array[10];
     var imagen = array[14];
     var chinventario = array[15];
@@ -725,9 +750,9 @@ function cargarImgEvidencia() {
 
 function tablaEvidencias(d = "") {
     $.ajax({
-        url: "com.sine.enlace/enlaceimgs.php",
+        url: "com.sine.enlace/enlacecarta.php",
         type: "POST",
-        data: {transaccion: "tablaimg", d: d},
+        data: {transaccion: "tablaimgs", d: d},
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -743,6 +768,55 @@ function tablaEvidencias(d = "") {
         }
     });
 }
+
+function displayIMG(id) {
+    $.ajax({
+        url: "com.sine.imprimir/img.php",
+        type: "POST",
+        data: { img: id },
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 1000);
+            if (bandera == '0') {
+                alertify.error(res);
+                cargandoHide();
+            } else {
+                var array = datos.split("<type>");
+                console.log(array);
+                var t = array[0];
+                var data = array[1];
+                if (t == 'd') {
+                    var newTab = window.open('com.sine.imprimir/img.php?doc=' + id, '_blank');
+                    newTab.document.body.innerHTML = data;
+                } else {
+                    $("#archivos").modal('show');
+                    $('#fotito').html(data);
+                }
+            }
+        }
+    });
+}
+
+function eliminarIMG(idtmp) {
+    alertify.confirm("¿Estás seguro que deseas eliminar este archivo?", function () {
+        $.ajax({
+            url: "com.sine.enlace/enlacecarta.php",
+            type: "POST",
+            data: {transaccion: "eliminarimg", idtmp: idtmp},
+            success: function (datos) {
+                var texto = datos.toString();
+                var bandera = texto.substring(0, 1);
+                var res = texto.substring(1, 1000);
+                if (bandera == '0') {
+                    alertify.error(res);
+                }
+                tablaEvidencias('1');
+            }
+        });
+    }).set({title: "Q-ik"});
+}
+
 //---------------------------------------------AUTOACOMPLETADO
 function autocompletarMercancia() {
     var chbus = $("input[name=busqueda]:checked").val();
@@ -1067,7 +1141,7 @@ function agregarMercancia(tid = null) {
                     $("#descripcion-mercancia").val('');
                     $("#cantidad-mercancia").val('1');
                     $("#unidad-mercancia").val('');
-                    $("#peso-mercancia").val('');
+                    $("#peso-mercancia").val('0');
                     $("#material-peligroso").val('');
                     $("#clv-peligro").val('');
                     $("#clv-embalaje").val('');
@@ -1802,10 +1876,14 @@ function insertarFacturaCarta(tag = null) {
                 if (bandera == '0') {
                     alertify.error(res);
                 } else {
-                    alertify.success((tag !== "") ? 'Datos de carta actualizados' : 'Carta guardada correctamente');
+                    alertify.success((tag !== null) ? 'Datos de carta actualizados' : 'Carta guardada correctamente');
+                    var array = datos.split("<tag>");
+                    var tagins = array[1];
                     loadView('listacarta');
-                    if (idvehiculo == "0" || idremolque1 == '0' || idremolque2 == '0' || idremolque3 == '0' || flagoperador == '0') {
-                        checkNuevoRegistro(tag);
+                    if(tag == null){
+                        if (idvehiculo == "0" || idremolque1 == '0' || idremolque2 == '0' || idremolque3 == '0' || flagoperador == '0') {
+                            checkNuevoRegistro(tagins);
+                        }
                     }
                 }
                 cargandoHide();
@@ -1829,7 +1907,37 @@ function checkNuevoRegistro(tag) {
                 if (bandera == '0') {
                     alertify.error(res);
                 } else {
-                    alertify.success('Datos guardados correctamente');
+                    console.log(datos);
+                    var array = datos.split("</tr>");
+                    if (array[0] === "1") {
+                        alertify.success('Datos de vehículo guardados correctamente.');
+                    } else if (array[0] !== "0") {
+                        alertify.error(array[0]);
+                    }
+
+                    if (array[1] === "1") {
+                        alertify.success('Datos de remolque 1 guardados correctamente.');
+                    } else if (array[1] !== "0") {
+                        alertify.error(array[1]);
+                    }
+
+                    if (array[2] === "1") {
+                        alertify.success('Datos de remolque 2 guardados correctamente.');
+                    } else if (array[2] !== "0") {
+                        alertify.error(array[2]);
+                    }
+
+                    if (array[3] === "1") {
+                        alertify.success('Datos de remolque 3 guardados correctamente.');
+                    } else if (array[3] !== "0") {
+                        alertify.error(array[3]);
+                    }
+
+                    if (array[4] === "1") {
+                        alertify.success('Datos de operador guardados correctamente.');
+                    } else if (array[4] !== "0") {
+                        alertify.error(array[4]);
+                    }
                     filtrarCarta();
                 }
                 cargandoHide();
@@ -2087,7 +2195,7 @@ function setValoresEditarCarta(datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
             var res = texto.substring(1, 1000);
-            //tablaEvidencias('1');
+            tablaEvidencias('1');
         }
     });
 
@@ -2298,6 +2406,8 @@ function getClientebyRFC() {
                     $("#razon-cliente").val(array[1]);
                     $("#regfiscal-cliente").val(array[2]);
                     $("#cp-cliente").val(array[3]);
+                    $("#nombre-cliente").val(array[4]);
+                    $("#direccion-cliente").val(array[5]);
                 }
                 cargandoHide();
             }
@@ -2311,4 +2421,365 @@ function imprimirCarta(id) {
     cargandoShow();
     VentanaCentrada('./com.sine.imprimir/imprimircarta.php?carta=' + id, 'Carta', '', '1024', '768', 'true');
     cargandoHide();
+}
+
+function copiarCarta(cid) {
+    cargandoHide();
+    cargandoShow();
+    $.ajax({
+        url: "com.sine.enlace/enlacecarta.php",
+        type: "POST",
+        data: {transaccion: "editarcarta", cid: cid},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 1000);
+            if (bandera == '0') {
+                alertify.error(res);
+                cargandoHide();
+            } else {
+                loadView('carta');
+                window.setTimeout("setValoresCopiarCarta('" + datos + "')", 600);
+            }
+        }
+    });
+}
+
+function setValoresCopiarCarta(datos) {
+    var array = datos.split("</tr>");
+    var fechacreacion = array[1];
+    var rfcemisor = array[2];
+    var rzsocial = array[3];
+    var clvreg = array[4];
+    var regimen = array[5];
+    var codpostal = array[6];
+    var idcliente = array[10];
+    var cliente = array[11];
+    var rfccliente = array[12];
+    var rzcliente = array[13];
+    var cpreceptor = array[14];
+    var regfiscalreceptor = array[15];
+    var chfirmar = array[16];
+    var idforma_pago = array[17];
+    var idmetodo_pago = array[18];
+    var idmoneda = array[19];
+    var tcambio = array[20];
+    var iduso_cfdi = array[21];
+    var idtipo_comprobante = array[22];
+    var iddatos = array[24];
+    var tipomovimiento = array[26];
+    var idvehiculo = array[27];
+    var nombrevehiculo = array[28];
+    var numpermiso = array[29];
+    var tipopermiso = array[30];
+    var tipotransporte = array[31];
+    var anhomod = array[32];
+    var placa = array[33];
+    var segurocivil = array[34];
+    var polizaseguro = array[35];
+    var idremolque1 = array[36];
+    var nmremolque1 = array[37];
+    var tiporemolque1 = array[38];
+    var placaremolque1 = array[39];
+    var idremolque2 = array[40];
+    var nmremolque2 = array[41];
+    var tiporemolque2 = array[42];
+    var placaremolque2 = array[43];
+    var idremolque3 = array[44];
+    var nmremolque3 = array[45];
+    var tiporemolque3 = array[46];
+    var placaremolque3 = array[47];
+    var tag = array[48];
+    var seguroambiente = array[49];
+    var polizaambiente = array[50];
+    var periodoglobal = array[51];
+    var mesperiodo = array[52];
+    var anhoperiodo = array[53];
+    var dircliente = array[54];
+    var observaciones = array[55];
+    var pesovehicular = array[57];
+	var pesobruto = array[58];
+    var txt = observaciones.replace(new RegExp("<ent>", 'g'), "\n");
+
+    $.ajax({
+        url: "com.sine.enlace/enlacecarta.php",
+        type: "POST",
+        data: {transaccion: "prodfactura", tag: tag},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 1000);
+            if (bandera == '0') {
+                alertify.error(res);
+            } else {
+                tablaProductos();
+            }
+        }
+    });
+
+    $.ajax({
+        url: "com.sine.enlace/enlacecarta.php",
+        type: "POST",
+        data: {transaccion: "mercanciacarta", tag: tag},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 1000);
+            if (bandera == '0') {
+                alertify.error(res);
+            } else {
+                tablaMercancia();
+            }
+        }
+    });
+
+    $.ajax({
+        url: "com.sine.enlace/enlacecarta.php",
+        type: "POST",
+        data: {transaccion: "ubicacioncarta", tag: tag},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 1000);
+            if (bandera == '0') {
+                alertify.error(res);
+            } else {
+                tablaUbicacion();
+            }
+        }
+    });
+
+    $.ajax({
+        url: "com.sine.enlace/enlacecarta.php",
+        type: "POST",
+        data: {transaccion: "operadorcarta", tag: tag},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 1000);
+            if (bandera == '0') {
+                alertify.error(res);
+            } else {
+                tablaOperador();
+            }
+        }
+    });
+
+    $.ajax({
+        url: "com.sine.enlace/enlacecarta.php",
+        type: "POST",
+        data: {transaccion: "doccarta", tag: tag},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 1000);
+            tablaEvidencias('1');
+        }
+    });
+
+	$("#rfc-emisor").val(rfcemisor);
+    $("#razon-emisor").val(rzsocial);
+    $("#regimen-emisor").val(clvreg + "-" + regimen);
+    $("#cp-emisor").val(codpostal);
+    $("#fecha-creacion").val(fechacreacion);
+    loadOpcionesFacturacion(iddatos);
+    $("#id-cliente").val(idcliente);
+    $("#nombre-cliente").val(cliente);
+    $("#rfc-cliente").val(rfccliente);
+    $("#razon-cliente").val(rzcliente);
+    $("#regfiscal-cliente").val(regfiscalreceptor);
+    $("#direccion-cliente").val(dircliente);
+    $("#cp-cliente").val(cpreceptor);
+    loadOpcionesComprobante('tipo-comprobante', idtipo_comprobante);
+    loadOpcionesMetodoPago('id-metodo-pago', idmetodo_pago);
+    loadOpcionesFormaPago2(idforma_pago);
+    loadOpcionesMoneda('id-moneda', idmoneda);
+    $("#tipo-cambio").val(tcambio);
+    loadOpcionesUsoCFDI('id-uso', iduso_cfdi);
+    opcionesPeriodoGlobal('periodicidad-factura', periodoglobal);
+    opcionesMeses(mesperiodo);
+    if (anhoperiodo != "") {
+        $("#option-default-anho-periodo").val(anhoperiodo);
+        $("#option-default-anho-periodo").text(anhoperiodo);
+    }
+
+    if (chfirmar == '1') {
+        $("#chfirma").attr('checked', true);
+    }
+
+    $("#tipo-movimiento").val(tipomovimiento);
+    $("#id-vehiculo").val(idvehiculo);
+    $("#nombre-vehiculo").val(nombrevehiculo);
+    $("#num-permiso").val(numpermiso);
+    $("#tipo-permiso").val(tipopermiso);
+    $("#conf-transporte").val(tipotransporte);
+    $("#anho-modelo").val(anhomod);
+    $("#placa-vehiculo").val(placa);
+    $("#seguro-respcivil").val(segurocivil);
+    $("#poliza-respcivil").val(polizaseguro);
+    $("#seguro-medambiente").val(seguroambiente);
+    $("#poliza-medambiente").val(polizaambiente);
+    $("#id-remolque1").val(idremolque1);
+    $("#nombre-remolque1").val(nmremolque1);
+    $("#tipo-remolque1").val(tiporemolque1);
+    $("#placa-remolque1").val(placaremolque1);
+    $("#id-remolque2").val(idremolque2);
+    $("#nombre-remolque2").val(nmremolque2);
+    $("#tipo-remolque2").val(tiporemolque2);
+    $("#placa-remolque2").val(placaremolque2);
+    $("#id-remolque3").val(idremolque3);
+    $("#nombre-remolque3").val(nmremolque3);
+    $("#tipo-remolque3").val(tiporemolque3);
+    $("#placa-remolque3").val(placaremolque3);
+    $("#observaciones-carta").val(txt);
+
+    $('#peso-vehiculo').val(pesovehicular);
+    $('#peso-bruto').val(pesobruto);
+
+    loadFolioCarta(iddatos);
+    cargandoHide();
+}
+
+function verEvidencias(id) {
+    $("#modal-evidencia").modal('show');
+    $.ajax({
+        url: "com.sine.enlace/enlacecarta.php",
+        type: "POST",
+        data: {transaccion: "tablaimg", id: id},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 1000);
+            if (bandera == '0') {
+                alertify.error(res);
+            } else {
+                if(datos == '<tbody>'){
+                    $("#tabla-evidencias").html("<div class='col-12 text-center py-3'>Este comunicado no contiene archivos.</div>");
+                } else {
+                    $("#tabla-evidencias").html(datos);
+                }
+            }
+            cargandoHide();
+        }
+    });
+}
+
+function visutab(archivo, ext) {
+    var ruta = "./cartaporte/" + archivo;
+    if (ext == "jpg" || ext == "png" || ext == "jpeg" || ext == "gif") {
+        $("#fotito").html('<img src="' + ruta + '"/>')
+    } else {
+        $('#fotito').html('<embed type="application/pdf" src="' + ruta + '"  width="100%" style="height: 31rem"/>');
+    }
+}
+
+function cerrarModal(){
+    $('#archivo').modal('hide');
+    $('#fotito').html("");
+}
+
+function showCorreosCarta(idfactura) {
+    cargandoHide();
+    cargandoShow();
+    $("#btn-enviar-carta").attr("onclick", "enviarCarta(" + idfactura + ")");
+    $("#correo1").val('');
+    $("#correo2").val('');
+    $("#correo3").val('');
+    $("#correo4").val('');
+    $("#correo5").val('');
+    $("#correo6").val('');
+    getCorreos(idfactura);
+    $("#chcorreo1").prop('checked', false);
+    $("#chcorreo2").prop('checked', true);
+    $("#chcorreo3").prop('checked', false);
+    $("#chcorreo4").prop('checked', false);
+    $("#chcorreo5").prop('checked', false);
+    $("#chcorreo6").prop('checked', false);
+    cargandoHide();
+}
+
+function getCorreos(idfactura) {
+    $.ajax({
+        url: "com.sine.enlace/enlacecarta.php",
+        type: "POST",
+        data: {transaccion: "getcorreos", idfactura: idfactura},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 1000);
+            if (bandera == '0') {
+                alertify.error(res);
+            } else {
+                var array = datos.split("<corte>");
+                $("#correo1").val(array[0]);
+                $("#correo2").val(array[1]);
+                $("#correo3").val(array[2]);
+                $("#correo4").val(array[3]);
+                $("#correo5").val(array[4]);
+                $("#correo6").val(array[5]);
+            }
+        }
+    });
+}
+
+function enviarCarta(id) {
+    var mailalt1 = "ejemplo@ejemplo.com";
+    var mailalt2 = "ejemplo@ejemplo.com";
+    var mailalt3 = "ejemplo@ejemplo.com";
+    var mailalt4 = "ejemplo@ejemplo.com";
+    var mailalt5 = "ejemplo@ejemplo.com";
+    var mailalt6 = "ejemplo@ejemplo.com";
+    var chcorreo1 = 0;
+    var chcorreo2 = 0;
+    var chcorreo3 = 0;
+    var chcorreo4 = 0;
+    var chcorreo5 = 0;
+    var chcorreo6 = 0;
+
+    if ($("#chcorreo1").prop('checked')) {
+        chcorreo1 = 1;
+        mailalt1 = $("#correo1").val();
+    }
+    if ($("#chcorreo2").prop('checked')) {
+        chcorreo2 = 1;
+        mailalt2 = $("#correo2").val();
+    }
+    if ($("#chcorreo3").prop('checked')) {
+        chcorreo3 = 1;
+        mailalt3 = $("#correo3").val();
+    }
+    if ($("#chcorreo4").prop('checked')) {
+        chcorreo4 = 1;
+        mailalt4 = $("#correo4").val();
+    }
+    if ($("#chcorreo5").prop('checked')) {
+        chcorreo5 = 1;
+        mailalt5 = $("#correo5").val();
+    }
+    if ($("#chcorreo6").prop('checked')) {
+        chcorreo6 = 1;
+        mailalt6 = $("#correo6").val();
+    }
+
+    if (isEmailtoSend(mailalt1, "correo1") && isEmailtoSend(mailalt2, "correo2") && isEmailtoSend(mailalt3, "correo3") && isEmailtoSend(mailalt4, "correo4") && isEmailtoSend(mailalt5, "correo5") && isEmailtoSend(mailalt6, "correo6") && isCheckedMailSend(chcorreo1, chcorreo2, chcorreo3, chcorreo4, chcorreo5, chcorreo6)) {
+        cargandoHide();
+        cargandoShow();
+        $.ajax({
+            url: "com.sine.imprimir/imprimircarta.php",
+            type: "POST",
+            data: {transaccion: "pdf", id: id, ch1: chcorreo1, ch2: chcorreo2, ch3: chcorreo3, ch4: chcorreo4, ch5: chcorreo5, ch6: chcorreo6, mailalt1: mailalt1, mailalt2: mailalt2, mailalt3: mailalt3, mailalt4: mailalt4, mailalt5: mailalt5, mailalt6: mailalt6},
+            success: function (datos) {
+                var texto = datos.toString();
+                var bandera = texto.substring(0, 1);
+                var res = texto.substring(0, 1000);
+                if (bandera == '0') {
+                    alertify.error(res);
+                } else {
+                    $("#enviarmail").modal('hide');
+                    alertify.success(res);
+                }
+                cargandoHide();
+            }
+        });
+    }
 }

@@ -149,25 +149,25 @@ class Enrutador
                     include_once '../com.sine.vista/Impuestos/listaimpuestos.php';
                     break;
                 case 'config':
-                    include_once '../com.sine.vista/Configuracion/configuracion.php';
+                    include_once '../com.sine.vista/configuracion/configuracion.php';
                     break;
                 case 'encabezado':
-                    include_once '../com.sine.vista/Configuracion/formencabezados.html';
+                    include_once '../com.sine.vista/configuracion/formencabezados.html';
                     break;
                 case 'correo':
-                    include_once '../com.sine.vista/Configuracion/formcorreo.html';
+                    include_once '../com.sine.vista/configuracion/formcorreo.html';
                     break;
                 case 'folio':
-                    include_once '../com.sine.vista/Configuracion/formfolios.html';
+                    include_once '../com.sine.vista/configuracion/formfolios.html';
                     break;
                 case 'listafolio':
-                    include_once '../com.sine.vista/Configuracion/listafolios.php';
+                    include_once '../com.sine.vista/configuracion/listafolios.php';
                     break;
                 case 'comision':
-                    include_once '../com.sine.vista/Configuracion/formcomisiones.html';
+                    include_once '../com.sine.vista/configuracion/formcomisiones.html';
                     break;
                 case 'tablas':
-                    include_once '../com.sine.vista/Configuracion/formtablas.html';
+                    include_once '../com.sine.vista/configuracion/formtablas.html';
                     break;
                 case 'listafiel':
                     include_once '../com.sine.vista/DescargaMasiva/listafiel.php';

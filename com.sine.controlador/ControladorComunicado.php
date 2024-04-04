@@ -705,34 +705,6 @@ class ControladorComunicado
         return $consultado;
     }
 
-    /*public function getIMGList($tag) {
-         $datos ="<thead>
-                    <tr>
-                        <th>Nombre Archivo</th>
-                        
-                    </tr>
-                  </thead>
-                <tbody>";
-
-        $archivos = "";
-        $imgs = $this->getImgComAux($tag);
-        $n = 1;
-        foreach 
-        ($imgs as $actual) {
-            $nombrefoto = $actual['docname'];
-            $nombredoc = $actual['docfile'];
-           
-            $datos .= "<tr>
-            <td> 
-                <button type='button' class='btn btn-outline-secondary btn-sm' onclick='visutab(\"" . $nombredoc . "\")'>
-                    $nombrefoto
-                </button>
-            </td>
-        </tr>";
-        }
-        return $datos;
-    }*/
-
     public function getIMGList($tag)
     {
         $datos = "<tbody>";

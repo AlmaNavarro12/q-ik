@@ -215,6 +215,39 @@ function getEstadoMunicipioByCodP() {
     }
 }
 
+//Por cruce de de funciones se hace una para operador
+function getEstadoMunicipioByCodPOperador() {
+    var cp = $("#cp-operador").val();
+    if (cp !== "") {
+        if (isNumber(cp, "cp-operador")) {
+            cargandoHide();
+            cargandoShow();
+            $.ajax({
+                url: rutaPrincipal + "com.sine.enlace/enlaceCodigopostal.php",
+                type: 'POST',
+                dataType: 'html',
+                data: {transaccion: 'buscarcp', cp: cp},
+                success: function (datos) {
+                    var array = datos.split("<tr>");
+                    var estados = array[0];
+                    var municipios = array[1];
+                    var texto = datos.toString();
+                    var bandera = texto.substring(0, 1);
+                    var res = texto.substring(1, 5000);
+                    if (bandera == 0) {
+                        alertify.error(res);
+                    } else {
+                        cargandoHide();
+                        $(".contenedor-estado-op").html(estados);
+                        $(".contenedor-municipio-op").html(municipios);
+                    }
+                    cargandoHide();
+                }
+            });
+        }
+    }
+}
+
 //------------------------------------ESTADO
 function loadOpcionesEstado(contenedor, id = "", selectValue = "") {
     $.ajax({

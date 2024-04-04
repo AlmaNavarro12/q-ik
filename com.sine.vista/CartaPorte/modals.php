@@ -35,7 +35,6 @@
             </div>
             <div class="modal-body">
                 <div id="datosproducto" class="outer_div" >
-                    <input id="idfacturaenvio" name="idfacturaenvio" type="hidden"/>
                     <div class="row">
                         <div class="col-md-6 py-2 form-group">
                             <label class="label-form text-right mb-2" for="correo1">Correo información</label>
@@ -102,26 +101,9 @@
                     </div>
                     <div class="row mt-3">
                         <div class="col-md-12 text-end" id="btn">
-                            <button class="button-modal" onclick="enviarfactura()" id="btn-pago">Enviar <span class="fas fa-envelope"></span></button>
+                            <button class="button-modal" onclick="enviarCarta()" id="btn-enviar-carta">Enviar <span class="fas fa-envelope"></span></button>
                         </div>	
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!--MODAL PARA VER LAS EVIDENCIAS-->
-<div class="modal fade bs-example-modal-lg" id="modal-evidencia" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <button type="button" class="close-modal" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="titulo-modal" id="myModalLabel">Evidencias adjuntadas</h4>
-            <div class="modal-body">
-                <div class="row">
-                    <table id="tabla-evidencias" class="table tab-hover table-condensed table-responsive table-row thead-mod">
-
-                    </table>
                 </div>
             </div>
         </div>
@@ -202,6 +184,31 @@
                 <div class="row">
                     <div class="col-md-12 text-end" id="div-reset">
                     </div>	
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--MODAL PARA VER ARCHIVOS-->
+<div class="modal fade shadow-lg rounded rounded-5" id="modal-evidencia"  tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+        <div class="modal-header">
+                <h4 class="modal-title fs-5 fw-bold" id="label-nuevo-producto">Evidencias adjuntas</h4>
+                <button type="button" id="btn-close-modal" class="btn-close" data-bs-dismiss="modal" onclick="cerrarModal()" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row" id="contenido">
+                    <div class="col-md-4">
+                        <div class="col-12">
+                            <table class="table table-responsive table-secondary border border-start-0 border-dark" id="tabla-evidencias">
+                            </table> 
+                        </div>
+                    </div>
+                    <div class="col-md-8 d-flex justify-content-center" id="fotito">
+                        <embed src="" class="col-12 mx-auto" type="application/pdf"/>
+                    </div>
                 </div>
             </div>
         </div>

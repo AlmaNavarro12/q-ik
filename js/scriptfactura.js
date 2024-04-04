@@ -1801,7 +1801,7 @@ function enviarfactura() {
                     alertify.error(res);
                 } else {
                     $("#enviarmail").modal('hide');
-                    alertify.success('correo enviado correctamente.');
+                    alertify.success('Correo enviado correctamente.');
                 }
                 cargandoHide();
             }

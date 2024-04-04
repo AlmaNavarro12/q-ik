@@ -98,7 +98,7 @@ include("buscarProductos.php");
         <div class="row">
             <div class="col-md-4 py-2">
                 <div class="new-tooltip icon tip">
-                    <label class="label-form text-right" for="nombre-cliente">Cliente</label> <span class="fas fa-question-circle small text-primary-emphasis"></span> <label class="mark-required text-danger fw-bold">*</label>
+                    <label class="label-form text-right" for="nombre-cliente">Cliente</label> <span class="fas fa-question-circle small text-primary-emphasis"></span> <label class="mark-required text-danger fw-bold">&nbsp;</label>
                     <span class="tiptext">Puede realizar la busqueda por: Nombre, Apellidos, Empresa, RFC o Raz&oacute;n
                         social
                         de un cliente que haya registrado previamente y el sistema cargara los datos de forma
@@ -427,7 +427,7 @@ include("buscarProductos.php");
             <div class="row mt-3">
                 <div class="col-md-4 py-2">
                     <div class="new-tooltip icon tip">
-                        <label class="label-form text-right" for="clv-producto">Clave/ Nombre mercancía <span class="fas fa-question-circle small text-primary-emphasis"></span></label> <label class="mark-required text-danger fw-bold">*</label>
+                        <label class="label-form text-right" for="clv-producto">Clave/ Nombre mercancía <span class="fas fa-question-circle small text-primary-emphasis"></span></label> <label class="mark-required text-danger fw-bold">&nbsp;</label>
                         <span class="tiptext">Puede realizar la búsqueda por Clave o Descripción Fiscal de un producto que haya registrado previamente y el sistema cargará los datos de forma automática, si no realizó registro del producto puede seleccionar la opción "Producto sin registrar" y se realizara la búsqueda en el cátalogo de productos del SAT.</span>
                     </div>
                     <div class="form-group">
@@ -870,7 +870,7 @@ include("buscarProductos.php");
                 <div class="col-md-4 py-2">
                     <label class="label-form text-right" for="rfc-operador">RFC Operador</label> <label class="mark-required text-danger fw-bold">*</label>
                     <div class="form-group">
-                        <input class='form-control text-center input-form' id="rfc-operador" name='rfc-operador' placeholder='RFC del operador' type='text' onblur="checkOperador(); valRFCOperador();" />
+                        <input class='form-control text-center input-form' id="rfc-operador" name='rfc-operador' maxlength="13" placeholder='RFC del operador' type='text' onblur="checkOperador();" />
                         <div id="rfc-operador-errors"></div>
                     </div>
                 </div>
@@ -891,6 +891,17 @@ include("buscarProductos.php");
                     </div>
                 </div>
                 <div class="col-md-4 py-2">
+                <div class="new-tooltip icon tip me-2">
+                    <span class="fas fa-question-circle small text-primary-emphasis"></span>
+                    <span class="tiptext">Al ingresar el código postal se selecciona el estado y municipio correspondiente. Si no es el estado o municipio deseados puedes seleccionarlos del listado manualmente.</span>
+                </div>
+                    <label class="label-form text-right" for="cp-operador">Código postal del operador </label> <label class="mark-required text-danger fw-bold">*</label>
+                    <div class="form-group">
+                        <input class='form-control text-center input-form' id='cp-operador' name='cp-operador' placeholder='Código postal domicilio' maxlength="5" minlength="5" oninput="validarNum(this);" type='text' onblur="getEstadoMunicipioByCodPOperador();" />
+                        <div id="cp-operador-errors"></div>
+                    </div>
+                </div>
+                <div class="col-md-4 py-2">
                     <label class="label-form text-right" for="estado-operador">Estado</label> <label class="mark-required text-danger fw-bold">*</label>
                     <div class="form-group">
                         <select class="form-select text-center input-form" id="estado-operador" name="estado-operador" onchange="loadOpcionesMunicipioOperador()">
@@ -900,7 +911,7 @@ include("buscarProductos.php");
                         <div id="estado-operador-errors"></div>
                     </div>
                 </div>
-                <div class="col-md-4 py-2">
+                <div class="col-md-3 py-2">
                     <label class="label-form text-right" for="municipio-operador">Municipio</label> <label class="mark-required text-danger fw-bold">&nbsp;</label>
                     <div class="form-group">
                         <select class="form-select text-center input-form" id="municipio-operador" name="municipio-operador">
@@ -908,13 +919,6 @@ include("buscarProductos.php");
                             <optgroup id="municipios-operador" class="contenedor-municipio-op text-start"> </optgroup>
                         </select>
                         <div id="municipio-operador-errors"></div>
-                    </div>
-                </div>
-                <div class="col-md-3 py-2">
-                    <label class="label-form text-right" for="cp-operador">Código postal del operador </label> <label class="mark-required text-danger fw-bold">*</label>
-                    <div class="form-group">
-                        <input class='form-control text-center input-form' id='cp-operador' name='cp-operador' placeholder='Código postal domicilio' maxlength="5" minlength="5" oninput="validarNum(this);" type='text' onblur="getEstadoOperador();" />
-                        <div id="cp-operador-errors"></div>
                     </div>
                 </div>
 
@@ -955,7 +959,7 @@ include("buscarProductos.php");
                         </div>
                     </div>
                 </div>
-                <div class="col-md-8 scroll-table">
+                <div class="col-md-8 scroll-table py-2">
                     <table class="table table-hover table-condensed table-bordered table-striped text-center" style="max-width: 100%;">
                         <tbody id="img-table">
                         </tbody>

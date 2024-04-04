@@ -57,9 +57,9 @@ function obtenerDatosCliente(){
     $c->setNum_interior($_POST['interior']);
     $c->setNum_exterior($_POST['exterior']);
     $c->setLocalidad($_POST['localidad']);
-    $c->setEstado($_POST['estado']);
+    $c->setEstado($_POST['estado'] ?? 0);
     $c->setNombreEstado($_POST['nombreestado']);
-    $c->setMunicipio($_POST['municipio']);
+    $c->setMunicipio($_POST['municipio'] ?? 0);
     $c->setNombreMunicipio($_POST['nombremunicipio']);
     $c->setCodigo_postal($_POST['postal']);
     $c->setIdBanco($_POST['idbanco']);

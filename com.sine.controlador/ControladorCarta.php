@@ -10,7 +10,7 @@ use SWServices\Toolkit\SignService as Sellar;
 use SWServices\Stamp\StampService as StampService;
 use SWServices\Cancelation\CancelationService as CancelationService;
 use SWServices\SatQuery\SatQueryService as consultaCfdiSAT;
-
+use PHPMailer\PHPMailer\PHPMailer;
 
 date_default_timezone_set("America/Mexico_City");
 
@@ -1518,6 +1518,361 @@ class ControladorCarta {
         return $insertado;
     }
     
+    private function checkCartaAux($tag) {
+        $existe = false;
+        $detalle = $this->getDetalle($tag);
+        foreach ($detalle as $detactual) {
+            $existe = true;
+            break;
+        }
+        return $existe;
+    }
+
+    public function checkCarta($tag) {
+        $check = $this->checkCartaAux($tag);
+        if ($check) {
+            $datos = $this->nuevosRegistros($tag);
+        }
+        return $datos;
+    }
+
+    private function nuevosRegistros($tag) {
+        $vehiculo = false;
+        $remolque1 = false;
+        $remolque2 = false;
+        $remolque3 = false;
+        $operador = false;
+
+        $datoscarta = $this->getDatosCarta($tag);
+        $placas = "";
+        foreach ($datoscarta as $datactual) {
+            $placas = $datactual['carta_placa'];
+            $idvehiculo = $datactual['carta_idvehiculo'];
+            $idremolque1 = $datactual['carta_idremolque1'];
+            $idremolque2 = $datactual['carta_idremolque2'];
+            $idremolque3 = $datactual['carta_idremolque3'];
+
+            if ($idvehiculo == '0') {
+                $nombre = $datactual['nombrevehiculo'];
+                $numpermiso = $datactual['carta_numpermiso'];
+                $tipopermiso = $datactual['carta_tipopermiso'];
+                $tipotransporte = $datactual['carta_conftransporte'];
+                $anhomod = $datactual['carta_anhomod'];
+                $placa = $datactual['carta_placa'];
+                $segurocivil = $datactual['carta_segurocivil'];
+                $polizaseguro = $datactual['carta_polizaseguro'];
+
+                if ($nombre == '') {
+                    $nombre = $placa;
+                }
+
+                $checkv = $this->checkVehiculo($placa);
+                if ($checkv == '0') {
+                    $consulta = "INSERT INTO `transporte` VALUES (:id, :nombre, :numpermiso, :tipopermiso, :conftransporte, :anho, :placa, :segurorc, :polizarc, :seguroma, :polizama, :segurocg, :polizacg, :st);";
+                    $val = array("id" => null,
+                        "nombre" => $nombre,
+                        "numpermiso" => $numpermiso,
+                        "tipopermiso" => $tipopermiso,
+                        "conftransporte" => $tipotransporte,
+                        "anho" => $anhomod,
+                        "placa" => $placa,
+                        "segurorc" => $segurocivil,
+                        "polizarc" => $polizaseguro,
+                        "seguroma" => '',
+                        "polizama" => '',
+                        "segurocg" => '',
+                        "polizacg" => '',
+                        "st" => '1');
+                    $vehiculo = $this->consultas->execute($consulta, $val);
+                } { $vehiculo = "Ya hay un vehículo registrado con el número de placas ".$placas.".";}
+            } else {
+                $vehiculo = "Ya hay un vehículo registrado con el número de placas ".$placas.".";
+            }
+
+            $placasremolque1 = $datactual['carta_placaremolque1'];
+            if ($idremolque1 == '0') {
+                $nmremolque1 = $datactual['carta_nmremolque1'];
+                $tiporemolque1 = $datactual['carta_tiporemolque1'];
+                $placaremolque1 = $datactual['carta_placaremolque1'];
+                $placasremolque1 = $placaremolque1;
+                if ($nmremolque1 == '') {
+                    $nmremolque1 = $placaremolque1;
+                }
+
+                $checkrem1 = $this->checkRemolque($placaremolque1);
+                if ($checkrem1 == '0' && $placaremolque1 != "") {
+                    $consulta = "INSERT INTO `remolque` VALUES (:id, :nombre, :tipo, :placa, :st);";
+                    $valores = array("id" => null,
+                        "nombre" => $nmremolque1,
+                        "tipo" => $tiporemolque1,
+                        "placa" => $placaremolque1,
+                        "st" => '1');
+                    $remolque1 = $this->consultas->execute($consulta, $valores);
+                } else {$remolque1 = "0"; }
+            } else {
+                $remolque1 = "Ya hay un remolque con el número de placas ".$placasremolque1." (Remolque 1).";
+            }
+
+            $placaremolque2 = $datactual['carta_placaremolque2'];
+            if ($idremolque2 == '0') {
+                $nmremolque2 = $datactual['carta_nmremolque2'];
+                $tiporemolque2 = $datactual['carta_tiporemolque2'];
+                $placaremolque2 = $datactual['carta_placaremolque2'];
+                if ($nmremolque2 == '') {
+                    $nmremolque2 = $placaremolque2;
+                }
+
+                $checkrem2 = $this->checkRemolque($placaremolque2);
+                if ($checkrem2 == '0' && $placaremolque2 != "") {
+                    $consulta = "INSERT INTO `remolque` VALUES (:id, :nombre, :tipo, :placa, :st);";
+                    $valores = array("id" => null,
+                        "nombre" => $nmremolque2,
+                        "tipo" => $tiporemolque2,
+                        "placa" => $placaremolque2,
+                        "st" => '1');
+                    $remolque2 = $this->consultas->execute($consulta, $valores);
+                } else {$remolque2 = "0"; }
+            } else {
+                $remolque1 = "Ya hay un remolque con el número de placas ".$placaremolque2." (Remolque 2).";
+            }
+
+            $placaremolque3 = "";
+            if ($idremolque3 == '0') {
+                $nmremolque3 = $datactual['carta_nmremolque3'];
+                $tiporemolque3 = $datactual['carta_tiporemolque3'];
+                $placaremolque3 = $datactual['carta_placaremolque3'];
+                if ($nmremolque3 == '') {
+                    $nmremolque3 = $placaremolque3;
+                }
+
+                $checkrem3 = $this->checkRemolque($placaremolque3);
+                if ($checkrem3 == '0' && $placaremolque3 != "") {
+                    $consulta = "INSERT INTO `remolque` VALUES (:id, :nombre, :tipo, :placa, :st);";
+                    $valores = array("id" => null,
+                        "nombre" => $nmremolque3,
+                        "tipo" => $tiporemolque3,
+                        "placa" => $placaremolque3,
+                        "st" => '1');
+                    $remolque3 = $this->consultas->execute($consulta, $valores);
+                } else {$remolque3 = "0"; }
+            } else {
+                $remolque3 = "Ya hay un remolque con el número de placas ".$placaremolque3." (Remolque 3).";
+            }
+        }
+
+        $operadores = $this->getOperadores($tag);
+        foreach ($operadores as $actual) {
+            $idop = $actual['operador_id'];
+
+            $rfc = $actual["operador_rfc"];
+            if ($idop == '0') {
+                $nombreop = $actual['operador_nombre'];
+                $rfc = $actual["operador_rfc"];
+                $lic = $actual['operador_numlic'];
+                $idestado = $actual["operador_idestado"];
+                $nombre_estado = $actual["nombre_estado"];
+                $calle = $actual["operador_calle"];
+                $cp = $actual['operador_cp'];
+
+                if ($nombreop == '') {
+                    $nmop = $rfc;
+                    $apaternoop = '';
+                    $amaternoop = "";
+                } else {
+                    $divnm = explode(" ", $nombreop);
+                    $nmop = $divnm[0];
+                    if (isset($divnm[3])) {
+                        $apaternoop = $divnm[2];
+                        $amaternoop = $divnm[3];
+                    } else {
+                        $apaternoop = $divnm[1];
+                        $amaternoop = $divnm[2];
+                    }
+                }
+
+                $checkop = $this->checkOperador($rfc);
+                if ($checkop == '0') {
+                    $consulta = "INSERT INTO `operador` VALUES (:id, :nombre, :apaterno, :amaterno, :licencia, :rfc, :empresa, :idestado, :nombre_estado, :idmunicipio, :nombre_municipio, :calle, :cp, :st);";
+                    $valores = array("id" => null,
+                        "nombre" => $nmop,
+                        "apaterno" => $apaternoop,
+                        "amaterno" => $amaternoop,
+                        "licencia" => $lic,
+                        "rfc" => $rfc,
+                        "empresa" => '',
+                        "idestado" => $idestado,
+                        "nombre_estado" => $nombre_estado,
+                        "idmunicipio" => '0',
+                        "nombre_municipio" => '',
+                        "calle" => $calle,
+                        "cp" => $cp,
+                        "st" => '1');
+                    $operador = $this->consultas->execute($consulta, $valores);
+                } else { $operador =  "Ya hay un operador registrado con con el RFC, ".$rfc."."; }
+            } else {
+                $operador =  "Ya hay un operador registrado con con el RFC, ".$rfc.".";
+            }
+        }
+        return "$vehiculo</tr>$remolque1</tr>$remolque2</tr>$remolque3</tr>$operador";
+    }
+
+    /*private function nuevosRegistros($tag) {
+        $insertado = false;
+        $datoscarta = $this->getDatosCarta($tag);
+        foreach ($datoscarta as $datactual) {
+            $idvehiculo = $datactual['carta_idvehiculo'];
+            $idremolque1 = $datactual['carta_idremolque1'];
+            $idremolque2 = $datactual['carta_idremolque2'];
+            $idremolque3 = $datactual['carta_idremolque3'];
+
+            if ($idvehiculo == '0') {
+                $nombre = $datactual['nombrevehiculo'];
+                $numpermiso = $datactual['carta_numpermiso'];
+                $tipopermiso = $datactual['carta_tipopermiso'];
+                $tipotransporte = $datactual['carta_conftransporte'];
+                $anhomod = $datactual['carta_anhomod'];
+                $placa = $datactual['carta_placa'];
+                $segurocivil = $datactual['carta_segurocivil'];
+                $polizaseguro = $datactual['carta_polizaseguro'];
+
+                if ($nombre == '') {
+                    $nombre = $placa;
+                }
+
+                $checkv = $this->checkVehiculo($placa);
+                if ($checkv == '0') {
+                    $consulta = "INSERT INTO `transporte` VALUES (:id, :nombre, :numpermiso, :tipopermiso, :conftransporte, :anho, :placa, :segurorc, :polizarc, :seguroma, :polizama, :segurocg, :polizacg, :st);";
+                    $val = array("id" => null,
+                        "nombre" => $nombre,
+                        "numpermiso" => $numpermiso,
+                        "tipopermiso" => $tipopermiso,
+                        "conftransporte" => $tipotransporte,
+                        "anho" => $anhomod,
+                        "placa" => $placa,
+                        "segurorc" => $segurocivil,
+                        "polizarc" => $polizaseguro,
+                        "seguroma" => '',
+                        "polizama" => '',
+                        "segurocg" => '',
+                        "polizacg" => '',
+                        "st" => '1');
+                    $insertado = $this->consultas->execute($consulta, $val);
+                }
+            }
+
+            if ($idremolque1 == '0') {
+                $nmremolque1 = $datactual['carta_nmremolque1'];
+                $tiporemolque1 = $datactual['carta_tiporemolque1'];
+                $placaremolque1 = $datactual['carta_placaremolque1'];
+                if ($nmremolque1 == '') {
+                    $nmremolque1 = $placaremolque1;
+                }
+
+                $checkrem1 = $this->checkRemolque($placaremolque1);
+                if ($checkrem1 == '0' && $placaremolque1 != "") {
+                    $consulta = "INSERT INTO `remolque` VALUES (:id, :nombre, :tipo, :placa, :st);";
+                    $valores = array("id" => null,
+                        "nombre" => $nmremolque1,
+                        "tipo" => $tiporemolque1,
+                        "placa" => $placaremolque1,
+                        "st" => '1');
+                    $insertado = $this->consultas->execute($consulta, $valores);
+                }
+            }
+
+            if ($idremolque2 == '0') {
+                $nmremolque2 = $datactual['carta_nmremolque2'];
+                $tiporemolque2 = $datactual['carta_tiporemolque2'];
+                $placaremolque2 = $datactual['carta_placaremolque2'];
+                if ($nmremolque2 == '') {
+                    $nmremolque2 = $placaremolque2;
+                }
+
+                $checkrem2 = $this->checkRemolque($placaremolque2);
+                if ($checkrem2 == '0' && $placaremolque2 != "") {
+                    $consulta = "INSERT INTO `remolque` VALUES (:id, :nombre, :tipo, :placa, :st);";
+                    $valores = array("id" => null,
+                        "nombre" => $nmremolque2,
+                        "tipo" => $tiporemolque2,
+                        "placa" => $placaremolque2,
+                        "st" => '1');
+                    $insertado = $this->consultas->execute($consulta, $valores);
+                }
+            }
+
+            if ($idremolque3 == '0') {
+                $nmremolque3 = $datactual['carta_nmremolque3'];
+                $tiporemolque3 = $datactual['carta_tiporemolque3'];
+                $placaremolque3 = $datactual['carta_placaremolque3'];
+                if ($nmremolque3 == '') {
+                    $nmremolque3 = $placaremolque3;
+                }
+
+                $checkrem3 = $this->checkRemolque($placaremolque3);
+                if ($checkrem3 == '0' && $placaremolque3 != "") {
+                    $consulta = "INSERT INTO `remolque` VALUES (:id, :nombre, :tipo, :placa, :st);";
+                    $valores = array("id" => null,
+                        "nombre" => $nmremolque3,
+                        "tipo" => $tiporemolque3,
+                        "placa" => $placaremolque3,
+                        "st" => '1');
+                    $insertado = $this->consultas->execute($consulta, $valores);
+                }
+            }
+        }
+
+        $operadores = $this->getOperadores($tag);
+        foreach ($operadores as $actual) {
+            $idop = $actual['operador_id'];
+
+            if ($idop == '0') {
+                $nombreop = $actual['operador_nombre'];
+                $rfc = $actual["operador_rfc"];
+                $lic = $actual['operador_numlic'];
+                $idestado = $actual["operador_idestado"];
+                $nombre_estado = $actual["nombre_estado"];
+                $calle = $actual["operador_calle"];
+                $cp = $actual['operador_cp'];
+
+                if ($nombreop == '') {
+                    $nmop = $rfc;
+                    $apaternoop = '';
+                    $amaternoop = "";
+                } else {
+                    $divnm = explode(" ", $nombreop);
+                    $nmop = $divnm[0];
+                    if (isset($divnm[3])) {
+                        $apaternoop = $divnm[2];
+                        $amaternoop = $divnm[3];
+                    } else {
+                        $apaternoop = $divnm[1];
+                        $amaternoop = $divnm[2];
+                    }
+                }
+
+                $checkop = $this->checkOperador($rfc);
+                if ($checkop == '0') {
+                    $consulta = "INSERT INTO `operador` VALUES (:id, :nombre, :apaterno, :amaterno, :licencia, :rfc, :empresa, :idestado, :nombre_estado, :idmunicipio, :nombre_municipio, :calle, :cp, :st);";
+                    $valores = array("id" => null,
+                        "nombre" => $nmop,
+                        "apaterno" => $apaternoop,
+                        "amaterno" => $amaternoop,
+                        "licencia" => $lic,
+                        "rfc" => $rfc,
+                        "empresa" => '',
+                        "idestado" => $idestado,
+                        "nombre_estado" => $nombre_estado,
+                        "idmunicipio" => '0',
+                        "nombre_municipio" => '',
+                        "calle" => $calle,
+                        "cp" => $cp,
+                        "st" => '1');
+                    $insertado = $this->consultas->execute($consulta, $valores);
+                }
+            }
+        }
+        return $insertado;
+    }*/
 
     private function getTMPEvidencias($sid) {
         $consultado = false;
@@ -1761,7 +2116,7 @@ class ControladorCarta {
                 $datos .= "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' $timbre>$tittimbre <span class='text-muted fas fa-bell'></span></a></li>";
             }
 
-            $datos .= "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' data-bs-toggle='modal' data-bs-target='#modal-evidencia' onclick=\"verEvidencias($idfactura);\">Ver evidencias <span class='text-muted fas fa-save'></span></a></li>
+            $datos .= "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' onclick=\"verEvidencias($idfactura);\">Ver evidencias <span class='text-muted fas fa-save'></span></a></li>
                         <li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' data-bs-toggle='modal' data-bs-target='#enviarmail' onclick='showCorreosCarta($idfactura);'>Enviar <span class='text-muted fas fa-envelope'></span></a></li>";
 
             if ($uuid != "") {
@@ -2135,11 +2490,20 @@ class ControladorCarta {
         $cliente = '';
         $datos = $this->getClientebyRFC($rfc);
         foreach ($datos as $actual) {
+            $estado =  $actual["nombre_estado"];
+            $municipio =  $actual["nombre_municipio"];
+            $int = "";
+            if($actual['numero_interior'] != ""){
+                $int = " Int. ".$actual['numero_interior'];
+            }
+
             $idcliente = $actual['id_cliente'];
             $razon = $actual['razon_social'];
             $regimen = $actual['regimen_cliente'];
             $cp = $actual['codigo_postal'];
-            $cliente .= "$idcliente</tr>$razon</tr>$regimen</tr>$cp";
+            $nombre = $actual['nombre'] . " " . $actual['apaterno'] . " - " . $actual['nombre_empresa'];
+            $direccion = $actual['calle']." ".$actual['numero_exterior'].$int." ".$actual['localidad']." ".$municipio." ".$estado;
+            $cliente .= "$idcliente</tr>$razon</tr>$regimen</tr>$cp</tr>$nombre</tr>$direccion";
         }
         return 'x' . $cliente;
     }
@@ -2172,8 +2536,7 @@ class ControladorCarta {
     //----------------------------------------IMPRIMIR
     public function getFacturas($idfactura) {
         $consultado = false;
-        $consulta = "SELECT * FROM factura_carta dat 
-        WHERE dat.idfactura_carta=:id";
+        $consulta = "SELECT * FROM factura_carta dat WHERE dat.idfactura_carta=:id";
         $val = array("id" => $idfactura);
         $consultado = $this->consultas->getResults($consulta, $val);
         return $consultado;
@@ -2236,5 +2599,275 @@ class ControladorCarta {
             $nombre = $actual['nombreoperador'] . ' ' . $actual['apaternooperador'] . ' ' . $actual['amaternooperador'];
         }
         return $nombre;
+    }
+
+    private function getConfigMailAux() {
+        $consultado = false;
+        $consulta = "SELECT * FROM correoenvio WHERE chuso1=:id;";
+        $valores = array("id" => '1');
+        $consultado = $this->consultas->getResults($consulta, $valores);
+        return $consultado;
+    }
+
+    private function getConfigMail() {
+        $datos = "";
+        $get = $this->getConfigMailAux();
+        foreach ($get as $actual) {
+            $correo = $actual['correo'];
+            $pass = $actual['password'];
+            $remitente = $actual['remitente'];
+            $correoremitente = $actual['correoremitente'];
+            $host = $actual['host'];
+            $puerto = $actual['puerto'];
+            $seguridad = $actual['seguridad'];
+            $datos = "$correo</tr>$pass</tr>$remitente</tr>$correoremitente</tr>$host</tr>$puerto</tr>$seguridad";
+        }
+        return $datos;
+    }
+
+    public function mail($sm) {
+        require_once '../com.sine.controlador/ControladorConfiguracion.php';
+        $cc = new ControladorConfiguracion();
+        $body = $cc->getMailBody('4');
+        $divM = explode("</tr>", $body);
+        $asunto = $divM[1];
+        $saludo = $divM[2];
+        $msg = $divM[3];
+        $logo = $divM[4];
+
+        $config = $this->getConfigMail();
+        if ($config != "") {
+            $div = explode("</tr>", $config);
+            $correoenvio = $div[0];
+            $pass = $div[1];
+            $remitente = $div[2];
+            $correoremitente = $div[3];
+            $host = $div[4];
+            $puerto = $div[5];
+            $seguridad = $div[6];
+
+            $mail = new PHPMailer;
+            $mail->isSMTP();
+            $mail->Mailer = 'smtp';
+            $mail->SMTPAuth = true;
+            $mail->Host = $host;
+            $mail->Port = $puerto;
+            $mail->SMTPSecure = $seguridad;
+            $mail->Username = $correoenvio;
+            $mail->Password = $pass;
+            $mail->From = $correoremitente;
+            $mail->FromName = $remitente;
+
+            $mail->Subject = iconv("utf-8", "windows-1252",$asunto);
+            $mail->isHTML(true);
+            $mail->Body = $this->bodyMail($asunto, $saludo, $sm->getRazonsocial(), $msg, $logo);
+
+            if ($sm->getChmail1() == '1') {
+                $mail->addAddress($sm->getMailalt1());
+            }
+            if ($sm->getChmail2() == '1') {
+                $mail->addAddress($sm->getMailalt2());
+            }
+            if ($sm->getChmail3() == '1') {
+                $mail->addAddress($sm->getMailalt3());
+            }
+            if ($sm->getChmail4() == '1') {
+                $mail->addAddress($sm->getMailalt4());
+            }
+            if ($sm->getChmail5() == '1') {
+                $mail->addAddress($sm->getMailalt5());
+            }
+            if ($sm->getChmail6() == '1') {
+                $mail->addAddress($sm->getMailalt6());
+            }
+
+            $mail->addStringAttachment($sm->getPdfstring(), $sm->getFolio() . "_" . $sm->getRfcemisor() . "_" . $sm->getUuid() . ".pdf");
+            if ($sm->getCfdistring() != "") {
+                $mail->addStringAttachment($sm->getCfdistring(), $sm->getFolio() . "_" . $sm->getRfcemisor() . "_" . $sm->getUuid() . ".xml");
+            }
+
+            if (!$mail->send()) {
+                echo '0No se envio el mensaje, ' . $mail->ErrorInfo;
+            } else {
+                return 'Se ha enviado la factura con carta porte.';
+            }
+        } else {
+            return "0No se ha configurado un correo de envío para esta área de carta porte.";
+        }
+    }
+
+    private function bodyMail($asunto, $saludo, $nombre, $msg, $logo) {
+        $archivo = "../com.sine.dao/configuracion.ini";
+        $ajustes = parse_ini_file($archivo, true);
+        if (!$ajustes) {
+            throw new Exception("No se puede abrir el archivo " . $archivo);
+        }
+        $rfcfolder = 'NAGA021226FJ0';//$ajustes['cron']['rfcfolder'];
+
+        $txt = str_replace("<corte>", "</p><p style='font-size:18px; text-align: justify;'>", $msg);
+        $message = "<html>
+                        <body>
+                            <table width='100%' bgcolor='#e0e0e0' cellpadding='0' cellspacing='0' border='0' style='border-radius: 25px;'>
+                                <tr><td>
+                                        <table align='center' width='100%' border='0' cellpadding='0' cellspacing='0' style='max-width:650px; border-radius: 20px; background-color:#fff; font-family:sans-serif;'>
+                                            <thead>
+                                                <tr height='80'>
+                                                    <th align='left' colspan='4' style='padding: 6px; background-color:#f5f5f5; border-radius: 20px; border-bottom:solid 1px #bdbdbd;' ><img src='https://localhost/$rfcfolder/img/$logo' height='100px'/></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr align='center' height='10' style='font-family:sans-serif; '>
+                                                    <td style='background-color:#09096B; text-align:center; border-radius: 5px;'></td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan='4' style='padding:15px;'>
+                                                        <h1>$asunto</h1>
+                                                        <p style='font-size:20px;'>$saludo $nombre</p>
+                                                        <hr/>
+                                                        <p style='font-size:18px; text-align: justify;'>$txt</p>
+                                                    </td>
+                                                </tr>
+
+                                            </tbody>
+                                        </table>
+                                    </td></tr>
+                            </table>
+                        </body>
+                    </html>";
+        return $message;
+    }
+
+    //---------------------------------------EVIDENCIAS
+    public function documentoCarta($tag, $sid) {
+        $insertado = false;
+        $ubicaciones = $this->getDocumentosCartaAux($tag);
+        foreach ($ubicaciones as $actual) {
+            $iddoc = $actual['iddetalledoccarta'];
+            $orignm = $actual['orignm'];
+            $imgnm = $actual["imgnm"];
+            $ext = $actual['ext'];
+            $descripcion = $actual["descripcion"];
+
+            $consulta = "INSERT INTO `tmpimg` VALUES (:id, :tmpname, :imgtmp, :ext, :tmpdescripcion, :sid);";
+            $valores = array("id" => null,
+                "tmpname" => $orignm,
+                "imgtmp" => $imgnm,
+                "ext" => $ext,
+                "tmpdescripcion" => $descripcion,
+                "sid" => $sid);
+
+            $insertado = $this->consultas->execute($consulta, $valores);
+            copy("../cartaporte/$imgnm", "../temporal/tmp/$imgnm");
+        }
+        return $insertado;
+    }
+
+    private function getDocumentosCartaAux($tag) {
+        $consultado = false;
+        $consulta = "SELECT * FROM detalledoccarta WHERE tagimg=:tag";
+        $val = array("tag" => $tag);
+        $consultado = $this->consultas->getResults($consulta, $val);
+        return $consultado;
+    }
+
+    public function tablaEvidencias($fid){
+        $tag = $this->getTagCartabyID($fid);
+        $datos = "<tbody>";
+
+        $productos = $this->getDocumentosCartaAux($tag);
+        foreach ($productos as $actual) {
+            $orignm = $actual['orignm'];
+            $nombredoc = $actual['imgnm'];
+            $ext = $actual['ext'];
+
+            $datos .= "<tr>
+                        <td onclick='visutab(\"$nombredoc\",\"$ext\")'>$orignm</td>
+                      </tr>";
+        }
+        return $datos;
+    }
+
+    private function getTmpImg($sid)
+    {
+        $consultado = false;
+        $consulta = "SELECT * FROM tmpimg where sessionid=:sid;";
+        $val = array("sid" => $sid);
+        $consultado = $this->consultas->getResults($consulta, $val);
+        return $consultado;
+    }
+
+    public function tablaIMG($idtmp, $d = '')
+    {
+        $datos = "<corte>";
+        $img = $this->getTmpImg($idtmp);
+        foreach ($img as $actual) {
+            $idtmp = $actual['idtmpimg'];
+            $name = $actual['tmpname'];
+            $coldesc = "";
+            if ($d == "1") {
+                $descripcion = $actual["tmpdescripcion"];
+                $coldesc = "<td style='word-break: break-all;'><input class='form-control text-center input-sm' id='descripcion$idtmp' type='text' value='$descripcion' onblur=\"addDescripcion('$idtmp')\" placeholder='Añade un nombre o descripcion al archivo (opcional)' title='Añade un nombre o descripcion al archivo (opcional)'/> </td>";
+            }
+            $datos .= "
+                <tr>
+                    <td class='click-row' style='word-break: break-all;' onclick=\"displayIMG('$idtmp') \">$name </td>
+                    $coldesc
+                    <td><button class='btn btn-xs btn-danger' onclick='eliminarIMG($idtmp)' title='Eliminar imagen'><span class=' fas fa-times fa-sm'></span></button></td>
+                </tr>";
+        }
+        return $datos;
+    }
+
+    public function eliminarIMG($idtmp)
+    {
+        $img = $this->getNameImg($idtmp);
+        $consultado = false;
+        $consulta = "DELETE FROM tmpimg where idtmpimg=:id;";
+        $val = array("id" => $idtmp);
+        $consultado = $this->consultas->execute($consulta, $val);
+        unlink("../temporal/tmp/$img");
+        return $consultado;
+    }
+
+    private function getNameImg($idsession)
+    {
+        $img = "";
+        $imgs = $this->getIMGDataAux($idsession);
+        foreach ($imgs as $actual) {
+            $img = $actual['imgtmp'];
+        }
+        return $img;
+    }
+
+    private function getIMGDataAux($idsession)
+    {
+        $consultado = false;
+        $consulta = "SELECT * FROM tmpimg WHERE idtmpimg=:id;";
+        $valores = array("id" => $idsession);
+        $consultado = $this->consultas->getResults($consulta, $valores);
+        return $consultado;
+    }
+
+    public function getCorreosAux($idfactura) {
+        $consultado = false;
+        $consulta = "SELECT c.email_informacion,c.email_facturacion,c.email_gerencia, c.correoalt1, c.correoalt2, c.correoalt3, c.telefono FROM factura_carta dat INNER JOIN cliente c on (dat.idcliente=c.id_cliente) WHERE dat.idfactura_carta=:id;";
+        $val = array("id" => $idfactura);
+        $consultado = $this->consultas->getResults($consulta, $val);
+        return $consultado;
+    }
+
+    public function getCorreo($idfactura) {
+        $datos = "";
+        $correos = $this->getCorreosAux($idfactura);
+        foreach ($correos as $actual) {
+            $correo1 = $actual['email_informacion'];
+            $correo2 = $actual['email_facturacion'];
+            $correo3 = $actual['email_gerencia'];
+            $correo4 = $actual['correoalt1'];
+            $correo5 = $actual['correoalt2'];
+            $correo6 = $actual['correoalt3'];
+            $datos .= "$correo1<corte>$correo2<corte>$correo3<corte>$correo4<corte>$correo5<corte>$correo6";
+        }
+        return $datos;
     }
 }

@@ -359,7 +359,7 @@ require_once 'Enrutador.php';
                                                 }
                                                 if ($reporteventa == '1') {
                                                 ?>
-                                                    <li class="lista-submenu-elemento ps-5 list-menu" data-submenu='reporteventas'> Ventas</li>
+                                                    <li class="lista-submenu-elemento ps-5 list-menu" data-submenu='reporteventas'> Comisiones</li>
                                                 <?php
                                                 }
                                                 if ($reporteinventario == '1') {
@@ -369,7 +369,7 @@ require_once 'Enrutador.php';
                                                 }
                                                 if ($reportepuntoventa == '1') {
                                                 ?>
-                                                    <li class="lista-submenu-elemento ps-5 list-menu" data-submenu='reportepuntoventa'> Punto de venta</li>
+                                                    <li class="lista-submenu-elemento ps-5 list-menu" data-submenu='reportepuntoventa'> Ventas</li>
                                                 <?php
                                                 }
                                                 ?>

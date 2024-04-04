@@ -53,14 +53,10 @@
                 <input type="hidden" class="form-control" id="idcant">
                 <div class="row">
                     <div class="form-group col-md-12">
-                        <label class="label-form text-right" for="fecha-creacion">Cantidad</label>
+                        <label class="label-form text-right mb-2" for="fecha-creacion">Cantidad</label>
                         <div class="input-group">
                             <input class="form-control text-center input-form" id="cantidad-producto" name="cantidad-producto" placeholder="Cantidad" type="number" />
-                            <span class='input-group-btn'>
-                                <button type='button' class='button-modal' data-type='plus' id="btn-modificar-cant">
-                                    <span class='fas fa-plus'></span>
-                                </button>
-                            </span>
+                            <button class="btn button-modal" type="button" onclick="modificarCantidad();"><span class='fas fa-plus'></span></button>
                         </div>
                     </div>
                     <div id="cantidad-producto-errors">
@@ -359,6 +355,23 @@
                         </div>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--VISUALIZACION DE IMÁGENES EN EL FORMULARIO-->
+<div class="modal fade shadow-lg rounded rounded-5" id="archivos" name="archivos" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+        <div class="modal-header">
+                <h4 class="modal-title fs-5 fw-bold" id="label-nuevo-producto">Visualización de imagen</h4>
+                <button type="button" id="btn-close-modal" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="fotito" class="d-flex justify-content-center">
+                <embed src="" class="col-md-8"  type="application/pdf"/>
+                </div>
             </div>
         </div>
     </div>

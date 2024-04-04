@@ -120,7 +120,7 @@ if (isset($_POST['transaccion'])) {
             echo $datos != "" ? $datos : "0No hay clientes registrados.";
             break;
         case 'aplicarEgreso':
-            $datos = $cp->aplicarEgreso($_POST['uuid'], $_POST['montoant_tmp'], $_POST['monto'],);
+            $datos = $cp->aplicarEgreso($_POST['uuid'], $_POST['montoant_tmp'], $_POST['monto']);
             echo $datos;
             break;
             /*case 'cfdipago':

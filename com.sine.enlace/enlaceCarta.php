@@ -154,6 +154,10 @@ if (isset($_POST['transaccion'])) {
             $insertado = $cc->agregarCFDI($t);
             echo $insertado ? $insertado : "0Error: No se insertó el registro.";
             break;
+        case 'nuevosdatos':
+            $datos = $cc->checkCarta($_POST['tag']);
+            echo $datos != "" ? $datos : "0No se han registrados los datos.";
+            break;
             //----------------------------------------RELACION CON LOS OTROS MODULOS
         case 'valvehiculo':
             $placa = strtoupper(str_replace(['-', ' ', '.', '/', ',', '_'], "", $_POST['placa']));
@@ -187,15 +191,32 @@ if (isset($_POST['transaccion'])) {
             $datos = $cc->documentoCarta($_POST['tag'], session_id());
             echo $datos != "" ? $datos : "0No hay evidencias agregadas datos.";
             break;
+        //----------------------------------------------EVIDENCIAS
+        case 'tablaimg':
+            $insertado = $cc->tablaEvidencias($_POST['id']);
+            echo $insertado != "" ? $insertado : "0No se han encontrado evidencias.";
+            break;
         //----------------------------------------------PAGOS
         case 'getdatospago':
             $datos = $cc->getDatosFacPago($_POST['idcarta']);
             echo $datos != "" ? $datos : "0No se han encontrado datos.";
             break;
-        //-------------------------------------------GET CLIENTES
+        case 'tablaimgs':
+            $datos = $cc->tablaIMG(session_id());
+            echo  $datos;
+            break;
+        case 'eliminarimg':
+            $resultado = $cc->eliminarIMG($_POST['idtmp']);
+            echo 'Archivo eliminado.';
+            break;
+        //-------------------------------------------GET
         case 'getcliente':
             $datos = $cc->checkCliente($_POST['rfc']);
             echo $datos;
+            break;
+        case 'getcorreos':
+            $datos = $cc->getCorreo($_POST['idfactura']);
+            echo $datos != "" ? $datos : "0No se han encontrado correos.";
             break;
             
         

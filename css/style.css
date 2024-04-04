@@ -1716,3 +1716,8 @@ a.state-link{
     line-height: 17px;
     color: #444444;
 }
+
+#fotito img {
+    max-height: 480px;
+    max-width: 100%;
+}

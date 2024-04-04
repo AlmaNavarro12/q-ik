@@ -92,7 +92,7 @@ class ControladorSat{
     }
 
     public function getCoincidenciasCatalogoFiscal($term){
-        $datos = $this->materialpeligroso->getCoincidenciasCatalogoFiscal($term);
-        return $datos;
+        $resultados =  $this->materialpeligroso->getCoincidenciasCatalogoProducto($term);
+        return $resultados;
     }
 }
