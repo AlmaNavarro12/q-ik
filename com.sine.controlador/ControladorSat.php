@@ -3,20 +3,21 @@ require_once '../../CATSAT/CATSAT/com.sine.controlador/controladorBanco.php';
 require_once '../../CATSAT/CATSAT/com.sine.controlador/controladorMonedas.php';
 require_once '../../CATSAT/CATSAT/com.sine.controlador/controladorImpuestos.php'; 
 require_once '../../CATSAT/CATSAT/com.sine.controlador/controladorMaterialPeligroso.php'; 
-
+require_once '../../CATSAT/CATSAT/com.sine.controlador/controladorEstado.php';
 
 class ControladorSat{
     
     private $banco;
     private $catalogoimpuestos;
     private $materialpeligroso;
-
+    private $estados;
 
     function __construct(){
         $this->banco = new ControladorBanco();
         $this->monedas = new ControladorMonedas();
         $this->catalogoimpuestos = new ControladorImpuestos();
         $this->materialpeligroso = new ControladorMaterial();
+        $this->estados = new ControladorEstado();
     }
 
     public function getRFCBancoOrdenante($id) {
@@ -94,5 +95,14 @@ class ControladorSat{
     public function getCoincidenciasCatalogoFiscal($term){
         $resultados =  $this->materialpeligroso->getCoincidenciasCatalogoProducto($term);
         return $resultados;
+    }
+
+    public function getClvEstado($idestado) {
+        $clv = "";
+        $est = $this->estados->getEstadoById($idestado);
+        foreach ($est as $actual) {
+            $clv = $actual['c_estado'];
+        }
+        return $clv;
     }
 }

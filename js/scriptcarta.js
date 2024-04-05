@@ -93,6 +93,220 @@ function filtrarProducto(pag = "") {
     });
 }
 
+function editarConcepto(idtmp) {
+    $.ajax({
+        url: "com.sine.enlace/enlacefactura.php",
+        type: "POST",
+        data: {transaccion: "editarconcepto", idtmp: idtmp},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 1000);
+            if (bandera == '0') {
+                alertify.error(res);
+            } else {
+                setValoresEditarConcepto(datos);
+            }
+            cargandoHide();
+        }
+    });
+}
+
+function setValoresEditarConcepto(datos) {
+    var array = datos.split("</tr>");
+    var idtmp = array[0];
+    var nombre = array[1];
+    var cantidad = array[2];
+    var precio = array[3];
+    var totunitario = array[4];
+    var descuento = array[5];
+    var impdescuento = array[6];
+    var total = array[7];
+    var observaciones = array[8];
+    var clvfiscal = array[9];
+    var clvunidad = array[10]
+    var traslados = array[11];
+    var retencion = array[12];
+
+    $("#editar-idtmp").val(idtmp);
+    $("#editar-descripcion").val(nombre);
+    $("#editar-cfiscal").val(clvfiscal);
+    $("#editar-cunidad").val(clvunidad);
+    $("#editar-cantidad").val(cantidad);
+    $("#editar-precio").val(precio);
+    $("#editar-totuni").val(totunitario);
+    $("#editar-descuento").val(descuento);
+    $("#editar-impdesc").val(impdescuento);
+    $("#editar-traslados").html(traslados);
+    $("#editar-retencion").html(retencion);
+    $("#editar-total").val(Math.floor(total * 100) / 100);
+    $("#editar-observaciones").val(observaciones);
+}
+
+function actualizarConceptoFactura() {
+    var idtmp = $("#editar-idtmp").val();
+    var descripcion = $("#editar-descripcion").val();
+    var clvfiscal = $("#editar-cfiscal").val();
+    var clvunidad = $("#editar-cunidad").val();
+    var cantidad = $("#editar-cantidad").val();
+    var precio = $("#editar-precio").val();
+    var totalunitario = $("#editar-totuni").val();
+    var descuento = $("#editar-descuento").val();
+    var impdescuento = $("#editar-impdesc").val();
+    var total = $("#editar-total").val();
+    var observaciones = $("#editar-observaciones").val();
+
+    var traslados = [];
+    $.each($("input[name='chtrasedit']:checked"), function () {
+        traslados.push(0 + "-" + $(this).val() + "-" + $(this).attr("data-impuesto"));
+    });
+
+    var retenciones = [];
+    $.each($("input[name='chretedit']:checked"), function () {
+        retenciones.push(0 + "-" + $(this).val() + "-" + $(this).attr("data-impuesto"));
+    });
+    var idtraslados = traslados.join("<impuesto>");
+    var idretencion = retenciones.join("<impuesto>");
+    if (isnEmpty(idtmp, "editar-idtmp") && isnEmpty(descripcion, "editar-descripcion") && isnEmpty(clvfiscal, "editar-cfiscal") && isnEmpty(clvunidad, "editar-cunidad") && isPositive(cantidad, "editar-cantidad") && isPositive(precio, "editar-precio") && isPositive(descuento, "editar-descuento")) {
+        $.ajax({
+            url: "com.sine.enlace/enlacefactura.php",
+            type: "POST",
+            data: {transaccion: "actualizarconcepto", idtmp: idtmp, descripcion: descripcion, clvfiscal: clvfiscal, clvunidad: clvunidad, cantidad: cantidad, precio: precio, totalunitario: totalunitario, descuento: descuento, impdescuento: impdescuento, total: total, observaciones: observaciones, idtraslados: idtraslados, idretencion: idretencion},
+            success: function (datos) {
+                var texto = datos.toString();
+                var bandera = texto.substring(0, 1);
+                var res = texto.substring(1, 1000);
+                if (bandera == '0') {
+                    alertify.error(res);
+                } else {
+                    tablaProductos();
+                    $("#editar-producto").modal('hide');
+                }
+            }
+        });
+
+    }
+}
+
+function editarProductoFactura(idprod, idtmp) {
+    $.ajax({
+        url: "com.sine.enlace/enlaceproducto.php",
+        type: "POST",
+        data: {transaccion: "editarproducto", idproducto: idprod},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 1000);
+            if (bandera == '0') {
+                alertify.error(res);
+            } else {
+                setValoresEditarProducto(datos, idtmp);
+            }
+            cargandoHide();
+        }
+    });
+}
+
+function setValoresEditarProducto(datos, idtmp) {
+    $("#muestraimagen").html('');
+    var array = datos.split("</tr>");
+    var idproducto = array[0];
+    var codigo = array[1];
+    var nombre = array[2];
+    var clvunidad = array[3];
+    var descripcion_unidad = array[4];
+    var unidad = clvunidad + "-" + descripcion_unidad;
+    var descripcion_producto = array[5];
+    var pcompra = array[6];
+    var porcentaje = array[7];
+    var ganancia = array[8];
+    var pventa = array[9];
+    var tipo = array[10];
+    var clvfiscal = array[11];
+    var descripcionfiscal = array[12];
+    var clavefiscal = clvfiscal + "-" + descripcionfiscal;
+    var idproveedor = array[13];
+    var empresa = array[14];
+    var imagen = array[15];
+    var chinventario = array[16];
+    var cantidad = array[17];
+    var img = array[18];
+
+    if (tipo == "1") {
+        $("#inventario").removeAttr('hidden');
+    } else if (tipo == "2") {
+        $("#inventario").attr('hidden', true);
+    }
+
+    if (chinventario == '1') {
+        $("#chinventario").prop('checked', true);
+        $("#cantidad").removeAttr('disabled');
+    }
+
+    $("#codigo-producto").val(codigo);
+    $("#producto").val(nombre);
+    $("#tipo").val(tipo);
+    $("#cantidad").val(cantidad);
+    $("#clave-unidad").val(unidad);
+    $("#descripcion").val(descripcion_producto);
+    $("#pcompra").val(pcompra);
+    $("#porganancia").val(porcentaje)
+    $("#ganancia").val(ganancia);
+    $("#pventa").val(pventa);
+    $("#clave-fiscal").val(clavefiscal);
+    $("#id-proveedor").val(idproveedor);
+    $("#filename").val(imagen);
+    $("#imgactualizar").val(imagen);
+
+    if (imagen !== '') {
+        $("#muestraimagen").html(img);
+    }
+
+    $("#btn-form-producto-factura").attr("onclick", "actualizarProductoFactura(" + idproducto + "," + idtmp + ");");
+}
+
+function actualizarProductoFactura(idproducto, idtmp) {
+    var codproducto = $("#codigo-producto").val();
+    var producto = $("#producto").val();
+    var descripcion = $("#descripcion").val();
+    var clavefiscal = $("#clave-fiscal").val();
+    var tipo = $("#tipo").val();
+    var unidad = $("#clave-unidad").val();
+    var pcompra = $("#pcompra").val();
+    var porcentaje = $("#porganancia").val();
+    var ganancia = $("#ganancia").val();
+    var pventa = $("#pventa").val();
+    var idproveedor = $("#id-proveedor").val() || '0';
+    var imagen = $('#filename').val();
+    var imgactualizar = $("#imgactualizar").val();
+    var chinventario = 0;
+    var cantidad = $("#cantidad").val();
+    if ($("#chinventario").prop('checked')) {
+        chinventario = 1;
+    }
+
+    if (isnEmpty(codproducto, "codigo-producto") && isnEmpty(producto, "producto") && isList(clavefiscal, "clave-fiscal") && isnEmpty(tipo, "tipo") && isListUnit(unidad, "clave-unidad") && isPositive(porcentaje, "porganancia") && isPositive(ganancia, "ganancia") && isPositive(pventa, "pventa")) {
+        $.ajax({
+            url: "com.sine.enlace/enlaceproducto.php",
+            type: "POST",
+            data: {transaccion: "actualizarproducto", idproducto: idproducto, idtmp: idtmp, codproducto: codproducto, producto: producto, tipo: tipo, unidad: unidad, descripcion: descripcion, pcompra: pcompra, porcentaje: porcentaje, ganancia: ganancia, pventa: pventa, clavefiscal: clavefiscal, idproveedor: idproveedor, imagen: imagen, imgactualizar: imgactualizar, chinventario: chinventario, cantidad: cantidad, insert: 'f'},
+            success: function (datos) {
+                var texto = datos.toString();
+                var bandera = texto.substring(0, 1);
+                var res = texto.substring(1, 1000);
+                if (bandera == '0') {
+                    cargandoHide();
+                    alertify.error(res);
+                } else {
+                    cargandoHide();
+                    tablaProductos();
+                    $("#nuevo-producto").modal('hide');
+                }
+            }
+        });
+    }
+}
+
 function incrementarCantidad(idtmp) {
     $.ajax({
         url: "com.sine.enlace/enlacefactura.php",
@@ -268,7 +482,7 @@ function calcularImpuestosTotalReverse() {
         id = $(this).attr("id");
         div = $(this).val().split("-");
         porcentaje = parseFloat(div[0]);
-        tipoImp = parseFloat(div[1]); //1 traslado //2retencion
+        tipoImp = parseFloat(div[1]);
 
         if (tipoImp == 1) {
             costo = Math.round((total / (porcentaje + 1)) * 100) / 100;
@@ -285,6 +499,36 @@ function calcularImpuestosTotalReverse() {
         $('#p' + id).val(impuesto);
     });
     $("#pventa").val(myRound(total, 2));
+}
+
+function checkIVA(idtmp) {
+    var traslados = [];
+    $.each($("input[name='chtrastabla" + idtmp + "']:checked"), function () {
+        traslados.push(0 + "-" + $(this).val() + "-" + $(this).attr("data-impuesto"));
+    });
+    var idtraslados = traslados.join("<impuesto>");
+
+    var retenciones = [];
+    $.each($("input[name='chrettabla" + idtmp + "']:checked"), function () {
+        retenciones.push(0 + "-" + $(this).val() + "-" + $(this).attr("data-impuesto"));
+    });
+    var idretenciones = retenciones.join("<impuesto>");
+    $.ajax({
+        url: "com.sine.enlace/enlacefactura.php",
+        type: "POST",
+        data: {transaccion: "chivatmp", idtmp: idtmp, traslados: idtraslados, retenciones: idretenciones},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 1000);
+            if (bandera == '0') {
+                alertify.error(res);
+            } else {
+                tablaProductos();
+                cargandoHide();
+            }
+        }
+    });
 }
 
 function insertarProductoCarta(idproducto, idtmp) {
@@ -616,11 +860,44 @@ function agregarObservaciones() {
             if (bandera == '0') {
                 alertify.error(res);
             } else {
+                $("#modal-observaciones").modal('hide');
                 tablaProductos(uuid);
             }
             cargandoHide();
         }
     });
+}
+
+function calcularImporteEditar() {
+    var cantidad = $("#editar-cantidad").val() || '0';
+    var precio = $("#editar-precio").val() || '0';
+
+    var importe = parseFloat(cantidad) * parseFloat(precio);
+    $("#editar-totuni").val(Math.floor(importe * 100) / 100);
+    calcularDescuentoEditar();
+}
+
+function calcularDescuentoEditar() {
+    var pordesc = $("#editar-descuento").val() || '0';
+    var importe = $("#editar-totuni").val() || '0';
+
+    var descuento = parseFloat(importe) * (parseFloat(pordesc) / 100);
+    var subtotal = (parseFloat(importe) - parseFloat(descuento));
+    var traslados = 0;
+    var retencion = 0;
+
+    $.each($("input[name='chtrasedit']:checked"), function () {
+        var tasa = $(this).val();
+        traslados += parseFloat(subtotal) * parseFloat(tasa);
+    });
+
+    $.each($("input[name='chretedit']:checked"), function () {
+        var tasa = $(this).val();
+        retencion += parseFloat(subtotal) * parseFloat(tasa);
+    });
+    var total = (parseFloat(subtotal) + parseFloat(traslados)) - parseFloat(retencion);
+    $("#editar-impdesc").val(Math.floor(descuento * 100) / 100);
+    $("#editar-total").val(Math.floor(total * 100) / 100);
 }
 
 function loadFolioCarta(iddatos = "") {
@@ -973,6 +1250,7 @@ function autocompletarOperador() {
             $("#estado-operador").val(idestado);
             $("#direccion-operador").val(calle);
             $("#cp-operador").val(codpostal);
+            loadOpcionesEstado('contenedor-estado-op', 'estado-operador', idestado);
             loadOpcionesMunicipioOperador(idmunicipio, idestado);
         }
     });
@@ -1384,14 +1662,14 @@ function agregarUbicacion(tid = null) {
     var nombreestado = $("#id-estado option:selected").text().substring(3);
     var idmunicipio = $("#id-municipio").val() || '0';
     var nombremunicipio = $("#id-municipio option:selected").text();
-    var cp = $("#cp-ubicacion").val();
+    var cp = $("#codigo_postal").val();
     var distancia = $("#distancia-ubicacion").val();
     var fecha = $("#fecha-llegada").val();
     var hora = $("#hora-llegada").val();
 
     var transaccion = (tid != null) ? "actualizarubicacion" : "agregarubicacion";
 
-    if (isnEmpty(rfc, "rfc-ubicacion") && isnEmpty(tipo, "tipo-ubicacion") && isnEmpty(idestado, "id-estado") && isnEmpty(cp, "cp-ubicacion") && isPositive(distancia, "distancia-ubicacion") && isnEmpty(fecha, "fecha-llegada") && isnEmpty(hora, "hora-llegada")) {
+    if (isnEmpty(rfc, "rfc-ubicacion") && isnEmpty(tipo, "tipo-ubicacion") && isnEmpty(idestado, "id-estado") && isnEmpty(cp, "codigo_postal") && isPositive(distancia, "distancia-ubicacion") && isnEmpty(fecha, "fecha-llegada") && isnEmpty(hora, "hora-llegada")) {
         cargandoHide();
         cargandoShow();
         $.ajax({
@@ -1541,7 +1819,7 @@ function setValoresEditarUbicacion(datos) {
     $("#direccion-ubicacion").val(array[10]);
     $("#id-estado").val(array[5]);
     loadOpcionesMunicipio(array[11], array[5]);
-    $("#cp-ubicacion").val(array[6]);
+    $("#codigo_postal").val(array[6]);
     $("#distancia-ubicacion").val(array[7]);
     $("#fecha-llegada").val(array[8]);
     $("#hora-llegada").val(array[9]);
@@ -2782,4 +3060,29 @@ function enviarCarta(id) {
             }
         });
     }
+}
+
+//-------------------------------------TIMBRAR
+function timbrarCarta(id) {
+    alertify.confirm("¿Estás seguro que deseas timbrar esta carta?", function () {
+        cargandoHide();
+        cargandoShow();
+        $.ajax({
+            url: "com.sine.enlace/enlacecarta.php",
+            type: "POST",
+            data: {transaccion: "xml", id: id},
+            success: function (datos) {
+                var texto = datos.toString();
+                var bandera = texto.substring(0, 1);
+                var res = texto.substring(0, 1000);
+                if (bandera == '0') {
+                    alertify.error(res);
+                } else {
+                    alertify.success("Carta timbrada correctamente");
+                    loadView('listacarta');
+                }
+                cargandoHide();
+            }
+        });
+    }).set({title: "Q-ik"});
 }

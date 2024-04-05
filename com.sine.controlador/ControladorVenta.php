@@ -691,14 +691,15 @@ class ControladorVenta
         return $consultado;
     }
 
-    public function modificarCantidad($idtmp, $cant, $precio)
-    {
+    public function modificarCantidad($idtmp, $cant, $precio){
         $check = $this->checarTicketTmpById($idtmp);
-        $canttmp = $check[0]['tmpcant'];
-        $precio_tmp = $check[0]['tmpprecio'];
-        $trasladotmp = $check[0]['tmptraslados'];
-        $rettmp = $check[0]['tmpretenciones'];
-        $idproducto = $check[0]['tmpidprod'];
+        foreach ($check as $actual) {
+            $canttmp = $actual['tmpcant'];
+            $precio_tmp = $actual['tmpprecio'];
+            $trasladotmp = $actual['tmptraslados'];
+            $rettmp = $actual['tmpretenciones'];
+            $idproducto = $actual['tmpidprod'];
+        }
 
         $chinv = 0;
         $cantidad = 0;
@@ -713,23 +714,30 @@ class ControladorVenta
         $traslado = $trasladotmp != "" ? $this->reBuildArray2($importe, $trasladotmp) : "";
         $retencion = $rettmp != "" ? $this->reBuildArray2($importe, $rettmp) : "";
 
-        $restante = ($cantidad + $canttmp) - $cant;
+        $pedido = $cantidad + $canttmp;
+        $restante = $pedido - $cant;
 
-        if ($chinv == '1' && $restante < 0) {
-            $datos = "0El inventario no es suficiente para agregar más producto. Hay " . $cantidad + $canttmp . " productos en existencia.";
-        } else {
+        if ($chinv == '1') {
+            if ($restante < 0) {
+                $datos = "0El inventario no es suficiente para agregar más producto. Hay $pedido productos en existencia.";
+            } else {
+                $consulta = "UPDATE `tmpticket` SET tmpcant=:cant, tmpimporte=:totuni, tmptraslados=:traslados, tmpretenciones=:retenciones  WHERE idtmpticket=:id;";
+                $valores = array("id" => $idtmp,
+                    "cant" => $cant,
+                    "totuni" => bcdiv($importe, '1', 2),
+                    "traslados" => $traslado,
+                    "retenciones" => $retencion);
+                $datos = $this->consultas->execute($consulta, $valores);
+                $inv = $this->restaurarInvCant($idproducto, $restante);
+            }
+        } else if ($chinv == '0') {
             $consulta = "UPDATE `tmpticket` SET tmpcant=:cant, tmpimporte=:totuni, tmptraslados=:traslados, tmpretenciones=:retenciones  WHERE idtmpticket=:id;";
-            $valores = array(
-                "id" => $idtmp,
+            $valores = array("id" => $idtmp,
                 "cant" => $cant,
                 "totuni" => bcdiv($importe, '1', 2),
                 "traslados" => $traslado,
-                "retenciones" => $retencion
-            );
+                "retenciones" => $retencion);
             $datos = $this->consultas->execute($consulta, $valores);
-            if ($chinv == '1') {
-                $this->restaurarInvCant($idproducto, $restante);
-            }
         }
         return $datos;
     }
@@ -755,8 +763,9 @@ class ControladorVenta
 
         $chinv = 0;
         $cantidad = 0;
+        $codigo = explode("|", $codprod);
 
-        $prod = $this->getProductobyCodAux($codprod);
+        $prod = $this->getProductobyCodAux($codigo[0]);
         foreach ($prod as $pactual) {
             $chinv = $pactual['chinventario'];
             $cantidad = $pactual['cantinv'];
@@ -787,13 +796,16 @@ class ControladorVenta
             "ret" => $retencion
         );
 
-        if ($chinv == '1' && $cantidad <= 0) {
-            return "0El inventario no es suficiente para agregar más producto. Hay " . $canttmp . " productos en existencia.";
+        if($chinv == '1'){
+            if($cantidad <= 0){
+                $datos = "0El inventario no es suficiente para agregar más producto. Hay " . $canttmp . " productos en existencia.";
+            } else {
+                $datos = $this->consultas->execute($consulta, $valores);
+                $inv = $this->restaurarInvCant($idproducto, $restante);
+            }
+        } else {
+            $datos = $this->consultas->execute($consulta, $valores);
         }
-        if ($chinv == '1') {
-            $inv = $this->restaurarInvCant($idproducto, $restante);
-        }
-        $datos = $this->consultas->execute($consulta, $valores);
         return $datos;
     }
 
@@ -809,7 +821,9 @@ class ControladorVenta
             $descuento = $actual['descuento'];
         }
         $chinv = 0;
-        $prod = $this->getProductobyCodAux($codprod);
+        $codigo = explode("|", $codprod);
+
+        $prod = $this->getProductobyCodAux($codigo[0]);
         foreach ($prod as $pactual) {
             $chinv = $pactual['chinventario'];
             $idproducto = $pactual['idproser'];

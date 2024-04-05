@@ -216,9 +216,13 @@ if (isset($_POST['transaccion'])) {
             break;
         case 'getcorreos':
             $datos = $cc->getCorreo($_POST['idfactura']);
-            echo $datos != "" ? $datos : "0No se han encontrado correos.";
+            echo $datos;
             break;
-            
+        //-------------------------------------------TIMBRADO
+        case 'xml':
+            $cadena = $cc->checkSaldo($_POST['id']);
+            echo $cadena != "" ? $cadena : "0No se han encontrado correos.";
+            break;
         
     }
 }

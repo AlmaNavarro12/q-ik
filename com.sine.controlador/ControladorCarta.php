@@ -1,5 +1,6 @@
 <?php 
 require_once '../com.sine.dao/Consultas.php';
+require_once '../com.sine.controlador/ControladorSat.php';
 require_once '../vendor/autoload.php';
 require_once '../com.sine.modelo/Session.php';
 require_once '../com.sine.modelo/CartaPorte.php';
@@ -17,9 +18,11 @@ date_default_timezone_set("America/Mexico_City");
 class ControladorCarta {
 
     private $consultas;
+    private $controladorSat;
 
     function __construct() {
         $this->consultas = new Consultas();
+        $this->controladorSat = new ControladorSat();
     }
 
     public function getDatosFacturacionbyId($iddatos) {
@@ -1584,7 +1587,7 @@ class ControladorCarta {
                         "polizacg" => '',
                         "st" => '1');
                     $vehiculo = $this->consultas->execute($consulta, $val);
-                } { $vehiculo = "Ya hay un vehículo registrado con el número de placas ".$placas.".";}
+                } else { $vehiculo = "Ya hay un vehículo registrado con el número de placas ".$placas.".";}
             } else {
                 $vehiculo = "Ya hay un vehículo registrado con el número de placas ".$placas.".";
             }
@@ -1715,164 +1718,6 @@ class ControladorCarta {
         }
         return "$vehiculo</tr>$remolque1</tr>$remolque2</tr>$remolque3</tr>$operador";
     }
-
-    /*private function nuevosRegistros($tag) {
-        $insertado = false;
-        $datoscarta = $this->getDatosCarta($tag);
-        foreach ($datoscarta as $datactual) {
-            $idvehiculo = $datactual['carta_idvehiculo'];
-            $idremolque1 = $datactual['carta_idremolque1'];
-            $idremolque2 = $datactual['carta_idremolque2'];
-            $idremolque3 = $datactual['carta_idremolque3'];
-
-            if ($idvehiculo == '0') {
-                $nombre = $datactual['nombrevehiculo'];
-                $numpermiso = $datactual['carta_numpermiso'];
-                $tipopermiso = $datactual['carta_tipopermiso'];
-                $tipotransporte = $datactual['carta_conftransporte'];
-                $anhomod = $datactual['carta_anhomod'];
-                $placa = $datactual['carta_placa'];
-                $segurocivil = $datactual['carta_segurocivil'];
-                $polizaseguro = $datactual['carta_polizaseguro'];
-
-                if ($nombre == '') {
-                    $nombre = $placa;
-                }
-
-                $checkv = $this->checkVehiculo($placa);
-                if ($checkv == '0') {
-                    $consulta = "INSERT INTO `transporte` VALUES (:id, :nombre, :numpermiso, :tipopermiso, :conftransporte, :anho, :placa, :segurorc, :polizarc, :seguroma, :polizama, :segurocg, :polizacg, :st);";
-                    $val = array("id" => null,
-                        "nombre" => $nombre,
-                        "numpermiso" => $numpermiso,
-                        "tipopermiso" => $tipopermiso,
-                        "conftransporte" => $tipotransporte,
-                        "anho" => $anhomod,
-                        "placa" => $placa,
-                        "segurorc" => $segurocivil,
-                        "polizarc" => $polizaseguro,
-                        "seguroma" => '',
-                        "polizama" => '',
-                        "segurocg" => '',
-                        "polizacg" => '',
-                        "st" => '1');
-                    $insertado = $this->consultas->execute($consulta, $val);
-                }
-            }
-
-            if ($idremolque1 == '0') {
-                $nmremolque1 = $datactual['carta_nmremolque1'];
-                $tiporemolque1 = $datactual['carta_tiporemolque1'];
-                $placaremolque1 = $datactual['carta_placaremolque1'];
-                if ($nmremolque1 == '') {
-                    $nmremolque1 = $placaremolque1;
-                }
-
-                $checkrem1 = $this->checkRemolque($placaremolque1);
-                if ($checkrem1 == '0' && $placaremolque1 != "") {
-                    $consulta = "INSERT INTO `remolque` VALUES (:id, :nombre, :tipo, :placa, :st);";
-                    $valores = array("id" => null,
-                        "nombre" => $nmremolque1,
-                        "tipo" => $tiporemolque1,
-                        "placa" => $placaremolque1,
-                        "st" => '1');
-                    $insertado = $this->consultas->execute($consulta, $valores);
-                }
-            }
-
-            if ($idremolque2 == '0') {
-                $nmremolque2 = $datactual['carta_nmremolque2'];
-                $tiporemolque2 = $datactual['carta_tiporemolque2'];
-                $placaremolque2 = $datactual['carta_placaremolque2'];
-                if ($nmremolque2 == '') {
-                    $nmremolque2 = $placaremolque2;
-                }
-
-                $checkrem2 = $this->checkRemolque($placaremolque2);
-                if ($checkrem2 == '0' && $placaremolque2 != "") {
-                    $consulta = "INSERT INTO `remolque` VALUES (:id, :nombre, :tipo, :placa, :st);";
-                    $valores = array("id" => null,
-                        "nombre" => $nmremolque2,
-                        "tipo" => $tiporemolque2,
-                        "placa" => $placaremolque2,
-                        "st" => '1');
-                    $insertado = $this->consultas->execute($consulta, $valores);
-                }
-            }
-
-            if ($idremolque3 == '0') {
-                $nmremolque3 = $datactual['carta_nmremolque3'];
-                $tiporemolque3 = $datactual['carta_tiporemolque3'];
-                $placaremolque3 = $datactual['carta_placaremolque3'];
-                if ($nmremolque3 == '') {
-                    $nmremolque3 = $placaremolque3;
-                }
-
-                $checkrem3 = $this->checkRemolque($placaremolque3);
-                if ($checkrem3 == '0' && $placaremolque3 != "") {
-                    $consulta = "INSERT INTO `remolque` VALUES (:id, :nombre, :tipo, :placa, :st);";
-                    $valores = array("id" => null,
-                        "nombre" => $nmremolque3,
-                        "tipo" => $tiporemolque3,
-                        "placa" => $placaremolque3,
-                        "st" => '1');
-                    $insertado = $this->consultas->execute($consulta, $valores);
-                }
-            }
-        }
-
-        $operadores = $this->getOperadores($tag);
-        foreach ($operadores as $actual) {
-            $idop = $actual['operador_id'];
-
-            if ($idop == '0') {
-                $nombreop = $actual['operador_nombre'];
-                $rfc = $actual["operador_rfc"];
-                $lic = $actual['operador_numlic'];
-                $idestado = $actual["operador_idestado"];
-                $nombre_estado = $actual["nombre_estado"];
-                $calle = $actual["operador_calle"];
-                $cp = $actual['operador_cp'];
-
-                if ($nombreop == '') {
-                    $nmop = $rfc;
-                    $apaternoop = '';
-                    $amaternoop = "";
-                } else {
-                    $divnm = explode(" ", $nombreop);
-                    $nmop = $divnm[0];
-                    if (isset($divnm[3])) {
-                        $apaternoop = $divnm[2];
-                        $amaternoop = $divnm[3];
-                    } else {
-                        $apaternoop = $divnm[1];
-                        $amaternoop = $divnm[2];
-                    }
-                }
-
-                $checkop = $this->checkOperador($rfc);
-                if ($checkop == '0') {
-                    $consulta = "INSERT INTO `operador` VALUES (:id, :nombre, :apaterno, :amaterno, :licencia, :rfc, :empresa, :idestado, :nombre_estado, :idmunicipio, :nombre_municipio, :calle, :cp, :st);";
-                    $valores = array("id" => null,
-                        "nombre" => $nmop,
-                        "apaterno" => $apaternoop,
-                        "amaterno" => $amaternoop,
-                        "licencia" => $lic,
-                        "rfc" => $rfc,
-                        "empresa" => '',
-                        "idestado" => $idestado,
-                        "nombre_estado" => $nombre_estado,
-                        "idmunicipio" => '0',
-                        "nombre_municipio" => '',
-                        "calle" => $calle,
-                        "cp" => $cp,
-                        "st" => '1');
-                    $insertado = $this->consultas->execute($consulta, $valores);
-                }
-            }
-        }
-        return $insertado;
-    }*/
 
     private function getTMPEvidencias($sid) {
         $consultado = false;
@@ -2869,5 +2714,615 @@ class ControladorCarta {
             $datos .= "$correo1<corte>$correo2<corte>$correo3<corte>$correo4<corte>$correo5<corte>$correo6";
         }
         return $datos;
+    }
+
+    //----------------------------------TIMBRADO
+    private function getSaldoAux() {
+        $consultado = false;
+        $consulta = "SELECT * FROM contador_timbres WHERE idtimbres=:id;";
+        $valores = array("id" => '1');
+        $consultado = $this->consultas->getResults($consulta, $valores);
+        return $consultado;
+    }
+
+    private function checkSaldoAux() {
+        $restantes = "0";
+        $saldo = $this->getSaldoAux();
+        foreach ($saldo as $actual) {
+            $restantes = $actual['timbresRestantes'];
+        }
+        return $restantes;
+    }
+
+    public function checkSaldo($idfactura) {
+        $timbrar = "";
+        $saldo = $this->checkSaldoAux();
+        if ($saldo > 0) {
+            $timbrar = $this->guardarXML($idfactura);
+        } else {
+            $timbrar = "0Su saldo de timbres se ha agotado.";
+        }
+        return $timbrar;
+    }
+
+    private function getDistinctCfdisRelacionados($id) {
+        $consultado = false;
+        $consulta = "SELECT DISTINCT tiporel FROM cfdirelacionado WHERE cfditag=:id;";
+        $val = array("id" => $id);
+        $consultado = $this->consultas->getResults($consulta, $val);
+        return $consultado;
+    }
+
+    private function getcfdisRelacionadosByTipo($id, $tipo) {
+        $consultado = false;
+        $consulta = "SELECT * FROM cfdirelacionado WHERE cfditag=:id AND tiporel=:tipo;";
+        $val = array("id" => $id,
+            "tipo" => $tipo);
+        $consultado = $this->consultas->getResults($consulta, $val);
+        return $consultado;
+    }
+
+    private function guardarXML($idfactura){
+        $facturas = $this->getFacturas($idfactura);
+        foreach ($facturas as $facturaactual) {
+            $idcliente = $facturaactual['idcliente'];
+            $razonSocial = $facturaactual['rzreceptor'];
+            $rfcCliente = $facturaactual['rfcreceptor'];
+            $cpreceptor = $facturaactual['cpreceptor'];
+            $regfiscalreceptor = $facturaactual['regfiscalreceptor'];
+            $iddatos = $facturaactual['iddatosfacturacion'];
+
+            $cfdi = $facturaactual['nombre_uso_cfdi'];
+            list($cuso, $descripcionuso) = explode('-', $cfdi, 2);
+
+            $serie = $facturaactual['serie'];
+            $letra = $facturaactual['letra'];
+            $folio = $facturaactual['foliocarta'];
+            $subtotal = bcdiv($facturaactual['subtotal'], '1', 2);
+            $subiva = $facturaactual['subtotaliva'];
+            $subret = $facturaactual['subtotalret'];
+            $totdescuentos = $facturaactual['totaldescuentos'];
+            $total = bcdiv($facturaactual['totalfactura'], '1', 2);
+            $moneda = $facturaactual['nombre_moneda'];
+            list($c_moneda, $des_moneda) = explode('-', $moneda, 2);
+            $tcambio = $facturaactual['tcambio'];
+            $metodo = $facturaactual['nombre_metodo_pago'];
+            list($c_metodopago, $des_metodo) = explode('-', $metodo, 2);
+            $forma = $facturaactual['nombre_forma_pago'];
+            list($c_formapago, $des_pago) = explode('-', $forma, 2);
+            $comprobante = $facturaactual['nombre_comprobante'];
+            list($c_tipoComprobante, $tipocomprobante) = explode('-', $comprobante, 2);
+            $tag = $facturaactual['tagfactura'];
+            $p_bruto_vehicular = $facturaactual['pesobruto'];
+            $idccp = $facturaactual['idccp'];
+        }
+
+        if ($c_tipoComprobante == 'T') {
+            $subtotal = '0';
+            $total = '0';
+            $c_moneda = 'XXX';
+        }
+
+        $sine = $this->getDatosFacturacionbyId($iddatos);
+        foreach ($sine as $sineactual) {
+        	$rfcemisor = $sineactual['rfc'];
+            $rzsocial = $sineactual['razon_social'];
+            $clvregimen = $sineactual['c_regimenfiscal'];
+            $regimenemisor = $sineactual['regimen_fiscal'];
+            $cpemisor = $sineactual['codigo_postal'];
+            $nocertificado = $sineactual['numcsd'];
+            $csd = $sineactual['csd'];
+            $difverano = $sineactual['difhorarioverano'];
+            $difinvierno = $sineactual['difhorarioinvierno'];
+        }
+
+        $fecha = date('Y-m-d\TH:i:s', strtotime('-1 hour'));
+        $xml = new DomDocument('1.0', 'UTF-8');
+        $raiz = $xml->createElementNS('http://www.sat.gob.mx/cfd/4', 'cfdi:Comprobante');
+        $raiz = $xml->appendChild($raiz);
+        $raiz->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:cartaporte30', 'http://www.sat.gob.mx/CartaPorte30');
+        $raiz->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
+        $raiz->setAttributeNS('http://www.w3.org/2001/XMLSchema-instance', 'schemaLocation', 'http://www.sat.gob.mx/cfd/4 http://www.sat.gob.mx/sitio_internet/cfd/4/cfdv40.xsd http://www.sat.gob.mx/CartaPorte30 http://www.sat.gob.mx/sitio_internet/cfd/CartaPorte/CartaPorte30.xsd');
+        $raiz->setAttribute('Version', '4.0');
+        $raiz->setAttribute('Serie', $serie);
+        $raiz->setAttribute('Folio', $letra . $folio);
+        $raiz->setAttribute('Fecha', $fecha);
+        $raiz->setAttribute('SubTotal', $subtotal);
+        $raiz->setAttribute('Moneda', $c_moneda);
+        ($c_tipoComprobante == 'I')? $raiz->setAttribute('FormaPago', $c_formapago):'';
+        ($c_tipoComprobante == 'I')? $raiz->setAttribute('MetodoPago', $c_metodopago):'';
+        ($c_tipoComprobante == 'I')? $raiz->setAttribute('TipoCambio', $tcambio):'';
+        ($totdescuentos > 0)?$raiz->setAttribute('Descuento', bcdiv($totdescuentos, '1', 2)):'';
+        $raiz->setAttribute('Total', $total);
+        $raiz->setAttribute('TipoDeComprobante', $c_tipoComprobante);
+        $raiz->setAttribute('Exportacion', '01');
+        $raiz->setAttribute('LugarExpedicion', iconv('UTF-8', 'windows-1252',$cpemisor));
+        $raiz->setAttribute('NoCertificado', $nocertificado);
+        //Convertir certificado a B64 con openssl: enc -in "CSD/00001000000407565367.cer" -a -A -out "cerB64.txt" 
+        $raiz->setAttribute('Certificado', $csd);
+
+        $cfdis = $this->getDistinctCfdisRelacionados($tag);
+        foreach ($cfdis as $relactual) {
+            $tiporel = $relactual['tiporel'];
+
+            $cfdisrel = $xml->createElement('cfdi:CfdiRelacionados');
+            $cfdisrel = $raiz->appendChild($cfdisrel);
+            $cfdisrel->setAttribute('TipoRelacion', $tiporel);
+
+            $cfdis2 = $this->getcfdisRelacionadosByTipo($tag, $tiporel);
+            foreach ($cfdis2 as $relactual2) {
+                $uuid = $relactual2['uuid'];
+                $cfdirel = $xml->createElement('cfdi:CfdiRelacionado');
+                $cfdirel = $cfdisrel->appendChild($cfdirel);
+                $cfdirel->setAttribute('UUID', $uuid);
+            }
+        }
+
+        $emisor = $xml->createElement('cfdi:Emisor');
+        $emisor = $raiz->appendChild($emisor);
+        $emisor->setAttribute('Rfc', $rfcemisor);
+        $emisor->setAttribute('Nombre', strtoupper($rzsocial));
+        $emisor->setAttribute('RegimenFiscal', $clvregimen);
+
+        $receptor = $xml->createElement('cfdi:Receptor');
+        $receptor = $raiz->appendChild($receptor);
+        $receptor->setAttribute('Rfc', $rfcCliente);
+        $receptor->setAttribute('Nombre', strtoupper($razonSocial));
+        $receptor->setAttribute('DomicilioFiscalReceptor', $cpreceptor);
+        $divreg = explode("-", $regfiscalreceptor);
+        $receptor->setAttribute('RegimenFiscalReceptor', $divreg[0]);
+        $receptor->setAttribute('UsoCFDI', $cuso);
+
+        $baseT = 0;
+
+        $conceptos = $xml->createElement('cfdi:Conceptos');
+        $conceptos = $raiz->appendChild($conceptos);
+        $detallefactura = $this->getDetalle($tag);
+        foreach ($detallefactura as $detalleactual) {
+            $claveFiscal = $detalleactual['clvfiscal'];
+            $precioV = $detalleactual['precio'];
+            $cantidad = $detalleactual['cantidad'];
+            $unidad = $detalleactual['clvunidad'];
+            $descripcion = $detalleactual['carta_producto'];
+            $totalu = $detalleactual['totalunitario'];
+            $impdescuento = $detalleactual['impdescuento'];
+            $traslados = $detalleactual['traslados'];
+            $retenciones = $detalleactual['retenciones'];
+            $objimp = "01";
+            $importe = bcdiv($totalu, '1', 2) - bcdiv($impdescuento, '1', 2);
+            $divclv = explode("-", $claveFiscal);
+            $claveFiscal = $divclv[0];
+
+            $divunit = explode("-", $unidad);
+            $cunidad = $divunit[0];
+            $dunidad = $divunit[1];
+
+            $concepto = $xml->createElement('cfdi:Concepto');
+            $concepto = $conceptos->appendChild($concepto);
+            $concepto->setAttribute('ClaveProdServ', $claveFiscal);
+            $concepto->setAttribute('Cantidad', $cantidad);
+            $concepto->setAttribute('ClaveUnidad', $cunidad);
+            $concepto->setAttribute('Unidad', $dunidad);
+            $concepto->setAttribute('Descripcion', $descripcion);
+            $concepto->setAttribute('ValorUnitario', bcdiv($precioV, '1', 2));
+            $concepto->setAttribute('Importe', bcdiv($totalu, '1', 2));
+            if ($traslados != "" || $retenciones != "") {
+                $objimp = "02";
+            }
+            if ($c_tipoComprobante == 'T') {
+                $objimp = "01";
+            }
+            $concepto->setAttribute('ObjetoImp', $objimp);
+            if ($impdescuento > 0) {
+                $concepto->setAttribute('Descuento', bcdiv($impdescuento, '1', 2));
+            }
+
+            if ($c_tipoComprobante == 'I') {
+                if ($traslados != "" || $retenciones != "") {
+                    $impuestos = $xml->createElement('cfdi:Impuestos');
+                    $impuestos = $concepto->appendChild($impuestos);
+                    $baseT += bcdiv($importe, '1', 2);
+                }
+                if ($traslados != "") {
+                    $nodetraslados = $xml->createElement('cfdi:Traslados');
+                    $nodetraslados = $impuestos->appendChild($nodetraslados);
+
+                    $divt = explode("<impuesto>", $traslados);
+                    foreach ($divt as $tras) {
+                        $divt = explode("-", $tras);
+                        $imp = "00$divt[2]";
+                        $traslado = $xml->createElement('cfdi:Traslado');
+                        $traslado = $nodetraslados->appendChild($traslado);
+                        $traslado->setAttribute('Base', bcdiv($importe, '1', 2));
+                        $traslado->setAttribute('Impuesto', $imp);
+                        $traslado->setAttribute('TipoFactor', 'Tasa');
+                        $traslado->setAttribute('TasaOCuota', bcdiv($divt[1], '1', 6));
+                        $traslado->setAttribute('Importe', bcdiv($divt[0], '1', 2));
+                    }
+                }
+
+                if ($retenciones != "") {
+                    $noderet = $xml->createElement('cfdi:Retenciones');
+                    $noderet = $impuestos->appendChild($noderet);
+
+                    $divr = explode("<impuesto>", $retenciones);
+                    foreach ($divr as $ret) {
+                        $divr = explode("-", $ret);
+                        $imp = "00$divr[2]";
+                        $retencion = $xml->createElement('cfdi:Retencion');
+                        $retencion = $noderet->appendChild($retencion);
+                        $retencion->setAttribute('Base', bcdiv($importe, '1', 2));
+                        $retencion->setAttribute('Impuesto', $imp);
+                        $retencion->setAttribute('TipoFactor', 'Tasa');
+                        $retencion->setAttribute('TasaOCuota', bcdiv($divr[1], '1', 6));
+                        $retencion->setAttribute('Importe', bcdiv($divr[0], '1', 2));
+                    }
+                }
+            }
+        }
+
+        if ($c_tipoComprobante == 'I') {
+            if ($subiva != "" || $subret != "") {
+                $impuestosT = $xml->createElement('cfdi:Impuestos');
+                $impuestosT = $raiz->appendChild($impuestosT);
+            }
+            $totalR = 0;
+            if ($subret != "") {
+                $noderet = $xml->createElement('cfdi:Retenciones');
+                $noderet = $impuestosT->appendChild($noderet);
+                $div2 = explode("<impuesto>", $subret);
+                foreach ($div2 as $ret1) {
+                    $divr = explode("-", $ret1);
+                    $impr = "00$divr[2]";
+                    $retencion = $xml->createElement('cfdi:Retencion');
+                    $retencion = $noderet->appendChild($retencion);
+                    $retencion->setAttribute('Impuesto', $impr);
+                    $retencion->setAttribute('Importe', bcdiv($divr[0], '1', 2));
+                    $totalR += bcdiv($divr[0], '1', 2);
+                }
+                $impuestosT->setAttribute('TotalImpuestosRetenidos', bcdiv($totalR, '1', 2));
+            }
+
+            $totalT = 0;
+            if ($subiva != "") {
+                $nodetraslados = $xml->createElement('cfdi:Traslados');
+                $nodetraslados = $impuestosT->appendChild($nodetraslados);
+                $div1 = explode("<impuesto>", $subiva);
+                foreach ($div1 as $tras1) {
+                    $divt = explode("-", $tras1);
+                    $imp = "00$divt[2]";
+                    $traslado = $xml->createElement('cfdi:Traslado');
+                    $traslado = $nodetraslados->appendChild($traslado);
+                    $traslado->setAttribute('Base', bcdiv($baseT, '1', 2));
+                    $traslado->setAttribute('Impuesto', $imp);
+                    $traslado->setAttribute('TipoFactor', 'Tasa');
+                    $traslado->setAttribute('TasaOCuota', bcdiv($divt[1], '1', 6));
+                    $traslado->setAttribute('Importe', bcdiv($divt[0], '1', 2));
+                    $totalT += bcdiv($divt[0], '1', 2);
+                }
+                $impuestosT->setAttribute('TotalImpuestosTrasladados', bcdiv($totalT, '1', 2));
+            }
+        }
+        $totaldistancia = $this->getDistanciaTotal($tag);
+        
+        $complemento = $xml->createElement('cfdi:Complemento');
+        $complemento = $raiz->appendChild($complemento);
+        $nodecp = $xml->createElement('cartaporte30:CartaPorte');
+        $nodecp = $complemento->appendChild($nodecp);
+        $nodecp->setAttribute('Version', '3.0');
+        $nodecp->setAttribute('TranspInternac', 'No');
+
+        $nodecp->setAttribute('IdCCP', $idccp);
+        $nodecp->setAttribute('TotalDistRec', $totaldistancia);
+        
+
+        $ubicaciones = $xml->createElement('cartaporte30:Ubicaciones');
+        $ubicaciones = $nodecp->appendChild($ubicaciones);
+        $getorigenes = $this->getUbicaciones($tag, '1');
+        foreach ($getorigenes as $oractual) {
+            $rfcubicacion = $oractual['ubicacion_rfc'];
+            $idestadoub = $oractual["ubicacion_idestado"];
+            $codpostal = $oractual['ubicacion_codpostal'];
+            $fechallegada = $oractual['fechallegada'];
+            $hora = $oractual['horallegada'];
+            $estadoub = $this->controladorSat->getClvEstado($idestadoub);
+
+            $nodeubicacion = $xml->createElement('cartaporte30:Ubicacion');
+            $nodeubicacion = $ubicaciones->appendChild($nodeubicacion);
+            $nodeubicacion->setAttribute('TipoUbicacion', 'Origen');
+            $nodeubicacion->setAttribute('RFCRemitenteDestinatario', $rfcubicacion);
+            $nodeubicacion->setAttribute('FechaHoraSalidaLlegada', $fechallegada . 'T' . $hora . ":00");
+            
+            $nodedomicilio = $xml->createElement('cartaporte30:Domicilio');
+            $nodedomicilio = $nodeubicacion->appendChild($nodedomicilio);
+            $nodedomicilio->setAttribute('Estado', $estadoub);
+            $nodedomicilio->setAttribute('Pais', 'MEX');
+            $nodedomicilio->setAttribute('CodigoPostal', $codpostal);
+        }
+
+        $getdestinos = $this->getUbicaciones($tag, '2');
+        foreach ($getdestinos as $desactual) {
+            $rfcubicacion = $desactual['ubicacion_rfc'];
+            $idestadoub = $desactual["ubicacion_idestado"];
+            $codpostal = $desactual['ubicacion_codpostal'];
+            $distancia = $desactual['ubicacion_distancia'];
+            $fechallegada = $desactual['fechallegada'];
+            $hora = $desactual['horallegada'];
+            $estadoub = $this->controladorSat->getClvEstado($idestadoub);
+
+            $nodeubicacion = $xml->createElement('cartaporte30:Ubicacion');
+            $nodeubicacion = $ubicaciones->appendChild($nodeubicacion);
+            $nodeubicacion->setAttribute('TipoUbicacion', 'Destino');
+            $nodeubicacion->setAttribute('RFCRemitenteDestinatario', $rfcubicacion);
+            $nodeubicacion->setAttribute('FechaHoraSalidaLlegada', $fechallegada . 'T' . $hora . ":00");
+            $nodeubicacion->setAttribute('DistanciaRecorrida', $distancia);
+            
+            $nodedomicilio = $xml->createElement('cartaporte30:Domicilio');
+            $nodedomicilio = $nodeubicacion->appendChild($nodedomicilio);
+            $nodedomicilio->setAttribute('Estado', $estadoub);
+            $nodedomicilio->setAttribute('Pais', 'MEX');
+            $nodedomicilio->setAttribute('CodigoPostal', $codpostal);
+        }
+
+        $pesototal = 0;
+        $nummercancias = 0;
+
+        $mercancias = $xml->createElement('cartaporte30:Mercancias');
+        $mercancias = $nodecp->appendChild($mercancias);
+
+        $countpeligro = 0;
+        $getmercancias = $this->getMercancias($tag);
+        foreach ($getmercancias as $meractual) {
+            $clv = $meractual['clave_mercanca'];
+            $descripcion = $meractual['descripcion_mercancia'];
+            $cantmercancia = $meractual['cant_mercancia'];
+            $unidadmerc = $meractual['unidad_mercancia'];
+            $peso = $meractual['peso_mercancia'];
+            $condicion = $meractual['condicion'];
+            $cpeligro = $meractual['peligro'];
+            $clvmaterial = $meractual['clvmaterial'];
+            $embalaje = $meractual['embalaje'];
+
+            $divclv = explode("-", $clv);
+            $divun = explode("-", $unidadmerc);
+
+            $nodemercancia = $xml->createElement('cartaporte30:Mercancia');
+            $nodemercancia = $mercancias->appendChild($nodemercancia);
+            $nodemercancia->setAttribute('BienesTransp', $divclv[0]);
+            $nodemercancia->setAttribute('Descripcion', $descripcion);
+            $nodemercancia->setAttribute('Cantidad', $cantmercancia);
+            $nodemercancia->setAttribute('ClaveUnidad', $divun[0]);
+            $nodemercancia->setAttribute('PesoEnKg', bcdiv($peso, '1', 2));
+
+            if ($condicion == '0-1' || $condicion == '1') {
+                if ($cpeligro == '0') {
+                    $peligro = 'No';
+                } else if ($cpeligro == '1') {
+                    $peligro = 'Si';
+                    $countpeligro++;
+                } else {
+                    $peligro = 'No';
+                }
+                $divp = explode("-", $clvmaterial);
+                $dive = explode("-", $embalaje);
+                $nodemercancia->setAttribute('MaterialPeligroso', $peligro);
+                if ($cpeligro == '1') {
+                    $nodemercancia->setAttribute('CveMaterialPeligroso', $divp[0]);
+                    $nodemercancia->setAttribute('Embalaje', $dive[0]);
+                }
+            }
+            $nummercancias++;
+            $pesototal += $peso;
+        }
+
+        $mercancias->setAttribute('PesoBrutoTotal', bcdiv($pesototal, '1', 2));
+        $mercancias->setAttribute('UnidadPeso', 'KGM');
+        $mercancias->setAttribute('NumTotalMercancias', $nummercancias);
+
+        $datoscarta = $this->getDatosCarta($tag);
+        foreach ($datoscarta as $datactual) {
+            $numpermiso = $datactual['carta_numpermiso'];
+            $tipopermiso = $datactual['carta_tipopermiso'];
+            $tipotransporte = $datactual['carta_conftransporte'];
+            $anhomod = $datactual['carta_anhomod'];
+            $placa = $datactual['carta_placa'];
+            $segurocivil = $datactual['carta_segurocivil'];
+            $polizaseguro = $datactual['carta_polizaseguro'];
+            $tiporemolque1 = $datactual['carta_tiporemolque1'];
+            $placaremolque1 = $datactual['carta_placaremolque1'];
+            $tiporemolque2 = $datactual['carta_tiporemolque2'];
+            $placaremolque2 = $datactual['carta_placaremolque2'];
+            $tiporemolque3 = $datactual['carta_tiporemolque3'];
+            $placaremolque3 = $datactual['carta_placaremolque3'];
+            $seguroambiente = $datactual['carta_seguroambiente'];
+            $polizaambiente = $datactual['carta_polizaambiente'];
+
+            $divper = explode("-", $tipopermiso);
+            $divveh = explode("-", $tipotransporte);
+        }
+        $nodetransporte = $xml->createElement('cartaporte30:Autotransporte');
+        $nodetransporte = $mercancias->appendChild($nodetransporte);
+        $nodetransporte->setAttribute('PermSCT', $divper[0]);
+        $nodetransporte->setAttribute('NumPermisoSCT', $numpermiso);
+
+        $nodeidentvehicular = $xml->createElement('cartaporte30:IdentificacionVehicular');
+        $nodeidentvehicular = $nodetransporte->appendChild($nodeidentvehicular);
+        $nodeidentvehicular->setAttribute('ConfigVehicular', $divveh[0]);
+        $nodeidentvehicular->setAttribute('PesoBrutoVehicular', $p_bruto_vehicular);
+        $nodeidentvehicular->setAttribute('AnioModeloVM', $anhomod);
+        $nodeidentvehicular->setAttribute('PlacaVM', $placa);
+        
+        $nodeseguros = $xml->createElement('cartaporte30:Seguros');
+        $nodeseguros = $nodetransporte->appendChild($nodeseguros);
+        $nodeseguros->setAttribute('AseguraRespCivil', $segurocivil);
+        $nodeseguros->setAttribute('PolizaRespCivil', $polizaseguro);
+        
+        if ($countpeligro > 0) {
+            $nodeseguros->setAttribute('AseguraMedAmbiente', $seguroambiente);
+            $nodeseguros->setAttribute('PolizaMedAmbiente', $polizaambiente);
+        }
+
+        if ($tiporemolque1 != "" || $tiporemolque2 != "" || $tiporemolque3 != "") {
+            $remolques = $xml->createElement('cartaporte30:Remolques');
+            $remolques = $nodetransporte->appendChild($remolques);
+
+            if ($tiporemolque1 != "") {
+                $divrem1 = explode("-", $tiporemolque1);
+                $noderemolque = $xml->createElement('cartaporte30:Remolque');
+                $noderemolque = $remolques->appendChild($noderemolque);
+                $noderemolque->setAttribute('SubTipoRem', $divrem1[0]);
+                $noderemolque->setAttribute('Placa', $placaremolque1);
+            }
+
+            if ($tiporemolque2 != "") {
+                $divrem2 = explode("-", $tiporemolque2);
+                $noderemolque = $xml->createElement('cartaporte30:Remolque');
+                $noderemolque = $remolques->appendChild($noderemolque);
+                $noderemolque->setAttribute('SubTipoRem', $divrem2[0]);
+                $noderemolque->setAttribute('Placa', $placaremolque2);
+            }
+
+            if ($tiporemolque3 != "") {
+                $divrem3 = explode("-", $tiporemolque3);
+                $noderemolque = $xml->createElement('cartaporte30:Remolque');
+                $noderemolque = $remolques->appendChild($noderemolque);
+                $noderemolque->setAttribute('SubTipoRem', $divrem3[0]);
+                $noderemolque->setAttribute('Placa', $placaremolque3);
+            }
+        }
+
+        $figuratransporte = $xml->createElement('cartaporte30:FiguraTransporte');
+        $figuratransporte = $nodecp->appendChild($figuratransporte);
+
+        $operadores = $this->getOperadores($tag);
+        foreach ($operadores as $opactual) {
+            $numlicencia = $opactual['operador_numlic'];
+            $rfcoperador = $opactual['operador_rfc'];
+            $operador_nombre = $opactual['operador_nombre'];
+
+            $nodefigura = $xml->createElement('cartaporte30:TiposFigura');
+            $nodefigura = $figuratransporte->appendChild($nodefigura);
+            $nodefigura->setAttribute('TipoFigura', '01');
+            $nodefigura->setAttribute('NombreFigura', $operador_nombre);
+            $nodefigura->setAttribute('RFCFigura', $rfcoperador);
+            $nodefigura->setAttribute('NumLicencia', $numlicencia);            
+        }
+
+
+        $sello = $this->SelloXML($xml->saveXML(), $rfcemisor);
+        $obj = json_decode($sello);
+        $xml2 = new DOMDocument("1.0", "UTF-8");
+        $xml2->loadXML($xml->saveXML());
+        $c = $xml2->getElementsByTagNameNS('http://www.sat.gob.mx/cfd/4', 'Comprobante')->item(0);
+        $c->setAttribute('Sello', $obj->sello);
+        $doc = "../XML/XML2.xml";
+        $xml2->save($doc);
+        $timbre = $this->timbrado($xml2->saveXML(), $idfactura, $rfcemisor, $rzsocial, $clvregimen, $regimenemisor, $cpemisor);
+        return $timbre;
+    }
+
+    function SelloXML($doc, $rfc) {
+        $xmlFile = $doc;
+        $carpeta = '../temporal/' . $rfc . '/';
+        $xslFile = "../vendor/recursos/cadenaoriginal_4_0.xslt";
+        $xml = new DOMDocument("1.0", "UTF-8");
+        $xml->loadXML($xmlFile);
+        $xsl = new DOMDocument();
+        $xsl->load($xslFile);
+        $proc = new XSLTProcessor;
+        $proc->importStyleSheet($xsl);
+        $cadenaOriginal = $proc->transformToXML($xml);
+        $fichero = "../vendor/recursos/cadenaOriginal.txt";
+        file_put_contents($fichero, $cadenaOriginal, LOCK_EX);
+        $params = array(
+            "cadenaOriginal" => "../vendor/recursos/cadenaOriginal.txt",
+            //Archivo key pem: pkcs8 -inform DET -in CSD/cer.key -passin pass:12345678a -out llaveprivada.pem
+            "archivoKeyPem" => $carpeta . 'keyPEM.pem',
+            //archivo cer pem: x509 -inform der -in CSD/cer.cer -out certificado.pem
+            "archivoCerPem" => $carpeta . 'csdPEM.pem'
+        );
+        try {
+            $result = Sellar::ObtenerSello($params);
+            return $result;
+        } catch (Exception $e) {
+            echo '0Caught exception: ', $e->getMessage(), "\n";
+        }
+    }
+
+    private function getSWAccessAux() {
+        $consultado = false;
+        $consulta = "SELECT * FROM swaccess WHERE idswaccess=:id;";
+        $valores = array("id" => '1');
+        $consultado = $this->consultas->getResults($consulta, $valores);
+        return $consultado;
+    }
+
+    private function getSWAccess() {
+        $datos = "";
+        $get = $this->getSWAccessAux();
+        foreach ($get as $actual) {
+            $token = $actual['accesstoken'];
+            $url = $actual['sw_url'];
+        }
+        $datos = "$url</tr>$token";
+        return $datos;
+    }
+
+    function timbrado($doc, $idfactura, $rfcemisor, $rzsocial, $clvregimen, $regimenemisor, $cpemisor) {
+        $swaccess = $this->getSWAccess();
+        $div = explode("</tr>", $swaccess);
+        $url = $div[0];
+        $token = $div[1];
+        $params = array(
+            "url" => $url,
+            "token" => $token
+        );
+
+        try {
+            header("Content-type: text/plain");
+            $stamp = StampService::Set($params);
+            $result = $stamp::StampV4($doc);
+            if ($result->status == "error") {
+                return '0' . $result->message . " " . $result->messageDetail;
+            } else if ($result->status == "success") {
+                $guardar = $this->guardarTimbre($result, $idfactura, $rfcemisor, $rzsocial, $clvregimen, $regimenemisor, $cpemisor);
+                var_dump($result);
+                return $guardar;
+            }
+        } catch (Exception $e) {
+            header("Content-type: text/plain");
+            echo "0" . $e->getMessage();
+        }
+    }
+
+    private function guardarTimbre($result, $idfactura, $rfcemisor, $rzsocial, $clvregimen, $regimenemisor, $cpemisor) {
+        $actualizado = false;
+        $consulta = "UPDATE `factura_carta` SET  factura_rfcemisor=:rfc, factura_rzsocial=:razon, factura_clvregimen=:clvreg, factura_regimen=:regimen, factura_cpemisor=:cpemisor, cadenaoriginal=:cadena, nocertificadosat=:certSAT, nocertificadocfdi=:certCFDI, uuid=:uuid, sellosat=:selloSAT, sellocfdi=:selloCFDI, fechatimbrado=:fechatimbrado, qrcode=:qrcode, cfdistring=:cfdi WHERE idfactura_carta=:id;";
+        $valores = array("rfc" => $rfcemisor, 
+            "razon" => $rzsocial,
+            "clvreg" => $clvregimen,
+            "regimen" => $regimenemisor,
+            "cpemisor" => $cpemisor,
+            "cadena" => $result->data->cadenaOriginalSAT,
+            "certSAT" => $result->data->noCertificadoSAT,
+            "certCFDI" => $result->data->noCertificadoCFDI,
+            "uuid" => $result->data->uuid,
+            "selloSAT" => $result->data->selloSAT,
+            "selloCFDI" => $result->data->selloCFDI,
+            "fechatimbrado" => $result->data->fechaTimbrado,
+            "qrcode" => $result->data->qrCode,
+            "cfdi" => $result->data->cfdi,
+            "id" => $idfactura);
+        $actualizado = $this->consultas->execute($consulta, $valores);
+        $timbres = $this->updateTimbres();
+        return '+Timbre Guardado';
+    }
+
+    private function updateTimbres() {
+        $actualizado = false;
+        $consulta = "UPDATE `contador_timbres` SET  timbresUtilizados=timbresUtilizados+1, timbresRestantes=timbresRestantes-1 WHERE idtimbres=:idtimbres;";
+        $valores = array("idtimbres" => '1');
+        $actualizado = $this->consultas->execute($consulta, $valores);
+        return $actualizado;
     }
 }

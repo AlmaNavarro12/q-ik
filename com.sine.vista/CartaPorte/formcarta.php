@@ -906,7 +906,7 @@ include("buscarProductos.php");
                     <div class="form-group">
                         <select class="form-select text-center input-form" id="estado-operador" name="estado-operador" onchange="loadOpcionesMunicipioOperador()">
                             <option value="" id="option-default-estado">- - - -</option>
-                            <optgroup id="estados-operador" class="contenedor-estado text-start"> </optgroup>
+                            <optgroup id="estados-operador" class="contenedor-estado-op text-start"> </optgroup>
                         </select>
                         <div id="estado-operador-errors"></div>
                     </div>

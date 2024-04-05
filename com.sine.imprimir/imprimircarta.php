@@ -918,7 +918,7 @@ foreach ($detallefactura as $detalleactual) {
     $claveFiscal = $detalleactual['clvfiscal'];
     $precioV = $detalleactual['precio'];
     $cantidad = $detalleactual['cantidad'];
-    $unidad = $detalleactual['clvunidad'];
+    $unidad = iconv("utf-8", "windows-1252",$detalleactual['clvunidad']);
     $descripcion = $detalleactual['carta_producto'];
     $totalu = $detalleactual['totalunitario'];
     $traslados = $detalleactual['traslados'];

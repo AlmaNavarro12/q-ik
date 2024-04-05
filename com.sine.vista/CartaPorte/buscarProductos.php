@@ -81,7 +81,7 @@
                 <input type="hidden" class="form-control" id="idtmp">
                 <div class="row">
                     <div class="form-group col-md-12">
-                        <label class="label-form text-right" for="observaciones-producto">Observaciones</label>
+                        <label class="label-form text-right mb-1" for="observaciones-producto">Observaciones</label>
                         <textarea rows="5" cols="60" id="observaciones-producto" class="form-control input-form" placeholder="Observaciones sobre el producto" maxlength="400"></textarea>
                     </div>
                     <div id="observaciones-producto-errors">
@@ -89,7 +89,7 @@
                 </div>
                 <div class="row mt-3">
                     <div class="col-md-12 text-end">
-                        <button class="button-modal" onclick="agregarObservaciones();" id="btn-observaciones">Agregar <span class="fas fa-pencil"></span></button>
+                        <button class="button-modal" onclick="agregarObservaciones();" id="btn-observaciones">Agregar <span class="fas fa-edit"></span></button>
                     </div>
                 </div>
             </div>
@@ -102,7 +102,7 @@
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
             <div class="modal-header py-0">
-                <div class="label-sub fs-5 py-0" id="titulo-alerta">
+                <div class="label-sub fs-5 py-0" id="titulo-alerta-editar-producto">
                     Agregar nuevo producto
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" onclick="limpiarCampos();" aria-label="Close"></button>
@@ -245,7 +245,7 @@
 </div>
 </div>
 
-
+<!--EDITAR UN PRODUCTO EN FACTURA-->
 <div class="modal fade bs-example-modal-lg" id="editar-producto" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
