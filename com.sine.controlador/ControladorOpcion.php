@@ -237,4 +237,37 @@ class ControladorOpcion {
         }
         return $op;
     }
+
+    private function getImpuestos($tipo) {
+        $consultado = false;
+        $consulta = "SELECT * FROM impuesto where tipoimpuesto=:tipo";
+        $valores = array("tipo" => $tipo);
+        $consultado = $this->consultas->getResults($consulta, $valores);
+        return $consultado;
+    }
+
+    public function opcionesImpuestos($t) {
+        $impuestos = $this->getImpuestos($t);
+        $checkedT = "";
+        $iconT = "";
+        $optraslados = "";
+        $nm = "";
+
+        if ($t == '1') {
+            $nm = 'chtrasladoobra';
+        } else if ($t == '2') {
+            $nm = 'chretencionobra';
+        }
+        foreach ($impuestos as $actual) {
+            if ($actual['chuso'] == '1') {
+                $iconT = "far fa-check-square mx-2";
+                $checkedT = "checked";
+            } else {
+                $iconT = "far fa-square mx-2";
+                $checkedT = "";
+            }
+            $optraslados .= "<li data-location='form' data-id=''><label class='dropdown-menu-item checkbox'><input type='checkbox' $checkedT value='" . $actual['porcentaje'] . "' name='$nm' data-impuesto='" . $actual['impuesto'] . "' data-tipo='" . $actual['tipoimpuesto'] . "'/><span class='$iconT' id='chuso1span'></span>" . $actual['nombre'] . " (" . $actual['porcentaje'] . ")" . "</label></li>";
+        }
+        return $optraslados;
+    }
 }

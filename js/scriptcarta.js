@@ -1659,7 +1659,7 @@ function agregarUbicacion(tid = null) {
     var tipo = $("#tipo-ubicacion").val();
     var direccion = $("#direccion-ubicacion").val();
     var idestado = $("#id-estado").val();
-    var nombreestado = $("#id-estado option:selected").text().substring(3);
+    var nombreestado = $("#id-estado option:selected").text().substring(4);
     var idmunicipio = $("#id-municipio").val() || '0';
     var nombremunicipio = $("#id-municipio option:selected").text();
     var cp = $("#codigo_postal").val();
@@ -1862,7 +1862,7 @@ function agregarOperador(tid = null) {
     var rfc = $("#rfc-operador").val();
     var licencia = $("#num-licencia").val();
     var estado = $("#estado-operador").val() || 0;
-    var nombreestado = $("#estado-operador option:selected").text().substring(3);
+    var nombreestado = $("#estado-operador option:selected").text().substring(4);
     var direccion = $("#direccion-operador").val();
     var codpostal = $("#cp-operador").val();
     var idmunicipio = $("#municipio-operador").val() || '0';
@@ -1965,7 +1965,7 @@ function setValoresEditarOperador(datos) {
     $("#rfc-operador").val(array[3]);
     $("#num-licencia").val(array[4]);
     $("#direccion-operador").val(array[6]);
-    $("#estado-operador").val(array[5]);
+    loadOpcionesEstado('contenedor-estado-op', 'estado-operador', array[5]);
     loadOpcionesMunicipioOperador(array[8], array[5]);
     $("#cp-operador").val(array[7]);
     $("#btn-agregar-operador").attr("onclick", "agregarOperador(" + array[0] + ")");
@@ -2154,7 +2154,7 @@ function insertarFacturaCarta(tag = null) {
                 if (bandera == '0') {
                     alertify.error(res);
                 } else {
-                    alertify.success((tag !== null) ? 'Datos de carta actualizados' : 'Carta guardada correctamente');
+                    alertify.success((tag !== null) ? 'Datos de carta actualizados.' : 'Carta guardada correctamente.');
                     var array = datos.split("<tag>");
                     var tagins = array[1];
                     loadView('listacarta');
@@ -2185,43 +2185,26 @@ function checkNuevoRegistro(tag) {
                 if (bandera == '0') {
                     alertify.error(res);
                 } else {
-                    console.log(datos);
                     var array = datos.split("</tr>");
-                    if (array[0] === "1") {
-                        alertify.success('Datos de vehículo guardados correctamente.');
-                    } else if (array[0] !== "0") {
-                        alertify.error(array[0]);
-                    }
-
-                    if (array[1] === "1") {
-                        alertify.success('Datos de remolque 1 guardados correctamente.');
-                    } else if (array[1] !== "0") {
-                        alertify.error(array[1]);
-                    }
-
-                    if (array[2] === "1") {
-                        alertify.success('Datos de remolque 2 guardados correctamente.');
-                    } else if (array[2] !== "0") {
-                        alertify.error(array[2]);
-                    }
-
-                    if (array[3] === "1") {
-                        alertify.success('Datos de remolque 3 guardados correctamente.');
-                    } else if (array[3] !== "0") {
-                        alertify.error(array[3]);
-                    }
-
-                    if (array[4] === "1") {
-                        alertify.success('Datos de operador guardados correctamente.');
-                    } else if (array[4] !== "0") {
-                        alertify.error(array[4]);
-                    }
+                    mandarAlerta(array[0], "vehículo");
+                    mandarAlerta(array[1], "remolque 1");
+                    mandarAlerta(array[2], "remolque 2");
+                    mandarAlerta(array[3], "remolque 3");
+                    mandarAlerta(array[4], "operador");
                     filtrarCarta();
                 }
                 cargandoHide();
             }
         });
     }).set({title: "Q-ik"});
+}
+
+function mandarAlerta(id, mensaje){
+    if (id == "1") {
+        alertify.success("Los datos del "+mensaje+" se han guardado correctamente.")
+    } else if(id != "1" && id != ""){
+        alertify.error(id);
+    }
 }
 
 function editarCarta(cid) {

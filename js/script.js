@@ -743,7 +743,7 @@ function loadView(vista) {
         'paginicio': ["getUserFirstSession()", 300, "getSaldo()", 350, "datosGrafica()", 400, "loadopcionesAno()", 450],
         'notificacion': ["filtrarNotificaciones()", 350],
         'comprar': [],
-        'nuevousuario': ["checkUsuario()", 350, /** "truncateTmp()", 400, "truncateTmpCot()", 400, */ "loadOpcionesEstado()", 450],
+        'nuevousuario': ["checkUsuario()", 350, "truncateTmp()", 400, "truncateTmpCot()", 400, "loadOpcionesEstado()", 450],
         'listasuarioaltas': ["truncateTmp()", 300, "truncateTmpCot()", 350, "loadBtnCrear('usuario')", 370, "filtrarUsuario()", 400],
         'asignarpermisos': ["truncateTmp()", 300, "truncateTmpCot()", 350],
         'categoria': [],
@@ -764,13 +764,12 @@ function loadView(vista) {
         'precio': ["truncateTmp()", 400, "truncateTmpCot()", 450],
         'pago': ["loadFecha()", 300, "cancelarPago2()", 320, "loadOpcionesFolios('3')", 350, "loadOpcionesMoneda()", 400, "loadOpcionesFormaPago2()", 420, "loadOpcionesFacturacion()", 500],
         'listapago': ["loadBtnCrear('pago')", 350, "opcionesMotivoCancelar()", 380, "loadListaPago()", 400],
-        
         'factura': ["truncateTmp()", 300, "getOptionsTaxes()", 300, "loadOpcionesFacturacion()", 320, "loadFecha()", 350, "loadOpcionesFolios('1')", 370, "filtrarProducto()", 400, "loadOpcionesFormaPago2()", 420, "loadOpcionesMetodoPago()", 450, "loadOpcionesMoneda()", 470, "loadOpcionesUsoCFDI()", 500, "loadOpcionesComprobante()", 520, "loadOpcionesProveedor()", 550, "loadOpcionesTipoRelacion()", 570, "opcionesPeriodoGlobal()", 600, "opcionesMeses()", 320, "opcionesAnoGlobal()", 650],
-        
         'listafactura': ["truncateTmp()", 300, "truncateTmpCot()", 350, "loadBtnCrear('factura')", 400, "loadListaFactura()", 300, "opcionesMotivoCancelar()", 420,],
         
-        'cotizacion': ["truncateTmpCot()", 300, "loadOpcionesImpuestos('1')", 320, "loadOpcionesImpuestos('2')", 340, "loadOpcionesFolios('5')", 350, "loadFecha()", 370, "loadOpcionesFacturacion()", 400, "loadOpcionesComprobante()", 420, "2()", 450, "loadOpcionesMetodoPago()", 470, "loadOpcionesMoneda()", 500, "loadOpcionesUsoCFDI()", 520, "filtrarProducto() ", 550, "loadOpcionesProveedor()", 600],
+        'cotizacion': ["truncateTmpCot()", 300, "loadOpcionesImpuestos('1')", 320, "loadDocumento()", 450, "getOptionsTaxes()", 300, "loadOpcionesImpuestos('2')", 340, "loadOpcionesFolios('5')", 350, "loadFecha()", 370, "loadOpcionesFacturacion()", 400, "loadOpcionesComprobante()", 420, "loadOpcionesFormaPago2()", 450, "loadOpcionesMetodoPago()", 470, "loadOpcionesMoneda()", 500, "loadOpcionesUsoCFDI()", 520, "filtrarProducto() ", 550, "loadOpcionesProveedor()", 600, "filtrarCotizacion()", 300],
         'listacotizacion': ["truncateTmp()", 300, "truncateTmpCot()", 350, "loadBtnCrear('cotizacion')", 360, "filtrarCotizacion()", 400],
+        
         'instalacion': ["truncateTmp()", 350, "truncateTmpCot()", 400, "loadFolio()", 430, "loadDocumento()", 450, "loadFecha()", 500],
         'listainstalacion': ["truncateTmp()", 350, "truncateTmpCot()", 400, "filtrarInstalacion() ", 500],
         'listacontratos': ["truncateTmp()", 300, "truncateTmpCot()", 350, "loadBtnCrear('contrato')", 370, "filtrarContratos()", 400],
@@ -1299,6 +1298,28 @@ function getOptionsTaxes(taxes = "") {
     cargandoHide();
 }
 
+function loadOpcionesImpuestos(t) {
+    $.ajax({
+        url: 'com.sine.enlace/enlaceopcion.php',
+        type: 'POST',
+        data: {transaccion: 'opcionesimpuestos', t: t},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 5000);
+            if (bandera == 0) {
+                alertify.error(res);
+            } else {
+                if (t == '1') {
+                    $("#traslados-option").html(datos);
+                } else if (t == '2') {
+                    $("#retencion-option").html(datos);
+                }
+            }
+        }
+    });
+}
+
 function habilitaImp(val) {
     var div = val.split('-');
     var porcentaje = div[0];
@@ -1482,6 +1503,22 @@ function truncateTmpCarta() {
     });
 }
 
+function truncateTmpCot() {
+    $.ajax({
+        url: "com.sine.enlace/enlacecotizacion.php",
+        type: "POST",
+        data: {transaccion: "cancelar"},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 1000);
+            if (bandera == '0') {
+                alertify.error(res);
+            } 
+        }
+    });
+}
+
 function loadFecha() {
     $.ajax({
         url: 'com.sine.enlace/enlacefactura.php',
@@ -1494,7 +1531,6 @@ function loadFecha() {
             if (bandera == '') {
                 alertify.error(res);
             } else {
-                //alert(datos);
                 $("#fecha-creacion").val(datos);
             }
         }

@@ -38,8 +38,9 @@ if (isset($_POST['transaccion'])) {
         case 'opcionescliente':
             $datos = $co->opcionesCliente();
             break;
-        
-        
+        case 'opcionesimpuestos':
+            $datos = $co->opcionesImpuestos($_POST['t']);
+            break;
         /*
             case 'opcionesmotivo':
             $datos = $co->opcionesMotivo(); CATSAT
@@ -97,10 +98,7 @@ if (isset($_POST['transaccion'])) {
             $datos = $co->opcionesVendedor();
             break;
         */
-        /*case 'opcionesimpuestos':
-            $datos = $co->opcionesImpuestos($_POST['t']); 
-            break;
-        
+        /*
         case 'periodoglobal':
             $datos = $co->opcionesPeriodoGlobal($_POST['id']); CATSAT
             break;

@@ -49,11 +49,12 @@ if (isset($_GET['transaccion'])) {
         case 'operador':
             echo json_encode($cp->getCoincidenciasOperador($_GET['term']));
             break;
-
-            /*
         case 'emailcliente':
             echo json_encode($cp->getCoincidenciasBusquedaMail($_GET['term']));
             break;
+
+            /*
+        
         case 'catfiscal':
             echo json_encode($cp->getCoincidenciasCatalogoFiscal($_GET['term']));
             break;

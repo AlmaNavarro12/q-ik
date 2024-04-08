@@ -877,7 +877,7 @@ include("buscarProductos.php");
                 <div class="col-md-4 py-2">
                     <label class="label-form text-right" for="num-licencia">No. de Licencia </label> <label class="mark-required text-danger fw-bold">*</label>
                     <div class="form-group">
-                        <input class='form-control text-center input-form' id="num-licencia" name='num-licencia' placeholder='Número de licenia del operador' type='text' oninput="autocompletarOperador();" />
+                        <input class='form-control text-center input-form' id="num-licencia" name='num-licencia' placeholder='Número de licenia del operador' type='text' />
                         <div id="num-licencia-errors"></div>
                     </div>
                 </div>

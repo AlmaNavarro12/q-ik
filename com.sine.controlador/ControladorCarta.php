@@ -602,7 +602,7 @@ class ControladorCarta {
 
     public function actualizarOperador($t) {
         $actualizado = false;
-        $consulta = "UPDATE tmpoperador SET tmpidoperador=:oid, tmpnombre=:nombre, tmprfc=:rfc, tmplicencia=:lic, tmp_idestado=:estado, tmpnombre_estado=:nombre_estado, tmp_calle=:calle, tmp_cp=:cp, tmpidmunicipio=:idmunicipio, tmpnombre_municipio=:nombre_municipio, WHERE idtmpoperador=:id;";
+        $consulta = "UPDATE tmpoperador SET tmpidoperador=:oid, tmpnombre=:nombre, tmprfc=:rfc, tmplicencia=:lic, tmp_idestado=:estado, tmpnombre_estado=:nombre_estado, tmp_calle=:calle, tmp_cp=:cp, tmpidmunicipio=:idmunicipio, tmpnombre_municipio=:nombre_municipio WHERE idtmpoperador=:id;";
         $valores = array("id" => $t->getTmpid(),
             "oid" => $t->getTmpidoperador(),
             "nombre" => $t->getTmpnombre(),
@@ -1401,7 +1401,7 @@ class ControladorCarta {
                 "clvmaterial" => $actual['tmpclvmaterial'],
                 "embalaje" => $actual['tmpembalaje']
             );
-            $insertado .= $this->consultas->execute($consulta, $val);
+            $insertado = $this->consultas->execute($consulta, $val);
         }
         return $insertado;
     }
@@ -1429,7 +1429,7 @@ class ControladorCarta {
                 "idmunicipio" => $actual['tmpidmunicipio'],
                 "nombre_municipio" => $actual['tmpnombre_municipio'],
             );
-            $insertado .= $this->consultas->execute($consulta, $val);
+            $insertado = $this->consultas->execute($consulta, $val);
         }
         
         return $insertado;
@@ -1455,7 +1455,7 @@ class ControladorCarta {
                 "idmunicipio" => $actual['tmpidmunicipio'],
                 "nombre_municipio" => $actual['tmpnombre_municipio'],
             );
-            $insertado .= $this->consultas->execute($consulta, $val);
+            $insertado = $this->consultas->execute($consulta, $val);
         }
         
         return $insertado;
@@ -1539,7 +1539,8 @@ class ControladorCarta {
         return $datos;
     }
 
-    private function nuevosRegistros($tag) {
+    private function nuevosRegistros($tag)
+    {
         $vehiculo = false;
         $remolque1 = false;
         $remolque2 = false;
@@ -1547,32 +1548,29 @@ class ControladorCarta {
         $operador = false;
 
         $datoscarta = $this->getDatosCarta($tag);
-        $placas = "";
         foreach ($datoscarta as $datactual) {
-            $placas = $datactual['carta_placa'];
             $idvehiculo = $datactual['carta_idvehiculo'];
             $idremolque1 = $datactual['carta_idremolque1'];
             $idremolque2 = $datactual['carta_idremolque2'];
             $idremolque3 = $datactual['carta_idremolque3'];
 
+            $placa = $datactual['carta_placa'];
             if ($idvehiculo == '0') {
                 $nombre = $datactual['nombrevehiculo'];
                 $numpermiso = $datactual['carta_numpermiso'];
                 $tipopermiso = $datactual['carta_tipopermiso'];
                 $tipotransporte = $datactual['carta_conftransporte'];
                 $anhomod = $datactual['carta_anhomod'];
-                $placa = $datactual['carta_placa'];
                 $segurocivil = $datactual['carta_segurocivil'];
                 $polizaseguro = $datactual['carta_polizaseguro'];
 
-                if ($nombre == '') {
-                    $nombre = $placa;
-                }
+                $nombre = ($nombre == '') ? $placa : $nombre;
 
                 $checkv = $this->checkVehiculo($placa);
                 if ($checkv == '0') {
                     $consulta = "INSERT INTO `transporte` VALUES (:id, :nombre, :numpermiso, :tipopermiso, :conftransporte, :anho, :placa, :segurorc, :polizarc, :seguroma, :polizama, :segurocg, :polizacg, :st);";
-                    $val = array("id" => null,
+                    $val = array(
+                        "id" => null,
                         "nombre" => $nombre,
                         "numpermiso" => $numpermiso,
                         "tipopermiso" => $tipopermiso,
@@ -1585,138 +1583,128 @@ class ControladorCarta {
                         "polizama" => '',
                         "segurocg" => '',
                         "polizacg" => '',
-                        "st" => '1');
+                        "st" => '1'
+                    );
                     $vehiculo = $this->consultas->execute($consulta, $val);
-                } else { $vehiculo = "Ya hay un vehículo registrado con el número de placas ".$placas.".";}
-            } else {
-                $vehiculo = "Ya hay un vehículo registrado con el número de placas ".$placas.".";
-            }
-
-            $placasremolque1 = $datactual['carta_placaremolque1'];
-            if ($idremolque1 == '0') {
-                $nmremolque1 = $datactual['carta_nmremolque1'];
-                $tiporemolque1 = $datactual['carta_tiporemolque1'];
-                $placaremolque1 = $datactual['carta_placaremolque1'];
-                $placasremolque1 = $placaremolque1;
-                if ($nmremolque1 == '') {
-                    $nmremolque1 = $placaremolque1;
-                }
-
-                $checkrem1 = $this->checkRemolque($placaremolque1);
-                if ($checkrem1 == '0' && $placaremolque1 != "") {
-                    $consulta = "INSERT INTO `remolque` VALUES (:id, :nombre, :tipo, :placa, :st);";
-                    $valores = array("id" => null,
-                        "nombre" => $nmremolque1,
-                        "tipo" => $tiporemolque1,
-                        "placa" => $placaremolque1,
-                        "st" => '1');
-                    $remolque1 = $this->consultas->execute($consulta, $valores);
-                } else {$remolque1 = "0"; }
-            } else {
-                $remolque1 = "Ya hay un remolque con el número de placas ".$placasremolque1." (Remolque 1).";
-            }
-
-            $placaremolque2 = $datactual['carta_placaremolque2'];
-            if ($idremolque2 == '0') {
-                $nmremolque2 = $datactual['carta_nmremolque2'];
-                $tiporemolque2 = $datactual['carta_tiporemolque2'];
-                $placaremolque2 = $datactual['carta_placaremolque2'];
-                if ($nmremolque2 == '') {
-                    $nmremolque2 = $placaremolque2;
-                }
-
-                $checkrem2 = $this->checkRemolque($placaremolque2);
-                if ($checkrem2 == '0' && $placaremolque2 != "") {
-                    $consulta = "INSERT INTO `remolque` VALUES (:id, :nombre, :tipo, :placa, :st);";
-                    $valores = array("id" => null,
-                        "nombre" => $nmremolque2,
-                        "tipo" => $tiporemolque2,
-                        "placa" => $placaremolque2,
-                        "st" => '1');
-                    $remolque2 = $this->consultas->execute($consulta, $valores);
-                } else {$remolque2 = "0"; }
-            } else {
-                $remolque1 = "Ya hay un remolque con el número de placas ".$placaremolque2." (Remolque 2).";
-            }
-
-            $placaremolque3 = "";
-            if ($idremolque3 == '0') {
-                $nmremolque3 = $datactual['carta_nmremolque3'];
-                $tiporemolque3 = $datactual['carta_tiporemolque3'];
-                $placaremolque3 = $datactual['carta_placaremolque3'];
-                if ($nmremolque3 == '') {
-                    $nmremolque3 = $placaremolque3;
-                }
-
-                $checkrem3 = $this->checkRemolque($placaremolque3);
-                if ($checkrem3 == '0' && $placaremolque3 != "") {
-                    $consulta = "INSERT INTO `remolque` VALUES (:id, :nombre, :tipo, :placa, :st);";
-                    $valores = array("id" => null,
-                        "nombre" => $nmremolque3,
-                        "tipo" => $tiporemolque3,
-                        "placa" => $placaremolque3,
-                        "st" => '1');
-                    $remolque3 = $this->consultas->execute($consulta, $valores);
-                } else {$remolque3 = "0"; }
-            } else {
-                $remolque3 = "Ya hay un remolque con el número de placas ".$placaremolque3." (Remolque 3).";
-            }
-        }
-
-        $operadores = $this->getOperadores($tag);
-        foreach ($operadores as $actual) {
-            $idop = $actual['operador_id'];
-
-            $rfc = $actual["operador_rfc"];
-            if ($idop == '0') {
-                $nombreop = $actual['operador_nombre'];
-                $rfc = $actual["operador_rfc"];
-                $lic = $actual['operador_numlic'];
-                $idestado = $actual["operador_idestado"];
-                $nombre_estado = $actual["nombre_estado"];
-                $calle = $actual["operador_calle"];
-                $cp = $actual['operador_cp'];
-
-                if ($nombreop == '') {
-                    $nmop = $rfc;
-                    $apaternoop = '';
-                    $amaternoop = "";
                 } else {
-                    $divnm = explode(" ", $nombreop);
-                    $nmop = $divnm[0];
-                    if (isset($divnm[3])) {
-                        $apaternoop = $divnm[2];
-                        $amaternoop = $divnm[3];
+                    $vehiculo = "Ya existe un registro de vehículo con el número de placas $placa.";
+                }
+            } else {
+                $checkv = $this->checkVehiculo($placa);
+                if($checkv != "0"){
+                    $vehiculo = "Ya existe un registro de vehículo con el número de placas $placa.";
+                }
+            }
+
+            $placaremolque1 = $datactual['carta_placaremolque1'];
+            $nmremolque1 = $datactual['carta_nmremolque1'];
+            $tiporemolque1 = $datactual['carta_tiporemolque1'];
+
+            $remolque1 = $this->insertarNuevoRemolque($idremolque1, $placaremolque1, $nmremolque1, $tiporemolque1, '1');
+
+
+            $nmremolque2 = $datactual['carta_nmremolque2'];
+            $tiporemolque2 = $datactual['carta_tiporemolque2'];
+            $placaremolque2 = $datactual['carta_placaremolque2'];
+            $remolque2 = $this->insertarNuevoRemolque($idremolque2, $placaremolque2, $nmremolque2, $tiporemolque2, '2');
+
+
+            $nmremolque3 = $datactual['carta_nmremolque3'];
+            $tiporemolque3 = $datactual['carta_tiporemolque3'];
+            $placaremolque3 = $datactual['carta_placaremolque3'];
+            $remolque3 = $this->insertarNuevoRemolque($idremolque3, $placaremolque3, $nmremolque3, $tiporemolque3, '3');
+
+            $operadores = $this->getOperadores($tag);
+            foreach ($operadores as $actual) {
+                $idop = $actual['operador_id'];
+                $rfc = $actual["operador_rfc"];
+
+                if ($idop == '0') {
+                    $nombreop = $actual['operador_nombre'];
+                    $lic = $actual['operador_numlic'];
+                    $idestado = $actual["operador_idestado"];
+                    $nombre_estado = $actual["nombre_estado"];
+                    $calle = $actual["operador_calle"];
+                    $cp = $actual['operador_cp'];
+
+                    if ($nombreop == '') {
+                        $nmop = $rfc;
+                        $apaternoop = '';
+                        $amaternoop = "";
                     } else {
-                        $apaternoop = $divnm[1];
-                        $amaternoop = $divnm[2];
+                        $divnm = explode(" ", $nombreop);
+                        $nmop = $divnm[0];
+                        if (isset($divnm[3])) {
+                            $apaternoop = $divnm[2];
+                            $amaternoop = $divnm[3];
+                        } else {
+                            $apaternoop = $divnm[1];
+                            $amaternoop = $divnm[2];
+                        }
+                    }
+
+                    $checkop = $this->checkOperador($rfc);
+                    if ($checkop == '0') {
+                        $consulta = "INSERT INTO `operador` VALUES (:id, :nombre, :apaterno, :amaterno, :licencia, :rfc, :empresa, :idestado, :nombre_estado, :idmunicipio, :nombre_municipio, :calle, :cp, :st);";
+                        $valores = array(
+                            "id" => null,
+                            "nombre" => $nmop,
+                            "apaterno" => $apaternoop,
+                            "amaterno" => $amaternoop,
+                            "licencia" => $lic,
+                            "rfc" => $rfc,
+                            "empresa" => '',
+                            "idestado" => $idestado,
+                            "nombre_estado" => $nombre_estado,
+                            "idmunicipio" => '0',
+                            "nombre_municipio" => '',
+                            "calle" => $calle,
+                            "cp" => $cp,
+                            "st" => '1'
+                        );
+                        $operador = $this->consultas->execute($consulta, $valores);
+                    } else{
+                        $operador = "Ya existe un registro de operador con el RFC $rfc.";
+                    }
+                } else {
+                    $checkop = $this->checkOperador($rfc);
+                    if($checkop != "0"){
+                        $operador = "Ya existe un registro de operador con el RFC $rfc.";
                     }
                 }
+            }
+            return "$vehiculo</tr>$remolque1</tr>$remolque2</tr>$remolque3</tr>$operador";
+        }
+    }
 
-                $checkop = $this->checkOperador($rfc);
-                if ($checkop == '0') {
-                    $consulta = "INSERT INTO `operador` VALUES (:id, :nombre, :apaterno, :amaterno, :licencia, :rfc, :empresa, :idestado, :nombre_estado, :idmunicipio, :nombre_municipio, :calle, :cp, :st);";
-                    $valores = array("id" => null,
-                        "nombre" => $nmop,
-                        "apaterno" => $apaternoop,
-                        "amaterno" => $amaternoop,
-                        "licencia" => $lic,
-                        "rfc" => $rfc,
-                        "empresa" => '',
-                        "idestado" => $idestado,
-                        "nombre_estado" => $nombre_estado,
-                        "idmunicipio" => '0',
-                        "nombre_municipio" => '',
-                        "calle" => $calle,
-                        "cp" => $cp,
-                        "st" => '1');
-                    $operador = $this->consultas->execute($consulta, $valores);
-                } else { $operador =  "Ya hay un operador registrado con con el RFC, ".$rfc."."; }
-            } else {
-                $operador =  "Ya hay un operador registrado con con el RFC, ".$rfc.".";
+    private function insertarNuevoRemolque($idremolque, $placaremolque, $nmremolque, $tiporemolque, $numero) {
+        $remolque = "";
+        $checkrem = $this->checkRemolque($placaremolque);
+
+        if ($nmremolque == '') {
+            $nmremolque = $placaremolque;
+        }
+    
+        if ($idremolque == '0') {
+            if ($checkrem == '0' && $placaremolque != "") {
+                $consulta = "INSERT INTO `remolque` VALUES (:id, :nombre, :tipo, :placa, :st);";
+                $valores = array(
+                    "id" => null,
+                    "nombre" => $nmremolque,
+                    "tipo" => $tiporemolque,
+                    "placa" => $placaremolque,
+                    "st" => '1'
+                );
+                $remolque = $this->consultas->execute($consulta, $valores);
+            } else if ($checkrem != '0' && $placaremolque != "") {
+                $remolque = "Ya existe un registro de remolque (Remolque $numero) con el número de placas $placaremolque.";
+            }
+        } else if ($idremolque != "0" && $placaremolque != "") {
+            if ($checkrem != "0") {
+                $remolque = "Ya existe un registro de remolque (Remolque $numero) con el número de placas $placaremolque.";
             }
         }
-        return "$vehiculo</tr>$remolque1</tr>$remolque2</tr>$remolque3</tr>$operador";
+        return $remolque;
     }
 
     private function getTMPEvidencias($sid) {
@@ -2405,7 +2393,7 @@ class ControladorCarta {
 
     private function getDistanciaTotalAux($tag) {
         $consultado = false;
-        $consulta = "SELECT sum(ubicacion_distancia) distancia FROM detalleubicacion u WHERE tagubicacion=:tag";
+        $consulta = "SELECT sum(ubicacion_distancia) distancia FROM detalleubicacion u WHERE tagubicacion=:tag AND ubicacion_tipo=2;";
         $val = array("tag" => $tag);
         $consultado = $this->consultas->getResults($consulta, $val);
         return $consultado;

@@ -272,4 +272,21 @@ class ControladorAuto {
         }
         return $datos;
     }
+
+    public function getCoincidenciasBusquedaMail($referencia) {
+        $datos = array();
+        $consulta = "select distinct * from datos_cotizacion where (emailcot like '%$referencia%') group by emailcot limit 0,5;";
+        $resultados = $this->consultas->getResults($consulta, null);
+        $contador = 0;
+        foreach ($resultados as $resultado) {
+            $datos[] = array("value" => $resultado['emailcot'],
+                "id" => $resultado["iddatos_cotizacion"],
+                "nombre" => $resultado['emailcot']);
+            $contador++;
+        }
+        if ($contador == 0) {
+            $datos [] = array("value" => "No se encontraron registros", "id" => "Ninguno");
+        }
+        return $datos;
+    }
 }

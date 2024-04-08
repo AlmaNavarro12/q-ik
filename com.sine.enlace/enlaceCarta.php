@@ -156,7 +156,7 @@ if (isset($_POST['transaccion'])) {
             break;
         case 'nuevosdatos':
             $datos = $cc->checkCarta($_POST['tag']);
-            echo $datos != "" ? $datos : "0No se han registrados los datos.";
+            echo $datos;
             break;
             //----------------------------------------RELACION CON LOS OTROS MODULOS
         case 'valvehiculo':
