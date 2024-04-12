@@ -105,7 +105,7 @@
         <div class="modal-content">
             <div class="modal-header py-0">
                 <div class="label-sub fs-5 py-0" id="titulo-alerta-editar-producto">
-                    Agregar nuevo producto
+                    Agregar nuevo producto / servicio
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" onclick="limpiarCampos();" aria-label="Close"></button>
             </div>
@@ -120,7 +120,7 @@
                         </div>
                         <div class="col-md-4 py-2 form-group">
                             <label class="label-form text-right" for="producto">Nombre</label> <label class="mark-required text-danger fw-bold">*</label>
-                            <input class="form-control text-center input-form" id="producto" name="producto" placeholder="Producto" type="text" />
+                            <input class="form-control text-center input-form" id="producto" name="producto" onkeyup="llenaDescripcion()" placeholder="Producto" type="text" />
                             <div id="producto-errors">
                             </div>
                         </div>
@@ -131,9 +131,9 @@
                             </div>
                         </div>
                         <div class="col-md-4 py-2 form-group">
-                            <label class="label-form text-right" for="clave-fiscal-prod">Clave fiscal</label> <label class="mark-required text-danger fw-bold">*</label>
-                            <input class="form-control text-center input-form" id="clave-fiscal-prod" name="clave-fiscal-prod" placeholder="Clave del producto o servicio" type="text" oninput="aucompletarCatalogo();" />
-                            <div id="clave-fiscal-prod-errors">
+                            <label class="label-form text-right" for="clave-fiscal">Clave fiscal</label> <label class="mark-required text-danger fw-bold">*</label>
+                            <input class="form-control text-center input-form" id="clave-fiscal" name="clave-fiscal" placeholder="Clave del producto o servicio" type="text" oninput="aucompletarCatalogo();" />
+                            <div id="clave-fiscal-errors">
                             </div>
                         </div>
                         <div class="col-md-4 py-2 form-group">
@@ -170,9 +170,9 @@
                             </div>
                         </div>
                         <div class="col-md-4 py-2 form-group">
-                            <label class="label-form text-right" for="clave-unidad-prod">Clave unidad</label> <label class="mark-required text-danger fw-bold">*</label>
-                            <input class="form-control text-center input-form" id="clave-unidad-prod" name="clave-unidad-prod" placeholder="Clave de unidad de venta" type="text" oninput="aucompletarUnidad();" />
-                            <div id="clave-unidad-prod-errors">
+                            <label class="label-form text-right" for="clave-unidad">Clave unidad</label> <label class="mark-required text-danger fw-bold">*</label>
+                            <input class="form-control text-center input-form" id="clave-unidad" name="clave-unidad" placeholder="Clave de unidad de venta" type="text" oninput="aucompletarUnidad();" />
+                            <div id="clave-unidad-errors">
                             </div>
                         </div>
                         <div class="col-md-2 py-2 form-group">

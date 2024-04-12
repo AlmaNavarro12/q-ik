@@ -6,6 +6,7 @@ require_once '../com.sine.modelo/Session.php';
 require_once '../com.sine.modelo/Cotizacion.php';
 require_once '../com.sine.modelo/TMPCotizacion.php';
 require_once '../com.sine.modelo/SendMail.php';
+require_once '../vendor/numeroaletras/NumeroALetras.php';
 
 date_default_timezone_set("America/Mexico_City");
 use PHPMailer\PHPMailer\PHPMailer;
@@ -36,7 +37,9 @@ class ControladorCotizacion {
             $eliminar = $actual['eliminarcotizacion'];
             $crear = $actual['crearcotizacion'];
             $crearfac = $actual['crearfactura'];
-            $datos .= "$lista</tr>$editar</tr>$eliminar</tr>$crear</tr>$crearfac";
+            $exportar = $actual['exportarfactura'];
+            $anticipo = $actual['anticipo'];
+            $datos .= "$lista</tr>$editar</tr>$eliminar</tr>$crear</tr>$crearfac</tr>$exportar</tr>$anticipo";
         }
         return $datos;
     }
@@ -100,6 +103,23 @@ class ControladorCotizacion {
         return $meses[$m] ?? '';
     }
 
+    private function getUsuariobyID($idusuario) {
+        $consultado = false;
+        $consulta = "SELECT * FROM usuario WHERE idusuario=:cid;";
+        $val = array("cid" => $idusuario);
+        $consultado = $this->consultas->getResults($consulta, $val);
+        return $consultado;
+    }
+
+    private function getNombreUsuarioById($idusuario) {
+        $nombre = "";
+        $datos = $this->getUsuariobyID($idusuario);
+        foreach ($datos as $actual) {
+            $nombre = $actual['nombre'] . " " . $actual['apellido_paterno'] . " " . $actual['apellido_materno'];
+        }
+        return $nombre;
+    }
+
     public function listaServiciosHistorial($REF, $pag, $numreg) {
         include '../com.sine.common/pagination.php';
         $idlogin = $_SESSION[sha1("idusuario")];
@@ -110,6 +130,8 @@ class ControladorCotizacion {
                 <th class='text-center'>Fecha de Creación </th>
                 <th class='text-center'>Cliente</th>
                 <th class='text-center'>Email</th>
+                <th class='text-center'>Exportó </th>
+                <th class='text-center'>Fecha de exportación </th>
                 <th class='text-center'>Total </th>
                 <th class='text-center'>Opción</th>
             </tr>
@@ -119,7 +141,7 @@ class ControladorCotizacion {
         if ($REF == "") {
             $condicion = "ORDER BY iddatos_cotizacion DESC";
         } else {
-            $condicion = "WHERE (concat(letra,foliocotizacion) LIKE '%$REF%') OR (nombrecliente LIKE '%$REF%') ORDER BY iddatos_cotizacion DESC;";
+            $condicion = "WHERE (concat(letra,foliocotizacion) LIKE '%$REF%') OR (nombrecliente LIKE '%$REF%') ORDER BY iddatos_cotizacion DESC";
         }
 
         $permisos = $this->getPermisos($idlogin);
@@ -142,11 +164,24 @@ class ControladorCotizacion {
                 $cliente = $listafacturaActual['nombrecliente'];
                 $correo = $listafacturaActual['emailcot'];
                 $total = $listafacturaActual['totalcotizacion'];
+                $tagfactura = $listafacturaActual['expfactura'];
+                $idexporto = $listafacturaActual['sessionexporto'];
+                $fechaexportacion = "";
+                $nombreexporto = $this->getNombreUsuarioById($idexporto);
+
                 $divideF = explode("-", $fecha);
                 $mes = $this->translateMonth($divideF[1]);
                 $fecha = $divideF[2] . ' / ' . $mes;
-
+                
                 $check = $this->checkAnticipos($idcotizacion);
+
+                if(isset($listafacturaActual['fecha_exportar'])) {
+                    $fechaexportacion = $listafacturaActual['fecha_exportar'];
+                    list($año, $mes, $dia) = explode('-', $fechaexportacion);
+                    $nombreMes = $this->translateMonth($mes);
+                    $fechaexportacion = "$dia / $nombreMes";
+                }
+
                 if ($check == '0') {
                     $txtanticipo = "Agregar anticipo";
                     $datamodal = "data-bs-target='#anticipos' onclick='cargarDatosAnticipo($idcotizacion);'";
@@ -158,27 +193,30 @@ class ControladorCotizacion {
                 $datos .= "<tr>
                         <td>$folio</td>
                         <td class='text-center'>$fecha</td>
-                        <td>$cliente</td>
+                        <td class='lh-sm text-center'>$cliente</td>
                         <td>$correo</td>
-                        <td>$ " . number_format($total, 2, '.', ',') . "</td>
+                        <td class='text-center text-uppercase'>$nombreexporto</td>
+                        <td class='text-center'>$fechaexportacion</td>
+
+                        <td class='text-center'>$" . number_format($total, 2, '.', ',') . "</td>
                         <td align='center'><div class='dropdown dropend'>
                         <button class='button-list dropdown-toggle' title='Opciones'  type='button' data-bs-toggle='dropdown'><span class='fas fa-ellipsis-v text-muted'></span>
                         <span class='caret'></span></button>
-                        <ul class='dropdown-menu dropdown-menu-right'>";
+                        <ul class='dropdown-menu dropdown-menu-right z-1'>";
 
-                if ($div[1] == '1') {
+                if ($div[1] == '1' && $tagfactura == "0") {
                     $datos .= "<li class='notification-link py-1 ps-3' ><a class='text-decoration-none text-secondary-emphasis' onclick='editarCotizacion($idcotizacion);'>Editar cotización <span class='fas fa-edit text-muted small'></span></a></li>";
                 }
 
-                if ($div[2] == '1') {
+                if ($div[2] == '1' && $tagfactura == "0") {
                     $datos .= "<li class='notification-link py-1 ps-3' ><a class='text-decoration-none text-secondary-emphasis' onclick='eliminarCotizacion($idcotizacion);'>Eliminar cotización <span class='fas fa-times text-muted'></span></a></li>";
                 }
 
                 $datos .= "<li class='notification-link py-1 ps-3' ><a class='text-decoration-none text-secondary-emphasis' onclick=\"imprimirCotizacion($idcotizacion)\";'>Ver cotización <span class='fas fa-eye text-muted'></span></a></li>
-                        <li class='notification-link py-1 ps-3' ><a class='text-decoration-none text-secondary-emphasis' data-bs-toggle='modal' data-bs-target='#enviarmail' onclick='showCorreos($idcotizacion);'>Enviar al cliente <span class='fas fa-envelope text-muted small' ></span></a></li>
-                        <li class='notification-link py-1 ps-3' ><a class='text-decoration-none text-secondary-emphasis' data-bs-toggle='modal' onclick='cobrarCotizacion($idcotizacion);'>Cobrar cotización <span class='fas fa-dollar-sign text-muted small'></span></a></li>";
+                        <li class='notification-link py-1 ps-3' ><a class='text-decoration-none text-secondary-emphasis' data-bs-toggle='modal' data-bs-target='#enviarmail' onclick='showCorreos($idcotizacion);'>Enviar al cliente <span class='fas fa-envelope text-muted small' ></span></a></li>";
 
-                if ($div[4] == '1') {
+                        //<li class='notification-link py-1 ps-3' ><a class='text-decoration-none text-secondary-emphasis' data-bs-toggle='modal' onclick='cobrarCotizacion($idcotizacion);'>Cobrar cotización <span class='fas fa-dollar-sign text-muted small'></span></a></li>
+                if ($div[5] == '1') {
                     $datos .= "<li class='notification-link py-1 ps-3' ><a class='text-decoration-none text-secondary-emphasis' onclick='exportarCotizacion($idcotizacion);'>Exportar como factura <span class='text-muted small fas fa-external-link-alt'></span></a></li>";
                 }
 
@@ -186,9 +224,12 @@ class ControladorCotizacion {
                     $datos .= "<li class='notification-link py-1 ps-3' ><a class='text-decoration-none text-secondary-emphasis' onclick='copiarCotizacion($idcotizacion);'>Copiar cotización <span class='text-muted small fas fa-copy'></span></a></li>";
                 }
 
-                $datos .= "<li class='notification-link py-1 ps-3' ><a class='text-decoration-none text-secondary-emphasis' onclick='actualizarPrecios($idcotizacion);'>Actualizar precios <span class='text-muted small fas fa-sync-alt'></span></a></li>
-                        <li class='notification-link py-1 ps-3' ><a class='text-decoration-none text-secondary-emphasis' data-bs-toggle='modal' $datamodal>$txtanticipo <span class='text-muted small fas fa-copy'></span></a></li>
-                        </ul>
+                $datos .= "<li class='notification-link py-1 ps-3' ><a class='text-decoration-none text-secondary-emphasis' onclick='actualizarPrecios($idcotizacion);'>Actualizar precios <span class='text-muted small fas fa-sync-alt'></span></a></li>";
+
+                if($div[6] == '1'){
+                        $datos .= "<li class='notification-link py-1 ps-3' ><a class='text-decoration-none text-secondary-emphasis' data-bs-toggle='modal' $datamodal>$txtanticipo <span class='text-muted small fas fa-copy'></span></a></li>";
+                }
+                $datos .= "</ul>
                         </div></td>
                     </tr>";
                 $finales++;
@@ -267,7 +308,7 @@ class ControladorCotizacion {
     private function getProdHistorial($condicion)
     {
         $consultado = false;
-        $consulta = "SELECT p.codproducto, p.idproser, p.nombre_producto, p.descripcion_producto, p.precio_venta, p.tipo, p.clave_fiscal FROM productos_servicios p $condicion;";
+        $consulta = "SELECT p.codproducto, p.idproser, p.nombre_producto, p.descripcion_producto, p.precio_venta, p.tipo, p.clave_fiscal, p.impuestos_aplicables FROM productos_servicios p $condicion;";
         $consultado = $this->consultas->getResults($consulta, null);
         return $consultado;
     }
@@ -287,14 +328,14 @@ class ControladorCotizacion {
         $datos = "<thead>
                     <tr>
                         <th class='col-md-1'>CÓdigo </th>
-                        <th class='col-md-6'>Producto/Servicio   </th>
+                        <th class='col-md-3'>Producto/Servicio   </th>
                         <th class='col-md-1'>Cantidad </th>
                         <th class='col-md-1'>P.Venta </th>
                         <th class='col-md-1'>Importe </th>
                         <th class='col-md-1'>Desc % </th>
                         <th class='col-md-1'>Traslados</th>
                         <th class='col-md-1'>Retenciones</th>
-                        <th class='col-md-1'>Total</th>
+                        <th class='col-md-2'>Total</th>
                         <th class='text-center'><span class='fas fa-plus'></span> </th>
                     </tr> 
                   </thead>
@@ -366,11 +407,11 @@ class ControladorCotizacion {
             $datos .= "
                     <tr>
                         <td>$codigo</td>
-                        <td><textarea rows='2' id='prodserv$idprod' class='form-control input-form' placeholder='Descripcion del producto' >$nombre</textarea></td>
+                        <td><textarea rows='2' id='prodserv$idprod' class='form-control input-form' placeholder='Descripción del producto' >$nombre</textarea></td>
                         <td><input class='form-control input-modal text-center input-sm' value='1' id='cantidad_$idprod' name='cantidad_$idprod' placeholder='Cantidad' type='number' oninput='calcularImporte($idprod)'/></td>
                         <td><input class='form-control input-modal text-center input-sm' id='pventa_$idprod' name='pventa_$idprod' value='$pventa' type='text' oninput='calcularImporte($idprod)'/></td>
                         <td><input class='form-control input-modal text-center input-sm' disabled id='importe_$idprod' name='importe_$idprod' value='$pventa' type='text'/></td>
-                        <td><input class='form-control input-modal text-center input-sm' id='pordescuento_$idprod' name='pordescuento_$idprod' value='0' type='number' oninput='calcularDescuento($idprod)'/> <input class='form-control input-modal text-center input-sm' id='descuento_$idprod' name='descuento_$idprod' value='0' type='hidden'/></td>
+                        <td><input class='form-control input-modal text-center input-sm' id='pordescuento_$idprod' name='pordescuento_$idprod' value='0' type='text' oninput='calcularDescuento($idprod); validarNum(this)'/> <input class='form-control input-modal text-center input-sm' id='descuento_$idprod' name='descuento_$idprod' value='0' type='hidden'/></td>
                         <td><div class='input-group'>
                         <div class='dropdown'>
                         <button type='button' class='button-impuesto dropdown-bs-toggle' data-bs-toggle='dropdown'>Traslados <span class='caret'></span></button>
@@ -447,8 +488,7 @@ class ControladorCotizacion {
     public function checkInventario($t) {
         $idproducto = $t->getIdproductotmp();
         $cantidad = $t->getCantidadtmp();
-        echo "Hola" . $idproducto;
-        $inventario = $this->checkInventarioAux($idproducto);
+         $inventario = $this->checkInventarioAux($idproducto);
         foreach ($inventario as $invactual) {
             $chinv = $invactual['chinventario'];
             $cantidadinv = $invactual['cantinv'];
@@ -1202,7 +1242,7 @@ class ControladorCotizacion {
         $idusuario = $_SESSION[sha1("idusuario")];
         $documento = $this->getDocumento();
 
-        $consulta = "INSERT INTO `datos_cotizacion` VALUES (:id, :fecha_creacion, :serie, :letra, :folio, :idcliente, :nombrecliente, :email, :email2, :email3, :idmetodopago, :idformapago, :idmoneda, :iduso, :tipocomprobante, :iddatos, :observaciones, :subtotal, :subiva, :subret, :totdescuentos, :total, :envio, :chfirmar, :iddocumento, :documento, :expcot, :tag);";
+        $consulta = "INSERT INTO `datos_cotizacion` VALUES (:id, :fecha_creacion, :serie, :letra, :folio, :idcliente, :nombrecliente, :email, :email2, :email3, :idmetodopago, :idformapago, :idmoneda, :iduso, :tipocomprobante, :iddatos, :observaciones, :subtotal, :subiva, :subret, :totdescuentos, :total, :envio, :chfirmar, :iddocumento, :documento, :expcot, :tag, :sid, :fechaexportar, :horaexportar);";
         $valores = array("id" => null,
             "fecha_creacion" => $hoy,
             "serie" => $serie,
@@ -1230,7 +1270,11 @@ class ControladorCotizacion {
             "iddocumento" => $idusuario,
             "documento" => $documento,
             "expcot" => '0',
-            "tag" => $tag);
+            "tag" => $tag,
+            "sid" => null,
+            "fechaexportar" => null,
+            "horaexportar" => null
+        );
 
         $insertado = $this->consultas->execute($consulta, $valores);
         $detalle = $this->detalleCotizacion($f->getSessionid(), $tag);
@@ -1793,4 +1837,615 @@ class ControladorCotizacion {
                     </html>";
         return $message;
     }
+
+    private function obtenerTagCotizacion($idcotizacion){
+        $tag_coti = "";
+        $consulta = "SELECT tagcotizacion FROM datos_cotizacion WHERE iddatos_cotizacion = :id";
+        $val = array("id" => $idcotizacion);
+        $stmt = $this->consultas->getResults($consulta, $val);
+        foreach($stmt as $row){
+            $tag_coti = $row['tagcotizacion'];
+        }
+        return $tag_coti;
+    }
+
+    public function cobrarCotizacion($idcotizacion, $sid){
+        $n = 0;
+        $tag_coti = $this->obtenerTagCotizacion($idcotizacion);
+        $consulta = "SELECT dc.id_prodservicio, ps.codproducto, dc.clvfiscal, dc.clvunidad, dc.cotizacion_producto, dc.precio, dc.cantidad, dc.descuento, dc.impdescuento, dc.totunitario, dc.totaldescuento, dc.traslados, dc.retenciones
+                    FROM detalle_cotizacion AS dc
+                    INNER JOIN productos_servicios AS ps ON ps.idproser = dc.id_prodservicio
+                    WHERE tagdetalle = :tagdet";
+        $val = array("tagdet" => $tag_coti);
+        $stmt = $this->consultas->getResults($consulta, $val);
+        foreach($stmt AS $row){
+            $id_prodservicio = $row['id_prodservicio'];
+            $codproducto = $row['codproducto'];
+            $clvfiscal = $row['clvfiscal'];
+            $clvunidad = $row['clvunidad'];
+            $cotizacion_producto = $row['cotizacion_producto'];
+            $precio = $row['precio'];
+            $cantidad = $row['cantidad'];
+            $descuento = $row['descuento'];
+            $impdescuento = $row['impdescuento'];
+            $totunitario = $row['totunitario'];
+            $totaldescuento = $row['totaldescuento'];
+            $traslados = $row['traslados'];
+            $retenciones = $row['retenciones'];
+
+            $consulta = "INSERT INTO tmpticket (tmpidprod, tmpcod, tmpclvfiscal, tmpclvunidad, tmpprod, tmpprecio, tmpcant, descuento, impdescuento, tmpimporte, totaldescuento, tmptraslados, tmpretenciones, sid) 
+                        VALUES (:tmpidprod, :tmpcod, :tmpclvfiscal, :tmpclvunidad, :tmpprod, :tmpprecio, :tmpcant, :descuento, :impdescuento, :tmpimporte, :totaldescuento, :tmptraslados, :tmpretenciones, :sid)";
+            $values = array(
+                'tmpidprod' => $id_prodservicio,
+                'tmpcod' => $codproducto,
+                'tmpclvfiscal' => $clvfiscal,
+                'tmpclvunidad' => $clvunidad,
+                'tmpprod' => $cotizacion_producto,
+                'tmpprecio' => $precio,
+                'tmpcant' => $cantidad,
+                'descuento' =>  $descuento,
+                'impdescuento' => $impdescuento,
+                'tmpimporte' => $totunitario,
+                'totaldescuento' => $totaldescuento,
+                'tmptraslados' => $traslados,
+                'tmpretenciones' => $retenciones,
+                'sid' => $sid
+            );    
+            
+            $insertado = $this->consultas->execute($consulta, $values);
+            $n++;
+        }
+        return $sid;
+    }
+
+    private function getTagbyIDAux($id)
+    {
+        $datos = false;
+        $consulta = "SELECT iddatos_venta, tagventa, formapago, tagfactura, tarjeta FROM datos_venta WHERE iddatos_venta=:id";
+        $val = array("id" => $id);
+        $datos = $this->consultas->getResults($consulta, $val);
+        return $datos;
+    }
+
+    public function getFolioFacturaAux($tag) {
+        $consultado = false;
+        $consulta = "SELECT CONCAT(letra, folio_interno_fac) AS folio_interno FROM datos_factura WHERE tagfactura=:cid;";
+        $val = array("cid" => $tag);
+        $consultado = $this->consultas->getResults($consulta, $val);
+        return $consultado;
+    }
+
+    private function getFolioFactura($tag) {
+        $folio = "";
+        $datos = $this->getFolioFacturaAux($tag);
+        foreach ($datos as $actual) {
+            $folio = $actual['folio_interno'];
+        }
+        return $folio;
+    }
+
+    public function getTagCotizacionByIdAux($tag) {
+        $consultado = false;
+        $consulta = "SELECT expfactura FROM datos_cotizacion WHERE iddatos_cotizacion=:cid;";
+        $val = array("cid" => $tag);
+        $consultado = $this->consultas->getResults($consulta, $val);
+        return $consultado;
+    }
+
+    private function getTagCotizacionById($tag) {
+        $folio = "";
+        $datos = $this->getTagCotizacionByIdAux($tag);
+        foreach ($datos as $actual) {
+            $folio = $actual['expfactura'];
+        }
+        return $folio;
+    }
+
+    public function validarExistenciaFacturaCotizacion($idcot, $tagcot, $sid)
+    {
+        $datos = "";
+        $tag = $this->getTagCotizacionById($idcot);
+        $folio = $this->getFolioFactura($tag);
+        if ($folio) {
+            $datos = "0Ya existe una factura relacionada a esta cotización, con folio " . $folio . ".";
+        } else {
+            $datos = $this->exportarprodCotizacion($tagcot, $sid);
+        }
+        return $datos;
+    }
+
+    public function exportarprodCotizacion($tag, $sessionid) {
+        $insertado = false;
+        $productos = $this->getDetalle($tag);
+        foreach ($productos as $productoactual) {
+            $idproducto = $productoactual["id_prodservicio"];
+            $nombre = $productoactual["cotizacion_producto"];
+            $cantidad = $productoactual["cantidad"];
+            $precio = $productoactual["precio"];
+            $totunitario = $productoactual["totunitario"];
+            $descuento = $productoactual['descuento'];
+            $impdescuento = $productoactual['impdescuento'];
+            $totdescuento = $productoactual['totaldescuento'];
+            $traslados = $productoactual['traslados'];
+            $retenciones = $productoactual['retenciones'];
+            $observaciones = $productoactual['observacionesp'];
+            $chinv = $productoactual['chinv'];
+            $clvfiscal = $productoactual['clvfiscal'];
+            $clvunidad = $productoactual['clvunidad'];
+
+            $consulta = "INSERT INTO `tmp` VALUES (:id, :idproducto, :nombre, :cantidad, :precio, :importe, :descuento, :impdescuento, :imptotal, :traslado, :ret, :observaciones, :chinv, :clvfiscal, :clvunidad, :session);";
+            $valores = array("id" => null,
+                "idproducto" => $idproducto,
+                "nombre" => $nombre,
+                "cantidad" => $cantidad,
+                "precio" => $precio,
+                "importe" => $totunitario,
+                "descuento" => $descuento,
+                "impdescuento" => $impdescuento,
+                "imptotal" => $totdescuento,
+                "traslado" => $traslados,
+                "ret" => $retenciones,
+                "observaciones" => $observaciones,
+                "chinv" => $chinv,
+                "clvfiscal" => $clvfiscal,
+                "clvunidad" => $clvunidad,
+                "session" => $sessionid);
+            $insertado = $this->consultas->execute($consulta, $valores);
+            if ($chinv == '1') {
+                $remover = $this->removerInventario($idproducto, $cantidad);
+            }
+        }
+        return $insertado;
+    }
+
+    public function removerInventario($idproducto, $cantidad) {
+        $consultado = false;
+        $consulta = "UPDATE `productos_servicios` set cantinv=cantinv-:cantidad where idproser=:idproducto;";
+        $valores = array("idproducto" => $idproducto, "cantidad" => $cantidad);
+        $consultado = $this->consultas->getResults($consulta, $valores);
+        return $consultado;
+    }
+
+    private function getTagbyID($idcotizacion) {
+        $tag = "";
+        $datos = $this->getCotizacionById($idcotizacion);
+        foreach ($datos as $actual) {
+            $tag = $actual['tagcotizacion'];
+        }
+        return $tag;
+    }
+
+    private function getDetalleActualizar($tag) {
+        $consultado = false;
+        $consulta = "SELECT * FROM detalle_cotizacion c INNER JOIN productos_servicios p ON (c.id_prodservicio=p.idproser) WHERE c.tagdetalle=:tag";
+        $val = array("tag" => $tag);
+        $consultado = $this->consultas->getResults($consulta, $val);
+        return $consultado;
+    }
+
+    private function arrayImpuestos($impuestos, $importe) {
+        $div = explode("<impuesto>", $impuestos);
+        $row = array();
+        $Timp = 0;
+        foreach ($div as $d) {
+            $div2 = explode("-", $d);
+            $imp = $importe * $div2[1];
+            $Timp += $imp;
+            if ($imp > 0) {
+                $row[] = bcdiv($imp, '1', 2) . '-' . $div2[1] . '-' . $div2[2];
+            }
+        }
+        $traslados = implode("<impuesto>", $row);
+        return "$traslados</tr>$Timp";
+    }
+
+    public function checkArrayPrecios($idcot, $idimpuesto) {
+        $productos = $this->getDetalle($idcot);
+        $imptraslados = $this->getImpuestos($idimpuesto);
+        $row = array();
+        foreach ($imptraslados as $tactual) {
+            $impuesto = $tactual['impuesto'];
+            $porcentaje = $tactual['porcentaje'];
+            $Timp = 0;
+
+            foreach ($productos as $productoactual) {
+                if ($idimpuesto == '1') {
+                    $traslados = $productoactual['traslados'];
+                } else if ($idimpuesto == '2') {
+                    $traslados = $productoactual['retenciones'];
+                }
+                $div = explode("<impuesto>", $traslados);
+                foreach ($div as $d) {
+                    $div2 = explode("-", $d);
+                    if ($porcentaje == $div2[1] && $impuesto == $div2[2]) {
+                        $Timp += $div2[0];
+                    }
+                }
+            }
+            if ($Timp > 0) {
+                $row[] = bcdiv($Timp, '1', 2) . '-' . $porcentaje . '-' . $impuesto;
+            }
+        }
+        $trasarray = implode("<impuesto>", $row);
+        return $trasarray;
+    }
+
+    public function actualizarPrecios($idcotizacion) {
+        $tag = $this->getTagbyID($idcotizacion);
+        $detalle = $this->getDetalleActualizar($tag);
+        $subtotal = 0;
+        $subtras = 0;
+        $subret = 0;
+        $totdesc = 0;
+        foreach ($detalle as $actual) {
+            $iddetalle = $actual['iddetalle_cotizacion'];
+            $precio = $actual['precio_venta'];
+            $cantidad = $actual['cantidad'];
+            $descuento = $actual['descuento'];
+            $traslados = $actual['traslados'];
+            $retencion = $actual['retenciones'];
+            $totun = bcdiv($precio, '1', 2) * $cantidad;
+            $impdescuento = bcdiv($totun, '1', 2) * ($descuento / 100);
+            $totaldescuento = bcdiv($totun, '1', 2) - bcdiv($impdescuento, '1', 2);
+
+            $arrtraslados = $this->arrayImpuestos($traslados, $totaldescuento);
+            $divT = explode("</tr>", $arrtraslados);
+            $trasimp = $divT[0];
+            $Timp = $divT[1];
+
+            $arrretenciones = $this->arrayImpuestos($retencion, $totaldescuento);
+            $divR = explode("</tr>", $arrretenciones);
+            $retenciones = $divR[0];
+            $Tret = $divR[1];
+
+            $subtotal += $totun;
+            $totdesc += $impdescuento;
+            $subtras += $Timp;
+            $subret += $Tret;
+
+            $actualizado = false;
+            $consulta = "UPDATE `detalle_cotizacion` SET precio=:precio, totunitario=:totunitario, impdescuento=:impdescuento, totaldescuento=:totaldescuento, traslados=:traslados, retenciones=:retenciones WHERE iddetalle_cotizacion=:id;";
+            $valores = array("id" => $iddetalle,
+                "precio" => bcdiv($precio, '1', 2),
+                "totunitario" => bcdiv($totun, '1', 2),
+                "impdescuento" => bcdiv($impdescuento, '1', 2),
+                "totaldescuento" => bcdiv($totaldescuento, '1', 2),
+                "traslados" => $trasimp,
+                "retenciones" => $retenciones);
+            $insertado = $this->consultas->execute($consulta, $valores);
+        }
+
+        $total = ((bcdiv($subtotal, '1', 2) + bcdiv($subtras, '1', 2)) - bcdiv($subret, '1', 2)) - bcdiv($totdesc, '1', 2);
+        $totaltraslados = $this->checkArrayPrecios($idcotizacion, '1');
+        $totalretencion = $this->checkArrayPrecios($idcotizacion, '2');
+
+        $actualizado = false;
+        $consulta = "UPDATE `datos_cotizacion` SET subtot=:subtot, totdesc=:totdesc, totalcotizacion=:totalcotizacion, subiva=:traslados, subret=:retenciones WHERE tagcotizacion=:tag;";
+        $valores = array("tag" => $tag,
+            "subtot" => bcdiv($subtotal, '1', 2),
+            "traslados" => $totaltraslados,
+            "retenciones" => $totalretencion,
+            "totdesc" => bcdiv($totdesc, '1', 2),
+            "totalcotizacion" => bcdiv($total, '1', 2));
+        $insertado2 = $this->consultas->execute($consulta, $valores);
+        return $insertado2;
+    }
+
+    private function getRestantesAux($idcotizacion) {
+        $consultado = false;
+        $consulta = "SELECT restante FROM anticipo where anticipo_idcotizacion=:id order by idanticipo desc limit 1;";
+        $val = array("id" => $idcotizacion);
+        $consultado = $this->consultas->getResults($consulta, $val);
+        return $consultado;
+    }
+
+    private function getRestanteAnticipo($cid, $totcot) {
+        $check = false;
+        $restante = 0;
+        $anticipos = $this->getRestantesAux($cid);
+        foreach ($anticipos as $actual) {
+            $restante = $actual['restante'];
+            $check = true;
+        }
+
+        if (!$check) {
+            $restante = $totcot;
+        }
+        return $restante;
+    }
+
+    public function getCotizacionAnticipo($idcotizacion) {
+        $datos = "";
+        $cotizacion = $this->getCotizacionById($idcotizacion);
+        foreach ($cotizacion as $actual) {
+            $creacion = date('d/m/Y');
+            $total = $this->getRestanteAnticipo($idcotizacion, $actual['totalcotizacion']);
+            $nombrecliente = $actual['nombrecliente'];
+            $folio = $actual['letra'] . $actual['foliocotizacion'];
+            $anticipo = ($total / 2);
+            $restante = $total - $anticipo;
+            $letras = NumeroALetras::convertir(bcdiv($anticipo, '1', 2), 'pesos', 'centavos');
+            $div = explode(".", bcdiv($anticipo, '1', 2));
+            $mensaje = addslashes("Se recibio de $nombrecliente la cantidad de $ " . bcdiv($anticipo, 1, 2) . " ($letras $div[1]/100 M.N.) por concepto del 50% de anticipo por la cotizacion de servicios con folio $folio.");
+            $datos = "$nombrecliente</tr>$creacion</tr>$total</tr>$anticipo</tr>$restante</tr>$folio</tr>$mensaje";
+        }
+        return $datos;
+    }
+    
+    public function transcribirCantidad($idcot, $cantidad) {
+        $mensaje = "";
+        $cotizacion = $this->getCotizacionById($idcot);
+        foreach ($cotizacion as $actual) {
+            $total = $actual['totalcotizacion'];
+            if ($cantidad > $total) {
+                $mensaje = "0La cantidad ingresada es mayor que el total de la cotización.";
+            } else {
+                $porcentaje = ($cantidad / $total) * 100;
+                $nombrecliente = $actual['nombrecliente'];
+                $folio = $actual['letra'] . $actual['foliocotizacion'];
+                $letras = NumeroALetras::convertir(bcdiv($cantidad, '1', 2), 'pesos', 'centavos');
+                $div = explode(".", bcdiv($cantidad, '1', 2));
+                $mensaje = addslashes("Se recibió de $nombrecliente la cantidad de $ " . bcdiv($cantidad, 1, 2) . " ($letras $div[1]/100 M.N.) por concepto del " . bcdiv($porcentaje, 1, 2) . "% de anticipo por la cotización de servicios con folio $folio.");
+            }
+        }
+        return $mensaje;
+    }
+
+    public function nuevoAnticipo($a) {
+        if ($a->getRestante() < 0) {
+            $datos = "0El monto ingresado es mayor que el restante de la cotización";
+        } else {
+            $datos = $this->insertarAnticipo($a);
+        }
+        return $datos;
+    }
+
+    private function insertarAnticipo($a) {
+        $hoy = date('Y-m-d');
+        $insertado = false;
+        $consulta = "INSERT INTO `anticipo` VALUES (:id, :fechacreacion, :idcot, :monto, :restante, :autorizacion, :fechaanticipo, :imganticipo, :texto, :emision);";
+        $valores = array("id" => null,
+            "fechacreacion" => $hoy,
+            "idcot" => $a->getIdcotizacion(),
+            "monto" => bcdiv($a->getMonto(), '1', 2),
+            "restante" => bcdiv($a->getRestante(), '1', 2),
+            "autorizacion" => $a->getAutorizacion(),
+            "fechaanticipo" => $a->getFecha(),
+            "imganticipo" => $a->getImg(),
+            "texto" => $a->getMensaje(),
+            "emision" => $a->getEmision());
+        $insertado = $this->consultas->execute($consulta, $valores);
+        if ($a->getImg() != "") {
+            rename('../temporal/anticipos/' . $a->getImg(), '../img/anticipos/' . $a->getImg());
+        }
+        return $insertado;
+    }
+
+    private function getAnticipos($idcotizacion) {
+        $consultado = false;
+        $consulta = "SELECT a.*,d.letra,d.foliocotizacion,d.totalcotizacion FROM anticipo a inner join datos_cotizacion d on (a.anticipo_idcotizacion=d.iddatos_cotizacion) where a.anticipo_idcotizacion='$idcotizacion'";
+        $consultado = $this->consultas->getResults($consulta, null);
+        return $consultado;
+    }
+
+    public function listaAnticipo($idcotizacion) {
+        $datos = "<thead><tr>
+                    <th class='text-center'>Fecha de Creación </th>
+                    <th class='text-center'>Monto</th>
+                    <th class='text-center'>Restante</th>
+                    <th class='text-center'>No. Autorización</th>
+                    <th class='text-center'>Fecha Transacción</th>
+                    <th class='text-center'>Comprobante</th>
+                    <th class='text-center'>Opción</th>
+                  </tr></thead><tbody>";
+
+        $anticipos = $this->getAnticipos($idcotizacion);
+        foreach ($anticipos as $actual) {
+            $idanticipo = $actual['idanticipo'];
+            $fechacreacion = $actual['fechacreacion'];
+            $monto = $actual['montoanticipo'];
+            $autorizacion = $actual['autorizacion'];
+            $fechaanticipo = $actual['fechaanticipo'];
+            $img = $actual['imganticipo'];
+            $folio = $actual['letra'] . $actual['foliocotizacion'];
+            $total = $actual['totalcotizacion'];
+            $restante = $actual['restante'];
+
+            $divf = explode("-", $fechacreacion);
+            $fechacreacion = "$divf[2]/$divf[1]/$divf[0]";
+
+            $divf2 = explode("-", $fechaanticipo);
+            $fechaanticipo = "$divf2[2]/$divf2[1]/$divf2[0]";
+
+            if ($img != "") {
+                $link = "<a class='fw-semibold text-decoration-none' onclick='verImagenAnticipo($idanticipo)'>Ver archivo <i class='fas fa-file'></i></a>";
+            } else {
+                $link = "No hay archivo";
+            }
+
+            $datos .= "
+                    <tr>
+                        <td class='text-center'>$fechacreacion</td>
+                        <td class='text-center'>$" . bcdiv($monto, '1', 2) . "</td>
+                        <td class='text-center'>$" . bcdiv($restante, '1', 2) . "</td>
+                        <td class='text-center'>$autorizacion</td>
+                        <td class='text-center'>$fechaanticipo</td>
+                        <td class='text-center'>$link</td>
+                        <td class='text-center'><div class='dropdown'>
+                        <button class='button-list dropdown-toggle' title='Opciones'  type='button' data-bs-toggle='dropdown'><span class='fas fa-ellipsis-v'></span>
+                        <span class='caret'></span></button>
+                        <ul class='dropdown-menu dropdown-menu-right'>
+                        <li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' onclick='editarAnticipo($idanticipo);'>Editar anticipo <span class='fas fa-edit small text-muted'></span></a></li>
+                        <li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' onclick='eliminarAnticipo($idanticipo, $idcotizacion);'>Eliminar anticipo <span class='text-muted fas fa-times'></span></a></li>
+                        <li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' onclick=\"imprimirAnticipo($idanticipo)\";'>Imprimir anticipo <span class='text-muted fas fa-list-alt'></span></a></li>
+                        </ul>
+                        </div></td>
+                    </tr>
+                     ";
+        }
+        $datos .= "</tbody>";
+        $check = $this->checkAnticiposRestantes($idcotizacion);
+        if ($check) {
+            $datos .= "<tfoot><tr><th colspan='6'></th><th class='text-end'><button class='btn button-file text-uppercase fs-6' data-bs-toggle='modal' data-bs-target='#anticipos' onclick='cargarDatosAnticipo($idcotizacion);' id='btn-add-anticipo'><small>Agregar anticipo <span class='fas fa-plus'></span></small></button></th></tr></tfoot>";
+        }
+        return $datos;
+    }
+
+    private function checkAnticiposRestantes($idcotizacion) {
+        $check = false;
+        $datos = $this->getRestantesAux($idcotizacion);
+        foreach ($datos as $actual) {
+            $restante = $actual['restante'];
+            if ($restante > 0) {
+                $check = true;
+            }
+        }
+        return $check;
+    }
+
+    public function getAnticipoById($idtmp) {
+        $consultado = false;
+        $consulta = "select a.*,d.letra,d.foliocotizacion,d.totalcotizacion,d.foliocotizacion, f.firma FROM anticipo a inner join datos_cotizacion d on (a.anticipo_idcotizacion=d.iddatos_cotizacion) inner join datos_facturacion f on (f.id_datos=d.iddatosfacturacion) where a.idanticipo=:id";
+        $val = array("id" => $idtmp);
+        $consultado = $this->consultas->getResults($consulta, $val);
+        return $consultado;
+    }
+
+    private function getRestantePrevioAux($cid, $aid) {
+        $consultado = false;
+        $consulta = "SELECT restante FROM anticipo where anticipo_idcotizacion=:cid and idanticipo <:aid order by idanticipo desc limit 1";
+        $val = array("cid" => $cid,
+            "aid" => $aid);
+        $consultado = $this->consultas->getResults($consulta, $val);
+        return $consultado;
+    }
+
+    private function getTotalCotizacion($cid) {
+        $total = 0;
+        $datos = $this->getCotizacionById($cid);
+        foreach ($datos as $actual) {
+            $total = $actual['totalcotizacion'];
+        }
+        return $total;
+    }
+
+    private function getRestantePrevio($cid, $aid) {
+        $check = false;
+        $restante = 0;
+        $datos = $this->getRestantePrevioAux($cid, $aid);
+        foreach ($datos as $actual) {
+            $check = true;
+            $restante = $actual['restante'];
+        }
+        if (!$check) {
+            $restante = $this->getTotalCotizacion($cid);
+        }
+        return $restante;
+    }
+
+    public function getDatosAnticipo($idtmp) {
+        $anticipo = $this->getAnticipoById($idtmp);
+        $datos = "";
+        foreach ($anticipo as $actual) {
+            $idanticipo = $actual['idanticipo'];
+            $fechacreacion = $actual['fechacreacion'];
+            $idcotizacion = $actual['anticipo_idcotizacion'];
+            $monto = $actual['montoanticipo'];
+            $restante = $actual['restante'];
+            $autorizacion = $actual['autorizacion'];
+            $fechaanticipo = $actual['fechaanticipo'];
+            $img = $actual['imganticipo'];
+            $texto = addslashes($actual['texto']);
+            $emision = addslashes($actual['emision']);
+            $previo = $this->getRestantePrevio($idcotizacion, $idanticipo);
+            $src = "../img/anticipos/$img";
+            $type = "";
+            $base64 = "";
+
+            if ($img != "" && file_exists($src)) {
+                $type = pathinfo($src, PATHINFO_EXTENSION);
+
+                if ($type != 'pdf') {
+                    $data = file_get_contents($src);
+                    $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+                } else {
+                    copy($src, "../temporal/anticipos/$img");
+                }
+            }
+
+            $datos .= "$idanticipo</tr>$fechacreacion</tr>$idcotizacion</tr>$monto</tr>$restante</tr>$previo</tr>$autorizacion</tr>$fechaanticipo</tr>$img</tr>$type</tr>$texto</tr>$emision</tr>$base64";
+            break;
+        }
+        return $datos;
+    }
+
+    public function actualizarAnticipo($a) {
+        $img = $a->getImg();
+        if ($img == "") {
+            $img = $a->getActualizarimg();
+        } else if ($a->getImg() != $a->getActualizarimg()) {
+            if ($a->getImg() != "") {
+                rename('../temporal/anticipos/' . $a->getImg(), '../img/anticipos/' . $a->getImg());
+                unlink("../img/anticipos/" . $a->getActualizarimg());
+            }
+        }
+
+        $insertado = false;
+        $consulta = "UPDATE `anticipo` SET montoanticipo=:monto, restante=:restante, autorizacion=:autorizacion, fechaanticipo=:fechaanticipo, imganticipo=:img, texto=:texto, emision=:emision where idanticipo=:id;";
+        $valores = array("id" => $a->getIdanticipo(),
+            "monto" => bcdiv($a->getMonto(), '1', 2),
+            "restante" => bcdiv($a->getRestante(), '1', 2),
+            "autorizacion" => $a->getAutorizacion(),
+            "fechaanticipo" => $a->getFecha(),
+            "img" => $img,
+            "texto" => $a->getMensaje(),
+            "emision" => $a->getEmision());
+        $insertado = $this->consultas->execute($consulta, $valores);
+        $update = $this->actualizarRegistros($a->getIdanticipo(), $a->getIdcotizacion(), $a->getRestante());
+        return $insertado;
+    }
+
+    private function actualizarRegistros($aid, $cid, $restante) {
+        $update = false;
+        $datos = $this->getRegistrosAux($aid, $cid);
+        foreach ($datos as $actual) {
+            $idanticipo = $actual['idanticipo'];
+            $montoanticipo = $actual['montoanticipo'];
+            $restante = $restante - $montoanticipo;
+            $update = $this->modificarRegistros($idanticipo, $restante);
+        }
+        return $update;
+    }
+
+    private function getRegistrosAux($aid, $cid) {
+        $consultado = FALSE;
+        $consulta = "SELECT * FROM anticipo WHERE anticipo_idcotizacion=:cid and idanticipo > :aid";
+        $val = array("cid" => $cid,
+            "aid" => $aid);
+        $consultado = $this->consultas->getResults($consulta, $val);
+        return $consultado;
+    }
+
+    private function modificarRegistros($aid, $restante) {
+        $actualizado = false;
+        $consulta = "UPDATE `anticipo` SET restante=:restante WHERE idanticipo=:id;";
+        $valores = array("id" => $aid,
+            "restante" => bcdiv($restante, '1', 2));
+        $actualizado = $this->consultas->execute($consulta, $valores);
+        return $actualizado;
+    }
+
+    public function eliminarAnticipo($id, $cid) {
+        $eliminado = false;
+        $consulta = "DELETE FROM `anticipo` WHERE idanticipo=:id;";
+        $valores = array("id" => $id);
+        $eliminado = $this->consultas->execute($consulta, $valores);
+        $this->actualizarEliminado($id, $cid);
+        return $eliminado;
+    }
+
+    private function actualizarEliminado($aid, $cid) {
+        $restante = $this->getRestantePrevio($cid, $aid);
+        $update = $this->actualizarRegistros($aid, $cid, $restante);
+    } 
 }

@@ -127,7 +127,6 @@ include("buscarProductos.php");
                     </div>
                 </div>
             </div>
-
             <div class="col-md-4 py-2">
                 <label class="label-form text-right" for="tipo-comprobante">Tipo comprobante</label> <label class="mark-required text-danger fw-bold">&nbsp;</label>
                 <div class="form-group">
@@ -138,8 +137,19 @@ include("buscarProductos.php");
                     <div id="tipo-comprobante-errors"></div>
                 </div>
             </div>
-
             <div class="col-md-4 py-2">
+                <label class="label-form text-right" for="id-metodo-pago">M&eacute;todo de pago</label> <label class="mark-required text-danger fw-bold">&nbsp;</label>
+                <div class="form-group">
+                    <select class="form-select text-center input-form" id="id-metodo-pago" name="id-metodo-pago" onchange="checkMetodopago();">
+                        <option value="" id="option-default-metodo-pago">- - - -</option>
+                        <optgroup id="metodo-pago" class="contenedor-metodo-pago text-start"> </optgroup>
+                    </select>
+                    <div id="id-metodo-pago-errors"></div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+        <div class="col-md-4 py-2">
                 <label class="label-form text-right" for="id-forma-pago">Forma de pago</label> <label class="mark-required text-danger fw-bold">&nbsp;</label>
                 <div class=" form-group">
                     <select class="form-select text-center input-form" id="id-forma-pago" name="id-forma-pago">
@@ -149,20 +159,6 @@ include("buscarProductos.php");
                     <div id="id-forma-pago-errors"></div>
                 </div>
             </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-4 py-2">
-                <label class="label-form text-right" for="id-metodo-pago">M&eacute;todo de pago</label> <label class="mark-required text-danger fw-bold">&nbsp;</label>
-                <div class="form-group">
-                    <select class="form-select text-center input-form" id="id-metodo-pago" name="id-metodo-pago">
-                        <option value="" id="option-default-metodo-pago">- - - -</option>
-                        <optgroup id="metodo-pago" class="contenedor-metodo-pago text-start"> </optgroup>
-                    </select>
-                    <div id="id-metodo-pago-errors"></div>
-                </div>
-            </div>
-
             <div class="col-md-4 py-2">
                 <label class="label-form text-right" for="id-moneda">Moneda</label> <label class="mark-required text-danger fw-bold">&nbsp;</label>
                 <div class="form-group">
@@ -217,7 +213,8 @@ include("buscarProductos.php");
                 </div>
             </div>
         </div>
-        <div class="row scrollX">
+        <!--FECHA DEL 9 DE ABRIL 2024- POSIBLE CAMBIOS
+            <div class="row scrollX">
             <div class="col-md-12">
                 <a href="#cfdirel" data-bs-toggle='collapse' class="label-sub click-row text-decoration-none">Agregar mano de obra/ otros conceptos <span class="fas fa-chevron-down"></span></a>
                 <div id="cfdirel" class="panel-collapse collapse">
@@ -293,14 +290,14 @@ include("buscarProductos.php");
                     </table>
                 </div>
             </div>
-        </div>
+        </div>-->
         <div class="row mt-5">
             <div class="col-md-4 py-2">
                 <label class="label-sub" for="fecha-creacion">Conceptos</label>
             </div>
             <div class="col-md-8 text-end">
                 <button id="btn-nuevo-productos" type="button" class="button-modal" data-bs-toggle="modal" data-bs-target="#nuevo-producto" onclick="setCamposProducto();">
-                    <span class="fas fa-plus"></span> Nuevo producto
+                    <span class="fas fa-plus"></span> Nuevo producto / servicio
                 </button>
                 <button id="btn-agregar-productos" type="button" class="button-modal" data-bs-toggle="modal" data-bs-target="#myModal">
                     Agregar conceptos <span class="fas fa-search"></span>

@@ -7,10 +7,10 @@ include("modals.php");
     </div>
     <div class="row col-12 p-0">
         <div class="col-sm-6 py-1">
-            <input type="text" class="form-control input-search text-secondary-emphasis" id="buscar-carta" placeholder="Buscar carta porte (Folio, emisor o nombre del cliente)" oninput="buscarCarta()">
+            <input type="text" class="form-control input-search text-secondary-emphasis" id="buscar-carta" placeholder="Buscar carta porte (Folio, emisor o nombre del cliente)" oninput="filtrarCarta()">
         </div>
         <div class="col-sm-2 py-1">
-            <select class="form-select input-search text-center" id="num-reg" name="num-reg" onchange="buscarCarta()">
+            <select class="form-select input-search text-center" id="num-reg" name="num-reg" onchange="filtrarCarta()">
                 <option value="10"> 10</option>
                 <option value="15"> 15</option>
                 <option value="20"> 20</option>

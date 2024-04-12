@@ -121,6 +121,8 @@ class Permiso {
     private $cortedecaja;
     private $reporteinventario;
     private $reportepuntoventa;
+    private $exportarfactura;
+
 
     function __construct() {
         
@@ -317,6 +319,11 @@ class Permiso {
     function getListacarta() {
         return $this->listacarta;
     }
+
+    function getExportarFactura() {
+        return $this->exportarfactura;
+    }
+
 
     function getCrearcarta() {
         return $this->crearcarta;
@@ -628,6 +635,10 @@ class Permiso {
     
     function setEliminarDatos($eliminardatos) {
         $this->eliminardatos = $eliminardatos;
+    }
+
+    function setExportarFactura($exportarfactura) {
+        $this->exportarfactura = $exportarfactura;
     }
 
     function setDescargarDatos($descargardatos) {

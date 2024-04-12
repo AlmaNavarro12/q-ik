@@ -64,6 +64,15 @@ class ControladorCarta {
         return $check;
     }
 
+    public function checkStatusRemolque($placa) {
+        $check = '0';
+        $datos = $this->checkRemolqueAux($placa);
+        foreach ($datos as $actual) {
+            $check = $actual['status'];
+        }
+        return $check;
+    }
+
     private function checkVehiculoAux($placa) {
         $consultado = false;
         $consulta = "SELECT * FROM transporte WHERE placavehiculo=:placa;";
@@ -79,6 +88,15 @@ class ControladorCarta {
             $check = $actual['idtransporte'];
         }
         return $check;
+    }
+
+    public function checkStatusVehiculo($placa) {
+        $status = '0';
+        $datos = $this->checkVehiculoAux($placa);
+        foreach ($datos as $actual) {
+            $status = $actual['status'];
+        }
+        return $status;
     }
 
     private function checkOperadorAux($rfc) {
@@ -97,6 +115,16 @@ class ControladorCarta {
         }
         return $check;
     }
+
+    public function checkStatusOperador($rfc) {
+        $check = '0';
+        $datos = $this->checkOperadorAux($rfc);
+        foreach ($datos as $actual) {
+            $check = $actual['opstatus'];
+        }
+        return $check;
+    }
+
 
     public function agregarCFDI($t) {
         $insertado = false;
@@ -555,8 +583,8 @@ class ControladorCarta {
             $datos .= "
                     <tr>
                         <td>$nombre</td>
-                        <td>$rfc</td>
-                        <td>$lic</td>
+                        <td class='text-center'>$rfc</td>
+                        <td class='text-center'>$lic</td>
                         <td>$calle $cp $municipio $estado</td>
                         <td class='text-center'><div class='dropdown'>
                         <button $disuuid class='button-list dropdown-toggle' title='Editar'  type='button' data-bs-toggle='dropdown'><span class='fas fa-edit'></span>
@@ -1531,17 +1559,316 @@ class ControladorCarta {
         return $existe;
     }
 
-    public function checkCarta($tag) {
+    public function checkCarta($tag, $type, $num) {
         $check = $this->checkCartaAux($tag);
         if ($check) {
-            $datos = $this->nuevosRegistros($tag);
+            if($type == "t"){
+                $datos = $this->nuevosRegistrosTransporte($tag);
+            } else if($type == "o"){
+                $datos = $this->nuevosRegistrosOperador($tag);
+            } else if($type == "r"){
+                $datos = $this->nuevosRegistrosRemolque($tag, $num);
+            }
         }
         return $datos;
     }
 
-    private function nuevosRegistros($tag)
-    {
+    /*private function nuevosRegistrosTransporte($tag) {
         $vehiculo = false;
+        $datoscarta = $this->getDatosCarta($tag);
+    
+        foreach ($datoscarta as $datactual) {
+            $placa = $datactual['carta_placa'];
+            $nombre = $datactual['nombrevehiculo'] ?: $placa;
+            $numpermiso = $datactual['carta_numpermiso'];
+            $tipopermiso = $datactual['carta_tipopermiso'];
+            $tipotransporte = $datactual['carta_conftransporte'];
+            $anhomod = $datactual['carta_anhomod'];
+            $segurocivil = $datactual['carta_segurocivil'];
+            $polizaseguro = $datactual['carta_polizaseguro'];
+    
+            $checkv = $this->checkVehiculo($placa);
+            $checks = $this->checkStatusVehiculo($placa);
+    
+            if ($checkv == '0' || ($checkv != '0' && $checks == '0')) {
+                $consulta = ($checkv == '0') ?
+                    "INSERT INTO `transporte` VALUES (:id, :nombre, :numpermiso, :tipopermiso, :conftransporte, :anho, :placa, :segurorc, :polizarc, :seguroma, :polizama, :segurocg, :polizacg, :st);" :
+                    "UPDATE `transporte` SET nombrevehiculo=:nombre, numeropermiso=:numpermiso,tipopermiso=:tipopermiso, conftransporte=:conftransporte, anhomodelo=:anho, placavehiculo=:placa, segurorCivil=:segurorc, polizarcCivil=:polizarc, seguroAmbiente=:seguroma, polizaAmbiente=:polizama, seguroCarga=:segurocg, polizaCarga=:polizacg, status='1' WHERE placavehiculo=:placa;";
+    
+                $val = array(
+                    "id" => null,
+                    "nombre" => $nombre,
+                    "numpermiso" => $numpermiso,
+                    "tipopermiso" => $tipotransporte,
+                    "conftransporte" => $tipotransporte,
+                    "anho" => $anhomod,
+                    "placa" => $placa,
+                    "segurorc" => $segurocivil,
+                    "polizarc" => $polizaseguro,
+                    "seguroma" => '',
+                    "polizama" => '',
+                    "segurocg" => '',
+                    "polizacg" => '',
+                    "st" => '1'
+                );
+                $vehiculo = $this->consultas->execute($consulta, $val);
+            } else {
+                $vehiculo = "Ya existe un registro de vehículo con el número de placas $placa.";
+            }
+        }
+        return $vehiculo;
+    }*/
+
+    private function nuevosRegistrosTransporte($tag){
+        $vehiculo = "";
+        $datoscarta = $this->getDatosCarta($tag);
+        foreach ($datoscarta as $datactual) {
+            $idvehiculo = $datactual['carta_idvehiculo'];
+            $placa = $datactual['carta_placa'];
+            $nombre = $datactual['nombrevehiculo'];
+            $numpermiso = $datactual['carta_numpermiso'];
+            $tipopermiso = $datactual['carta_tipopermiso'];
+            $tipotransporte = $datactual['carta_conftransporte'];
+            $anhomod = $datactual['carta_anhomod'];
+            $segurocivil = $datactual['carta_segurocivil'];
+            $polizaseguro = $datactual['carta_polizaseguro'];
+            $nombre = ($nombre == '') ? $placa : $nombre;
+    
+            $checkv = $this->checkVehiculo($placa); //9 
+            $checks = $this->checkStatusVehiculo($placa); //1
+    
+            if ($idvehiculo == '0') {
+                if ($checkv == '0') {
+                    $consulta = "INSERT INTO `transporte` VALUES (:id, :nombre, :numpermiso, :tipopermiso, :conftransporte, :anho, :placa, :segurorc, :polizarc, :seguroma, :polizama, :segurocg, :polizacg, :st);";
+                    $val = array(
+                        "id" => null,
+                        "nombre" => $nombre,
+                        "numpermiso" => $numpermiso,
+                        "tipopermiso" => $tipopermiso,
+                        "conftransporte" => $tipotransporte,
+                        "anho" => $anhomod,
+                        "placa" => $placa,
+                        "segurorc" => $segurocivil,
+                        "polizarc" => $polizaseguro,
+                        "seguroma" => '',
+                        "polizama" => '',
+                        "segurocg" => '',
+                        "polizacg" => '',
+                        "st" => '1'
+                    );
+                    $vehiculo = $this->consultas->execute($consulta, $val);
+                } else if($checkv != "0" && $checks == "1") {
+                    return $vehiculo = "Ya existe un registro de vehículo con el número de placas $placa.";
+                } else if($checkv != "0" && $checks == "0"){
+                    $consulta = "UPDATE `transporte` SET nombrevehiculo=:nombre, numeropermiso=:numpermiso, tipopermiso=:tipopermiso, conftransporte=:conftransporte, anhomodelo=:anho, placavehiculo=:placa, seguroCivil=:segurorc, polizarcCivil=:polizarc, seguroAmbiente=:seguroma, polizaAmbiente=:polizama, seguroCarga=:segurocg, polizaCarga=:polizacg, status='1' WHERE placavehiculo=:placa;";
+                    $val = array(
+                        "nombre" => $nombre,
+                        "numpermiso" => $numpermiso,
+                        "tipopermiso" => $tipopermiso,
+                        "conftransporte" => $tipotransporte,
+                        "anho" => $anhomod,
+                        "placa" => $placa,
+                        "segurorc" => $segurocivil,
+                        "polizarc" => $polizaseguro,
+                        "seguroma" => '',
+                        "polizama" => '',
+                        "segurocg" => '',
+                        "polizacg" => ''
+                    );
+                    $vehiculo = $this->consultas->execute($consulta, $val);
+                }
+            } else {
+                if($checkv != "0" && $checks == "1"){
+                    return $vehiculo = "Ya existe un registro de vehículo con el número de placas $placa.";
+                } else if($checkv != "0" && $checks == "0"){
+                    $consulta = "UPDATE `transporte` SET nombrevehiculo=:nombre, numeropermiso=:numpermiso, tipopermiso=:tipopermiso, conftransporte=:conftransporte, anhomodelo=:anho, placavehiculo=:placa, seguroCivil=:segurorc, polizarcCivil=:polizarc, seguroAmbiente=:seguroma, polizaAmbiente=:polizama, seguroCarga=:segurocg, polizaCarga=:polizacg, status='1' WHERE placavehiculo=:placa;";
+                    $val = array(
+                        "nombre" => $nombre,
+                        "numpermiso" => $numpermiso,
+                        "tipopermiso" => $tipopermiso,
+                        "conftransporte" => $tipotransporte,
+                        "anho" => $anhomod,
+                        "placa" => $placa,
+                        "segurorc" => $segurocivil,
+                        "polizarc" => $polizaseguro,
+                        "seguroma" => '',
+                        "polizama" => '',
+                        "segurocg" => '',
+                        "polizacg" => ''
+                    );
+                    $vehiculo = $this->consultas->execute($consulta, $val);
+                }
+            }
+        }
+        return $vehiculo;
+    }
+    
+
+    private function nuevosRegistrosOperador($tag){
+        $operador = false;
+
+        $operadores = $this->getOperadores($tag);
+        foreach ($operadores as $actual) {
+            $idop = $actual['operador_id'];
+            $rfc = $actual["operador_rfc"];
+            $nombreop = $actual['operador_nombre'];
+            $lic = $actual['operador_numlic'];
+            $idestado = $actual["operador_idestado"];
+            $nombre_estado = $actual["nombre_estado"];
+            $calle = $actual["operador_calle"];
+            $cp = $actual['operador_cp'];
+            
+            $checkop = $this->checkOperador($rfc);
+            $checkops = $this->checkStatusOperador($rfc);
+
+            if ($nombreop == '') {
+                $nmop = $rfc;
+                $apaternoop = '';
+                $amaternoop = "";
+            } else {
+                $divnm = explode(" ", $nombreop);
+                $nmop = $divnm[0];
+                if (isset($divnm[3])) {
+                    $apaternoop = $divnm[2];
+                    $amaternoop = $divnm[3];
+                } else {
+                    $apaternoop = $divnm[1];
+                    $amaternoop = $divnm[2] ?? '';
+                }
+            }
+
+            if ($idop == '0') {
+                if ($checkop == '0') {
+                    $consulta = "INSERT INTO `operador` VALUES (:id, :nombre, :apaterno, :amaterno, :licencia, :rfc, :empresa, :idestado, :nombre_estado, :idmunicipio, :nombre_municipio, :calle, :cp, :st);";
+                    $valores = array(
+                        "id" => null,
+                        "nombre" => $nmop,
+                        "apaterno" => $apaternoop,
+                        "amaterno" => $amaternoop,
+                        "licencia" => $lic,
+                        "rfc" => $rfc,
+                        "empresa" => '',
+                        "idestado" => $idestado,
+                        "nombre_estado" => $nombre_estado,
+                        "idmunicipio" => '0',
+                        "nombre_municipio" => '',
+                        "calle" => $calle,
+                        "cp" => $cp,
+                        "st" => '1'
+                    );
+                    $operador = $this->consultas->execute($consulta, $valores);
+                } else if($checkop != "0" && $checkops == "1"){
+                    $operador = "Ya existe un registro de operador con el RFC $rfc.";
+                } else if($checkop != "0" && $checkops == "0"){
+                    $consulta = "UPDATE `operador` SET nombreoperador=:nombre, apaternooperador=:apaterno, amaternooperador=:amaterno, numlicencia=:licencia, rfcoperador=:rfc, empresa=:empresa, operador_idestado=:idestado, nombre_estado=:nombre_estado, operador_idmunicipio=:idmunicipio, nombre_municipio=:nombre_municipio, calle=:calle, cpoperador=:cp, opstatus=:st WHERE rfcoperador=:rfc;";
+                    $valores = array(
+                        "nombre" => $nmop,
+                        "apaterno" => $apaternoop,
+                        "amaterno" => $amaternoop,
+                        "licencia" => $lic,
+                        "rfc" => $rfc, 
+                        "empresa" => '',
+                        "idestado" => $idestado,
+                        "nombre_estado" => $nombre_estado,
+                        "idmunicipio" => '0',
+                        "nombre_municipio" => '',
+                        "calle" => $calle,
+                        "cp" => $cp,
+                        "st" => '1'
+                    );
+                    $operador = $this->consultas->execute($consulta, $valores);
+                }
+            } else {
+                if($checkop != "0" && $checkops ="1"){
+                    $operador = "Ya existe un registro de operador con el RFC $rfc.";
+                } else if($checkop != "0" && $checkops == "0"){
+                    $consulta = "UPDATE `operador` SET nombreoperador=:nombre, apaternooperador=:apaterno, amaternooperador=:amaterno, numlicencia=:licencia, rfcoperador=:rfc, empresa=:empresa, operador_idestado=:idestado, nombre_estado=:nombre_estado, operador_idmunicipio=:idmunicipio, nombre_municipio=:nombre_municipio, calle=:calle, cpoperador=:cp, opstatus=:st WHERE rfcoperador=:rfc;";
+                    $valores = array(
+                        "nombre" => $nmop,
+                        "apaterno" => $apaternoop,
+                        "amaterno" => $amaternoop,
+                        "licencia" => $lic,
+                        "rfc" => $rfc, 
+                        "empresa" => '',
+                        "idestado" => $idestado,
+                        "nombre_estado" => $nombre_estado,
+                        "idmunicipio" => '0',
+                        "nombre_municipio" => '',
+                        "calle" => $calle,
+                        "cp" => $cp,
+                        "st" => '1'
+                    );
+                    $operador = $this->consultas->execute($consulta, $valores);
+                }
+            }
+        }
+        return $operador;
+    }
+
+    private function nuevosRegistrosRemolque($tag, $num){
+        $datoscarta = $this->getDatosCarta($tag);
+        foreach ($datoscarta as $datactual) {
+            $idremolque = $datactual["carta_idremolque$num"];
+            $placaremolque = $datactual["carta_placaremolque$num"];
+            $nmremolque = $datactual["carta_nmremolque$num"];
+            $tiporemolque = $datactual["carta_tiporemolque$num"];
+
+            $remolque = $this->insertarNuevoRemolque($idremolque, $placaremolque, $nmremolque, $tiporemolque, $num);
+        }
+        return $remolque;
+    }
+
+    private function insertarNuevoRemolque($idremolque, $placaremolque, $nmremolque, $tiporemolque, $numero) {
+        $remolque = "";
+        $checkrem = $this->checkRemolque($placaremolque);
+        $checkrems = $this->checkStatusRemolque($placaremolque);
+
+        if ($nmremolque == '') {
+            $nmremolque = $placaremolque;
+        }
+    
+        if ($idremolque == '0') {
+            if ($checkrem == '0' && $placaremolque != "") {
+                $consulta = "INSERT INTO `remolque` VALUES (:id, :nombre, :tipo, :placa, :st);";
+                $valores = array(
+                    "id" => null,
+                    "nombre" => $nmremolque,
+                    "tipo" => $tiporemolque,
+                    "placa" => $placaremolque,
+                    "st" => '1'
+                );
+                $remolque = $this->consultas->execute($consulta, $valores);
+            } else if ($checkrem != '0' && $placaremolque != "") {
+                $remolque = "Ya existe un registro de remolque (Remolque $numero) con el número de placas $placaremolque.";
+            } else if(($checkrem != '0' && $placaremolque != "") && $checkrems == "0"){
+                $consulta = "UPDATE `remolque` SET nombreremolque=:nombre, tiporemolque=:tipo, placaremolque=:placa, status=:st WHERE placaremolque=:placa;";
+                $valores = array(
+                    "nombre" => $nmremolque,
+                    "tipo" => $tiporemolque,
+                    "placa" => $placaremolque,
+                    "st" => '1'
+                );
+                $remolque = $this->consultas->execute($consulta, $valores);
+            }
+        } else if ($idremolque != "0" && $placaremolque != "") {
+            if ($checkrem != "0" && $checkrems == "1") {
+                $remolque = "Ya existe un registro de remolque (Remolque $numero) con el número de placas $placaremolque.";
+            } else if($checkrem != "0" && $checkrems == "1"){
+                $consulta = "UPDATE `remolque` SET nombreremolque=:nombre, tiporemolque=:tipo, placaremolque=:placa, status=:st WHERE placaremolque=:placa;";
+                $valores = array(
+                    "nombre" => $nmremolque,
+                    "tipo" => $tiporemolque,
+                    "placa" => $placaremolque,
+                    "st" => '1'
+                );
+                $remolque = $this->consultas->execute($consulta, $valores);
+            }
+        }
+        return $remolque;
+    }
+
+    
+    /*private function nuevosRegistros($tag){
         $remolque1 = false;
         $remolque2 = false;
         $remolque3 = false;
@@ -1676,36 +2003,7 @@ class ControladorCarta {
             return "$vehiculo</tr>$remolque1</tr>$remolque2</tr>$remolque3</tr>$operador";
         }
     }
-
-    private function insertarNuevoRemolque($idremolque, $placaremolque, $nmremolque, $tiporemolque, $numero) {
-        $remolque = "";
-        $checkrem = $this->checkRemolque($placaremolque);
-
-        if ($nmremolque == '') {
-            $nmremolque = $placaremolque;
-        }
-    
-        if ($idremolque == '0') {
-            if ($checkrem == '0' && $placaremolque != "") {
-                $consulta = "INSERT INTO `remolque` VALUES (:id, :nombre, :tipo, :placa, :st);";
-                $valores = array(
-                    "id" => null,
-                    "nombre" => $nmremolque,
-                    "tipo" => $tiporemolque,
-                    "placa" => $placaremolque,
-                    "st" => '1'
-                );
-                $remolque = $this->consultas->execute($consulta, $valores);
-            } else if ($checkrem != '0' && $placaremolque != "") {
-                $remolque = "Ya existe un registro de remolque (Remolque $numero) con el número de placas $placaremolque.";
-            }
-        } else if ($idremolque != "0" && $placaremolque != "") {
-            if ($checkrem != "0") {
-                $remolque = "Ya existe un registro de remolque (Remolque $numero) con el número de placas $placaremolque.";
-            }
-        }
-        return $remolque;
-    }
+    */
 
     private function getTMPEvidencias($sid) {
         $consultado = false;
@@ -1795,8 +2093,8 @@ class ControladorCarta {
                 <th></th>
                 <th class='text-center'>No.Folio </th>
                 <th class='text-center'>Fecha de Creación </th>
-                <th class='text-start'>Emisor</th>
-                <th class='text-start'>Cliente</th>
+                <th class='text-center col-md-2'>Emisor</th>
+                <th class='text-center col-md-2'>Cliente</th>
                 <th class='text-center'>Estado </th>
                 <th class='text-center'>Timbre </th>
                 <th class='text-center'>Total </th>
@@ -1844,7 +2142,7 @@ class ControladorCarta {
                 $titbell = "Factura timbrada";
                 $xml = "href='./com.sine.imprimir/imprimirxml.php?c=$idfactura&t=a' target='_blank'";
                 $timbre = "data-bs-toggle='modal' data-bs-target='#modalcancelar' onclick='setCancelacion($idfactura);'";
-                $tittimbre = "Cancelar Carta";
+                $tittimbre = "Cancelar carta";
             } else {
             	$emisor = $this->getNombreEmisor($listafacturaActual['iddatosfacturacion']);
                 $timbre = "onclick='timbrarCarta($idfactura);'";
@@ -1860,7 +2158,7 @@ class ControladorCarta {
                     $color = "#34A853";
                     $title = "Factura pagada";
                     $function = "onclick='tablaPagos($idfactura,$estado)'";
-                    $modal = "data-toggle='modal' data-target='#pagosfactura'";
+                    $modal = "data-bs-toggle='modal' data-bs-target='#pagosfactura'";
                     break;
                 case '2':
                     $estadoF = "Pendiente";
@@ -1883,10 +2181,10 @@ class ControladorCarta {
                     break;
                 case '4':
                     $estadoF = "Pago parcial";
-                    $color = "#02E7EF";
-                    $title = "Factura pagada parcialmente";
+                    $color = "#128B8F";
+                    $title = "Factura pagada <br> parcialmente";
                     $function = "onclick='tablaPagos($idfactura,$estado)'";
-                    $modal = "data-toggle='modal' data-target='#pagosfactura'";
+                    $modal = "data-bs-toggle='modal' data-bs-target='#pagosfactura'";
                     break;
                 default:
                     $estadoF = "Pendiente";
@@ -1906,8 +2204,8 @@ class ControladorCarta {
                         <td style='background-color: $colorrow;'></td>
                         <td class='text-center'>$folio</td>
                         <td class='text-center'>$fecha</td>
-                        <td>$emisor</td>
-                        <td>$nombre_cliente</td>
+                        <td class='lh-1'>$emisor</td>
+                        <td class='lh-1'>$nombre_cliente</td>
                         <td class='text-center'>
                             <div class='small-tooltip icon tip'>
                                 <a class='state-link fw-semibold' style='color: $color;' $modal $function><span>$estadoF</span></a>
@@ -1917,15 +2215,15 @@ class ControladorCarta {
                         <td class='text-center'>
                             <div class='small-tooltip icon tip'>
                                 <span style='color: $colorB;' class='fas fa-bell'></span>
-                                <span class='tiptext fw-semibold' style='color: $color;'>$titbell</span>
+                                <span class='tiptext fw-semibold' style='color: $colorB;'>$titbell</span>
                             </div>
                         </td>
-                        <td>$" . number_format($total, 2, '.', ',') . "</td>
+                        <td class='text-center'>$" . number_format($total, 2, '.', ',') . "</td>
                         <td class='text-center'>$cmoneda</td>
                         <td align='center'><div class='dropdown dropend'>
                         <button class='button-list dropdown-toggle' title='Opciones'  type='button' data-bs-toggle='dropdown'><span class='fas fa-ellipsis-v text-muted'></span>
                         <span class='caret'></span></button>
-                        <ul class='dropdown-menu dropdown-menu-right'>";
+                        <ul class='dropdown-menu dropdown-menu-right z-1'>";
 
             if ($div[0] == '1') {
                 $datos .= "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' onclick='editarCarta($idfactura);'>Editar carta <span class='text-muted fas fa-edit small'></span></a></li>";
@@ -1942,7 +2240,7 @@ class ControladorCarta {
             $datos .= "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' onclick=\"imprimirCarta($idfactura);\">Ver carta porte <span class='text-muted fas fa-eye'></span></a></li>";
 
             if($uuid != "" && $uuid != ""){
-                $datos .= "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' $xml>Ver XML <span class='text-muted fas fa-download'></span></a></li>";
+                $datos .= "<div class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' $xml>Ver XML <span class='text-muted fas fa-download'></span></a></div>";
             }
 
             if($div[3] == '1'){
@@ -1953,7 +2251,7 @@ class ControladorCarta {
                         <li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' data-bs-toggle='modal' data-bs-target='#enviarmail' onclick='showCorreosCarta($idfactura);'>Enviar <span class='text-muted fas fa-envelope'></span></a></li>";
 
             if ($uuid != "") {
-                $datos .= "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis lh-base' data-toggle='modal' data-target='#modal-stcfdi' onclick='statusCancelacionCarta($idfactura);'>Comprobar estado de <br> la factura <span class='fas fa-check-circle text-muted'></span></a></li>";
+                $datos .= "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis lh-base' data-bs-toggle='modal' data-bs-target='#modal-stcfdi' onclick='statusCancelacionCarta($idfactura);'>Comprobar estado de <br> la factura <span class='fas fa-check-circle text-muted'></span></a></li>";
             }
             $datos .= "</ul>
                         </div></td>
@@ -3237,6 +3535,60 @@ class ControladorCarta {
         }
     }
 
+    public function getCartaById($idfactura) {
+        $consultado = false;
+        $consulta = "SELECT * FROM factura_carta dat 
+            INNER JOIN datos_carta dc ON (dat.tagfactura=dc.tagcarta)
+            INNER JOIN datos_facturacion df ON (df.id_datos=dat.iddatosfacturacion) WHERE dat.idfactura_carta=:cid;";
+        $val = array("cid" => $idfactura);
+        $consultado = $this->consultas->getResults($consulta, $val);
+        return $consultado;
+    }
+
+    public function checkStatusCFDI($idfactura) {
+        $datos = false;
+        $factura = $this->getCartaById($idfactura);
+        foreach ($factura as $actual) {
+            $emisor = $actual['factura_rfcemisor'];
+            $receptor = $actual['rfcreceptor'];
+            $total = $actual['totalfactura'];
+            $uuid = $actual['uuid'];
+            $cfdistring = $actual['cfdistring'];
+            $tcomprobante = $actual['id_tipo_comprobante'];
+        }
+        if ($tcomprobante == '5') {
+            $total = 0;
+        }
+
+        $xml = simplexml_load_string($cfdistring);
+        $comprobante = $xml->xpath('/cfdi:Comprobante');
+        $attr = $comprobante[0]->attributes();
+        $sello = $attr['Sello'];
+        $subsello = substr($sello, -8);
+        $soapUrl = "https://pruebacfdiconsultaqr.cloudapp.net/ConsultaCFDIService.svc"; //"https://consultaqr.facturaelectronica.sat.gob.mx/ConsultaCFDIService.svc";//productivo
+        //$soapUrl = "https://pruebacfdiconsultaqr.cloudapp.net/ConsultaCFDIService.svc";//pruebas
+        $consultaCfdi = consultaCfdiSAT::ServicioConsultaSAT($soapUrl, $emisor, $receptor, $total, $uuid, $subsello);
+        $codstatus = $consultaCfdi->CodigoEstatus;
+        $estado = $consultaCfdi->Estado;
+        $cancelable = $consultaCfdi->EsCancelable;
+        $statusCancelacion = $consultaCfdi->EstatusCancelacion;
+        $status = $consultaCfdi->Status;
+
+        if (is_array($consultaCfdi->EsCancelable)) {
+            $cancelable = "";
+        }
+
+        if (is_array($consultaCfdi->EstatusCancelacion)) {
+            $statusCancelacion = "";
+        }
+        $reset = "";
+        if ($statusCancelacion === "Solicitud rechazada") {
+            $reset = "<button class='button-modal' onclick='resetCfdiCarta($idfactura)' id='btn-reset-cfdi'>Restaurar factura <span class='fas fa-redo'></span></button>";
+        }
+        $datos = "$codstatus</tr>$estado</tr>$cancelable</tr>$statusCancelacion</tr>$reset</tr>$status";
+        return $datos;
+    }
+
     private function getSWAccessAux() {
         $consultado = false;
         $consulta = "SELECT * FROM swaccess WHERE idswaccess=:id;";
@@ -3312,5 +3664,258 @@ class ControladorCarta {
         $valores = array("idtimbres" => '1');
         $actualizado = $this->consultas->execute($consulta, $valores);
         return $actualizado;
+    }
+
+    public function getPagosReg($folio) {
+        $consultado = false;
+        $consulta = "SELECT * FROM pagos p INNER JOIN complemento_pago cp ON cp.tagpago = p.tagpago WHERE idpago = :id";
+        $val = array("id" => $folio);
+        $consultado = $this->consultas->getResults($consulta, $val);
+        return $consultado;
+    }
+
+    public function getPagosDetalle($id) {
+        $consultado = false;
+        $consulta = "SELECT idpago FROM detallepago dp INNER JOIN pagos p ON p.tagpago = dp.detalle_tagencabezado WHERE pago_idfactura=:id AND type=:type ORDER BY foliopago DESC;";
+        $val = array("id" => $id,
+            "type" => 'c');
+        $consultado = $this->consultas->getResults($consulta, $val);
+        return $consultado;
+    }
+
+    public function tablaPagosReg($idfactura, $status) {
+        $datos = "<corte><thead class='sin-paddding'>
+            <tr>
+                <th class='text-center'>FOLIO DE PAGO</th>
+                <th class='text-center'>FECHA DE PAGO</th>
+                <th class='text-center'>FORMA DE PAGO</th>
+                <th class='text-center'>TOTAL PAGADO</th>
+                <th class='text-center'>ESTADO</th>
+                <th class='text-center'>RECIBO</th>
+                </thead><tbody>";
+        $productos = $this->getPagosDetalle($idfactura);
+        foreach ($productos as $productoactual) {
+            $folio = $productoactual['idpago'];
+            $pagos = $this->getPagosReg($folio);
+            foreach ($pagos as $pagoactual) {
+                $idpago = $pagoactual['idpago'];
+                $foliopago = $pagoactual['letra'] . $pagoactual['foliopago'];
+                $fechapago = $pagoactual['complemento_fechapago'];
+                $div = explode("-", $fechapago);
+                $mes = $this->translateMonth($div[1]);
+
+                $fechapago = $div[2] . ' / ' . $mes;
+                $horapago = $pagoactual['complemento_horapago'];
+                $horapago = date('g:i A', strtotime($horapago));
+                $totalpagado = $pagoactual['totalpagado'];
+                $c_pago = $pagoactual['c_forma_pago'];
+                $formapago = $pagoactual['nombre_forma_pago'];
+
+                if ($pagoactual['cancelado'] == '0') {
+                    $estado = "Activo";
+                    if ($pagoactual['uuidpago'] != '') {
+                        $estado = "Timbrado";
+                    }
+                } else if ($pagoactual['cancelado'] == '1') {
+                    $estado = "Cancelado";
+                }
+
+                $datos .= "
+                    <tr>
+                        <td class='text-center'>$foliopago</td>
+                        <td class='text-center'>$fechapago a $horapago</td>
+                        <td class='text-center'>$c_pago $formapago</td>
+                        <td class='text-center'>$ " . bcdiv($totalpagado, '1', 2) . "</td>
+                        <td class='text-center'>$estado</td>
+                        <td class='text-center'><a class='btn button-list' title='Descagar PDF' onclick=\"imprimirpago($idpago);\"><span class='fas fa-list-alt'></span></a></td>
+                    </tr>
+                     ";
+            }
+        }
+
+        if ($status == '4') {
+            $datos .= "<tr><td colspan='5'></td><td class='text-center'><a class='btn button-list' title='Agregar nuevo pago' data-bs-dismiss='modal' onclick=\"registrarPago($idfactura);\"><span class='fas fa-file'></span></a></td></tr>";
+        }
+
+        $datos .= "</tbody>";
+        return $datos;
+    }
+
+    public function getUUID($idfactura) {
+        $datos = "";
+        $uuid = $this->getUUIDAux($idfactura);
+        foreach ($uuid as $u) {
+            $uuid = $u['uuid'];
+            $folio = $u['letra'] . $u['foliocarta'];
+            $rfc = $u['rfc'];
+            $pass = $u['passcsd'];
+            $csd = $u['csd'];
+            $key = $u['keyb64'];
+            $datos = "$uuid</tr>$folio</tr>$rfc</tr>$pass</tr>$csd</tr>$key";
+        }
+        return $datos;
+    }
+
+    public function getUUIDAux($idfactura) {
+        $consultado = false;
+        $consulta = "SELECT f.uuid, f.letra, f.foliocarta, d.rfc, d.passcsd, d.keyb64, d.csd FROM factura_carta f INNER JOIN datos_facturacion d ON (f.iddatosfacturacion=d.id_datos) WHERE f.idfactura_carta=:id;";
+        $val = array("id" => $idfactura);
+        $consultado = $this->consultas->getResults($consulta, $val);
+        return $consultado;
+    }
+
+    public function cancelarTimbre($idfactura, $motivo, $reemplazo) {
+        $swaccess = $this->getSWAccess();
+        $div = explode("</tr>", $swaccess);
+        $url = $div[0];
+        $token = $div[1];
+
+        $get = $this->getUUID($idfactura);
+        $divideU = explode("</tr>", $get);
+        $uuid = $divideU[0];
+        $rfc = $divideU[2];
+        $pass = $divideU[3];
+        $csd = $divideU[4];
+        $key = $divideU[5];
+
+        if ($motivo == '01') {
+            $params = array(
+                "url" => $url,
+                "token" => $token,
+                "uuid" => $uuid,
+                "password" => $pass,
+                "rfc" => $rfc,
+                "motivo" => $motivo,
+                "foliosustitucion" => $reemplazo,
+                "cerB64" => $csd,
+                "keyB64" => $key
+            );
+        } else {
+            $params = array(
+                "url" => $url,
+                "token" => $token,
+                "uuid" => $uuid,
+                "password" => $pass,
+                "rfc" => $rfc,
+                "motivo" => $motivo,
+                "cerB64" => $csd,
+                "keyB64" => $key
+            );
+        }
+
+        try {
+            header('Content-type: text/plain');
+            $cancelationService = CancelationService::Set($params);
+            $result = $cancelationService::CancelationByCSD();
+            if ($result->status == "error") {
+                return '0' . $result->message . " " . $result->messageDetail;
+            } else if ($result->status == "success") {
+                $guardar = $this->cancelarFactura($idfactura, $result->data->acuse);
+                return $guardar;
+            }
+        } catch (Exception $e) {
+            echo 'Caught exception: ', $e->getMessage(), "\n";
+        }
+    }
+
+    private function cancelarFactura($idfactura, $cfdi) {
+        $ruta = "../XML/XML_CANCEL.xml";
+        $archivo = fopen($ruta,"w");
+        fwrite($archivo, $cfdi);
+        fclose($archivo);
+
+
+        $xml = simplexml_load_file($ruta);
+        foreach ($xml->Folios as $folio) {
+            $uuid_cancel = $folio->UUID;
+            $status_uuid = $folio->EstatusUUID;
+        }
+
+        switch($status_uuid){
+            case 201:
+                $mensaje_cancel = "Solicitud de cancelación exitosa.";
+                break;
+            case 202:
+                $mensaje_cancel = "Folio fiscal previamente cancelado.";
+                break;
+            case 203:
+                $mensaje_cancel = "Folio fiscal no correspondiente al emisor.";
+                break;
+            case 204:
+                $mensaje_cancel = "Folio fiscal no aplicable a cancelación.";
+                break;
+            case 205:
+                $mensaje_cancel = "Folio fiscal no existente.";
+                break;
+            case 206:
+                $mensaje_cancel = "UUID no corresponde a un CFDI del sector primario.";
+                break;
+            case 207:
+                $mensaje_cancel = "No se especificó el motivo de cancelación o el motivo no es válido.";
+                break;
+            case 208:
+                $mensaje_cancel = "Folio sustitución inválido.";
+                break;
+            case 209:
+                $mensaje_cancel = "Folio sustitución no requerido.";
+                break;
+            case 210:
+                $mensaje_cancel = "La fecha de solicitud de cancelación es mayor a la fecha de declaración.";
+                break;
+            case 211:
+                $mensaje_cancel = "La fecha de solicitud de cancelación límite para factura global.";
+                break;
+            case 212:
+                $mensaje_cancel = "Relación no valida o inexistente.";
+                break;
+            case 300:
+                $mensaje_cancel = "Usuario no válido.";
+                break;
+            case 301:
+                $mensaje_cancel = "XML mal formado.";
+                break;
+            case 302:
+                $mensaje_cancel = "Sello mal formado.";
+                break;
+            case 304:
+                $mensaje_cancel = "Certificado revocado o caduco.";
+                break;
+            case 305:
+                $mensaje_cancel = "Certificado inválido.";
+                break;
+            case 309:
+                $mensaje_cancel = "Certificado inválido.";
+                break;
+            case 310:
+                $mensaje_cancel = "CSD inválido.";
+                break;
+            case 311:
+                $mensaje_cancel = "Motivo inválido.";
+                break;
+            case 312:
+                $mensaje_cancel = "UUID no relacionado.";
+                break;
+        }
+
+        $actualizado = "";
+        if($status_uuid == 201 || $status_uuid == 202){
+            $consulta = "UPDATE `factura_carta` SET status_pago=:estado, cfdicancel=:cfdi WHERE idfactura_carta=:id;);";
+            $valores = array("id" => $idfactura,
+                "estado" => '3',
+                "cfdi" => $cfdi);
+            $actualizado = $this->consultas->execute($consulta, $valores);
+            $actualizado = "1$status_uuid - $mensaje_cancel";
+        } else {
+            $actualizado = "0$status_uuid - $mensaje_cancel";
+        }
+        return $actualizado;
+    }
+
+    public function getXMLImprimir($idfactura) {
+        $consultado = false;
+        $consulta = "SELECT dat.letra,dat.foliocarta, dat.uuid,dat.cfdistring,dat.cfdicancel,df.rfc FROM factura_carta dat INNER JOIN datos_facturacion df ON (dat.iddatosfacturacion=df.id_datos) WHERE dat.idfactura_carta=:id;";
+        $val = array("id" => $idfactura);
+        $consultado = $this->consultas->getResults($consulta, $val);
+        return $consultado;
     }
 }

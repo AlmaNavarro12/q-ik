@@ -1,6 +1,4 @@
 function filtrarCotizacion(pag = "") {
-    cargandoHide();
-    cargandoShow();
     var REF = $("#buscar-cotizacion").val();
     var numreg = $("#num-reg").val();
     $.ajax({
@@ -242,13 +240,13 @@ function setCamposProducto() {
     $("#producto").val('');
     $("#tipo").val('');
     $("#inventario").attr('hidden', true);
-    $("#clave-unidad-prod").val('');
+    $("#clave-unidad").val('');
     $("#descripcion").val('');
     $("#pcompra").val(0);
     $("#porganancia").val(0);
     $("#ganancia").val(0);
     $("#pventa").val(0);
-    $("#clave-fiscal-prod").val('');
+    $("#clave-fiscal").val('');
     $('#id-proveedor').val('');
     $("#imagen").val('');
     $('#muestraimagen').html("");
@@ -259,9 +257,9 @@ function insertarProductoCot() {
     var codproducto = $("#codigo-producto").val();
     var producto = $("#producto").val();
     var descripcion = $("#descripcion").val();
-    var clavefiscal = $("#clave-fiscal-prod").val();
+    var clavefiscal = $("#clave-fiscal").val();
     var tipo = $("#tipo").val();
-    var unidad = $("#clave-unidad-prod").val();
+    var unidad = $("#clave-unidad").val();
     var pcompra = $("#pcompra").val();
     var porcentaje = $("#porganancia").val();
     var ganancia = $("#ganancia").val();
@@ -302,7 +300,7 @@ function insertarProductoCot() {
     }
 }
 
-function agregarManoObra() {
+/*function agregarManoObra() {
     var idproducto = '0';
     var descripcion = $("#descripcion-mano").val();
     var clvfiscal = $("#clave-fiscal").val();
@@ -345,7 +343,7 @@ function agregarManoObra() {
             }
         });
     }
-}
+}*/
 
 function tablaProductosCot() {
     $.ajax({
@@ -560,6 +558,17 @@ function actualizarConceptoCotizacion() {
     }
 }
 
+function checkMetodopago() {
+    var idmetodopago = $("#id-metodo-pago").val();
+    if (idmetodopago == '2') {
+        $('#formapago22').prop('selected', true);
+        $("#id-forma-pago").prop('disabled', true);
+    } else {
+        $('#formapago22').removeAttr('selected');
+        $("#id-forma-pago").removeAttr('disabled');
+    }
+}
+
 function eliminar(idtemp, cantidad, idproducto) {
     alertify.confirm("¿Estás seguro que deseas eliminar este producto?", function () {
         $.ajax({
@@ -603,7 +612,7 @@ function agregarProducto(idproducto) {
     var idtraslados = traslados.join("<impuesto>");
     var idretencion = retenciones.join("<impuesto>");
 
-    if (isNumber(cantidad, "cantidad_" + idproducto) && isNumber(pventa, "pventa_" + idproducto)) {
+    if (isNumber(cantidad, "cantidad_" + idproducto) && isNumber(pventa, "pventa_" + idproducto) && isPorcentaje(descuento, "pordescuento_" + idproducto)) {
         $.ajax({
             url: "com.sine.enlace/enlacecotizacion.php",
             type: "POST",
@@ -697,13 +706,13 @@ function setValoresEditarProducto(datos, idtmp) {
     $("#producto").val(array[2]);
     $("#tipo").val(tipo);
     $("#cantidad").val(array[16]);
-    $("#clave-unidad-prod").val(array[3] + "-" + array[4]);
+    $("#clave-unidad").val(array[3] + "-" + array[4]);
     $("#descripcion").val(array[5]);
     $("#pcompra").val(array[6]);
     $("#porganancia").val(array[7])
     $("#ganancia").val(array[8]);
     $("#pventa").val(array[9]);
-    $("#clave-fiscal-prod").val(array[11] + "-" + array[12]);
+    $("#clave-fiscal").val(array[11] + "-" + array[12]);
     if (array[13] != '0') {
         loadOpcionesProveedor(array[13]);
     }
@@ -792,6 +801,40 @@ function actualizarProductoFactura(idproducto, idtmp) {
             }
         });
     }
+}
+
+
+function calcularImporte(idproducto) {
+    var cantidad = $("#cantidad_" + idproducto).val() || '0';
+    var precio = $("#pventa_" + idproducto).val() || '0';
+
+    var importe = parseFloat(cantidad) * parseFloat(precio);
+    $("#importe_" + idproducto).val(Math.floor(importe * 100) / 100);
+    calcularDescuento(idproducto);
+}
+
+function calcularDescuento(idproducto) {
+    var pordesc = $("#pordescuento_" + idproducto).val() || '0';
+    var importe = $("#importe_" + idproducto).val() || '0';
+    var descuento = parseFloat(importe) * (parseFloat(pordesc) / 100);
+    var subtotal = (parseFloat(importe) - parseFloat(descuento));
+    var traslados = 0;
+    var retencion = 0;
+
+    $.each($("input[name='chtraslado" + idproducto + "']:checked"), function () {
+        var tasa = $(this).val();
+        traslados += parseFloat(subtotal) * parseFloat(tasa);
+    });
+
+    $.each($("input[name='chretencion" + idproducto + "']:checked"), function () {
+        var tasa = $(this).val();
+        retencion += parseFloat(subtotal) * parseFloat(tasa);
+    });
+
+    var total = (parseFloat(subtotal) + parseFloat(traslados)) - parseFloat(retencion);
+
+    $("#descuento_" + idproducto).val(descuento);
+    $("#total_" + idproducto).val(Math.floor(total * 100) / 100);
 }
 
 function calcularImporteEditar() {
@@ -1185,6 +1228,493 @@ function enviarcotizacion(id_cotizacion) {
             }
         });
     }
+}
+
+function cobrarCotizacion(idcotizacion){
+    $('.list-element').removeClass("menu-active");
+    $('.marker').removeClass("marker-active");
+    $('#punto-venta').addClass("menu-active");
+    $('#punto-venta').children('div.marker').addClass("marker-active");
+
+    loadView('puntodeventa');
+    window.setTimeout("cobrarCotizacion(" + idcotizacion + ")", 500);
+    cargandoHide();
+}
+
+function exportarCotizacion(idcotizacion) {
+    cargandoHide();
+    cargandoShow();
+    $.ajax({
+        url: "com.sine.enlace/enlacecotizacion.php",
+        type: "POST",
+        data: {transaccion: "editarcotizacion", idcotizacion: idcotizacion},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 1000);
+            if (bandera == '0') {
+                alertify.error(res);
+                cargandoHide();
+            } else {
+                window.setTimeout("mandarFactura('" + datos + "')", 1000);
+            }
+        }
+    });
+}
+
+function mandarFactura(datosAux){
+    var array = datosAux.split("</tr>");
+    var idcotizacion = array[0];
+    var tag = array[25];
+
+    $.ajax({
+        url: "com.sine.enlace/enlacecotizacion.php",
+        type: "POST",
+        data: {transaccion: "validarcotizacion", idcotizacion: idcotizacion, tag:tag},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 1000);
+            if (bandera == '0') {
+                alertify.error(res);
+            } else {
+                $('.list-element').removeClass("menu-active");
+                $('.marker').removeClass("marker-active");
+                $('#factura-menu').addClass("menu-active");
+                $('#factura-menu').children('div.marker').addClass("marker-active");
+                loadView('factura');
+                window.setTimeout("setValoresExportarCotizacion('" + datosAux + "')", 1000);
+                window.setTimeout("exportarProducto('"+tag+"')", 900);
+                window.setTimeout("loadDatosFactura()", 800);
+            }
+            cargandoHide();
+        }
+    });
+}
+
+function exportarProducto(tag) {
+    $.ajax({
+        url: "com.sine.enlace/enlacecotizacion.php",
+        type: "POST",
+        data: {transaccion: "exportarproducto", tag: tag},
+        success: function (datos) {
+            console.log(datos);
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 1000);
+            if (bandera == '0') {
+                alertify.error(res);
+                cargandoHide();
+            } else {
+                tablaProductos();
+            }
+        }
+    });
+}
+
+function setValoresExportarCotizacion(datos) {
+    var array = datos.split("</tr>");
+    var idcotizacion = array[0];
+    var idcliente = array[5];
+    var idmetodo_pago = array[10];
+    var idmoneda = array[11];
+    var iduso_cfdi = array[12];
+    var idforma_pago = array[13];
+    var idtipo_comprobante = array[14];
+    var iddatos = array[15];
+    var contribuyente = array[16];
+    var tag = array[25];
+
+    $("#option-default-datos").val(iddatos);
+    $("#option-default-datos").text(contribuyente);
+    if (idcliente !== "0") loadCliente(idcliente);
+    if (idtipo_comprobante !== "0") loadOpcionesComprobante("tipo-comprobante", idtipo_comprobante);
+    if (idforma_pago !== "0") loadOpcionesFormaPago2(idforma_pago);
+    if (idmetodo_pago !== "0") loadOpcionesMetodoPago('id-metodo-pago', idmetodo_pago);
+    if (iduso_cfdi !== "0") loadOpcionesUsoCFDI('id-uso', iduso_cfdi);
+
+    if (idmoneda !== "0") {
+        loadOpcionesMoneda('id-moneda', idmoneda);
+        getTipoCambioSinTag(idmoneda);
+    }
+
+    $("#form-factura").append("<input type='hidden' id='idcotizacion' name='idcotizacion' value='" + idcotizacion + "'/>")
+    loadDatosFactura();
+}
+
+function actualizarPrecios(idcotizacion) {
+    alertify.confirm("Esto actualizará los precios de todos los productos en la cotización ¿Desea continuar?", function () {
+        cargandoHide();
+        cargandoShow();
+        $.ajax({
+            url: "com.sine.enlace/enlacecotizacion.php",
+            type: "POST",
+            data: {transaccion: "actualizarprecios", idcotizacion: idcotizacion},
+            success: function (datos) {
+                var texto = datos.toString();
+                var bandera = texto.substring(0, 1);
+                var res = texto.substring(1, 1000);
+                if (bandera == '0') {
+                    alertify.error(res);
+                } else {
+                    alertify.success('Precios actualizados correctamente.');
+                    loadView('listacotizacion');
+                }
+                cargandoHide();
+            }
+        });
+    }).set({title: "Q-ik"});
+}
+
+function getExtension(filename) {
+    return filename.split('.').pop();
+  }
+
+function cargarImgAnticipo() {
+    cargandoHide();
+    cargandoShow();
+    var formData = new FormData();
+    var imgInput = $("#imagen")[0].files[0];
+    var rutaAnticipos = "temporal/anticipos/";
+    var img = $("#imagen").val();
+
+    formData.append("imagen", imgInput);
+    formData.append("ruta_personalizada", rutaAnticipos);
+
+    var extension = getExtension(img);
+    console.log(extension);
+    if(extension == 'jpg' || extension == 'jpeg' || extension == 'png' || extension == 'gif' || extension == 'jfif'){
+        enlace = "cargarimg.php";
+    } else if(extension =="pdf") {
+        enlace = "cargarpdf.php";
+    } else if(extension == "docx" || extension =="xlsx" || extension=="pptx"){
+        enlace = "cargaroffice.php";
+    } else if(extension == "rar" || extension == "zip"){
+        enlace = "cargarcomprimidos.php";
+    }
+    var img = $("#imagen").val();
+    if (isnEmpty(img, 'imagen')) {
+        $.ajax({
+            url: 'com.sine.enlace/' + enlace,
+            type: "POST",
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function (datos) {
+                var array = datos.split("<corte>");
+                var view = array[0];
+                var fn = array[1];
+                var archivo = array[2];
+                $("#btn-anticipo").html(view);
+                $("#filename").val(fn);
+                $("#imagen").val('');
+                cargandoHide();
+            }
+        });
+    }
+}
+
+function cargarDatosAnticipo(idcotizacion) {
+    $.ajax({
+        url: "com.sine.enlace/enlacecotizacion.php",
+        type: "POST",
+        data: {transaccion: "datosanticipo", idcotizacion: idcotizacion},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 1000);
+            if (bandera == '0') {
+                alertify.error(res);
+            } else {
+                var array = datos.split("</tr>");
+
+                $("#fecha-creacion").val(array[1]);
+                $("#id-cotizacion").val(idcotizacion);
+                $("#total-cotizacion").val(array[2]);
+                $("#monto-anticipo").val(array[3]);
+                $("#restante-anticipo").val(array[4]);
+                $("#mensaje-anticipo").val(array[6]);
+                $("#img-anticipo").val('');
+                $("#btn-anticipo").html("");
+            }
+        }
+    });
+}
+
+function transcribirAnticipo() {
+    var idcot = $("#id-cotizacion").val();
+    var cant = $("#monto-anticipo").val() || '0';
+
+    calcularRestante();
+    $.ajax({
+        url: 'com.sine.enlace/enlacecotizacion.php',
+        type: "POST",
+        data: {transaccion: "transcribir", idcot: idcot, cant: cant},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 1000);
+            if (bandera == '0') {
+                alertify.error(res);
+                cargandoHide();
+            } else {
+                $("#mensaje-anticipo").val(datos);
+            }
+        }
+    });
+}
+
+function calcularRestante() {
+    var total = $("#total-cotizacion").val() || '0';
+    var monto = $("#monto-anticipo").val() || '0';
+
+    var restante = parseFloat(total) - parseFloat(monto);
+    $("#restante-anticipo").val(Math.floor(restante * 100) / 100);
+}
+
+function insertarAnticipo(idanticipo = null) {
+    var idcotizacion = $("#id-cotizacion").val();
+    var anticipo = $("#monto-anticipo").val();
+    var restante = $("#restante-anticipo").val();
+    var autorizacion = $("#no-autorizacion").val();
+    var fecha = $("#fecha-anticipo").val();
+    var img = $("#filename").val();
+    var mensaje = $("#mensaje-anticipo").val();
+    var emision = $("#lugar-emision").val();
+
+    if (isnEmpty(anticipo, "monto-anticipo") && isnEmpty(mensaje, "mensaje-anticipo")) {
+        cargandoShow();
+        var url = 'com.sine.enlace/enlacecotizacion.php';
+        var transaccion = idanticipo ? "actualizaranticipo" : "insertaranticipo";
+
+        var data = {
+            transaccion: transaccion,
+            idcotizacion: idcotizacion,
+            anticipo: anticipo,
+            restante: restante,
+            autorizacion: autorizacion,
+            fecha: fecha,
+            img: img,
+            mensaje: mensaje,
+            emision: emision
+        };
+
+        if (idanticipo) {
+            data.idanticipo = idanticipo;
+        }
+
+        $.ajax({
+            url: url,
+            type: "POST",
+            data: data,
+            success: function (datos) {
+                var texto = datos.toString();
+                var bandera = texto.substring(0, 1);
+                var res = texto.substring(1, 1000);
+                if (bandera == '0') {
+                    alertify.error(res);
+                    cargandoHide();
+                } else {
+                    var mensaje = idanticipo ? 'Anticipo actualizado.' : 'Anticipo registrado.';
+                    alertify.success(mensaje);
+                    $("#lista-anticipo").modal('hide');
+                    $("#anticipos").modal('hide');
+                    window.setTimeout("loadView('listacotizacion')", 600);
+                    window.setTimeout("cargandoHide()", 650);
+                }
+            }
+        });
+    }
+}
 
 
+function loadListaAnticipos(idcotizacion) {
+    $.ajax({
+        url: "com.sine.enlace/enlacecotizacion.php",
+        type: "POST",
+        data: {transaccion: "listaanticipos", idcotizacion: idcotizacion},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 1000);
+            if (bandera == '0') {
+                alertify.error(res);
+            } else {
+                $("#body-lista-anticipo").html(datos);
+            }
+            cargandoHide();
+        }
+    });
+}
+
+
+function editarAnticipo(idanticipo) {
+    $.ajax({
+        url: "com.sine.enlace/enlacecotizacion.php",
+        type: "POST",
+        data: {transaccion: "editaranticipo", idanticipo: idanticipo},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 1000);
+            if (bandera == '0') {
+                alertify.error(res);
+            } else {
+                $("#lista-anticipo").modal('hide');
+                window.setTimeout("setValoresAnticipo('" + datos + "')", 500);
+            }
+        }
+    });
+}
+
+function setValoresAnticipo(datos) {
+    $("#anticipos").modal('show');
+    $("#btn-anticipo").html("");
+
+    var array = datos.split("</tr>");
+    var idanticipo = array[0];
+    var img = array[8];
+    var imgtype = array[9];
+    var b64 = array[12];
+
+    $("#fecha-creacion").val(array[1]);
+    $("#id-cotizacion").val(array[2]);
+    $("#total-cotizacion").val(array[5]);
+    $("#monto-anticipo").val(array[3]);
+    $("#restante-anticipo").val(array[4]);
+    $("#no-autorizacion").val(array[6]);
+    $("#fecha-anticipo").val(array[7]);
+    $("#mensaje-anticipo").val(array[10]);
+    $("#lugar-emision").val(array[11]);
+    $("#filename").val(img);
+    $("#imgactualizar").val(img);
+    if (img != "") {
+        if (imgtype == 'pdf') {
+            $("#btn-anticipo").html("<a onclick='displayDocAnticipo();' class='btn btn-sm button-file col-12' title='Ver archivo'> Archivo <span class='fas fa-file'></span></a>");
+        } else {
+            $("#btn-anticipo").html("<img src='" + b64 + "' width='150px'>");
+        }
+    }
+    $("#btn-form-anticipo").attr("onclick", "insertarAnticipo(" + idanticipo + ");");
+}
+
+function displayDocAnticipo(fn = "") {
+    cargandoHide();
+    cargandoShow();
+    var archivo = (fn == "") ? $("#filename").val() : fn;
+    $("#anticipos").modal('hide');
+    $("#archivosotros").modal('show');
+    var ruta = "temporal/anticipos/" + archivo;
+    var extension = getExtension(archivo);
+    console.log("Extension " + extension);
+    if (extension === "pdf") {
+        $("#archivo-visualizar").html("<embed src='" + ruta + "' class='col-md-12' style='height: 500px;' type='application/pdf'/>");
+    } else {
+        $("#archivo-visualizar").html("<div class='py-5 px-3 text-center'><p class='fw-semibold text-muted'>No se puede visualizar el archivo en el navegador. </p><a class='text-decoration-none fw-semibold button-file' href='" + ruta + "' download='" + archivo + "'>Descargar archivo <span class='fas fa-file'></span></a></div>");
+        cargandoHide();
+        return;
+    }
+    cargandoHide();
+}
+
+
+function llenaDescripcion() {
+    var producto = $("#producto").val();
+    $("#descripcion").val(producto);
+}
+
+function addinventario() {
+    var tipo = $("#tipo").val();
+    if (tipo == '1') {
+        $("#inventarios").show('slow');
+        if ($("#chinventario").prop('checked')) {
+            $("#cantidad").removeAttr('disabled');
+        } else {
+            $("#cantidad").attr('disabled', true);
+            $("#cantidad").val('0');
+        }
+        $("#clave-unidad").val('');
+    } else {
+        $("#chinventario").removeAttr('checked');
+        $("#inventarios").hide('slow');
+        $("#cantidad").attr('disabled', true);
+        $("#cantidad").val('0');
+        $("#clave-unidad").val('E48-Unidad de servicio');
+    }
+}
+
+function eliminarAnticipo(idanticipo, idcotizacion) {
+    alertify.confirm("¿Estás seguro que deseas eliminar este anticipo?", function () {
+        cargandoHide();
+        cargandoShow();
+        $.ajax({
+            url: 'com.sine.enlace/enlacecotizacion.php',
+            type: "POST",
+            data: {transaccion: "eliminaranticipo", idanticipo: idanticipo, idcotizacion: idcotizacion},
+            success: function (datos) {
+                var texto = datos.toString();
+                var bandera = texto.substring(0, 1);
+                var res = texto.substring(1, 1000);
+                if (bandera == '0') {
+                    alertify.error(res);
+                    cargandoHide();
+                } else {
+                    $("#lista-anticipo").modal('hide');
+                    window.setTimeout("loadView('listacotizacion')", 400);
+                    window.setTimeout("cargandoHide()", 500);
+                }
+            }
+        });
+    }).set({title: "Q-ik"});
+}
+
+function imprimirAnticipo(idanticipo) {
+    cargandoHide();
+    cargandoShow();
+    VentanaCentrada('./com.sine.imprimir/imprimiranticipo.php?anticipo=' + idanticipo, 'Anticipo', '', '1024', '768', 'true');
+    cargandoHide();
+}
+
+function verImagenAnticipo(aid) {
+    cargandoHide();
+    cargandoShow();
+    $.ajax({
+        url: 'com.sine.imprimir/img.php',
+        type: "POST",
+        data: {transaccion: "img", aid: aid},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 1000);
+            if (bandera == '0') {
+                alertify.error(res);
+                cargandoHide();
+            } else {
+                var array = datos.split("<type>");
+                var t = array[0];
+                var data = array[1];
+                if (t == 'd') {
+                    var newTab = window.open('com.sine.imprimir/img.php?aid=' + aid);
+                } else {
+                    $('#fotito').html("");
+                    $("#lista-anticipo").modal("hide");
+                    $("#archivos").modal('show');
+                    $('#fotito').html(data);
+                }
+                cargandoHide();
+            }
+        }
+    });
+}
+
+function cerrarArchivos(){
+    $('#fotito').html("");
+    $("#archivos").modal('hide');
+    $("#lista-anticipo").modal("show");
+}
+
+function cerrarArchivosOtros(){
+    $('#archivo-visualizar').html("");
+    $("#archivosotros").modal('hide');
+    $("#anticipos").modal("show");
 }

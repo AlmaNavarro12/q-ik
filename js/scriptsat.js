@@ -104,14 +104,14 @@ function getTipoCambio() {
     });
 }
 
-function getTipoCambioSinTag() {
+function getTipoCambioSinTag(idmoneda = "") {
     cargandoHide();
     cargandoShow();
-    var idmoneda = $("#id-moneda").val();
+    var moneda = (idmoneda == "") ? $("#id-moneda").val() : idmoneda;
     $.ajax({
         url: rutaPrincipal+ 'com.sine.enlace/enlaceMonedas.php',
         type: 'POST',
-        data: { transaccion: 'gettipocambio', idmoneda: idmoneda },
+        data: { transaccion: 'gettipocambio', idmoneda: moneda },
         success: function (datos) {
             var texto = datos.toString();
             var bandera = texto.substring(0, 1);
@@ -119,7 +119,7 @@ function getTipoCambioSinTag() {
             if (bandera == 0) {
                 alertify.error(res);
             } else {
-                if (idmoneda != "1") {
+                if (moneda != "1") {
                     $("#tipo-cambio").removeAttr('disabled');
                 } else {
                     $("#tipo-cambio").attr('disabled', true);
@@ -440,16 +440,50 @@ function aucompletarPermiso(){
 }
 
 //----------------------------------TIPO AUTOTRANSPORTE
-function aucompletarConfigTransporte() {
+function aucompletarConfigTransporte(carta = "") {
     $('#conf-transporte').autocomplete({
         source: rutaPrincipal + "com.sine.enlace/enlaceAutotransporte.php?transaccion=autocompleta",
         select: function (event, ui) {
             var a = ui.item.value;
             var id = ui.item.id;
+
+            if(carta ==1){
+                var remolque = ui.item.remolque;
+                checarRemolque(remolque);
+            }
         }
     });
 }
 
+function checarRemolque(remolque) {
+    if (remolque === "1") {
+        $("#trans-remolque").show('slow');
+        changeText("#requiere-remolque", "* Es necesario añadir como mínimo un remolque.");
+    } else if (remolque === "0, 1") {
+        $("#trans-remolque").show('slow');
+        changeText("#requiere-remolque", "* Se puede o no añadir datos de remolques (Dejar vacíos si no los requieres).");
+    } else {
+        $("#trans-remolque").hide('slow');
+        changeText("#requiere-remolque", "");
+    }
+}
+
+function loadRemolques(){
+    var trans = $("#conf-transporte").val();
+    var remolque = trans.split("-");
+    var c_remolque = remolque[0];
+
+    $.ajax({
+        data: { transaccion: 'getRemolque', c_remolque:c_remolque},
+        url: rutaPrincipal + 'com.sine.enlace/enlaceAutotransporte.php',
+        type: 'POST',
+        dataType: 'JSON',
+        success: function (res) {
+            console.log(res);
+            checarRemolque(res);
+        }
+    });
+}
 //---------------------------------TIPO REMOLQUE
 function aucompletarTipoRemolque(number = "") {
     $('#tipo-remolque' + number).autocomplete({

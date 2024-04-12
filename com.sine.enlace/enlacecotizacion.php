@@ -88,6 +88,10 @@ if (isset($_POST['transaccion'])) {
             $eliminado = $cc->eliminarAnticipo($_POST['idanticipo'], $_POST['idcotizacion']);
             echo $eliminado ? "Anticipo eliminado correctamente. " : "0No se ha eliminado el dato.";
             break;
+        case 'transcribir':
+            $datos = $cc->transcribirCantidad($_POST['idcot'], $_POST['cant']);
+            echo $datos != "" ? $datos : "0Error al transcribir el mensaje.";
+            break;
         case 'editarconcepto':
             $datos = $cc->getDatosTMP($_POST['idtmp']);
             echo $datos != "" ? $datos : "0No se han encontrado datos.";
@@ -141,6 +145,23 @@ if (isset($_POST['transaccion'])) {
             $datos = $cc->checkConcepto($co);
             echo $datos != "" ? $datos : "0No se ha actualizado el concepto.";
             break;
+        //-----------------------------------------COBRAR
+        case 'cobrar':
+            $datos = $cc->cobrarCotizacion($_POST['idcotizacion'], session_id());
+            echo $datos != "" ? $datos : "0No se han encontrado productos a cobrar.";
+            break;
+        case 'validarcotizacion':
+            $datos = $cc->validarExistenciaFacturaCotizacion($_POST['idcotizacion'], $_POST['tag'], session_id());
+            echo $datos != "" ? $datos : "0No se han podido exportar la cotización.";
+            break;
+        case 'exportarproducto':
+            $datos = $cc->exportarprodCotizacion($_POST['tag'], session_id());
+            echo $datos != "" ? $datos : "0No se han encontrado productos a exportar.";
+            break;
+        case 'actualizarprecios':
+            $actualizar = $cc->actualizarPrecios($_POST['idcotizacion']);
+            echo $actualizar != "" ? $actualizar : "0No se han encontrado datos.";
+            break;
     }
 }
 
@@ -186,8 +207,8 @@ function obtenerDatosTmpCotizacion()
     $t->setSessionid(session_id());
     $t->setIdproductotmp($_POST['idproducto'] ?? '');
     $t->setDescripciontmp($_POST['descripcion']);
-    $t->setClvfiscal($_POST['clvfiscal']);
-    $t->setClvunidad($_POST['clvunidad']);
+    $t->setClvfiscal($_POST['clvfiscal'] ?? '');
+    $t->setClvunidad($_POST['clvunidad'] ?? '');
     $t->setCantidadtmp($_POST['cantidad']);
     $t->setPreciotmp($_POST['pventa']);
     $t->setImportetmp($_POST['importe']);

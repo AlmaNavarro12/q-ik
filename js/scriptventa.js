@@ -760,6 +760,24 @@ function guardarVenta(p, nprod) {
     $('#btn-form-reg').prop('disabled', false);
 }
 
+function ResetDescuento(){
+
+    var total = $('#total-original').val();
+    var descuento = $('#input-descuento-original').val();
+
+    $('#label-total').html(total);
+    $('#total-cobrar').val(total);
+    $('#label-descuento').html("$ "+descuento);
+    $('#input-descuento').val(descuento);
+    $('#PercentDescuento').val(5);
+
+    $('#Spndescuento').removeClass('far fa-square');
+    $('#Spndescuento').addClass('far fa-check-square ');
+    $('#groupDesc').hide('slow');
+
+    calcularCambio();
+}
+
 function filtrarVentas(pag = "") {
     cargandoHide();
     cargandoShow();
@@ -1086,7 +1104,23 @@ function mostrarDatosVenta(datos) {
     $("#btn-agregar-productos").attr('disabled', true);
 }
 
-function cobrarCotizacion(sid){
+function cobrarCotizacion(idcotizacion){
+    cargandoHide();
+    cargandoShow();
+    $.ajax({
+        url: "com.sine.enlace/enlacecotizacion.php",
+        type: "POST",
+        data: {transaccion: "cobrar", idcotizacion: idcotizacion},
+        success: function (datos) {
+            if(datos != null){
+                window.setTimeout("asignarTag('"+datos+"')", 500);
+            }
+        }
+    });
+    cargandoHide();
+}
+
+function asignarTag(sid){
     cargandoHide();
     cargandoShow();
     var tab = $("#tabs").find('.sub-tab-active').attr("data-tab");

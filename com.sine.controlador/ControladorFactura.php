@@ -1473,11 +1473,16 @@ class ControladorFactura
     private function actualizarCotizacion($idcot, $idfactura)
     {
         $consultado = false;
-
-        $consulta = "UPDATE `datos_cotizacion` SET expfactura=:exp WHERE iddatos_cotizacion=:id;";
+        $hoy = date("Y-m-d");
+        $hora = date("H:i:s");
+        $sessionid = $_SESSION[sha1("idusuario")];
+        $consulta = "UPDATE `datos_cotizacion` SET expfactura=:exp, sessionexporto=:sid, fecha_exportar=:fecha, hora_exportar=:hora WHERE iddatos_cotizacion=:id;";
         $valores = array(
             "id" => $idcot,
-            "exp" => $idfactura
+            "exp" => $idfactura,
+            "sid" => $sessionid,
+            "fecha" => $hoy,
+            "hora" => $hora
         );
         $consultado = $this->consultas->getResults($consulta, $valores);
         return $consultado;
@@ -1764,8 +1769,44 @@ class ControladorFactura
             $razonsocial = $actual['razon_social'];
             $regimen = $actual['regimen_cliente'];
             $codpostal = $actual['codigo_postal'];
+            $calle = $actual['calle'];
+                $numext = $actual['numero_exterior'];
+                $localidad = $actual['localidad'];
+                $idmunicipio = $actual['idmunicipio'];
+                $idestadodir = $actual['idestado'];
+                $nombremunicipio = $actual['nombre_municipio'];
+                $nombreestado = $actual['nombre_estado'];
 
-            $datos = "$nombre</tr>$rfc</tr>$razonsocial</tr>$regimen</tr>$codpostal";
+                $next = "";
+                if ($numext != "") {
+                    $next = " #$numext";
+                }
+
+                $col = "";
+                if ($localidad != "") {
+                    $col = ", Colonia: $localidad";
+                }
+
+                $cp = "";
+                if ($codpostal != "" && $codpostal != "0") {
+                    $cp = " CP. $codpostal";
+                }
+
+                $municipio = "";
+                if ($idmunicipio != "0") {
+                    $muni = $nombremunicipio;
+                    $municipio = ", $muni";
+                }
+
+                $estadodir = "";
+                if ($idestadodir != "0") {
+                    $est = $nombreestado;
+                    $estadodir = ", $est";
+                }
+
+                $direccion = $calle . $next . $col . $cp . $municipio . $estadodir;
+
+            $datos = "$nombre</tr>$rfc</tr>$razonsocial</tr>$regimen</tr>$codpostal</tr>$direccion";
         }
         return $datos;
     }
@@ -3058,7 +3099,7 @@ class ControladorFactura
         $datos = "<thead>
                     <tr>
                         <th class='col-md-1'>CÓdigo </th>
-                        <th class='col-md-6'>Producto/Servicio   </th>
+                        <th class='col-md-3'>Producto/Servicio   </th>
                         <th class='col-md-1'>Cantidad </th>
                         <th class='col-md-1'>P.Venta </th>
                         <th class='col-md-1'>Importe </th>

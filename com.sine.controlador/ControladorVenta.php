@@ -546,7 +546,6 @@ class ControladorVenta
             </div>
         </li>";
         }
-
         return $opciones;
     }
 
@@ -2743,7 +2742,6 @@ class ControladorVenta
                     "sid" => $sid
                 );
                 $datos = $this->consultas->execute($consulta, $val);
-                echo "inserta tmp " . $datos;
             }
         
         return $datos;

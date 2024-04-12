@@ -327,7 +327,7 @@ function setValoresAsignarPermisos(datos) {
         "pago", "crearpago", "editarpago", "eliminarpago", "listapago", "timbrarpago", //Timbrar
         "nomina", "listaempleado", "crearempleado", "editarempleado", "eliminarempleado", "listanomina", "crearnomina", "editarnomina", "eliminarnomina", "timbrarnomina", //Timbrar
         "cartaporte", "listaubicacion", "crearubicacion", "editarubicacion", "eliminarubicacion", "listatransporte", "creartransporte", "editartransporte", "eliminartransporte", "listaremolque", "crearremolque", "editarremolque", "eliminarremolque", "listaoperador", "crearoperador", "editaroperador", "eliminaroperador", "listacarta", "crearcarta", "editarcarta", "eliminarcarta", "timbrarcarta", //Timbrar
-        "cotizacion", "crearcotizacion", "editarcotizacion", "eliminarcotizacion", "listacotizacion","anticipo", 
+        "cotizacion", "crearcotizacion", "editarcotizacion", "eliminarcotizacion", "listacotizacion","anticipo", "exportarfactura",//Exportar a factura 
         "cliente", "crearcliente", "editarcliente", "eliminarcliente", "listacliente",
         "comunicado", "crearcomunicado", "editarcomunicado", "eliminarcomunicado", "listacomunicado",
         "producto", "crearproducto", "editarproducto", "eliminarproducto", "listaproducto",
@@ -380,7 +380,7 @@ function actualizarPermisos(idusuario) {
         pago: ["crearpago", "editarpago", "eliminarpago", "listapago", "timbrarpago"],
         nomina: ["listaempleado", "crearempleado", "editarempleado", "eliminarempleado", "listanomina", "crearnomina", "editarnomina", "eliminarnomina", "timbrarnomina"],
         cartaporte: ["listaubicacion", "crearubicacion", "editarubicacion", "eliminarubicacion", "listatransporte", "creartransporte", "editartransporte", "eliminartransporte", "listaremolque", "crearremolque", "editarremolque", "eliminarremolque", "listaoperador", "crearoperador", "editaroperador", "eliminaroperador", "listacarta", "crearcarta", "editarcarta", "eliminarcarta", "timbrarcarta"],
-        cotizacion: ["crearcotizacion", "editarcotizacion", "eliminarcotizacion", "listacotizacion", "anticipo"],
+        cotizacion: ["crearcotizacion", "editarcotizacion", "eliminarcotizacion", "listacotizacion", "anticipo", "exportarfactura"],
         cliente: ["crearcliente", "editarcliente", "eliminarcliente", "listacliente"],
         comunicado: ["crearcomunicado", "editarcomunicado", "eliminarcomunicado", "listacomunicado"],
         producto: ["crearproducto", "editarproducto", "eliminarproducto", "listaproducto"],

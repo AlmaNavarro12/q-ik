@@ -23,7 +23,7 @@
             <div class="col-md-6 py-2">
                 <label class="label-form text-right" for="num-permiso">N&uacute;mero permiso </label> <label class="mark-required text-danger fw-bold">*</label>
                 <div class="form-group">
-                    <input type="text" class="form-control input-form" id="num-permiso" placeholder="N&uacute;mero de permiso otorgado por la SCT" oninput="validarNum(this)" />
+                    <input type="text" class="form-control input-form" id="num-permiso" placeholder="N&uacute;mero de permiso otorgado por la SCT" oninput="validarLetNum(this)" />
                     <div id="num-permiso-errors"></div>
                 </div>
             </div>
@@ -55,7 +55,7 @@
             <div class="col-md-6 py-2">
                 <label class="label-form text-right" for="placa-vehiculo">Placa veh&iacute;culo</label> <label class="mark-required text-danger fw-bold">*</label>
                 <div class="form-group">
-                    <input type="text" class="form-control input-form" id="placa-vehiculo" placeholder="Placa del veh&iacute;culo (sin espacios ni guiones)" />
+                    <input type="text" class="form-control input-form" id="placa-vehiculo" placeholder="Placa del veh&iacute;culo (sin espacios ni guiones)" oninput="validarLetNum(this);"/>
                     <div id="placa-vehiculo-errors"></div>
                 </div>
             </div>

@@ -1721,3 +1721,9 @@ a.state-link{
     max-height: 480px;
     max-width: 100%;
 }
+
+#btn-anticipo img {
+    height: 200px;
+    width: auto;
+    max-width: 100%;
+}

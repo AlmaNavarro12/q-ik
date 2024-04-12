@@ -28,7 +28,7 @@ if (!empty($_FILES)) {
                 $tmpnombre = $ranstr . $fecha . '_' . $idusuario . $sessionid . '.' . $extension; 
                 //$insertar = $ci->insertarImg($nombre, $tmpnombre, $extension, $sessionid); 
                 move_uploaded_file($file["tmp_name"], "../temporal/tmp/" . $tmpnombre); 
-                echo $nombre; 
+                echo "<a onclick=\"displayDocAnticipo('$tmpnombre')\"; class='btn btn-sm button-file col-12' title='Ver archivo'> Archivo <span class='fas fa-file'></span></a><corte>$tmpnombre";
             } else {
                 echo 'Archivo comprimido no válido<br>'; 
             }

@@ -118,7 +118,7 @@
                         </div>
                         <div class="col-md-4 py-2 form-group">
                             <label class="label-form text-right" for="producto">Nombre</label> <label class="mark-required text-danger fw-bold">*</label>
-                            <input class="form-control text-center input-form" id="producto" name="producto" placeholder="Producto" type="text" />
+                            <input class="form-control text-center input-form" id="producto" name="producto" onkeyup="llenaDescripcion()" placeholder="Producto" type="text" />
                             <div id="producto-errors">
                             </div>
                         </div>

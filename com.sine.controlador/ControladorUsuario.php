@@ -11,7 +11,7 @@ class ControladorUsuario
         "pago", "crearpago", "editarpago", "eliminarpago", "listapago", "timbrarpago", //Timbrar
         "nomina", "listaempleado", "crearempleado", "editarempleado", "eliminarempleado", "listanomina", "crearnomina", "editarnomina", "eliminarnomina", "timbrarnomina", //Timbrar
         "cartaporte", "listaubicacion", "crearubicacion", "editarubicacion", "eliminarubicacion", "listatransporte", "creartransporte", "editartransporte", "eliminartransporte", "listaremolque", "crearremolque", "editarremolque", "eliminarremolque", "listaoperador", "crearoperador", "editaroperador", "eliminaroperador", "listacarta", "crearcarta", "editarcarta", "eliminarcarta", "timbrarcarta", //Timbrar
-        "cotizacion", "crearcotizacion", "editarcotizacion", "eliminarcotizacion", "listacotizacion","anticipo", 
+        "cotizacion", "crearcotizacion", "editarcotizacion", "eliminarcotizacion", "listacotizacion","anticipo", "exportarfactura", 
         "cliente", "crearcliente", "editarcliente", "eliminarcliente", "listacliente",
         "comunicado", "crearcomunicado", "editarcomunicado", "eliminarcomunicado", "listacomunicado", 
         "producto", "crearproducto", "editarproducto", "eliminarproducto", "listaproducto",
@@ -611,7 +611,7 @@ class ControladorUsuario
             $idusuario = $usuarioactual['idusuario'];
             $nombreusuario = $usuarioactual['nombre'] . ' ' . $usuarioactual['apellido_paterno'] . ' ' . $usuarioactual['apellido_materno'];
 
-            $datos = "$idusuario</tr>$nombreusuario</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>1</tr>$usuariologin";
+            $datos = "$idusuario</tr>$nombreusuario</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>1</tr>$usuariologin";
             break;
         }
         return $datos;

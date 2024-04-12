@@ -142,7 +142,7 @@
                 </div>
                 <div class="row mt-3 mb-5">
                     <div class="col-md-12 text-end" id="btn">
-                        <button class="button-modal" onclick="cancelarTimbre()" id="btn-cancelar">Cancelar timbre <span class="glyphicon glyphicon-bell"></span></button>
+                        <button class="button-modal" onclick="cancelarTimbre()" id="btn-cancelar">Cancelar timbre <span class="fas fa-bell"></span></button>
                     </div>	
                 </div>
             </div>
@@ -161,28 +161,28 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div class="row">
-                    <label class="label-sub" for="cod-status">Código estado:</label>
-                    <label class="label-form" id="cod-status"></label>
+            <div class="row">
+                    <span class="label-sub py-0 my-0" for="cod-status">Código de estado: </span>
+                    <span class="label-form" id="cod-status"></span>
                 </div>
                 
                 <div class="row">
-                    <label class="label-sub" for="estado-cfdi">Estado:</label>
-                    <label class="label-form" id="estado-cfdi"></label>
+                    <span class="label-sub py-0 my-0 mt-3" for="estado-cfdi">Estado: </span>
+                    <span class="label-form" id="estado-cfdi"></span>
                 </div>
                 
                 <div class="row">
-                    <label class="label-sub" for="cfdi-cancelable">Cancelable:</label>
-                    <label class="label-form" id="cfdi-cancelable"></label>
+                    <span class="label-sub py-0 my-0 mt-3" for="cfdi-cancelable">Cancelable: </span>
+                    <span class="label-form" id="cfdi-cancelable"></span>
                 </div>
                 
                 <div class="row">
-                    <label class="label-sub" for="estado-cancelacion">Estado cancelación:</label>
-                    <label class="label-form" id="estado-cancelacion"></label>
+                    <span class="label-sub py-0 my-0 mt-3" for="estado-cancelacion">Estado cancelación: </span>
+                    <span class="label-form" id="estado-cancelacion"></span>
                 </div>
                 
                 <div class="row">
-                    <div class="col-md-12 text-end" id="div-reset">
+                    <div class="col-md-12 text-right" id="div-reset">
                     </div>	
                 </div>
             </div>

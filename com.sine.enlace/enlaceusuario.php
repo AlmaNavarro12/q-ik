@@ -137,6 +137,8 @@ function obtenerDatosPermisos()
     $p->setEliminarcot($_POST['eliminarcotizacion']);
     $p->setListacotizacion($_POST['listacotizacion']);
     $p->setAnticipo($_POST['anticipo']);
+    $p->setExportarFactura($_POST['exportarfactura']);
+
 
     $p->setCliente($_POST['cliente']);
     $p->setCrearcliente($_POST['crearcliente']);

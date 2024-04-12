@@ -85,7 +85,7 @@ include("buscarProductos.php");
                 </div>
             </div>
         </div>
-        <div class="row mt-3">
+        <div class="row mt-3 mb-3">
             <div class="col-md-12 d-flex justify-content-end mb-2">
                 <label class="fw-bold text-danger small">* Campo obligatorio</label>
             </div>
@@ -315,7 +315,7 @@ include("buscarProductos.php");
             </div>
             <div class="col-md-8 text-end" id="btnprod">
                 <button id="btn-nuevo-producto" type="button" class="button-modal" data-bs-toggle="modal" data-bs-target="#nuevo-producto" onclick="limpiarCampos(); setCamposProducto();">
-                    <span class="fas fa-plus"></span> Nuevo producto
+                    <span class="fas fa-plus"></span> Nuevo producto / servicio
                 </button>
                 <button id="btn-agregar-productos" type="button" class="button-modal" data-bs-toggle="modal" data-bs-target="#myModal">
                     Agregar 
@@ -339,7 +339,7 @@ include("buscarProductos.php");
     <div class="div-form p-5 border border-secondary-subtle" id="div-carta" style="display: none;">
         <div class="row not-timbre">
         </div>
-        <div class="row">
+        <div class="row mb-3">
             <div class="col-md-12 d-flex justify-content-end mb-2">
                 <label class="fw-bold text-danger small">* Campo obligatorio</label>
             </div>
@@ -546,7 +546,7 @@ include("buscarProductos.php");
                 <div class="col-md-4 py-2">
                     <label class="label-form text-right" for="conf-transporte">Tipo autotransporte </label> <label class="mark-required text-danger fw-bold">*</label>
                     <div class="form-group">
-                        <input type="text" class="form-control input-form" id="conf-transporte" placeholder="Clave tipo de vehículo" oninput="aucompletarConfigTransporte();" />
+                        <input type="text" class="form-control input-form" id="conf-transporte" placeholder="Clave tipo de vehículo" oninput="aucompletarConfigTransporte(1);" />
                         <div id="calle-destino-errors"></div>
                     </div>
                 </div>
@@ -560,7 +560,7 @@ include("buscarProductos.php");
                 <div class="col-md-4 py-2">
                     <label class="label-form text-right" for="placa-vehiculo">Placa vehículo</label> <label class="mark-required text-danger fw-bold">*</label>
                     <div class="form-group">
-                        <input type="text" class="form-control input-form" id="placa-vehiculo" placeholder="Placa del vehículo (sin espacios ni guíones)" onblur="checkVehiculo();" />
+                        <input type="text" class="form-control input-form" id="placa-vehiculo" placeholder="Placa del vehículo (sin espacios ni guíones)" onblur="checkVehiculo();" oninput="validarPlacas(this);" />
                         <div id="placa-vehiculo-errors"></div>
                     </div>
                 </div>
@@ -618,11 +618,17 @@ include("buscarProductos.php");
                     </div>
                 </div>
             </div>
+            <div id="trans-remolque" style="display: none;">
             <div class="row mt-3">
                 <div class="col-md-12">
                     <label class="label-sub">Remolques</label>
                 </div>
             </div>
+            <div class="row mb-3">
+            <div class="col-md-12 d-flex justify-content-start mb-2">
+                <label class="fw-bold text-danger small" id="requiere-remolque">*</label>
+            </div>
+        </div>
             <div class="row">
                 <div class="col-md-4 py-2">
                     <div class="new-tooltip icon tip">
@@ -703,6 +709,7 @@ include("buscarProductos.php");
                         <div id="placa-remolque3-errors"></div>
                     </div>
                 </div>
+            </div>
             </div>
         </div>
         <div id="sub-ubicacion" class="sub-div pb-5 pt-5" style="display: none;" >
@@ -818,7 +825,7 @@ include("buscarProductos.php");
                     </div>
                 </div>
                 <div class="col-md-2 py-2">
-                    <label class="label-form text-right" for="fecha-llegada" id="fecha-label">Fecha llegada</label><label class="mark-required text-danger fw-bold">*</label>
+                    <label class="label-form text-right" for="fecha-llegada" id="fecha-label">Fecha llegada</label> <label class="mark-required text-danger fw-bold">*</label>
                     <div class="form-group">
                         <input class='form-control text-center input-form' id='fecha-llegada' name='fecha-llegada' type='date' />
                         <div id="fecha-llegada-errors"></div>
@@ -863,7 +870,7 @@ include("buscarProductos.php");
                     </div>
                     <div class="form-group">
                         <input type="hidden" value="" id="id-operador" name='id-operador' />
-                        <input class='form-control text-center input-form' id="nombre-operador" name='nombre-operador' placeholder='Buscar Operador' type='text' oninput="autocompletarOperador();" />
+                        <input class='form-control text-center input-form' id="nombre-operador" name='nombre-operador' placeholder='Buscar operador' type='text' oninput="autocompletarOperador();" />
                         <div id="nombre-operador-errors"></div>
                     </div>
                 </div>
@@ -924,7 +931,7 @@ include("buscarProductos.php");
 
                 <div class="col-md-1 py-2">
                     <div class="form-group">
-                    <label class="label-form text-right" for="btn-agregar-operador">Agregar</label><label class="mark-required text-danger fw-bold">&nbsp;</label>
+                    <label class="label-form text-right" id="label-btn-guardar" for="btn-agregar-operador">Agregar</label><label class="mark-required text-danger fw-bold">&nbsp;</label>
                         <button title="Agregar ubicacion" id="btn-agregar-operador" class='button-list-add col-12' onclick='agregarOperador();'><span class='fas fa-plus'></span></button>
                     </div>
                 </div>

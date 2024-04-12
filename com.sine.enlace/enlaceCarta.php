@@ -155,7 +155,7 @@ if (isset($_POST['transaccion'])) {
             echo $insertado ? $insertado : "0Error: No se insertó el registro.";
             break;
         case 'nuevosdatos':
-            $datos = $cc->checkCarta($_POST['tag']);
+            $datos = $cc->checkCarta($_POST['tag'], $_POST['type'], $_POST['num'] ?? '');
             echo $datos;
             break;
             //----------------------------------------RELACION CON LOS OTROS MODULOS
@@ -209,6 +209,10 @@ if (isset($_POST['transaccion'])) {
             $resultado = $cc->eliminarIMG($_POST['idtmp']);
             echo 'Archivo eliminado.';
             break;
+        case 'pagosfactura':
+            $datos = $cc->tablaPagosReg($_POST['idfactura'], $_POST['estado']);
+            echo $datos != "" ? $datos : "0No se han encontrado datos.";
+            break;
         //-------------------------------------------GET
         case 'getcliente':
             $datos = $cc->checkCliente($_POST['rfc']);
@@ -223,7 +227,14 @@ if (isset($_POST['transaccion'])) {
             $cadena = $cc->checkSaldo($_POST['id']);
             echo $cadena != "" ? $cadena : "0No se han encontrado correos.";
             break;
-        
+        case 'statuscfdi':
+            $datos = $cc->checkStatusCFDI($_POST['fid']);
+            echo $datos != "" ? $datos : "0No se han encontrado datos.";
+            break;
+        case 'cancelartimbre':
+            $cadena = $cc->cancelarTimbre($_POST['idfactura'], $_POST['motivo'], $_POST['reemplazo']);
+            echo $cadena;
+            break;
     }
 }
 

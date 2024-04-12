@@ -28,7 +28,7 @@
             <div class="col-md-6">
                 <label class="label-form text-right" for="nombre-destino">Nombre</label> <label class="mark-required text-danger fw-bold">*</label>
                 <div class="form-group">
-                    <input type="text" class="form-control input-form" id="nombre-destino" placeholder="Nombre/referencia de la empresa/lugar" />
+                    <input type="text" class="form-control input-form" id="nombre-destino" placeholder="Nombre/referencia de la empresa/lugar" oninput="validarLetNum(this)"/>
                     <div id="nombre-destino-errors"></div>
                 </div>
             </div>

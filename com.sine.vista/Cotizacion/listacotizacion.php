@@ -7,10 +7,10 @@ include("modals.php");
     </div>
     <div class="row col-12 p-0">
         <div class="col-sm-6 py-1">
-            <input type="text" class="form-control input-search text-secondary-emphasis" id="buscar-cotizacion" placeholder="Buscar cotización (Folio o nombre cliente)" oninput="buscarCotizacion()">
+            <input type="text" class="form-control input-search text-secondary-emphasis" id="buscar-cotizacion" placeholder="Buscar cotización (Folio o nombre cliente)" oninput="filtrarCotizacion()">
         </div>
         <div class="col-sm-2 py-1">
-            <select class="form-select input-search text-center" id="num-reg" name="num-reg" onchange="buscarCotizacion()">
+            <select class="form-select input-search text-center" id="num-reg" name="num-reg" onchange="filtrarCotizacion()">
                 <option value="10"> 10</option>
                 <option value="15"> 15</option>
                 <option value="20"> 20</option>
@@ -24,7 +24,7 @@ include("modals.php");
     </div>
 </div>
 
-<div class="scrollX div-form mw-100 bg-light mx-3 border border-secondary-subtle pb-2">
+<div class="scrollX div-form mw-100 bg-light mx-3 border border-secondary-subtle pb-5">
     <table class="table tab-hover table-condensed table-responsive table-row table-head" id="body-lista-cotizacion">
         <thead class="sin-paddding">
             <tr>

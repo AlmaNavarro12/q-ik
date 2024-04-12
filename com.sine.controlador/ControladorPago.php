@@ -2314,14 +2314,13 @@ class ControladorPago{
         foreach ($result_tag as $tagfactura) {
             $tag = $tagfactura['tagpago'];
     
-            $consulta_facturas = "SELECT pago_idfactura FROM `detallepago` WHERE detalle_tagencabezado=:tag;";
+            $consulta_facturas = "SELECT pago_idfactura, type FROM `detallepago` WHERE detalle_tagencabezado=:tag;";
             $valores_facturas = array("tag" => $tag);
             $result_facturas = $this->consultas->getResults($consulta_facturas, $valores_facturas);
     
                 foreach ($result_facturas as $factura) {
                     $idfactura = $factura['pago_idfactura'];
-                    $type = 'f'; 
-    
+                    $type = $factura['type'];
                     $estado = $this->getestadoFactura($idfactura, $type);
                     if ($estado != '3') {
                         $actualizar = $this->estadoFactura($idfactura, '2', $type);

@@ -989,6 +989,8 @@ function checkOperador() {
 }
 
 function limpiarCampos(){
+    $("#inventarios").hide();
+    $("#chinventario").prop('checked', false);
     $("#imagenproducto").hide();
     $("#muestraimagenproducto").val("");
     $("#filename").val("");
@@ -1060,7 +1062,6 @@ function displayIMG(id) {
                 cargandoHide();
             } else {
                 var array = datos.split("<type>");
-                console.log(array);
                 var t = array[0];
                 var data = array[1];
                 if (t == 'd') {
@@ -1171,6 +1172,7 @@ function autocompletarVehiculo() {
             $("#id-vehiculo").val(id);
             $("#num-permiso").val(numpermiso);
             $("#tipo-permiso").val(tipopermiso);
+            aucompletarConfigTransporte(1);
             $("#conf-transporte").val(tipoautot);
             $("#anho-modelo").val(anho);
             $("#placa-vehiculo").val(placa);
@@ -1968,6 +1970,7 @@ function setValoresEditarOperador(datos) {
     loadOpcionesEstado('contenedor-estado-op', 'estado-operador', array[5]);
     loadOpcionesMunicipioOperador(array[8], array[5]);
     $("#cp-operador").val(array[7]);
+    changeText("#label-btn-guardar", "Guardar");
     $("#btn-agregar-operador").attr("onclick", "agregarOperador(" + array[0] + ")");
     $("#btn-agregar-operador").css("background", "#5cb85c");
     $("#btn-agregar-operador").css("color", "white");
@@ -2004,10 +2007,10 @@ function eliminarOperador(tid) {
 function checkMetodopago() {
     var idmetodopago = $("#id-metodo-pago").val();
     if (idmetodopago == '2') {
-        $('#formapago6').prop('selected', true);
+        $('#formapago22').prop('selected', true);
         $("#id-forma-pago").prop('disabled', true);
     } else {
-        $('#formapago6').removeAttr('selected');
+        $('#formapago22').removeAttr('selected');
         $("#id-forma-pago").removeAttr('disabled');
     }
 }
@@ -2070,7 +2073,7 @@ function insertarFacturaCarta(tag = null) {
     var nombreremolque3 = $("#nombre-remolque3").val();
     var tiporemolque3 = $("#tipo-remolque3").val();
     var placaremolque3 = $("#placa-remolque3").val();
-    var flagoperador = $("#flag-operador").val();
+    var flagoperador = $("#flag-operador").val() || 0;
 
     var observaciones = $("#observaciones-carta").val();
     var txtbd = observaciones.replace(new RegExp("\n", 'g'), '<ent>');
@@ -2158,11 +2161,31 @@ function insertarFacturaCarta(tag = null) {
                     var array = datos.split("<tag>");
                     var tagins = array[1];
                     loadView('listacarta');
-                    if(tag == null){
-                        if (idvehiculo == "0" || idremolque1 == '0' || idremolque2 == '0' || idremolque3 == '0' || flagoperador == '0') {
-                            checkNuevoRegistro(tagins);
+                    if (tag == null) {
+                        if (idvehiculo == "0" 
+                         || (idremolque1 == "0" && (nombreremolque1 != "" || tiporemolque1 != "" || placaremolque1 !=""))
+                         || (idremolque2 == "0" && (nombreremolque2 != "" || tiporemolque2 != "" || placaremolque2 !="")) 
+                         || (idremolque3 == "0" && (nombreremolque3 != "" || tiporemolque3 != "" || placaremolque3 !="")) 
+                         || flagoperador == '0') {
+                            checkNuevoRegistro(tag);
                         }
+                        /*if (idvehiculo == "0") {
+                            checkNuevoRegistroTransporte(tagins);
+                        }
+                        if (idremolque1 == "0" && (nombreremolque1 != "" || tiporemolque1 != "" || placaremolque1 !="")) {
+                            checkNuevoRegistroRemolque(tagins, "1");
+                        }
+                        if (idremolque2 == "0" && (nombreremolque2 != "" || tiporemolque2 != "" || placaremolque2 !="")) {
+                            checkNuevoRegistroRemolque(tagins, "2");
+                        }
+                        if (idremolque3 == "0" && (nombreremolque3 != "" || tiporemolque3 != "" || placaremolque3 !="")) {
+                            checkNuevoRegistroRemolque(tagins, "3");
+                        }
+                        if (flagoperador == "0") {
+                            checkNuevoRegistroOperador(tagins);
+                        }*/
                     }
+                    
                 }
                 cargandoHide();
             }
@@ -2197,6 +2220,83 @@ function checkNuevoRegistro(tag) {
             }
         });
     }).set({title: "Q-ik"});
+}
+
+/*function checkNuevoRegistroTransporte(tag) {
+    alertify.confirm("¿Deseas guardar los nuevos datos del transporte registrado en el formulario anterior?", function () {
+        cargandoHide();
+        cargandoShow();
+        $.ajax({
+            url: "com.sine.enlace/enlacecarta.php",
+            type: "POST",
+            data: {transaccion: "nuevosdatos", tag: tag, type:'t'},
+            success: function (datos) {
+                var texto = datos.toString();
+                var bandera = texto.substring(0, 1);
+                var res = texto.substring(1, 1000);
+                if (bandera == '0') {
+                    alertify.error(res);
+                } else {
+                    mandarAlerta(datos, "vehículo");
+                    filtrarCarta();
+                }
+                cargandoHide();
+            }
+        });
+    }).set({title: "Q-ik"});
+}
+
+function checkNuevoRegistroOperador(tag) {
+    alertify.confirm("¿Deseas guardar los nuevos datos del operador registrado en el formulario anterior?", function () {
+        cargandoHide();
+        cargandoShow();
+        $.ajax({
+            url: "com.sine.enlace/enlacecarta.php",
+            type: "POST",
+            data: {transaccion: "nuevosdatos", tag: tag, type:'o'},
+            success: function (datos) {
+                var texto = datos.toString();
+                var bandera = texto.substring(0, 1);
+                var res = texto.substring(1, 1000);
+                if (bandera == '0') {
+                    alertify.error(res);
+                } else {
+                    mandarAlerta(datos, "operador");
+                    filtrarCarta();
+                }
+                cargandoHide();
+            }
+        });
+    }).set({title: "Q-ik"});
+}
+
+function checkNuevoRegistroRemolque(tag, num) {
+    alertify.confirm("¿Deseas guardar los nuevos datos del remolque"+num+" registrado en el formulario anterior?", function () {
+        cargandoHide();
+        cargandoShow();
+        $.ajax({
+            url: "com.sine.enlace/enlacecarta.php",
+            type: "POST",
+            data: {transaccion: "nuevosdatos", tag: tag, type:'r', num:num},
+            success: function (datos) {
+                var texto = datos.toString();
+                var bandera = texto.substring(0, 1);
+                var res = texto.substring(1, 1000);
+                if (bandera == '0') {
+                    alertify.error(res);
+                } else {
+                    mandarAlerta(datos, "remolque"+num);
+                    filtrarCarta();
+                }
+                cargandoHide();
+            }
+        });
+    }).set({title: "Q-ik"});
+}*/
+
+function llenaDescripcion() {
+    var producto = $("#producto").val();
+    $("#descripcion").val(producto);
 }
 
 function mandarAlerta(id, mensaje){
@@ -2292,6 +2392,8 @@ function setValoresEditarCarta(datos) {
     var observaciones = array[55];
 	var cfdisrel = array[56];
 	var pesovehicular = array[57];
+
+    console.log(tipotransporte);
 	var pesobruto = array[58];
     
     var txt = observaciones.replace(new RegExp("<ent>", 'g'), "\n");
@@ -2497,6 +2599,7 @@ function setValoresEditarCarta(datos) {
     $("#num-permiso").val(numpermiso);
     $("#tipo-permiso").val(tipopermiso);
     $("#conf-transporte").val(tipotransporte);
+    loadRemolques(tipotransporte);
     $("#anho-modelo").val(anhomod);
     $("#placa-vehiculo").val(placa);
     $("#seguro-respcivil").val(segurocivil);
@@ -2915,7 +3018,7 @@ function verEvidencias(id) {
                 alertify.error(res);
             } else {
                 if(datos == '<tbody>'){
-                    $("#tabla-evidencias").html("<div class='col-12 text-center py-3'>Este comunicado no contiene archivos.</div>");
+                    $("#tabla-evidencias").html("<div class='col-12 text-center py-3'>Esta carta porte no contiene archivos.</div>");
                 } else {
                     $("#tabla-evidencias").html(datos);
                 }
@@ -3068,4 +3171,118 @@ function timbrarCarta(id) {
             }
         });
     }).set({title: "Q-ik"});
+}
+
+function statusCancelacionCarta(fid) {
+    $("#cod-status").html('');
+    $("#estado-cfdi").html('');
+    $("#cfdi-cancelable").html('');
+    $("#estado-cancelacion").html('');
+    $("#div-reset").html('');
+    cargandoHide();
+    cargandoShow();
+    $.ajax({
+        url: "com.sine.enlace/enlacecarta.php",
+        type: "POST",
+        data: {transaccion: "statuscfdi", fid: fid},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 1000);
+            if (bandera == '0') {
+                alertify.error(res);
+            } else {
+                var array = datos.split("</tr>");
+                var codstatus = array[0];
+                var estado = array[1];
+                var cancelable = array[2];
+                var stcancelacion = array[3];
+                var reset = array[4];
+                var status = array[5];
+
+                $("#cod-status").html(codstatus);
+                $("#estado-cfdi").html(estado);
+                $("#cfdi-cancelable").html(cancelable);
+                $("#estado-cancelacion").html(stcancelacion);
+                $("#div-reset").html(reset);
+            }
+            cargandoHide();
+        }
+    });
+}
+
+function tablaPagos(idfactura, estado) {
+    cargandoHide();
+    cargandoShow();
+    $.ajax({
+        url: "com.sine.enlace/enlacecarta.php",
+        type: "POST",
+        data: {transaccion: "pagosfactura", idfactura: idfactura, estado: estado},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 1000);
+            if (bandera == '0') {
+                alertify.error(res);
+            } else {
+                var array = datos.split("<corte>");
+                var p2 = array[1];
+                $("#pagostabla").html(p2);
+            }
+            cargandoHide();
+        }
+    });
+}
+
+function imprimirpago(idpago) {
+    cargandoHide();
+    cargandoShow();
+    VentanaCentrada('./com.sine.imprimir/imprimirpago.php?pago=' + idpago, 'Pago', '', '1024', '768', 'true');
+    cargandoHide();
+}
+
+function setCancelacion(fid) {
+    $("#btn-cancelar").attr('onclick', 'cancelarTimbreCarta(' + fid + ')')
+}
+
+function checkCancelacion() {
+    var motivo = $("#motivo-cancelacion").val();
+    if (motivo === '01') {
+        $("#div-reemplazo").show('slow');
+    } else {
+        $("#div-reemplazo").hide('slow');
+    }
+}
+
+function cancelarTimbreCarta(idfactura) {
+    var motivo = $("#motivo-cancelacion").val();
+    var reemplazo = "0";
+    if (motivo === '01') {
+        reemplazo = $("#uuid-reemplazo").val(); 
+    }
+
+    if (isnEmpty(motivo, "motivo-cancelacion") && isnEmpty(reemplazo, "uuid-reemplazo")) {
+        alertify.confirm("¿Estás seguro que deseas cancelar esta carta?", function () {
+            cargandoHide();
+            cargandoShow();
+            $.ajax({
+                url: "com.sine.enlace/enlacecarta.php",
+                type: "POST",
+                data: {transaccion: "cancelartimbre", idfactura: idfactura, motivo: motivo, reemplazo: reemplazo},
+                success: function (datos) {
+                    var texto = datos.toString();
+                    var bandera = texto.substring(0, 1);
+                    var res = texto.substring(1, 1000);
+                    if (bandera == '0') {
+                        alertify.error(res);
+                    } else {
+                        $("#modalcancelar").modal('hide');
+                        alertify.success(res);
+                        filtrarCarta();
+                    }
+                    cargandoHide();
+                }
+            });
+        }).set({title: "Q-ik"});
+    }
 }

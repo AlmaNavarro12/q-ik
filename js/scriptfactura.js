@@ -1871,6 +1871,7 @@ function loadCliente(idcliente) {
                 var razon = array[2];
                 var regfiscal = array[3];
                 var codpostal = array[4];
+                var direccion = array[5];
 
                 $("#id-cliente").val(idcliente);
                 $("#nombre-cliente").val(nombre);
@@ -1878,6 +1879,7 @@ function loadCliente(idcliente) {
                 $("#razon-cliente").val(razon);
                 $("#regfiscal-cliente").val(regfiscal);
                 $("#cp-cliente").val(codpostal);
+                $("#direccion-cliente").val(direccion);
             }
         }
     });

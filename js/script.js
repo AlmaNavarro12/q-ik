@@ -386,6 +386,14 @@ function validarNum(input) {
     input.value = input.value.replace(/[^0-9]/g, '');
 }
 
+function validarLetNum(input) {
+    input.value = input.value.replace(/[^A-Za-zñÑáéíóúüÁÉÍÓÚÜ0-9. ]/g,'');
+}
+
+function validarPlacas(input) {
+    input.value = input.value.replace(/[^a-zA-Z0-9]/g, '');
+}
+
 //Validacion de campos vacios
 function isnEmpty(val, id) {
     if (val == "") {

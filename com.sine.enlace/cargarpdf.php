@@ -5,7 +5,9 @@ require_once '../com.sine.controlador/ControladorImgs.php';
 Session::start(); 
 date_default_timezone_set("America/Mexico_City"); 
 $ci = new ControladorImgs(); 
-$carpeta = "../temporal/tmp/"; 
+
+$rutaPersonalizada = $_POST["ruta_personalizada"];
+$rutaFile = '../' . $rutaPersonalizada;
 
 if (!empty($_FILES)) { 
     $sessionid = session_id(); 
@@ -22,10 +24,10 @@ if (!empty($_FILES)) {
             $tmpnombre = $ranstr . $fecha . '_' . $idusuario . $sessionid . '.' . $extension; 
 
             //$insertar = $ci->insertarImg($nombre, $tmpnombre, $extension , $sessionid); 
-            move_uploaded_file($file["tmp_name"], "../temporal/tmp/" . $tmpnombre); 
-            echo $nombre; 
-            //$vista = "temporal/tmp/" . $tmpnombre; 
-            //echo "<a href='' onclick='displayDocAnticipo();' class='btn btn-sm button-modal' title='Ver archivo' ><span class='fas fa-file'></span></a><corte>$nombre";
+            move_uploaded_file($file["tmp_name"], $rutaFile . $tmpnombre); 
+            //echo $nombre; 
+            $vista = $rutaPersonalizada . $tmpnombre; 
+            echo "<a onclick=\"displayDocAnticipo('$tmpnombre')\"; class='btn btn-sm button-file col-12' title='Ver archivo'>Archivo <span class='fas fa-file'></span></a><corte>$tmpnombre";
         } else {
             echo "Error: El archivo $nombre debe ser un PDF<br>"; 
         }
