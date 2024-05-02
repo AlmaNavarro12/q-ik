@@ -2168,7 +2168,23 @@ class ControladorFactura
         $this->eliminarCFDIAux($tag);
         $this->eliminarCfdiEgresoAux($tag);
         $this->modificarVenta($tag);
+        $this->modificarCotizacion($tag); //THIS
         return $eliminado;
+    }
+
+    //CAMBIIIIIIIIIIIOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOS
+    private function modificarCotizacion($tag){
+        $modificado = false;
+        $consulta = "UPDATE `datos_cotizacion` SET expfactura=:exp, sessionexporto=:sid, fecha_exportar=:fecha, hora_exportar=:hora WHERE expfactura=:tag;";
+        $valores = array(
+            "tag" => $tag,
+            "exp" => 0,
+            "sid" => 0,
+            "fecha" => null,
+            "hora" => null
+        );
+        $consultado = $this->consultas->getResults($consulta, $valores);
+        return $consultado;
     }
 
     private function modificarVenta($idFactura){
@@ -3099,14 +3115,14 @@ class ControladorFactura
         $datos = "<thead>
                     <tr>
                         <th class='col-md-1'>CÓdigo </th>
-                        <th class='col-md-3'>Producto/Servicio   </th>
+                        <th class='col-md-3'>Producto/Servicio </th>
                         <th class='col-md-1'>Cantidad </th>
                         <th class='col-md-1'>P.Venta </th>
                         <th class='col-md-1'>Importe </th>
                         <th class='col-md-1'>Desc % </th>
                         <th class='col-md-1'>Traslados</th>
                         <th class='col-md-1'>Retenciones</th>
-                        <th class='col-md-1'>Total</th>
+                        <th class='col-md-2'>Total</th>
                         <th class='text-center'><span class='fas fa-plus'></span> </th>
                     </tr> 
                   </thead>
@@ -3936,7 +3952,7 @@ class ControladorFactura
 
     private function bodyMail($asunto, $saludo, $nombre, $msg, $logo)
     {
-        $archivo = "../com.sine.dao/configuracion.ini";
+        $archivo = $_SESSION[sha1("database")].".ini";
         $ajustes = parse_ini_file($archivo, true);
         if (!$ajustes) {
             throw new Exception("No se puede abrir el archivo " . $archivo);

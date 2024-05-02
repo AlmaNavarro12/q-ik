@@ -106,6 +106,15 @@ class Enrutador
                 case 'cotizacion':
                     include_once '../com.sine.vista/Cotizacion/formCotizacion.php';
                     break;
+                case 'equipos':
+                    include_once '../com.sine.vista/Instalacion/listadoequipos.php';
+                    break;
+                case 'pasosvehiculo':
+                    include_once '../com.sine.vista/Instalacion/pasosvehiculo.php';
+                    break;
+                case 'pasoscaja':
+                    include_once '../com.sine.vista/Instalacion/pasoscaja.php';
+                    break;
                 case 'instalacion':
                     include_once '../com.sine.vista/Instalacion/forminstalacion.php';
                     break;

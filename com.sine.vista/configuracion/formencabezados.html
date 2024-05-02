@@ -24,13 +24,15 @@
                         <option class="option-list text-start" value="5">Encabezado Comunicados</option>
                         <option class="option-list text-start" value="6">Encabezado Reporte de Facturas</option>
                         <option class="option-list text-start" value="7">Encabezado Reporte de Pagos</option>
-                        <option class="option-list text-start" value="8">Encabezado Reporte Grafico de Impuestos
-                        </option>
+                        <option class="option-list text-start" value="8">Encabezado Reporte Grafico de Impuestos</option>
                         <option class="option-list text-start" value="9">Encabezado Reporte de Impuestos</option>
                         <option class="option-list text-start" value="10">Encabezado Reporte de Ventas</option>
                         <option class="option-list text-start" value="11">Encabezado Cartas Porte</option>
                         <option class="option-list text-start" value="12">Encabezado Ticket de Venta</option>
                         <option class="option-list text-start" value="13">Encabezado Corte de Caja</option>
+                        <option class="option-list text-start" value="14">Encabezado Reporte de inventario</option>
+                        <option class="option-list text-start" value="15">Encabezado Reporte de ventas</option>
+                        <option class="option-list text-start" value="16">Encabezado Instalación</option>
                     </optgroup>
                 </select>
                 <div id="id-encabezado-errors"></div>
@@ -160,7 +162,7 @@
                 <label class="label-form text-right mb-2" for="color-titulo">Color t&iacute;tulo</label>
                 <div class="form-group">
                     <input class="form-control text-center input-form" id="color-titulo" name="color-titulo"
-                        type="color" value="##17177C" onchange="visualizarPDF();" />
+                        type="color" value="#17177C" onchange="visualizarPDF();" />
                     <div id="color-titulo-errors">
                     </div>
                 </div>
@@ -192,7 +194,7 @@
                 <div class="col-md-6 py-1">
                     <label class="label-form text-right mb-2" for="color-subtitulo">Color subtitulos</label>
                     <div class="form-group">
-                        <input class="form-control text-center input-form" id="color-subtitulo" name="color-subtitulo"
+                        <input class="form-control text-center input-form" id="color-subtitulo" name="color-subtitulo" value="#17177C"
                             type="color" onchange="visualizarPDF();" />
                         <div id="color-subtitulo-errors">
                         </div>
@@ -270,11 +272,11 @@
             </div>
         </div>
     </div>
-    <div class="col-md-12 mt-3">
+    <div class="col-md-12 mt-3" id="common-pie">
         <div>
             <label class="label-sub">Pie de p&aacute;gina</label>
         </div>
-        <div id="common-pie" class="row">
+        <div class="row">
             <div class="row">
                 <div class="col-md-6 py-1">
                     <label id="lbl-pagina" class="label-form text-right mb-2" for="pagina">P&aacute;gina</label>

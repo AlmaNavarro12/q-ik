@@ -53,9 +53,15 @@ require_once 'Enrutador.php';
     $listaventa = $div[35];
     $registrarentrada = $div[36];
     $registrarsalida = $div[37];
-    $acceso = $div[38];
-    $imgperfil = $div[39];
-    $modulos = $div[40];
+
+    //CAMBIOS GPS
+    $instalaciongps = $div[38];
+    $listagps = $div[39];
+    $crearinstalacion = $div[40];
+    $listainstalacion = $div[41];
+    $acceso = $div[42];
+    $imgperfil = $div[43];
+    $modulos = $div[44];
 
     $notificaciones = $cp->getNotificacion();
     $divN = explode("<corte>", $notificaciones);
@@ -389,6 +395,40 @@ require_once 'Enrutador.php';
                         <?php
                                     }
                                     break;
+                                    case '15':
+                                        if ($instalaciongps == '1') {
+                                        ?>
+                                            <a href="#colinstalaciongps" class="text-white" style="text-decoration: none;" data-bs-toggle="collapse" data-bs-target="#colinstalaciongps" role="button" aria-expanded="false">
+                                                <li class="list-element mt-1 ps-5">
+                                                    <div class="marker"></div>
+                                                    <div class="pad"></div><label> Instalación GPS</label>
+                                                </li>
+                                            </a>
+                                            <div id='colinstalaciongps' class='panel-collapse collapse'>
+                                                <ul>
+                                                    <?php
+                                                    if ($listagps == '1') {
+                                                    ?>
+                                                     <li class='lista-submenu-elemento ps-5 list-menu' data-submenu='equipos'> Equipos GPS</li>
+                                                    <?php
+                                                    }
+                                                    if ($crearinstalacion == '1') {
+                                                    ?>
+                                                        <li class='lista-submenu-elemento ps-5 list-menu' data-submenu='instalacion'> Instalación</li>
+                                                    <?php
+                                                    }
+                                                    if ($listainstalacion == '1') {
+                                                    ?>
+                                                        <li class='lista-submenu-elemento ps-5 list-menu' data-submenu='listainstalacion'>Historial</li>
+                                                    <?php
+                                                    }
+                                                    ?>
+                                                    
+                                                </ul>
+                                            </div>
+                                        <?php
+                                        }
+                                        break;
                             }
                         }
                         ?>

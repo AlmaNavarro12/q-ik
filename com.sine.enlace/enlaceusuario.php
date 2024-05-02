@@ -198,7 +198,7 @@ function obtenerDatosPermisos()
     $p->setReporteventas($_POST['reporteventas']);
     $p->setReporteInventario($_POST['reporteinventario']);
     $p->setReportePuntoVenta($_POST['reportepuntoventa']);
-
+    $p->setReporteCorte($_POST['reportecorte']);
 
     $p->setConfiguracion($_POST['configuracion']);
     $p->setAddfolio($_POST['addfolio']);
@@ -219,6 +219,17 @@ function obtenerDatosPermisos()
     $p->setRegistrarSalida($_POST['registrarsalida']);
     $p->setCortedeCaja($_POST['cortedecaja']);
 
+    $p->setInstalacionGps($_POST['instalacion']);
+    $p->setCrearGps($_POST['creargps']);
+    $p->setEditarGps($_POST['editargps']);
+    $p->setEliminarGps($_POST['eliminargps']);
+    $p->setListaGps($_POST['listagps']);
+    $p->setCrearInstalacion($_POST['crearinstalacion']);
+    $p->setEditarInicio($_POST['editarinicio']);
+    $p->setEditarPasos($_POST['editarpasos']);
+    $p->setCancelarInstalacion($_POST['cancelarinstalacion']);
+    $p->setEliminarInstalacion($_POST['eliminarinstalacion']);
+    $p->setListaInstalacion($_POST['listainstalacion']);
     return $p;
 }
 

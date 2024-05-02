@@ -155,7 +155,7 @@ if (isset($_POST['transaccion'])) {
             echo $insertado ? $insertado : "0Error: No se insertó el registro.";
             break;
         case 'nuevosdatos':
-            $datos = $cc->checkCarta($_POST['tag'], $_POST['type'], $_POST['num'] ?? '');
+            $datos = $cc->checkCarta($_POST['tag']);
             echo $datos;
             break;
             //----------------------------------------RELACION CON LOS OTROS MODULOS

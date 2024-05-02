@@ -28,7 +28,7 @@
                     </div>
                 </form>
                 <div class="row scroll-modal scrollX mt-3" id="datosproducto">
-                    <table class="table tab-hover table-condensed table-responsive table-row table-head" id="body-lista-productos-cotizacion">
+                    <table class="table table-hover table-condensed table-responsive table-row table-head" id="body-lista-productos-cotizacion">
 
                     </table>
                 </div>
@@ -263,7 +263,7 @@
                 <form id="form-producto-editar" onsubmit="return false;">
                     <div class="row scrollX">
                         <div class="col-md-12">
-                            <table class="table tab-hover table-condensed table-responsive table-row table-head">
+                            <table class="table table-hover table-condensed table-responsive table-row table-head">
                                 <tbody>
                                     <tr>
                                         <td colspan="2">

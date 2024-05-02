@@ -52,58 +52,9 @@ if (isset($_GET['transaccion'])) {
         case 'emailcliente':
             echo json_encode($cp->getCoincidenciasBusquedaMail($_GET['term']));
             break;
-
-            /*
-        
-        case 'catfiscal':
-            echo json_encode($cp->getCoincidenciasCatalogoFiscal($_GET['term']));
+        case 'modelogps':
+            echo json_encode($cp->getCoincidenciasModelosGps($_GET['term']));
             break;
-        case 'datosfiscales':
-            echo json_encode($cp->getCoincidenciasCliente($_GET['term']));
-            break;*/
-
-            /*case 'catunidad':
-            echo json_encode($cp->getCoincidenciasCatalogoUnidad($_GET['term'])); CATSAT
-            break; 
-        case 'foliocotizaion':
-            echo json_encode($cp->getCoincidenciasFolioCotizacion($_GET['term']));
-            break;
-        case 'direccion':
-            echo json_encode($cp->getCoincidenciasDireccion($_GET['term']));
-            break;
-        case 'regimenfiscal':
-            echo json_encode($cp->getCoincidenciasRegimen($_GET['term'])); CATSAT
-            break;
-        case 'claveregimen':
-            echo json_encode($cp->getCoincidenciasClvRegimen($_GET['term'])); YA ESTA EN CATSAT
-            break;
-        
-        case 'tipopermiso':
-            echo json_encode($cp->getCoincidenciasTipoPermiso($_GET['term'])); YA ESTA EN CATSAT
-            break;
-        
-        case 'conftransporte':
-            echo json_encode($cp->getCoincidenciasConfigTransporte($_GET['term']));
-            break;
-        case 'subtiporemolque':
-            echo json_encode($cp->getCoincidenciasTipoRemolque($_GET['term']));
-            break;
-        
-        case 'peligro':
-            echo json_encode($cp->getCoincidenciasMaterialPeligroso($_GET['term']));; CATSAT
-            break;
-        case 'embalaje':
-            echo json_encode($cp->getCoincidenciasEmbalaje($_GET['term']));;
-            break;
-        case 'unitcarta':
-            echo json_encode($cp->getCoincidenciasUnidadCarta($_GET['term']));
-            break;
-        
-        
-        
-        
-        default:
-            break; */
     }
 } else {
     header("Location: ../");

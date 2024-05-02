@@ -1,7 +1,7 @@
 <?php
 class Usuario {
-
     //Todos los astributos de la tabla Usuario (Métodos Getter y Setter)
+    
     private $idUsuario;
     private $nombre;
     private $apellidoPaterno;

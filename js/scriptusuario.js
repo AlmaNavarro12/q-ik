@@ -336,9 +336,10 @@ function setValoresAsignarPermisos(datos) {
         "datosfacturacion", "creardatos", "editardatos", "listadatos", "eliminardatos", "descargardatos", //Eliminar, descargar archivos
         "contrato", "crearcontrato", "editarcontrato", "eliminarcontrato", "listacontrato",
         "usuarios", "crearusuario", "listausuario", "eliminarusuario", "asignarpermiso",
-        "reporte", "reportefactura", "reportepago", "reportegrafica", "reporteiva", "datosiva", "reporteventas", "reporteinventario", "reportepuntoventa",
+        "reporte", "reportefactura", "reportepago", "reportegrafica", "reporteiva", "datosiva", "reporteventas", "reporteinventario", "reportepuntoventa", "reportecorte",
         "configuracion", "addfolio", "listafolio", "editarfolio", "eliminarfolio", "addcomision", "encabezados", "confcorreo", "importar", 
         "ventas", "crearventa", "cancelarventa", "exportarventa", "listaventa", "registrarentrada", "registrarsalida", "cortedecaja",
+        "instalaciongps", "creargps", "editargps", "eliminargps", "listagps", "crearinstalacion", "editarinicio", "editarpasos", "cancelarinstalacion", "eliminarinstalacion", "listainstalacion",
         "accion", "idlogin"
     ];
 
@@ -389,9 +390,10 @@ function actualizarPermisos(idusuario) {
         datosfacturacion: ["creardatos", "editardatos", "listadatos", "eliminardatos", "descargardatos"],
         contrato: ["crearcontrato", "editarcontrato", "eliminarcontrato", "listacontrato"],
         usuarios: ["crearusuario", "listausuario", "eliminarusuario", "asignarpermiso"],
-        reporte: ["reportefactura", "reportepago", "reportegrafica", "reporteiva", "datosiva", "reporteventas", "reporteinventario", "reportepuntoventa"],
+        reporte: ["reportefactura", "reportepago", "reportegrafica", "reporteiva", "datosiva", "reporteventas", "reporteinventario", "reportepuntoventa", "reportecorte"],
         configuracion: ["addfolio", "listafolio", "editarfolio", "eliminarfolio", "addcomision", "encabezados", "confcorreo", "importar"],
         ventas: ["crearventa", "cancelarventa", "exportarventa", "listaventa", "registrarentrada", "registrarsalida", "cortedecaja"],
+        instalacion: ["creargps", "editargps", "eliminargps", "listagps", "crearinstalacion", "editarinicio", "editarpasos", "cancelarinstalacion", "eliminarinstalacion", "listainstalacion"]
     };
 
     var datos = {
@@ -437,7 +439,7 @@ function actualizarPermisos(idusuario) {
                 } else {
                     location.href = 'home.php';
                 }
-                alertify.success('Se guardaron los datos correctamente');
+                alertify.success('Se guardaron los permisos correctamente');
             }
         }
     });
@@ -455,4 +457,8 @@ function resposiveButton() {
         $("#bdos").removeClass('col-12 mb-3').addClass('col-md-6 row d-flex justify-content-end px-0 mx-0');
         $("#bdos > div").removeClass('col-12 mb-3').addClass('col-md-6 mb-3');
     }
+}
+
+function scrollToTop(){
+    document.getElementById("inicio-vista").scrollIntoView();
 }

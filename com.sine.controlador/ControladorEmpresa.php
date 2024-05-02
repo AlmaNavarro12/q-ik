@@ -159,9 +159,9 @@ class ControladorEmpresa {
                          <td>$regimenfiscal</td>
                          <td align='center'>
                          <div class='dropdown dropend'>
-                            <button class='button-list dropdown-bs-toggle' title='Opciones'  type='button' data-bs-toggle='dropdown'><span class='fas fa-ellipsis-v'></span>
+                            <button class='button-list dropdown-toggle' title='Opciones'  type='button' data-bs-toggle='dropdown'><span class='fas fa-ellipsis-v'></span>
                             <span class='caret'></span></button>
-                            <ul class='dropdown-menu dropdown-menu-right'>";
+                            <ul class='dropdown-menu dropdown-menu-right z-1'>";
                 
                 if ($divp[1] == '1') {
                     $datos .= "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' onclick='editarEmpresa($id)'>Editar datos <span class='text-muted small fas fa-edit'></span></a></li>";
@@ -296,7 +296,7 @@ class ControladorEmpresa {
         $datos = "";
         $check = $this->getError($c);
         if ($check != "") {
-            $datos = "0Error la contraseña es incorrecta " . $check;
+            $datos = "0Error la contraseña key es incorrecta " . $check;
         } else {
             $datos = $this->insertarDatos($c);
         }

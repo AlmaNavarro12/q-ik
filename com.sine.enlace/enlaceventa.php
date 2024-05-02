@@ -67,9 +67,16 @@ if (isset($_POST['transaccion'])) {
         case 'cancelarTicket':
             $insertado = $cv->cancelar(session_id());
             break;
+        case 'validarcancelacion':
+            $bandera = $cv->validarCancelacion($_POST['usuario'], $_POST['contrasena']);
+            echo $bandera ? $bandera : "0Ha occurrido un error.";
+            break;
         case 'cancelarTicked':
-            $insertado = $cv->cancelarTicked($_POST['id']);
+            $insertado = $cv->cancelarTicked($_POST['id'], $_POST['motivo'],  $_POST['idusuario']);
             echo $insertado;
+            break;
+        case 'listacancelacion':
+            $insertado = $cv->listaCancelacion($_POST['idventa']);
             break;
         case 'checkPrecio':
             $datos = $cv->checkPrecio($_POST['producto']);

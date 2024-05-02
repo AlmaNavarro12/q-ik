@@ -34,7 +34,9 @@ class ControladorAuto {
                 "direccion" => $resultado['calle']." ".$resultado['numero_exterior'].$int." ".$resultado['localidad']." ".$municipio." ".$estado,
                 "mailinfo" => $resultado['email_informacion'],
                 "mailfacturas" => $resultado['email_facturacion'],
-                "mailgerencia" => $resultado['email_gerencia']);
+                "mailgerencia" => $resultado['email_gerencia'],
+                "nombre" => $resultado['nombre'] . " " . $resultado['apaterno'] . " " . $resultado['amaterno'],
+            );
             $contador++;
         }
         if ($contador == 0) {
@@ -132,8 +134,7 @@ class ControladorAuto {
     public function getCoincidenciasLocalidad($referencia) {
         $datos = array();
         $consulta = "SELECT * FROM localidadenvio WHERE (c_Localidad LIKE '%$referencia%' OR Descripcion LIKE '%$referencia%') LIMIT 15;";
-        $c = new Consultas();
-        $resultados = $c->getResults($consulta, null);
+        $resultados = $this->consultas->getResults($consulta, null);
         $contador = 0;
         foreach ($resultados as $resultado) {
             $datos[] = array("value" => $resultado['c_Localidad']."-".$resultado['Descripcion'],
@@ -282,6 +283,23 @@ class ControladorAuto {
             $datos[] = array("value" => $resultado['emailcot'],
                 "id" => $resultado["iddatos_cotizacion"],
                 "nombre" => $resultado['emailcot']);
+            $contador++;
+        }
+        if ($contador == 0) {
+            $datos [] = array("value" => "No se encontraron registros", "id" => "Ninguno");
+        }
+        return $datos;
+    }
+
+    public function getCoincidenciasModelosGps($referencia) {
+        $datos = array();
+        $consulta = "select * from equipogps where (nombreequipo like '%$referencia%') limit 0,5;";
+        $resultados = $this->consultas->getResults($consulta, null);
+        $contador = 0;
+        foreach ($resultados as $resultado) {
+            $datos[] = array("value" => $resultado['nombreequipo'],
+                "id" => $resultado["idequipogps"],
+                "nombre" => $resultado['nombreequipo']);
             $contador++;
         }
         if ($contador == 0) {

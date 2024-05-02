@@ -8,6 +8,11 @@ include("buscarProductos.php");
     <div id="div-space">
     </div>
     <div class="div-form  p-5 border border-secondary-subtle">
+    <div class="col-md-12">
+            <div class="col-md-12 d-flex justify-content-end mb-2">
+                <label class="fw-bold text-danger small">* Campo obligatorio</label>
+            </div>
+        </div>
         <input type="hidden" name="transaccion" id="transaccion" value="" />
         <div class="row">
             <label class="control-label col-md-8 text-right">
@@ -82,11 +87,6 @@ include("buscarProductos.php");
             <div class="col-md-6 text-start">
                 <label class="label-sub" for="fecha-creacion">Datos de Cotizaci&oacute;n</label>
             </div>
-            <div class="col-md-6">
-            <div class="col-md-12 d-flex justify-content-end mb-2">
-                <label class="fw-bold text-danger small">* Campo obligatorio</label>
-            </div>
-        </div>
         </div>
         <div class="row">
             <div class="col-md-4 py-2">
@@ -218,7 +218,7 @@ include("buscarProductos.php");
             <div class="col-md-12">
                 <a href="#cfdirel" data-bs-toggle='collapse' class="label-sub click-row text-decoration-none">Agregar mano de obra/ otros conceptos <span class="fas fa-chevron-down"></span></a>
                 <div id="cfdirel" class="panel-collapse collapse">
-                    <table class="table tab-hover table-condensed table-responsive table-row table-head">
+                    <table class="table table-hover table-condensed table-responsive table-row table-head">
                         <tbody>
                             <tr class='align-middle'>
                                 <td colspan="2">
@@ -306,7 +306,7 @@ include("buscarProductos.php");
             </div>
         </div>
         <div class="row scrollX">
-            <table id="resultados" class="table tab-hover table-condensed table-responsive table-row table-head">
+            <table id="resultados" class="table table-hover table-condensed table-responsive table-row table-head">
             </table>
         </div>
         <div class="row mt-3">

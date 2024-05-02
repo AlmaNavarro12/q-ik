@@ -219,7 +219,8 @@ class ControladorCliente {
         foreach ($permisos as $actual) {
             $editar = $actual['editarcliente'];
             $eliminar = $actual['eliminarcliente'];
-            $datos .= "$editar</tr>$eliminar";
+            $lista = $actual['listacliente'];
+            $datos .= "$editar</tr>$eliminar</tr>$lista";
         }
         return $datos;
     }
@@ -250,6 +251,11 @@ class ControladorCliente {
             $condicion = "WHERE (c.nombre LIKE '%$REF%' OR c.apaterno LIKE '%$REF%' OR c.amaterno LIKE '%$REF%' OR c.rfc LIKE '%$REF%') ORDER BY c.nombre";
         }
 
+        
+        $permisos = $this->getPermisos($idlogin);
+        $div = explode("</tr>", $permisos);
+        if ($div[2] == '1') {
+
         $numrows = $this->getNumrows($condicion);
         $page = (isset($pag) && !empty($pag)) ? $pag : 1;
         $per_page = $numreg;
@@ -259,8 +265,6 @@ class ControladorCliente {
         $con = $condicion . " LIMIT $offset,$per_page ";
         $clientes = $this->getFiltrado($con);
         $finales = 0;
-        $permisos = $this->getPermisos($idlogin);
-        $div = explode("</tr>", $permisos);
 
         foreach ($clientes as $clienteactual) {
             $idcliente = $clienteactual['id_cliente'];
@@ -320,6 +324,7 @@ class ControladorCliente {
         $datos .= "</tbody><tfoot><tr><th colspan='3' class='align-top'>Mostrando $inicios al $finales de $numrows registros</th>";
         $datos .= "<th colspan='6'>" . paginate($page, $total_pages, $adjacents, $function) . "</th></tr></tfoot>";
 
+    }
         return $datos;
     }
 }

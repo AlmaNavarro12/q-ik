@@ -444,7 +444,7 @@ class ControladorPago{
             </div>
             <div class='row scrollX'>
                 <div class='col-md-12'>
-                    <table class='table tab-hover table-condensed table-responsive table-row thead-form'>
+                    <table class='table table-hover table-condensed table-responsive table-row thead-form'>
                         <tbody >
                             <tr>
                                 <td colspan='2'>
@@ -501,7 +501,7 @@ class ControladorPago{
                             </tr>
                         </tbody>
                     </table>
-                    <table class='table tab-hover table-condensed table-responsive table-row table-head' id='lista-cfdi-$tag'>
+                    <table class='table table-hover table-condensed table-responsive table-row table-head' id='lista-cfdi-$tag'>
 
                     </table>
                 </div>
@@ -885,10 +885,35 @@ class ControladorPago{
         return $eliminado;
     }
 
-    public function validarPago($p, $objimpuesto)
-    {
-        $datos = $this->insertarPago($p, $objimpuesto);
-        return $datos;
+    private function verificarPagos($sessionId) {
+        $consultado = false;
+        $consulta = "SELECT * FROM tmppago WHERE sessionid=:idsession;";
+        $valores = array("idsession" => $sessionId);
+        $consultado = $this->consultas->getResults($consulta, $valores);
+        return $consultado;
+    }
+
+    public function verificarCfdiPago($sid){
+        $validar = false;
+        $val = 0;
+        $cfdi = $this->verificarPagos($sid);
+        foreach ($cfdi as $actual) {
+            $val ++;
+        }
+        if ($val == 0) {
+            $validar = true;
+            echo "0No se ha agregado ningún cfdi relacionado al pago.";
+        }
+        return $validar;
+    }
+
+    public function validarPago($p, $objimpuesto) {
+        $insertado = false;
+        $validar = $this->verificarCfdiPago($p->getSessionid());
+        if (!$validar) {
+            $insertado = $this->insertarPago($p, $objimpuesto);
+        }
+        return $insertado;
     }
 
     private function insertarPago($p, $objimpuesto)
@@ -1849,7 +1874,7 @@ class ControladorPago{
 
         <div class='row scrollX'>
             <div class='col-md-12'>
-                <table class='table tab-hover table-condensed table-responsive table-row thead-form'>
+                <table class='table table-hover table-condensed table-responsive table-row thead-form'>
                     <tbody >
                         <tr>
                             <td colspan='2'>
@@ -1906,7 +1931,7 @@ class ControladorPago{
                         </tr>
                     </tbody>
                 </table>
-                <table class='table tab-hover table-condensed table-responsive table-row table-head' id='lista-cfdi-$tagcomp'>
+                <table class='table table-hover table-condensed table-responsive table-row table-head' id='lista-cfdi-$tagcomp'>
 
                 </table>
             </div>
@@ -1977,6 +2002,7 @@ class ControladorPago{
         foreach ($getpago as $actual) {
             $idfactura = $actual['pago_idfactura'];
             $type = $actual['type'];
+            $montoinsoluto = $actual['monto_insoluto'];
             $estado = $this->getestadoFactura($idfactura, $type);
             if ($estado != '3') {
                 $actualizar = $this->estadoFactura($idfactura, '2', $type);
@@ -2087,12 +2113,12 @@ class ControladorPago{
     }
 
     private function bodyMail($asunto, $saludo, $nombre, $msg, $logo) {
-        $archivo = "../com.sine.dao/configuracion.ini";
+        $archivo = $_SESSION[sha1("database")].".ini";
         $ajustes = parse_ini_file($archivo, true);
         if (!$ajustes) {
             throw new Exception("No se puede abrir el archivo " . $archivo);
         }
-        $rfcfolder = isset($ajustes['cron']['rfcfolder']) ? $ajustes['cron']['rfcfolder'] : 'NAGA021226FJ0';
+        $rfcfolder = $ajustes['cron']['rfcfolder'];
 
         $txt = str_replace("<corte>", "</p><p style='font-size:18px; text-align: justify;'>", $msg);
         $message = "<html>
@@ -2613,7 +2639,7 @@ class ControladorPago{
 
         <div class='row scrollX'>
             <div class='col-md-12'>
-                <table class='table tab-hover table-condensed table-responsive table-row thead-form'>
+                <table class='table table-hover table-condensed table-responsive table-row thead-form'>
                     <tbody >
                         <tr>
                             <td colspan='2'>
@@ -2670,7 +2696,7 @@ class ControladorPago{
                         </tr>
                     </tbody>
                 </table>
-                <table class='table tab-hover table-condensed table-responsive table-row table-head' id='lista-cfdi-$tagcomp'>
+                <table class='table table-hover table-condensed table-responsive table-row table-head' id='lista-cfdi-$tagcomp'>
 
                 </table>
             </div>

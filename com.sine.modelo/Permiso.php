@@ -124,10 +124,114 @@ class Permiso {
     private $exportarfactura;
 
 
+    //CAMBIOS EN RELACION A GPS 22 de abril
+    private $instalaciongps;
+    private $creargps;
+    private $editargps;
+    private $eliminargps;
+    private $listagps;
+    private $crearinstalacion;
+    private $editarinicio;
+    private $editarpasos;
+    private $cancelarinstalacion;
+    private $eliminarinstalacion; 
+    private $listainstalacion; 
+    private $reportecorte; 
+
     function __construct() {
         
     }
     
+    //GETTERS EN GPS
+    function getInstalacionGps() {
+        return $this->instalaciongps;
+    }
+    function getCrearGps() {
+        return $this->creargps;
+    }
+
+    function getEditarGps() {
+        return $this->editargps;
+    }
+
+    function getEliminarGps() {
+        return $this->eliminargps;
+    }
+
+    function getListaGps() {
+        return $this->listagps;
+    }
+
+    function getCrearInstalacion() {
+        return $this->crearinstalacion;
+    }
+
+    function getEditarInicio() {
+        return $this->editarinicio;
+    }
+
+    function getEditarPasos() {
+        return $this->editarpasos;
+    }
+
+    function getCancelarInstalacion() {
+        return $this->cancelarinstalacion;
+    }
+
+    function getEliminarInstalacion() {
+        return $this->eliminarinstalacion;
+    }
+
+    function getListaInstalacion() {
+        return $this->listainstalacion;
+    }
+
+    //SETTTER EN GPS
+    function setInstalacionGps($instalaciongps) {
+        $this->instalaciongps = $instalaciongps;
+    }
+
+    function setCrearGps($creargps) {
+        $this->creargps = $creargps;
+    }
+
+    function setEditarGps($editargps) {
+        $this->editargps = $editargps;
+    }
+
+    function setEliminarGps($eliminargps) {
+        $this->eliminargps = $eliminargps;
+    }
+
+    function setListaGps($listagps) {
+        $this->listagps = $listagps;
+    }
+
+    function setCrearInstalacion($crearinstalacion) {
+        $this->crearinstalacion = $crearinstalacion;
+    }
+
+    function setEditarInicio($editarinicio) {
+        $this->editarinicio = $editarinicio;
+    }
+
+    function setEditarPasos($editarpasos) {
+        $this->editarpasos = $editarpasos;
+    }
+
+    function setCancelarInstalacion($cancelarinstalacion) {
+        $this->cancelarinstalacion = $cancelarinstalacion;
+    }
+
+    function setEliminarInstalacion($eliminarinstalacion) {
+        $this->eliminarinstalacion = $eliminarinstalacion;
+    }
+
+    function setListaInstalacion($listainstalacion) {
+        $this->listainstalacion = $listainstalacion;
+    }
+
+    //FIN DE CAMBIOS
     function getIdUsuario() {
         return $this->idUsuario;
     }
@@ -553,6 +657,10 @@ class Permiso {
         return $this->reportepuntoventa;
     }
 
+    function getReporteCorte() {
+        return $this->creartransporte;
+    }
+
     function getConfiguracion() {
         return $this->configuracion;
     }
@@ -699,6 +807,10 @@ class Permiso {
 
     function setReportePuntoVenta($reportepuntoventa) {
         $this->reportepuntoventa = $reportepuntoventa;
+    }
+
+    function setReporteCorte($reportecorte) {
+        $this->reportecorte = $reportecorte;
     }
 
     function setCartaporte($cartaporte) {

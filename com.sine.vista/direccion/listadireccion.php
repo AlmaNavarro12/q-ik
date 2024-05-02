@@ -27,7 +27,7 @@
     </div>
 </div>
 <div class="scrollX div-form mw-100 bg-light mx-3 border border-secondary-subtle">
-    <table class="table tab-hover table-condensed table-responsive table-row table-head" id="body-lista-ubicacion">
+    <table class="table table-hover table-condensed table-responsive table-row table-head" id="body-lista-ubicacion">
         <thead class='sin-paddding'>
             <tr class="align-middle">
                 <th class="text-center">Tipo</th>

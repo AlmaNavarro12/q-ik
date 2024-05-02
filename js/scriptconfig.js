@@ -968,6 +968,12 @@ function setValoresEncabezado(datos) {
         $("#carta-titulo").attr('hidden', true);
         $("#titulo2").val('');
     }
+
+    if(idencabezado == '16'){
+        $("#common-pie").attr('hidden', true);
+    } else {
+        $("#common-pie").removeAttr('hidden');
+    }
     $("#eliminarimagen").attr("onclick", "eliminarImagen('actualizar')");
     cargandoHide();
     visualizarPDF();

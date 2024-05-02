@@ -33,7 +33,7 @@ include("modals.php");
 
 
 <div class="scrollX div-form mw-100 bg-light mx-3 border border-secondary-subtle">
-    <table class="table tab-hover table-condensed table-responsive table-row table-head" id="body-lista-ticket">
+    <table class="table table-hover table-condensed table-responsive table-row table-head" id="body-lista-ticket">
         <thead class="sin-paddding">
             <tr class='align-middle'>
                 <th></th>

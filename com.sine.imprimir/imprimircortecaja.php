@@ -27,6 +27,8 @@ class PDF extends FPDF
     var $rowborder;
     var $borderfill;
     var $Tfolio;
+    var $cse;
+    var $cnombreu;
     var $usuario;
     var $uid;
     var $supervisor;
@@ -275,6 +277,11 @@ class PDF extends FPDF
         }
         //Go to the next line
         $this->Ln($h);
+    }
+
+    public function getPageBreakTrigger()
+    {
+        return $this->PageBreakTrigger;
     }
 
     function RowNB($data)
@@ -577,30 +584,42 @@ class PDF extends FPDF
 
         if ($this->uid != '0') {
             $this->SetY(46);
-            $this->SetX(30);
-            $this->SetTextColor(0, 0, 0);
+            $this->SetX(10);
+            $this->SetTextColor($this->cse[0], $this->cse[1], $this->cse[2]);
             $this->SetFont('Arial', 'B', 12);
-            $this->Cell(45, 8, "Datos de usuario: " . iconv("utf-8", "windows-1252", $this->usuario), 0, 0, 'C', false);
-            $this->SetY(53);
-            $this->SetX(35);
-            $this->SetTextColor(0, 0, 0);
+            $this->Cell(0, 8, "Datos de usuario: ", 0, 0, 'L', false);
+            $this->SetTextColor($this->cnombreu[0], $this->cnombreu[1], $this->cnombreu[2]);
+            $this->SetY(46);
+            $this->SetX(60);
+            $this->Cell(0, 8, iconv("utf-8", "windows-1252", $this->usuario), 0, 0, 'L', false);
+            $this->SetY(51);
+            $this->SetX(10);
+            $this->SetTextColor($this->cse[0], $this->cse[1], $this->cse[2]);
             $this->SetFont('Arial', 'B', 12);
-            $this->Cell(45, 8, "Datos de supervisor: " . iconv("utf-8", "windows-1252", $this->supervisor), 0, 0, 'C', false);
+            $this->Cell(0, 8, "Datos de supervisor: ", 0, 0, 'L', false);
+            $this->SetTextColor($this->cnombreu[0], $this->cnombreu[1], $this->cnombreu[2]);
+            $this->SetY(51);
+            $this->SetX(60);
+            $this->Cell(0, 8, iconv("utf-8", "windows-1252", $this->usuario), 0, 0, 'L', false);
             $this->Ln(15);
         }
 
         $this->SetY(69);
-        $this->SetX(35);
-        $this->SetTextColor(0, 0, 0);
+        $this->SetX(27);
+        $this->SetTextColor($this->cse[0], $this->cse[1], $this->cse[2]);
         $this->SetFont('Arial', 'B', 14);
-        $this->Cell(45, 8, "Ventas totales: " . number_format($this->total, 2, '.', ','), 0, 0, 'C', false);
-        $this->SetX(135);
-        $this->Cell(45, 8, "Ganancias totales: " . number_format($this->ganancias, 2, '.', ','), 0, 0, 'C', false);
-
+        $this->Cell(0, 8, "Ventas totales:", 0, 0, 'L', false);
+        $this->SetTextColor($this->cnombreu[0], $this->cnombreu[1], $this->cnombreu[2]);
+        $this->SetY(69);
+        $this->SetX(67);
+        $this->Cell(45, 8, "$" . number_format($this->total, 2, '.', ','), 0, 0, 'L', false);
+        $this->SetX(125);
+        $this->SetTextColor($this->cse[0], $this->cse[1], $this->cse[2]);
+        $this->Cell(0, 8, "Ganancias totales:", 0, 0, 'L', false);
+        $this->SetTextColor($this->cnombreu[0], $this->cnombreu[1], $this->cnombreu[2]);
+        $this->SetX(172);
+        $this->Cell(45, 8, "$" . number_format($this->ganancias, 2, '.', ','), 0, 0, 'L', false);
         $this->Ln(18);
-
-
-        //$this->Row(array('Ventas totales:', "$ " . number_format(70, 2, '.', ','), '', 'Ganancias:', "$ " . number_format($totganancia, 2, '.', ',')));
     }
 
     function Footer()
@@ -713,7 +732,7 @@ if ($id < 10) {
 $divF = explode("-", $fecha);
 $mon = $cv->translateMonth($divF[1]);
 $dateformat = $divF[2] . "/" . $mon . "/" . $divF[0];
-$usuario = "";
+$usuario = $cv->getUserbyID($uid);
 
 $datos = $cv->printCorteCaja($tag, $fecha, $_GET['h'], $uid);
 $div = explode("<cut>", $datos);
@@ -762,6 +781,9 @@ $pdf->telefono2 = $telefono2;
 $pdf->chnum = $chnum;
 $pdf->colorpie = $colorpie;
 $pdf->Tfolio = $id;
+$pdf->cse = $rgbbld;
+$pdf->cnombreu = $rgbtxt;
+$pdf->fecha = $dateformat;
 $pdf->hora = date('h:i A', strtotime($hora));
 $pdf->usuario = $cv->getUserbyID($uid);
 $pdf->supervisor = $cv->getUserbyID($super);
@@ -770,6 +792,8 @@ $pdf->total = $totventas;
 $pdf->ganancias = $totganancia;
 
 $pdf->AliasNbPages();
+
+//-----------------------------------PAGINA 1
 $pdf->AddPage();
 $pdf->SetAligns('C');
 $pdf->SetRowBorder('NB');
@@ -799,17 +823,17 @@ $pdf->Row(array('', ''));
 
 $pdf->SetRowBorder('B');
 $pdf->SetLineHeight(4.5);
-$pdf->Row(array('Dinero inicial en caja:', "$ " . number_format($fondo, 2, '.', ',')));
+$pdf->Row(array('Dinero inicial en caja:', "$" . number_format($fondo, 2, '.', ',')));
 
 $entradas = $cv->getMovEfectivoByTag('1', $tag, $uid);
 foreach ($entradas as $actual) {
     $concepto =  iconv("utf-8", "windows-1252", $actual['concepto']);
     $monto = $actual['monto'];
     $total += $actual['monto'];
-    $pdf->Row(array(iconv("utf-8", "windows-1252", $concepto) . ":", "$ " . number_format($monto, 2, '.', ',')));
+    $pdf->Row(array(iconv("utf-8", "windows-1252", $concepto) . ":", "$" . number_format($monto, 2, '.', ',')));
 }
 
-$pdf->Row(array('Total:', "$ " . number_format($total, 2, '.', ',')));
+$pdf->Row(array('Total:', "$" . number_format($total, 2, '.', ',')));
 $y1 = $pdf->GetY();
 
 $total = 0;
@@ -826,7 +850,7 @@ foreach ($datf as $actual) {
 
 $pdf->SetY($y);
 $pdf->SetX(110);
-$pdf->Row(array(iconv("utf-8", "windows-1252", 'Ventas en efectivo:'), "$ " . number_format($efectivo, 2, '.', ',')));
+$pdf->Row(array(iconv("utf-8", "windows-1252", 'Ventas en efectivo:'), "$" . number_format($efectivo, 2, '.', ',')));
 
 $datcd = $cv->getVentasByTipoTag($tag, 'card', $uid, $fecha, $_GET['h']);
 foreach ($datcd as $actual) {
@@ -836,7 +860,7 @@ foreach ($datcd as $actual) {
 
 if ($tarjeta > 0) {
     $pdf->SetX(110);
-    $pdf->Row(array(iconv("utf-8", "windows-1252", 'Ventas con tarjeta:'), "$ " . number_format($tarjeta, 2, '.', ',')));
+    $pdf->Row(array(iconv("utf-8", "windows-1252", 'Ventas con tarjeta:'), "$" . number_format($tarjeta, 2, '.', ',')));
 }
 
 $datvl = $cv->getVentasByTipoTag($tag, 'val', $uid, $fecha, $_GET['h']);
@@ -847,7 +871,7 @@ foreach ($datvl as $actual) {
 
 if ($vales > 0) {
     $pdf->SetX(110);
-    $pdf->Row(array(iconv("utf-8", "windows-1252", 'Ventas con vales:'), "$ " . number_format($vales, 2, '.', ',')));
+    $pdf->Row(array(iconv("utf-8", "windows-1252", 'Ventas con vales:'), "$" . number_format($vales, 2, '.', ',')));
 }
 
 
@@ -865,7 +889,9 @@ foreach ($ent as $actual) {
 
 if ($entradas > 0) {
     $pdf->SetX(110);
-    $pdf->Row(array(iconv("utf-8", "windows-1252", 'Entradas:'), "$ " . number_format($entradas, 2, '.', ',')));
+    $pdf->setRowColorText(array("#48AD2C"));
+    $pdf->Row(array(iconv("utf-8", "windows-1252", 'Entradas:'), "$" . number_format($entradas, 2, '.', ',')));
+    $pdf->setRowColorText(array($txtbold, $clrtxt, $txtbold));
 }
 
 $out = $cv->getMovEfectivoByTag('2', $tag, $uid);
@@ -876,11 +902,13 @@ foreach ($out as $actual) {
 
 if ($salidas > 0) {
     $pdf->SetX(110);
-    $pdf->Row(array(iconv("utf-8", "windows-1252", 'Salidas:'), "$ " . number_format($salidas, 2, '.', ',')));
+    $pdf->setRowColorText(array("#FF0000"));
+    $pdf->Row(array(iconv("utf-8", "windows-1252", 'Salidas:'), "$" . number_format($salidas, 2, '.', ',')));
+    $pdf->setRowColorText(array($txtbold, $clrtxt, $txtbold));
 }
 
 $pdf->SetX(110);
-$pdf->Row(array(iconv("utf-8", "windows-1252", 'Total:'), "$ " . number_format($total, 2, '.', ',')));
+$pdf->Row(array(iconv("utf-8", "windows-1252", 'Total:'), "$" . number_format($total, 2, '.', ',')));
 $y2 = $pdf->GetY();
 
 $ylast = $y2;
@@ -918,25 +946,24 @@ foreach ($out as $actual) {
     $monto = $actual['monto'];
     $salidas += $actual['monto'];
 
-    $pdf->Row(array(iconv("utf-8", "windows-1252", $concepto . ":"), "$ " . number_format($monto, 2, '.', ',')));
+    $pdf->Row(array(iconv("utf-8", "windows-1252", $concepto . ":"), "$" . number_format($monto, 2, '.', ',')));
 }
-$pdf->Row(array(iconv("utf-8", "windows-1252", "Total:"), "$ " . number_format($salidas, 2, '.', ',')));
+$pdf->Row(array(iconv("utf-8", "windows-1252", "Total:"), "$" . number_format($salidas, 2, '.', ',')));
 
 $y1 = $pdf->GetY();
 
 $cancelaciones = 0;
 $pdf->SetY($y);
-$pdf->SetX(110);
 $can = $cv->getCancelacionesByTag($tag, $uid, $fecha, $hora);
 foreach ($can as $actual) {
+    $pdf->SetX(110);
     $concepto = $actual['concepto'];
     $monto = $actual['monto'];
     $cancelaciones += $actual['monto'];
-
-    $pdf->Row(array(iconv("utf-8", "windows-1252", $concepto . ":"), "$ " . number_format($monto, 2, '.', ',')));
+    $pdf->Row(array(iconv("utf-8", "windows-1252", $concepto . ":"), "$" . number_format($monto, 2, '.', ',')));
 }
 $pdf->SetX(110);
-$pdf->Row(array(iconv("utf-8", "windows-1252", "Total:"), "$ " . number_format($cancelaciones, 2, '.', ',')));
+$pdf->Row(array(iconv("utf-8", "windows-1252", "Total:"), "$" . number_format($cancelaciones, 2, '.', ',')));
 $y2 = $pdf->GetY();
 
 $ylast = $y2;
@@ -982,6 +1009,7 @@ if ($info[0]["comentarios"] != "") {
     }
 }
 
+//------------------------------------------PAGINA 2
 $pdf->AddPage();
 $fondo = $cv->getFondoCajaByTag($tag);
 if (!empty($fondo)) {
@@ -993,19 +1021,19 @@ if (!empty($fondo)) {
     $pdf->setRowColorText(array($txtbold));
     $pdf->SetWidths(array(150));
     $pdf->Row(array('Fondo de incio en caja:'));
-    $pdf->Ln(3);
+    $pdf->Ln(1);
 
     $pdf->SetAligns(array('L', 'C',));
     $pdf->SetWidths(array(145, 45));
     $pdf->SetSizes(array(10, 10));
     $pdf->SetStyles(array('', '',));
     $pdf->setRowColorText(array($txtbold, $txtbold));
-    $pdf->SetLineHeight(5.5);
+    $pdf->SetLineHeight(6.5);
     $pdf->SetRowBorder('B');
     foreach ($fondo as $actual) {
         $monto = $actual['fondo'];
         $hora = $actual['horaingreso'];
-        $pdf->Row(array(iconv("utf-8", "windows-1252", "Hora de ingreso: " . date('h:i A', strtotime($hora))), "$ " . number_format($monto, 2, '.', ',')));
+        $pdf->Row(array(iconv("utf-8", "windows-1252", "Hora de ingreso: " . date('h:i A', strtotime($hora))), "$" . number_format($monto, 2, '.', ',')));
     }
 }
 
@@ -1020,29 +1048,29 @@ if (!empty($entrada)) {
     $pdf->setRowColorText(array($txtbold));
     $pdf->SetWidths(array(150));
     $pdf->Row(array('Detalles de entrada de efectivo en la caja:'));
-    $pdf->Ln(3);
+    $pdf->Ln(1);
 
     $pdf->SetAligns(array('L', 'C', 'C',));
     $pdf->SetWidths(array(100, 45, 45));
     $pdf->SetSizes(array(10, 10, 10));
     $pdf->SetStyles(array('', '', ''));
     $pdf->setRowColorText(array($txtbold, $txtbold, $txtbold));
-    $pdf->SetLineHeight(5.5);
+    $pdf->SetLineHeight(6.5);
     $pdf->SetRowBorder('B');
     foreach ($entrada as $actual) {
         $concepto =  iconv("utf-8", "windows-1252", $actual['concepto']);
         $monto = $actual['monto'];
         $horam = $actual['hora'];
         $total += $actual['monto'];
-        $pdf->Row(array(iconv("utf-8", "windows-1252", $concepto), iconv("utf-8", "windows-1252", date('h:i A', strtotime($horam))), "$ " . number_format($monto, 2, '.', ',')));
+        $pdf->Row(array(iconv("utf-8", "windows-1252", $concepto), iconv("utf-8", "windows-1252", date('h:i A', strtotime($horam))), "$" . number_format($monto, 2, '.', ',')));
     }
-
-    $pdf->Cell(145, 4.5, iconv("utf-8", "windows-1252", ""), 1, 0, 'R');
-    $pdf->Cell(45, 4.5, "$ " . number_format($total, 2, '.', ','), 1, 1, 'C');
+    $pdf->SetFont('Arial', 'B', 10);
+    $pdf->Cell(145, 6.5, iconv("utf-8", "windows-1252", ""), 0, 0, 'R');
+    $pdf->Cell(45, 6.5, "$" . number_format($total, 2, '.', ','), 1, 1, 'C');
 }
 
-$entrada = $cv->getMovEfectivoByTag('2', $tag, $uid);
-if (!empty($entrada)) {
+$salida = $cv->getMovEfectivoByTag('2', $tag, $uid);
+if (!empty($salida)) {
     $total = 0;
     $pdf->Ln(8);
     $pdf->SetRowBorder('NB');
@@ -1052,117 +1080,25 @@ if (!empty($entrada)) {
     $pdf->setRowColorText(array($txtbold));
     $pdf->SetWidths(array(150));
     $pdf->Row(array('Detalles de salida de efectivo en la caja:'));
-    $pdf->Ln(3);
+    $pdf->Ln(1);
 
     $pdf->SetAligns(array('L', 'C', 'C',));
     $pdf->SetWidths(array(100, 45, 45));
     $pdf->SetSizes(array(10, 10, 10));
     $pdf->SetStyles(array('', '', ''));
     $pdf->setRowColorText(array($txtbold, $txtbold, $txtbold));
-    $pdf->SetLineHeight(5.5);
+    $pdf->SetLineHeight(6.5);
     $pdf->SetRowBorder('B');
     foreach ($entrada as $actual) {
         $concepto =  iconv("utf-8", "windows-1252", $actual['concepto']);
         $monto = $actual['monto'];
         $horam = $actual['hora'];
         $total += $actual['monto'];
-        $pdf->Row(array(iconv("utf-8", "windows-1252", $concepto), iconv("utf-8", "windows-1252", date('h:i A', strtotime($horam))), "$ " . number_format($monto, 2, '.', ',')));
+        $pdf->Row(array(iconv("utf-8", "windows-1252", $concepto), iconv("utf-8", "windows-1252", date('h:i A', strtotime($horam))), "$" . number_format($monto, 2, '.', ',')));
     }
-    $pdf->SetFont('Arial', 'B', 9);
-    $pdf->Cell(145, 4.5, iconv("utf-8", "windows-1252", "Total"), 1, 0, 'L');
-    $pdf->Cell(45, 4.5, "$ " . number_format($total, 2, '.', ','), 1, 1, 'C');
-}
-
-$pdf->Ln(8);
-$pdf->SetRowBorder('NB');
-$pdf->SetLineHeight(4.5);
-$pdf->SetSizes(array(13));
-$pdf->SetStyles(array('B'));
-$pdf->setRowColorText(array($txtbold));
-$pdf->SetWidths(array(150));
-$pdf->SetAligns(array('L',));
-$pdf->Row(array('Detalle pagos de facturas:'));
-$pdf->Ln(3);
-
-
-$detallesPagosPorForma  = $cv->obtenerDetallesPagosPorForma($tag, $fecha, $_GET['h'], $uid);
-if (empty($detallesPagosPorForma)) {
-    $pdf->SetAligns(array('L', 'C', 'C', 'C', 'C', 'C', 'C', 'C'));
-    $pdf->SetWidths(array(20, 20, 40, 45, 20, 25, 20));
-    $pdf->SetSizes(array(9, 9, 9, 9, 9, 9, 9, 9));
-    $pdf->SetStyles(array('B', 'B', 'B', 'B', 'B', 'B'));
-    $pdf->setRowColorText(array($txtbold, $txtbold, $txtbold, $txtbold, $txtbold, $txtbold));
-    $pdf->SetLineHeight(5.5);
-    $pdf->SetRowBorder('B');
-    $pdf->SetAligns(array('C'));
-    $pdf->SetWidths(array(190));
-    $pdf->Row(array(iconv("utf-8", "windows-1252", "No hay pagos de facturas registrados.")));
-} else {
-    foreach ($detallesPagosPorForma as $formaPago => $detalles) {
-        $pdf->SetAligns(array('L', 'C', 'C', 'C', 'C', 'C', 'C', 'C'));
-        $pdf->SetWidths(array(20, 20, 40, 45, 20, 25, 20));
-        $pdf->SetSizes(array(9, 9, 9, 9, 9, 9, 9, 9));
-        $pdf->SetStyles(array('B', 'B', 'B', 'B', 'B', 'B'));
-        $pdf->setRowColorText(array($txtbold, $txtbold, $txtbold, $txtbold, $txtbold, $txtbold));
-        $pdf->SetLineHeight(6.5);
-        $pdf->SetRowBorder('B');
-        $pdf->SetAligns(array('L'));
-        $pdf->SetWidths(array(190));
-        $pdf->Row(array(iconv("utf-8", "windows-1252", "Forma de pago: " . $formaPago)));
-
-        $sumaTotalPagos = 0;
-        $pdf->SetAligns(array('L', 'C', 'C', 'C', 'C', 'C', 'C', 'C'));
-        $pdf->SetWidths(array(20, 20, 40, 45, 20, 25, 20));
-        $pdf->SetSizes(array(9, 9, 9, 9, 9, 9, 9, 9));
-        $pdf->SetStyles(array('B', 'B', 'B', 'B', 'B', 'B'));
-        $pdf->setRowColorText(array($txtbold, $txtbold, $txtbold, $txtbold, $txtbold, $txtbold));
-        $pdf->SetLineHeight(2.9);
-        $pdf->SetRowBorder('B');
-
-        $pdf->Row(array(
-            iconv("utf-8", "windows-1252", "\nFolio"),
-            iconv("utf-8", "windows-1252", "\nHora"),
-            iconv("utf-8", "windows-1252", "\nEmisor"),
-            iconv("utf-8", "windows-1252", "\nReceptor"),
-            iconv("utf-8", "windows-1252", "\nMoneda"),
-            iconv("utf-8", "windows-1252", "\nNúmero de complemento"),
-            iconv("utf-8", "windows-1252", "\nTotal")
-        ));
-
-        foreach ($detalles as $detalle) {
-            $folio = $detalle["letra"] . $detalle["foliopago"];
-            $horapago = $detalle["hora_creacion"];
-            $emisor = $detalle["razonemisor"];
-            $receptor = $detalle["razonreceptor"];
-            $moneda = $detalle["nombre_moneda"];
-            $orden = $detalle["orden"];
-            $total = $detalle["total"];
-            $sumaTotalPagos += $total;
-            $emisor_capitalize = !empty($emisor) ? ucwords(mb_strtolower($emisor, 'UTF-8')) : "No disponible";
-            $receptor_capitalize = !empty($receptor) ? ucwords(mb_strtolower($receptor, 'UTF-8')) : "No disponible";
-
-            $pdf->SetLineHeight(3.5);
-            $pdf->Row(array(
-                iconv("utf-8", "windows-1252", "\n" . $folio),
-                iconv("utf-8", "windows-1252", "\n" . date('h:i A', strtotime($horapago))),
-                iconv("utf-8", "windows-1252", "\n" . $emisor_capitalize . "\n "),
-                iconv("utf-8", "windows-1252", "\n" . $receptor_capitalize . "\n "),
-                iconv("utf-8", "windows-1252", "\n" . $moneda),
-                iconv("utf-8", "windows-1252", "\n" . $orden),
-                iconv("utf-8", "windows-1252", "\n" . "$ " . number_format($total, 2, '.', ',')),
-
-            ));
-        }
-        $pdf->SetLineHeight(6.5);
-        $pdf->SetFont('Arial', 'B', 9);
-        $anchoCelda1 = 170;
-        $anchoCelda2 = 20;
-        $anchoTotal = $anchoCelda1 + $anchoCelda2 * 3;
-        $pdf->Cell($anchoCelda1, 4.5, iconv("utf-8", "windows-1252", "Total"), 1, 0, 'L');
-        $pdf->Cell($anchoCelda2, 4.5, "$ " . number_format($sumaTotalPagos, 2, '.', ','), 1, 1, 'C');
-        $pdf->Cell($anchoTotal, 2, '', 0, 1, 'C');
-        $pdf->Ln(6);
-    }
+    $pdf->SetFont('Arial', 'B', 10);
+    $pdf->Cell(145, 6.5, iconv("utf-8", "windows-1252", ""), 0, 0, 'L');
+    $pdf->Cell(45, 6.5, "$" . number_format($total, 2, '.', ','), 1, 1, 'C');
 }
 
 $pdf->Ln(8);
@@ -1174,31 +1110,30 @@ $pdf->setRowColorText(array($txtbold));
 $pdf->SetWidths(array(150));
 $pdf->SetAligns(array('L',));
 $pdf->Row(array('Detalle de ventas:'));
-$pdf->Ln(3);
+$pdf->Ln(1);
 
 $pdf->SetAligns(array('L', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C'));
 $pdf->SetWidths(array(20, 20, 20, 20, 20, 25, 20, 25, 20));
 $pdf->SetSizes(array(9, 9, 9, 9, 9, 9, 9, 9, 9));
 $pdf->SetStyles(array('B', 'B', 'B', 'B', 'B', 'B', 'B', 'B', 'B'));
 $pdf->setRowColorText(array($txtbold, $txtbold, $txtbold, $txtbold, $txtbold, $txtbold, $txtbold, $txtbold, $txtbold));
-$pdf->SetLineHeight(5.5);
+$pdf->SetLineHeight(6);
 $pdf->SetRowBorder('B');
 
 $ventas = $cv->obtenerDetallesVentas($tag, $fecha, $_GET['h'], $uid);
-
 if (empty($ventas)) {
     $pdf->SetAligns(array('C'));
     $pdf->SetWidths(array(190));
     $pdf->Row(array(iconv("utf-8", "windows-1252", "No hay ventas registradas.")));
 } else {
     $totalVentas = 0;
-
     $sumaTotalTras = 0;
     $sumaTotalRet = 0;
     $totalSin = 0;
     $descuento = 0;
     $totalDes = 0;
-
+    $pdf->SetWidths(array(20, 20, 20, 20, 20, 25, 20, 25, 20));
+    $pdf->SetRowBorder('B');
     $pdf->Row(array(
         iconv("utf-8", "windows-1252", "Folio"),
         iconv("utf-8", "windows-1252", "Hora"),
@@ -1210,7 +1145,7 @@ if (empty($ventas)) {
         iconv("utf-8", "windows-1252", "Retención"),
         iconv("utf-8", "windows-1252", "Total")
     ));
-    $pdf->SetStyles(array('', '', '', '', '', '', ''));
+    $pdf->SetStyles(array('', '', '', '', '', '', '', '', ''));
     foreach ($ventas as $detalles) {
         $folio = $detalles["letra"] . $detalles["folio"];
         $horav = $detalles["hora_venta"];
@@ -1265,17 +1200,21 @@ if (empty($ventas)) {
         $sumaTotalTras += $sumatras;
         $sumaTotalRet += $sumaret;
 
+        if ($pdf->GetY() + 10 > $pdf->getPageBreakTrigger()) {
+            $pdf->AddPage();
+        }
 
+        $pdf->SetWidths(array(20, 20, 20, 20, 20, 25, 20, 25, 20));
         $pdf->Row(array(
             iconv("utf-8", "windows-1252", $folio),
             iconv("utf-8", "windows-1252", date('h:i A', strtotime($horav))),
             $cantidad,
             iconv("utf-8", "windows-1252", $formapago),
-            "$ " . number_format($subtotal, 2, '.', ','),
-            "$ " . number_format($descuento, 2, '.', ','),
-            "$ " . number_format($sumatras, 2, '.', ','),
-            "$ " . number_format($sumaret, 2, '.', ','),
-            "$ " . number_format($total, 2, '.', ',')
+            "$" . number_format($subtotal, 2, '.', ','),
+            "$" . number_format($descuento, 2, '.', ','),
+            "$" . number_format($sumatras, 2, '.', ','),
+            "$" . number_format($sumaret, 2, '.', ','),
+            "$" . number_format($total, 2, '.', ',')
         ));
     }
     $pdf->SetFont('Arial', 'B', 9);
@@ -1283,14 +1222,13 @@ if (empty($ventas)) {
     $anchoCelda2 = 20;
     $anchoTotal = $anchoCelda1 + $anchoCelda2 * 3;
     $pdf->Cell($anchoCelda1, 4.5, iconv("utf-8", "windows-1252", "Total"), 1, 0, 'L');
-    $pdf->Cell($anchoCelda2, 4.5, "$ " . number_format($totalSin, 2, '.', ','), 1, 0, 'C');
-    $pdf->Cell(25, 4.5, "$ " . number_format($totalDes, 2, '.', ','), 1, 0, 'C');
-    $pdf->Cell(20, 4.5, "$ " . number_format($sumaTotalTras, 2, '.', ','), 1, 0, 'C');
-    $pdf->Cell(25, 4.5, "$ " . number_format($sumaTotalRet, 2, '.', ','), 1, 0, 'C');
-    $pdf->Cell($anchoCelda2, 4.5, "$ " . number_format($totalVentas, 2, '.', ','), 1, 1, 'C');
+    $pdf->Cell($anchoCelda2, 4.5, "$" . number_format($totalSin, 2, '.', ','), 1, 0, 'C');
+    $pdf->Cell(25, 4.5, "$" . number_format($totalDes, 2, '.', ','), 1, 0, 'C');
+    $pdf->Cell(20, 4.5, "$" . number_format($sumaTotalTras, 2, '.', ','), 1, 0, 'C');
+    $pdf->Cell(25, 4.5, "$" . number_format($sumaTotalRet, 2, '.', ','), 1, 0, 'C');
+    $pdf->Cell($anchoCelda2, 4.5, "$" . number_format($totalVentas, 2, '.', ','), 1, 1, 'C');
     $pdf->Cell($anchoTotal, 2, '', 0, 1, 'C');
 }
-
 
 $pdf->Ln(8);
 $pdf->SetRowBorder('NB');
@@ -1300,9 +1238,11 @@ $pdf->SetStyles(array('B'));
 $pdf->setRowColorText(array($txtbold));
 $pdf->SetWidths(array(150));
 $pdf->SetAligns(array('L',));
+if ($pdf->GetY() + 10 > $pdf->getPageBreakTrigger()) {
+    $pdf->AddPage();
+}
 $pdf->Row(array('Detalle de ventas canceladas:'));
-$pdf->Ln(3);
-
+$pdf->Ln(1);
 $pdf->SetAligns(array('L', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C'));
 $pdf->SetWidths(array(20, 20, 20, 20, 20, 25, 20, 25, 20));
 $pdf->SetSizes(array(9, 9, 9, 9, 9, 9, 9, 9, 9));
@@ -1312,20 +1252,25 @@ $pdf->SetLineHeight(5.5);
 $pdf->SetRowBorder('B');
 
 $ventas = $cv->obtenerDetallesVentasCanceladas($tag, $fecha, $_GET['h'], $uid);
-
 if (empty($ventas)) {
     $pdf->SetAligns(array('C'));
     $pdf->SetWidths(array(190));
+    if ($pdf->GetY() + 10 > $pdf->getPageBreakTrigger()) {
+        $pdf->AddPage();
+        $pdf->SetAligns(array('C'));
+        $pdf->SetWidths(array(190));
+    }
     $pdf->Row(array(iconv("utf-8", "windows-1252", "No hay ventas canceladas.")));
 } else {
     $totalVentas = 0;
-
     $sumaTotalTras = 0;
     $sumaTotalRet = 0;
     $totalSin = 0;
     $totalFinDes = 0;
     $desc = 0;
-
+    if ($pdf->GetY() + 10 > $pdf->getPageBreakTrigger()) {
+        $pdf->AddPage();
+    }
     $pdf->Row(array(
         iconv("utf-8", "windows-1252", "Folio"),
         iconv("utf-8", "windows-1252", "Hora"),
@@ -1391,17 +1336,27 @@ if (empty($ventas)) {
         $sumaTotalTras += $sumatras;
         $sumaTotalRet += $sumaret;
 
-
+        if ($pdf->GetY() + 10 > $pdf->getPageBreakTrigger()) {
+            $pdf->AddPage();
+            $pdf->Ln(1);
+            $pdf->SetAligns(array('L', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C'));
+            $pdf->SetWidths(array(20, 20, 20, 20, 20, 25, 20, 25, 20));
+            $pdf->SetSizes(array(9, 9, 9, 9, 9, 9, 9, 9, 9));
+            $pdf->SetStyles(array('B', 'B', 'B', 'B', 'B', 'B', 'B', 'B', 'B'));
+            $pdf->setRowColorText(array($txtbold, $txtbold, $txtbold, $txtbold, $txtbold, $txtbold, $txtbold, $txtbold, $txtbold));
+            $pdf->SetLineHeight(5.5);
+            $pdf->SetRowBorder('B');
+        }
         $pdf->Row(array(
             iconv("utf-8", "windows-1252", $folio),
             iconv("utf-8", "windows-1252", date('h:i A', strtotime($hora))),
             $cantidad,
             iconv("utf-8", "windows-1252", $formapago),
-            "$ " . number_format($subtotal, 2, '.', ','),
-            "$ " . number_format($desc, 2, '.', ','),
-            "$ " . number_format($sumatras, 2, '.', ','),
-            "$ " . number_format($sumaret, 2, '.', ','),
-            "$ " . number_format($total, 2, '.', ',')
+            "$" . number_format($subtotal, 2, '.', ','),
+            "$" . number_format($desc, 2, '.', ','),
+            "$" . number_format($sumatras, 2, '.', ','),
+            "$" . number_format($sumaret, 2, '.', ','),
+            "$" . number_format($total, 2, '.', ',')
         ));
     }
     $pdf->SetFont('Arial', 'B', 9);
@@ -1409,15 +1364,147 @@ if (empty($ventas)) {
     $anchoCelda2 = 20;
     $anchoTotal = $anchoCelda1 + $anchoCelda2 * 3;
     $pdf->Cell($anchoCelda1, 4.5, iconv("utf-8", "windows-1252", "Total"), 1, 0, 'L');
-    $pdf->Cell($anchoCelda2, 4.5, "$ " . number_format($totalSin, 2, '.', ','), 1, 0, 'C');
-    $pdf->Cell(25, 4.5, "$ " . number_format($totalFinDes, 2, '.', ','), 1, 0, 'C');
-    $pdf->Cell(20, 4.5, "$ " . number_format($sumaTotalTras, 2, '.', ','), 1, 0, 'C');
-    $pdf->Cell(25, 4.5, "$ " . number_format($sumaTotalRet, 2, '.', ','), 1, 0, 'C');
-    $pdf->Cell($anchoCelda2, 4.5, "$ " . number_format($totalVentas, 2, '.', ','), 1, 1, 'C');
+    $pdf->Cell($anchoCelda2, 4.5, "$" . number_format($totalSin, 2, '.', ','), 1, 0, 'C');
+    $pdf->Cell(25, 4.5, "$" . number_format($totalFinDes, 2, '.', ','), 1, 0, 'C');
+    $pdf->Cell(20, 4.5, "$" . number_format($sumaTotalTras, 2, '.', ','), 1, 0, 'C');
+    $pdf->Cell(25, 4.5, "$" . number_format($sumaTotalRet, 2, '.', ','), 1, 0, 'C');
+    $pdf->Cell($anchoCelda2, 4.5, "$" . number_format($totalVentas, 2, '.', ','), 1, 1, 'C');
     $pdf->Cell($anchoTotal, 2, '', 0, 1, 'C');
 }
 
-$pdf->isFinished = true;
+$pdf->Ln(8);
+$pdf->SetRowBorder('NB');
+$pdf->SetLineHeight(4.5);
+$pdf->SetSizes(array(13));
+$pdf->SetStyles(array('B'));
+$pdf->setRowColorText(array($txtbold));
+$pdf->SetWidths(array(150));
+$pdf->SetAligns(array('L',));
+$pdf->Row(array('Detalle pagos de facturas:'));
+$pdf->Ln(8);
+$detallesPagosPorForma  = $cv->obtenerDetallesPagosPorForma($tag, $fecha, $_GET['h'], $uid);
+if (empty($detallesPagosPorForma)) {
+    if ($pdf->GetY() + 10 > $pdf->getPageBreakTrigger()) {
+        $pdf->AddPage();
+        $pdf->SetAligns(array('L', 'C', 'C', 'C', 'C', 'C', 'C', 'C'));
+        $pdf->SetWidths(array(20, 20, 40, 45, 20, 25, 20));
+        $pdf->SetSizes(array(9, 9, 9, 9, 9, 9, 9, 9));
+        $pdf->SetStyles(array('B', 'B', 'B', 'B', 'B', 'B'));
+        $pdf->setRowColorText(array($txtbold, $txtbold, $txtbold, $txtbold, $txtbold, $txtbold));
+        $pdf->SetLineHeight(5.5);
+        $pdf->SetRowBorder('B');
+        $pdf->SetAligns(array('C'));
+        $pdf->SetWidths(array(190));
+    }
+    $pdf->SetAligns(array('L', 'C', 'C', 'C', 'C', 'C', 'C', 'C'));
+    $pdf->SetWidths(array(20, 20, 40, 45, 20, 25, 20));
+    $pdf->SetSizes(array(9, 9, 9, 9, 9, 9, 9, 9));
+    $pdf->SetStyles(array('B', 'B', 'B', 'B', 'B', 'B'));
+    $pdf->setRowColorText(array($txtbold, $txtbold, $txtbold, $txtbold, $txtbold, $txtbold));
+    $pdf->SetLineHeight(5.5);
+    $pdf->SetRowBorder('B');
+    $pdf->SetAligns(array('C'));
+    $pdf->SetWidths(array(190));
+    $pdf->Row(array(iconv("utf-8", "windows-1252", "No hay pagos de facturas registrados.")));
+} else {
+    foreach ($detallesPagosPorForma as $formaPago => $detalles) {
+        if ($pdf->GetY() + 10 > $pdf->getPageBreakTrigger()) {
+            $pdf->AddPage();
+            $pdf->SetAligns(array('L', 'C', 'C', 'C', 'C', 'C', 'C', 'C'));
+            $pdf->SetWidths(array(20, 20, 40, 45, 20, 25, 20));
+            $pdf->SetSizes(array(9, 9, 9, 9, 9, 9, 9, 9));
+            $pdf->SetStyles(array('B', 'B', 'B', 'B', 'B', 'B'));
+            $pdf->setRowColorText(array($txtbold, $txtbold, $txtbold, $txtbold, $txtbold, $txtbold));
+            $pdf->SetLineHeight(6.5);
+            $pdf->SetRowBorder('B');
+            $pdf->SetAligns(array('L'));
+            $pdf->SetWidths(array(190));
+        }
+        $pdf->SetAligns(array('L', 'C', 'C', 'C', 'C', 'C', 'C', 'C'));
+        $pdf->SetWidths(array(20, 20, 40, 45, 20, 25, 20));
+        $pdf->SetSizes(array(9, 9, 9, 9, 9, 9, 9, 9));
+        $pdf->SetStyles(array('B', 'B', 'B', 'B', 'B', 'B'));
+        $pdf->setRowColorText(array($txtbold, $txtbold, $txtbold, $txtbold, $txtbold, $txtbold));
+        $pdf->SetLineHeight(6.5);
+        $pdf->SetRowBorder('B');
+        $pdf->SetAligns(array('L'));
+        $pdf->SetWidths(array(190));
+        $pdf->Row(array(iconv("utf-8", "windows-1252", "Forma de pago: " . $formaPago)));
 
+        $sumaTotalPagos = 0;
+        $pdf->SetAligns(array('L', 'C', 'C', 'C', 'C', 'C', 'C', 'C'));
+        $pdf->SetWidths(array(20, 20, 40, 45, 20, 25, 20));
+        $pdf->SetSizes(array(9, 9, 9, 9, 9, 9, 9, 9));
+        $pdf->SetStyles(array('B', 'B', 'B', 'B', 'B', 'B'));
+        $pdf->setRowColorText(array($txtbold, $txtbold, $txtbold, $txtbold, $txtbold, $txtbold));
+        $pdf->SetLineHeight(2.9);
+        $pdf->SetRowBorder('B');
+
+        if ($pdf->GetY() + 10 > $pdf->getPageBreakTrigger()) {
+            $pdf->AddPage();
+            $pdf->SetAligns(array('L', 'C', 'C', 'C', 'C', 'C', 'C', 'C'));
+            $pdf->SetWidths(array(20, 20, 40, 45, 20, 25, 20));
+            $pdf->SetSizes(array(9, 9, 9, 9, 9, 9, 9, 9));
+            $pdf->SetStyles(array('B', 'B', 'B', 'B', 'B', 'B'));
+            $pdf->setRowColorText(array($txtbold, $txtbold, $txtbold, $txtbold, $txtbold, $txtbold));
+            $pdf->SetLineHeight(2.9);
+            $pdf->SetRowBorder('B');
+        }
+        $pdf->Row(array(
+            iconv("utf-8", "windows-1252", "\nFolio"),
+            iconv("utf-8", "windows-1252", "\nHora"),
+            iconv("utf-8", "windows-1252", "\nEmisor"),
+            iconv("utf-8", "windows-1252", "\nReceptor"),
+            iconv("utf-8", "windows-1252", "\nMoneda"),
+            iconv("utf-8", "windows-1252", "\nNo. de complemento\n "),
+            iconv("utf-8", "windows-1252", "\nTotal")
+        ));
+
+        foreach ($detalles as $detalle) {
+            $folio = $detalle["letra"] . $detalle["foliopago"];
+            $horapago = $detalle["hora_creacion"];
+            $emisor = $detalle["razonemisor"];
+            $receptor = $detalle["razonreceptor"];
+            $moneda = $detalle["nombre_moneda"];
+            $orden = $detalle["orden"];
+            $total = $detalle["total"];
+            $sumaTotalPagos += $total;
+            $emisor_capitalize = !empty($emisor) ? ucwords(mb_strtolower($emisor, 'UTF-8')) : "No disponible";
+            $receptor_capitalize = !empty($receptor) ? ucwords(mb_strtolower($receptor, 'UTF-8')) : "No disponible";
+
+            $pdf->SetLineHeight(3.5);
+            if ($pdf->GetY() + 10 > $pdf->getPageBreakTrigger()) {
+                $pdf->AddPage();
+                $pdf->SetAligns(array('L', 'C', 'C', 'C', 'C', 'C', 'C', 'C'));
+                $pdf->SetWidths(array(20, 20, 40, 45, 20, 25, 20));
+                $pdf->SetSizes(array(9, 9, 9, 9, 9, 9, 9, 9));
+                $pdf->SetStyles(array('B', 'B', 'B', 'B', 'B', 'B'));
+                $pdf->setRowColorText(array($txtbold, $txtbold, $txtbold, $txtbold, $txtbold, $txtbold));
+                $pdf->SetLineHeight(2.9);
+                $pdf->SetRowBorder('B');
+            }
+            $pdf->Row(array(
+                iconv("utf-8", "windows-1252", "\n" . $folio),
+                iconv("utf-8", "windows-1252", "\n" . date('h:i A', strtotime($horapago))),
+                iconv("utf-8", "windows-1252", "\n" . $emisor_capitalize . "\n "),
+                iconv("utf-8", "windows-1252", "\n" . $receptor_capitalize . "\n "),
+                iconv("utf-8", "windows-1252", "\n" . $moneda),
+                iconv("utf-8", "windows-1252", "\n" . $orden),
+                iconv("utf-8", "windows-1252", "\n" . "$" . number_format($total, 2, '.', ',')),
+
+            ));
+        }
+        $pdf->SetLineHeight(6.5);
+        $pdf->SetFont('Arial', 'B', 9);
+        $anchoCelda1 = 170;
+        $anchoCelda2 = 20;
+        $anchoTotal = $anchoCelda1 + $anchoCelda2 * 3;
+        $pdf->Cell($anchoCelda1, 6.5, iconv("utf-8", "windows-1252", ""), 0, 0, 'L');
+        $pdf->Cell($anchoCelda2, 6.5, "$" . number_format($sumaTotalPagos, 2, '.', ','), 1, 1, 'C');
+        $pdf->Cell($anchoTotal, 2, '', 0, 1, 'C');
+    }
+}
+
+$pdf->isFinished = true;
 $nm = str_replace(" ", "_", $usuario);
 $pdf->Output('corte_' . $fecha . '_' . $nm . '.pdf', 'I');

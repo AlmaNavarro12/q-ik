@@ -281,7 +281,7 @@ include("buscarProductos.php");
             <div class="col-md-12">
                 <a href="#cfdirel" data-bs-toggle='collapse' class="label-sub text-decoration-none">Agregar CFDIS Relacionados <span class="far fa-caret-square-down"></span></a>
                 <div id="cfdirel" class="panel-collapse collapse">
-                    <table class="table tab-hover table-condensed table-responsive table-row table-head">
+                    <table class="table table-hover table-condensed table-responsive table-row table-head">
                         <thead>
                             <tr>
                                 <th>Tipo de relación <span class="fas fa-sort-alpha-down"></span></th>
@@ -303,7 +303,7 @@ include("buscarProductos.php");
                             </tr>
                         </tbody>
                     </table>
-                    <table class="table tab-hover table-condensed table-responsive table-row table-head" id="body-lista-cfdi">
+                    <table class="table table-hover table-condensed table-responsive table-row table-head" id="body-lista-cfdi">
                     </table>
                 </div>
             </div>
@@ -324,7 +324,7 @@ include("buscarProductos.php");
             </div>
         </div>
         <div class="row scrollX">
-            <table id="resultados" class="table tab-hover table-condensed table-responsive table-row table-head">
+            <table id="resultados" class="table table-hover table-condensed table-responsive table-row table-head">
 
             </table>
         </div>
@@ -504,7 +504,7 @@ include("buscarProductos.php");
                 </div>
             </div>
             <div class="row scroll-table">
-                <table id="resultmercancia" class="table tab-hover table-condensed table-responsive table-row table-head">
+                <table id="resultmercancia" class="table table-hover table-condensed table-responsive table-row table-head">
 
                 </table>
             </div>
@@ -651,7 +651,7 @@ include("buscarProductos.php");
                 <div class="col-md-4 py-2">
                     <label class="label-form text-right" for="placa-remolque1">Placa Remolque No.1</label> <label class="mark-required text-danger fw-bold">&nbsp;</label>
                     <div class="form-group">
-                        <input type="text" class="form-control input-form" id="placa-remolque1" placeholder="Placa del remolque (sin espacios ni guiones)" onblur="checkRemolque(1);" />
+                        <input type="text" class="form-control input-form" id="placa-remolque1" placeholder="Placa del remolque (sin espacios ni guiones)" onblur="checkRemolque(1);" oninput="validarPlacas(this);"/>
                         <div id="placa-remolque1-errors"></div>
                     </div>
                 </div>
@@ -678,7 +678,7 @@ include("buscarProductos.php");
                 <div class="col-md-4 py-2">
                     <label class="label-form text-right" for="placa-remolque2">Placa remolque No.2</label> <label class="mark-required text-danger fw-bold">&nbsp;</label>
                     <div class="form-group">
-                        <input type="text" class="form-control input-form" id="placa-remolque2" placeholder="Placa del remolque (sin espacios ni guíones)" onblur="checkRemolque(2);" />
+                        <input type="text" class="form-control input-form" id="placa-remolque2" placeholder="Placa del remolque (sin espacios ni guíones)" onblur="checkRemolque(2);" oninput="validarPlacas(this);" />
                         <div id="placa-remolque2-errors"></div>
                     </div>
                 </div>
@@ -705,7 +705,7 @@ include("buscarProductos.php");
                 <div class="col-md-4 py-2">
                     <label class="label-form text-right" for="placa-remolque3">Placa remolque No.3</label> <label class="mark-required text-danger fw-bold">&nbsp;</label>
                     <div class="form-group">
-                        <input type="text" class="form-control input-form" id="placa-remolque3" placeholder="Placa del remolque (sin espacios ni guiones)" onblur="checkRemolque(3);" />
+                        <input type="text" class="form-control input-form" id="placa-remolque3" placeholder="Placa del remolque (sin espacios ni guiones)" onblur="checkRemolque(3);" oninput="validarPlacas(this);"/>
                         <div id="placa-remolque3-errors"></div>
                     </div>
                 </div>
@@ -848,7 +848,7 @@ include("buscarProductos.php");
             <div class="row mt-2">
                 <div class="col-md-12">
                     <div class="scroll-table">
-                        <table id="resultubicacion" class="table tab-hover table-condensed table-responsive table-row table-head">
+                        <table id="resultubicacion" class="table table-hover table-condensed table-responsive table-row table-head">
 
                         </table>
                     </div>
@@ -862,14 +862,14 @@ include("buscarProductos.php");
                 </div>
             </div>
             <div class="row">
-                <input type="hidden" value="" id="flag-operador" name='flag-operador' />
+                <input type="text" value="" id="flag-operador" name='flag-operador' />
                 <div class="col-md-4 py-2">
                     <div class="new-tooltip icon tip">
                         <label class="label-form text-right" for="nombre-operador">Nombre operador <span class="fas fa-question-circle small text-primary-emphasis"></span></label> <label class="mark-required text-danger fw-bold">&nbsp;</label>
                         <span class="tiptext">Puede realizar la búsqueda por nombre o RFC de un operador que haya registrado previamente y el sistema cargará los datos de forma automática, si no realizó registro del operador puede dejar este campo en blanco e ingresar los datos.</span>
                     </div>
                     <div class="form-group">
-                        <input type="hidden" value="" id="id-operador" name='id-operador' />
+                        <input type="text" value="" id="id-operador" name='id-operador' />
                         <input class='form-control text-center input-form' id="nombre-operador" name='nombre-operador' placeholder='Buscar operador' type='text' oninput="autocompletarOperador();" />
                         <div id="nombre-operador-errors"></div>
                     </div>
@@ -937,7 +937,7 @@ include("buscarProductos.php");
                 </div>
             </div>
             <div class="row scroll-table">
-                <table id="result-operador" class="table tab-hover table-condensed table-responsive table-row table-head">
+                <table id="result-operador" class="table table-hover table-condensed table-responsive table-row table-head">
 
                 </table>
             </div>

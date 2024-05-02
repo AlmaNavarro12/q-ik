@@ -12,10 +12,9 @@
                 <div id="loader" style="position: absolute;	text-align: center;	top: 55px;	width: 100%;display:none;"></div><!-- Carga gif animado -->
                 <div id="datosproducto" class="outer_div" >
                     <div class="row">
-                        <table id="pagostabla" class="table tab-hover table-condensed table-responsive table-row table-head">
+                        <table id="pagostabla" class="table table-hover table-condensed table-responsive table-row table-head">
 
                         </table>
-
                     </div>
                 </div>
             </div>

@@ -23,7 +23,7 @@ class ControladorProducto
                 <th class='text-center col-auto'>Unidad </th>
                 <th class='text-center col-auto'>P.Compra </th>
                 <th class='text-center col-auto'>P.Venta</th>
-                <th class='text-center col-auto'>C. Fiscal </th>
+                <th class='text-center col-auto'>C.Fiscal </th>
                 <th class='text-center col-auto'>Proveedor</th>
                 <th class='text-center col-auto'>Inventario</th>
                 <th class='text-center col-auto'>Cantidad</th>
@@ -124,7 +124,7 @@ class ControladorProducto
                         <td class='text-center'><div class='dropdown'>
                         <button class='button-list dropdown-toggle' title='Opciones'  type='button' data-bs-toggle='dropdown'><span class='fas fa-ellipsis-v text-muted'></span>
                         <span class='caret'></span></button>
-                        <ul class='dropdown-menu dropdown-menu-right'>";
+                        <ul class='dropdown-menu dropdown-menu-right z-1'>";
 
                 if ($div[1] == '1') {
                     $datos .= "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' onclick='editarProducto($id_producto);'>Editar producto <span class='fas fa-edit text-muted small'></span></a></li>";
@@ -447,7 +447,7 @@ class ControladorProducto
         return $consultado;
     }
 
-    private function reBuildArray($importe, $array) {
+    public function reBuildArray($importe, $array) {
         $div = explode("<impuesto>", $array);
         $row = array();
         $Timp = 0;
@@ -543,6 +543,14 @@ class ControladorProducto
             "cunidad" => $t->getClvunidad() . "-" . $t->getDescripcionunidad());
         $actualizado = $this->consultas->execute($consulta, $valores);
         return $actualizado;
+    }
+
+    private function checkProductoCotAux($idtmp) {
+        $consultado = false;
+        $consulta = "SELECT t.*,p.cantinv,p.chinventario FROM tmpcotizacion t inner join productos_servicios p on (t.id_productotmp=p.idproser) where t.idtmpcotizacion=:id;";
+        $val = array("id" => $idtmp);
+        $consultado = $this->consultas->getResults($consulta, $val);
+        return $consultado;
     }
 
     private function getIDProductoAux($datos)

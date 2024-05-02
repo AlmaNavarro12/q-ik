@@ -1798,12 +1798,12 @@ class ControladorCotizacion {
     }
 
     private function bodyMail($asunto, $saludo, $nombre, $msg, $logo) {
-        $archivo = "../com.sine.dao/configuracion.ini";
+        $archivo = $_SESSION[sha1("database")].".ini";
         $ajustes = parse_ini_file($archivo, true);
         if (!$ajustes) {
             throw new Exception("No se puede abrir el archivo " . $archivo);
         }
-        $rfcfolder = "NAGA021226FJ0";//$ajustes['cron']['rfcfolder'];
+        $rfcfolder = $ajustes['cron']['rfcfolder'];
 
         $txt = str_replace("<corte>", "</p><p style='font-size:18px; text-align: justify;'>", $msg);
         $message = "<html>

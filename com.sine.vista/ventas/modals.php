@@ -80,7 +80,7 @@
             </div>
             <div class="modal-body">
                 <div class="row">
-                    <table class="table tab-hover table-condensed table-responsive row-venta">
+                    <table class="table table-hover table-condensed table-responsive row-venta">
                         <tbody>
                             <tr class="text-center border border-light">
                                 <td>
@@ -343,6 +343,75 @@
                     </div>
                     <div class="col-md-4" id="btns">
                         <button class="button-file text-uppercase fw-bold col-12" onclick="validarSupervisor()" id="btn-form-entrada">Registrar corte <span class="fas fa-save"></span></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--MODAL PARA CANCELAR VENTA-->
+<div class="modal fade shadow-lg rounded rounded-5" id="modal-cancelacion" tabindex="-1" aria-labelledby="exampleModalLabel" data-bs-backdrop="static" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title fs-5 fw-bold text-uppercase" id="label-ingresos">Cancelación de ticket</h4>
+                <button type="button" id="btn-close-modal" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row py-2">
+                    <div class="col-md-6 mb-3">
+                        <label class="label-form text-right" for="nombre-vendedor">Nombre de usuario</label> <label class="mark-required text-danger fw-bold">*</label>
+                        <div class="input-group">
+                            <span class="input-group-text" id="basic-addon1"><i class="text-muted fas fa-user"></i></span>
+                            <input type="text" class="form-control input-form" id="nombre-vendedor" name="nombre-vendedor" placeholder="Nombre de usuario" autocomplete="new-text">
+                        </div>
+                        <div id="nombre-vendedor-errors"></div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="label-form text-right" for="contrasena-vendedor">Contraseña de usuario</label> <label class="mark-required text-danger fw-bold">*</label>
+                        <div class="input-group">
+                            <span class="input-group-text" id="basic-addon2"><i class="text-muted fas fa-lock"></i></span>
+                            <input type="password" class="form-control input-form" id="contrasena-vendedor" name="contrasena-vendedor" placeholder="Contraseña de usuario">
+                        </div>
+                        <div id="contrasena-vendedor-errors"></div>
+                    </div>
+                </div>
+                <div id="complemento-corte">
+                    <div class="mb-3">
+                        <label for="motivo-cancelar" class="form-label">Motivo <label class="mark-required text-danger fw-bold">*</label></label>
+                        <textarea class="form-control input-form" id="motivo-cancelar" placeholder="Motivo..." rows="3" style="height: 100px;"></textarea>
+                        <div id="motivo-cancelar-errors"></div>
+                    </div>
+                </div>
+                <div class="col-12 d-flex justify-content-end">
+                <div class="col-md-4" id="btns">
+                    <input type="hidden" id="idventa" name="idventa"/>
+                        <button class="button-file text-uppercase fw-bold col-12" onclick="validarCancelacion()" id="btn-form-entrada">Registrar cancelación <span class="fas fa-save"></span></button>
+                </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--MODAL PARA VER MOTIVO DE CANCELACION-->
+<div class="modal fade bs-example-modal-lg" id="cancelaciones" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+        <div class="modal-header py-0">
+                <div class="label-sub fs-5 py-0" id="titulo-alerta">
+                    Motivo de cancelación
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="loader" style="position: absolute;	text-align: center;	top: 55px;	width: 100%;display:none;"></div><!-- Carga gif animado -->
+                <div id="datosproducto" class="outer_div" >
+                    <div class="row">
+                        <table id="cancelaciontabla" class="table table-hover table-condensed table-responsive table-row table-head">
+
+                        </table>
                     </div>
                 </div>
             </div>

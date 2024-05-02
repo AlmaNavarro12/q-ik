@@ -493,6 +493,21 @@ function isNumber(val, id) {
     }
 }
 
+function isnEmptyImg(val, id, img) {
+    if (val == "") {
+        $("#" + id).css("border-color", "red");
+        $("#" + id + "-errors").text("Este campo no puede estar vacío.");
+        $("#" + id + "-errors").css("color", "red");
+        $("#" + id).focus();
+        //$("#"+img).val('');
+        return false;
+    } else {
+        $("#" + id + "-errors").text("");
+        $("#" + id).css("border-color", "green");
+        return true;
+    }
+}
+
 function isNumberPositive(val, id) {
         if (!isNaN(val)) {
             if (val > 0) {
@@ -636,6 +651,37 @@ function isList(val, id) {
     }
 }
 
+function isCheckedOption(id="", nombreGrupo) {
+    var checkboxes = document.getElementsByName(nombreGrupo);
+    for (var i = 0; i < checkboxes.length; i++) {
+        if (checkboxes[i].checked) {
+            $("#" + nombreGrupo + "-errors").text("");
+            return true; 
+        }
+    }
+    $("#" + nombreGrupo + "-errors").html("Debes seleccionar al menos un elemento de las opciones.");
+    $("#" + nombreGrupo + "-errors").css("color", "red");
+    return false;
+}
+
+function isCanvasBlank(canvas, canvasId) {
+    var context = canvas.getContext('2d');
+    var pixelBuffer = new Uint32Array(
+        context.getImageData(0, 0, canvas.width, canvas.height).data.buffer
+    );
+    var isBlank = !pixelBuffer.some(function (color) {
+        return color !== 0;
+    });
+
+    if (isBlank) {
+        $("#" + canvasId + "-errors").html("Debes crear una firma.");
+        $("#" + canvasId + "-errors").css("color", "red");
+        return false;
+    } else {
+        $("#" + canvasId + "-errors").html("");
+        return true;
+    }
+}
 
 //Función para ocultar el menu responsivo
 function resetMenu() {
@@ -754,8 +800,20 @@ function loadView(vista) {
         'nuevousuario': ["checkUsuario()", 350, "truncateTmp()", 400, "truncateTmpCot()", 400, "loadOpcionesEstado()", 450],
         'listasuarioaltas': ["truncateTmp()", 300, "truncateTmpCot()", 350, "loadBtnCrear('usuario')", 370, "filtrarUsuario()", 400],
         'asignarpermisos': ["truncateTmp()", 300, "truncateTmpCot()", 350],
+        
+        //Falta
         'categoria': [],
         'listacategoria': ["loadBtnCrear('categoria')", 360, "loadListaCategorias()", 500],
+        'insertar': ["truncateTmp()", 350, "truncateTmpCot()", 400],
+        'cfdi': ["truncateTmp()", 400],
+        'impuesto': [],
+        'instalacion': ["truncateTmp()", 350, "truncateTmpCot()", 400, "loadOpcionesInstalador()", 900, "getInstaladoresCH()", 300, "loadFechaIns()", 500, "loadOpcionesFolios('8')", 300],
+        'listainstalacion': ["truncateTmp()", 350, "truncateTmpCot()", 400, "buscarInstalacion() ", 500, "firmaModalIns()", 300],
+        'equipos': ['loadListaGPS()', 300, "loadBtnCrear('equipos')", 300],
+        'pasosvehiculo' : ["firmaInstalacion(1)", 300], 
+        'pasoscaja': ["firmaInstalacion(2)", 300],
+
+
         'nuevoproducto': ["truncateTmp()", 300, "truncateTmpCot()", 350, "loadOpcionesProveedor()", 350, "getOptionsTaxes()", 300,],
         'listaproductoaltas': ["truncateTmp()", 300, "truncateTmpCot()", 350, "loadBtnCrear('producto')", 370, "loadListaProductosaltas()", 400,],
         'valrfc': [],
@@ -763,23 +821,17 @@ function loadView(vista) {
         'listaclientealtas': ["truncateTmp()", 300, "truncateTmpCot()", 350, "loadBtnCrear('cliente')", 370, "loadListaClientesAltas()", 400],
         'comunicado': ["truncateTmpIMG()", 300, "loadFecha()", 350, "loadOpcionesFacturacion()", 400, "loadContactos()", 420],
         'listacomunicado': ["truncateTmpIMG()", 300, "loadBtnCrear('comunicado')", 350, "listaComunicados()", 400],
-        'insertar': ["truncateTmp()", 350, "truncateTmpCot()", 400],
-        'cfdi': ["truncateTmp()", 400],
-        'impuesto': [],
         'listaimpuesto': ["loadBtnCrear('impuesto')", 350, "loadListaImpuesto()", 400],
         'datosempresa': ["firmaCanvas()", 400, "loadOpcionesBanco('contenedor-banco')", 400, "loadOpcionesEstado()", 500],
-        'nuevocontrato': ["truncateTmpCot()", 300, "loadOpcionesFolios()", 320, "filtrarProductos()", 350, "loadFecha()", 370, "loadOpcionesFormaPago()", 400, "loadOpcionesMetodoPago()", 420, "loadOpcionesMoneda()", 450, "loadOpcionesUsoCFDI()", 470, "loadOpcionesFacturacion()", 500, "loadOpcionesProveedor()", 520],
+        'nuevocontrato': ["truncateTmpCot()", 300, "loadOpcionesFolios('1')", 320, "filtrarProductos()", 350, "loadFecha()", 370, "loadOpcionesFormaPago()", 400, "loadOpcionesMetodoPago()", 420, "loadOpcionesMoneda()", 450, "loadOpcionesUsoCFDI()", 470, "loadOpcionesFacturacion()", 500, "loadOpcionesProveedor()", 520],
         'precio': ["truncateTmp()", 400, "truncateTmpCot()", 450],
         'pago': ["loadFecha()", 300, "cancelarPago2()", 320, "loadOpcionesFolios('3')", 350, "loadOpcionesMoneda()", 400, "loadOpcionesFormaPago2()", 420, "loadOpcionesFacturacion()", 500],
         'listapago': ["loadBtnCrear('pago')", 350, "opcionesMotivoCancelar()", 380, "loadListaPago()", 400],
         'factura': ["truncateTmp()", 300, "getOptionsTaxes()", 300, "loadOpcionesFacturacion()", 320, "loadFecha()", 350, "loadOpcionesFolios('1')", 370, "filtrarProducto()", 400, "loadOpcionesFormaPago2()", 420, "loadOpcionesMetodoPago()", 450, "loadOpcionesMoneda()", 470, "loadOpcionesUsoCFDI()", 500, "loadOpcionesComprobante()", 520, "loadOpcionesProveedor()", 550, "loadOpcionesTipoRelacion()", 570, "opcionesPeriodoGlobal()", 600, "opcionesMeses()", 320, "opcionesAnoGlobal()", 650],
         'listafactura': ["truncateTmp()", 300, "truncateTmpCot()", 350, "loadBtnCrear('factura')", 400, "loadListaFactura()", 300, "opcionesMotivoCancelar()", 420,],
         
-        'cotizacion': ["truncateTmpCot()", 300, "loadOpcionesImpuestos('1')", 320, "loadDocumento()", 450, "getOptionsTaxes()", 300, "loadOpcionesImpuestos('2')", 340, "loadOpcionesFolios('5')", 350, "loadFecha()", 370, "loadOpcionesFacturacion()", 400, "loadOpcionesComprobante()", 420, "loadOpcionesFormaPago2()", 450, "loadOpcionesMetodoPago()", 470, "loadOpcionesMoneda()", 500, "loadOpcionesUsoCFDI()", 520, "filtrarProducto() ", 550, "loadOpcionesProveedor()", 600, "filtrarCotizacion()", 300],
+        'cotizacion': ["truncateTmpCot()", 300, "loadOpcionesImpuestos('1')", 320, "loadDocumento()", 450, "getOptionsTaxes()", 300, "loadOpcionesImpuestos('2')", 340, "loadOpcionesFolios('5')", 350, "loadFecha()", 370, "loadOpcionesFacturacion()", 400, "loadOpcionesComprobante()", 420, "loadOpcionesFormaPago2()", 450, "loadOpcionesMetodoPago()", 470, "loadOpcionesMoneda()", 500, "loadOpcionesUsoCFDI()", 520, "filtrarProducto()", 550, "loadOpcionesProveedor()", 600, "filtrarCotizacion()", 300],
         'listacotizacion': ["truncateTmp()", 300, "truncateTmpCot()", 350, "loadBtnCrear('cotizacion')", 360, "filtrarCotizacion()", 400],
-        
-        'instalacion': ["truncateTmp()", 350, "truncateTmpCot()", 400, "loadFolio()", 430, "loadDocumento()", 450, "loadFecha()", 500],
-        'listainstalacion': ["truncateTmp()", 350, "truncateTmpCot()", 400, "filtrarInstalacion() ", 500],
         'listacontratos': ["truncateTmp()", 300, "truncateTmpCot()", 350, "loadBtnCrear('contrato')", 370, "filtrarContratos()", 400],
         'listaempresa': ["truncateTmp()", 300, "truncateTmpCot()", 350, "loadBtnCrear('datos')", 370, "loadListaEmpresa()", 400],
         'listacfdi': ["truncateTmp()", 300, "truncateTmpCot()", 350, "loadListaCFDI()", 400],

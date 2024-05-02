@@ -834,7 +834,7 @@ foreach ($detallefactura as $detalleactual) {
     } else {
         $img = "No disponible";
     }
-    $pdf->Row(Array($cantidad, iconv("utf-8", "windows-1252",$cfiscal), $img, $unidad, iconv("utf-8", "windows-1252",$descripcion), iconv("utf-8", "windows-1252",$observacionesp), iconv("utf-8", "windows-1252",'$ ' . number_format($precioV, 2, '.', ',')), iconv("utf-8", "windows-1252",'$ ' . number_format($totalu, 2, '.', ','))));
+    $pdf->Row(Array($cantidad, iconv("utf-8", "windows-1252",$cfiscal), $img,  iconv("utf-8", "windows-1252", $unidad), iconv("utf-8", "windows-1252",$descripcion), iconv("utf-8", "windows-1252",$observacionesp), iconv("utf-8", "windows-1252",'$ ' . number_format($precioV, 2, '.', ',')), iconv("utf-8", "windows-1252",'$ ' . number_format($totalu, 2, '.', ','))));
 }
 
 $pdf->SetWidths(Array(20, 20));

@@ -35,7 +35,7 @@ class ControladorProveedor {
 
         $permisos = $this->getPermisos($idlogin);
         $div = explode("</tr>", $permisos);
-        if ($div[0] == '1') {
+        if ($div[2] == '1') {
             $numrows = $this->getNumrows($condicion);
             $page = (isset($pag) && !empty($pag)) ? $pag : 1;
             $per_page = $numreg;
@@ -70,7 +70,7 @@ class ControladorProveedor {
                          <td class='text-center'><div class='dropdown'>
                             <button class='button-list dropdown-toggle' title='Opciones'  type='button' data-bs-toggle='dropdown'><span class='fas fa-ellipsis-v'></span>
                             <span class='caret'></span></button>
-                            <ul class='dropdown-menu dropdown-menu-right'>";
+                            <ul class='dropdown-menu dropdown-menu-right z-1'>";
 
                 if ($div[0] == '1') {
                     $datos .= "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' onclick='editarProveedor($id_proveedor)'>Editar proveedor <span class='fas fa-edit'></span></a></li>";
@@ -126,7 +126,8 @@ class ControladorProveedor {
         foreach ($permisos as $actual) {
             $editar = $actual['editarproveedor'];
             $eliminar = $actual['eliminarproveedor'];
-            $datos .= "$editar</tr>$eliminar";
+            $lista = $actual['listaproveedor'];
+            $datos .= "$editar</tr>$eliminar</tr>$lista";
         }
         return $datos;
     }

@@ -30,7 +30,7 @@
             <div class="col-md-6 py-2">
                 <label class="label-form text-right" for="placa-remolque">Placa remolque</label> <label class="mark-required text-danger fw-bold">*</label>
                 <div class="form-group">
-                    <input type="text" class="form-control input-form" id="placa-remolque" placeholder="Placa del remolque (sin espacios ni gu&iacute;ones)" />
+                    <input type="text" class="form-control input-form" id="placa-remolque" placeholder="Placa del remolque (sin espacios ni gu&iacute;ones)" oninput="validarLetNum(this);" />
                     <div id="placa-remolque-errors"></div>
                 </div>
             </div>

@@ -117,8 +117,10 @@ if (isset($_POST['img'])) {
         $type = pathinfo($src, PATHINFO_EXTENSION);
         if ($type == 'pdf') {
             echo "d<type>";
-            header('Content-Disposition: attachment; filename='.$fn); readfile($src); exit();
-        }else{
+            header('Content-Disposition: attachment; filename=' . $fn);
+            readfile($src);
+            exit();
+        } else {
             $data = file_get_contents($src);
             $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
             echo 'i<type><img src="' . $base64 . '" style="max-width: 100%;"/>';
@@ -134,24 +136,24 @@ if (isset($_POST['img'])) {
     $id = intval($_GET['aid']);
     $fn = $con->getIMGAnticipo($id);
     $src = "../img/anticipos/$fn";
-    
+
     $type = pathinfo($src, PATHINFO_EXTENSION);
 
     if (file_exists($src)) {
-        header('Content-Disposition: attachment; filename='.sha1($fn).".$type"); 
+        header('Content-Disposition: attachment; filename=' . sha1($fn) . ".$type");
         readfile($src);
         exit();
     } else {
         echo "404 No se encontro el archivo";
     }
 } else if (isset($_GET['afn'])) {
-    
-    $src = "../temporal/tmp/".$_GET['afn'];
-    
+
+    $src = "../temporal/tmp/" . $_GET['afn'];
+
     $type = pathinfo($src, PATHINFO_EXTENSION);
 
     if (file_exists($src)) {
-        header('Content-Disposition: attachment; filename='.sha1($_GET['afn']).".$type"); 
+        header('Content-Disposition: attachment; filename=' . sha1($_GET['afn']) . ".$type");
         readfile($src);
         exit();
     } else {

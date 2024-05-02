@@ -10,7 +10,7 @@
             </div>
             <div class="modal-body">
                 <div class="scrollX">
-                    <table id="body-lista-anticipo" class="table tab-hover table-condensed table-responsive table-row table-head border border-light">
+                    <table id="body-lista-anticipo" class="table table-hover table-condensed table-responsive table-row table-head border border-light">
                         <thead class="sin-paddding">
                             <tr>
                                 <th>Fecha de Creacion </th>

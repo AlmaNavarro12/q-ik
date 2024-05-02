@@ -34,8 +34,11 @@ if (isset($_POST['transaccion'], $_POST['view'])) {
             case 'listafactura':
             case 'cotizacion':
             case 'listacotizacion':
+            case 'equipos':
             case 'instalacion':
             case 'listainstalacion':
+            case 'pasosvehiculo':
+            case 'pasoscaja':
             case 'listacontrato':
             case 'listacontratos':
             case 'listaprecios':

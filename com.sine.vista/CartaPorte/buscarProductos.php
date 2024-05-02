@@ -28,7 +28,7 @@
                     </div>
                 </form>
                 <div class="scrollX div-form mw-100">
-                    <table class="table tab-hover table-condensed table-responsive table-row table-head" id="body-lista-productos-factura">
+                    <table class="table table-hover table-condensed table-responsive table-row table-head" id="body-lista-productos-factura">
                     </table>
                 </div>
                 <div class="row fw-semibold mt-3 text-uppercase" style="color: #17177C;" id="pagination">
@@ -246,7 +246,7 @@
 </div>
 
 <!--EDITAR UN PRODUCTO EN FACTURA-->
-<div class="modal fade bs-example-modal-lg" id="editar-producto" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+<div class="modal fade bs-example-modal-lg" id="editar-producto" tabindex="-1" role="dialog" aria-labelledby="myModalLalebel">
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
             <div class="modal-header py-0">
@@ -259,7 +259,7 @@
                 <form id="form-producto-editar" onsubmit="return false;">
                     <div class="row scrollX">
                         <div class="col-md-12">
-                            <table class="table tab-hover table-condensed table-responsive table-row table-head">
+                            <table class="table table-hover table-condensed table-responsive table-row table-head">
                                 <tbody>
                                     <tr>
                                         <td colspan="2">

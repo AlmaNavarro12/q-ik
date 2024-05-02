@@ -1,12 +1,12 @@
 <?php
 require_once '../com.sine.dao/Consultas.php';
 
-class ControladorUsuario
-{
+session_start();
+class ControladorUsuario{
 
     private $consultas;
 
-    private $permisos = [
+    private $permisos = [ //Acomodar secuencia en BD
         "facturas", "crearfactura", "editarfactura", "eliminarfactura", "listafactura", "timbrarfactura", //Timbrar
         "pago", "crearpago", "editarpago", "eliminarpago", "listapago", "timbrarpago", //Timbrar
         "nomina", "listaempleado", "crearempleado", "editarempleado", "eliminarempleado", "listanomina", "crearnomina", "editarnomina", "eliminarnomina", "timbrarnomina", //Timbrar
@@ -20,9 +20,10 @@ class ControladorUsuario
         "datosfacturacion", "creardatos", "editardatos", "listadatos", "eliminardatos", "descargardatos", //Eliminar, descargar archivos
         "contrato", "crearcontrato", "editarcontrato", "eliminarcontrato", "listacontrato",
         "usuario", "crearusuario", "listausuario", "eliminarusuario", "asignarpermiso",
-        "reporte", "reportefactura", "reportepago", "reportegrafica", "reporteiva", "datosiva", "reporteventa", "reporteinventario", "reportepuntoventa",
+        "reporte", "reportefactura", "reportepago", "reportegrafica", "reporteiva", "datosiva", "reporteventa", "reporteinventario", "reportepuntoventa", "reportecorte",
         "configuracion", "addfolio", "listafolio", "editarfolio", "eliminarfolio", "addcomision", "encabezados", "confcorreo", "importar", 
-        "ventas", "crearventa", "cancelarventa", "exportarventa", "listaventa", "registrarentrada", "registrarsalida", "cortedecaja"
+        "ventas", "crearventa", "cancelarventa", "exportarventa", "listaventa", "registrarentrada", "registrarsalida", "cortedecaja",
+        "instalaciongps", "creargps", "editargps", "eliminargps", "listagps", "crearinstalacion", "editarinicio", "editarpasos", "cancelarinstalacion", "eliminarinstalacion", "listainstalacion",
     ];
 
     function __construct()
@@ -33,7 +34,6 @@ class ControladorUsuario
     public function listaServiciosHistorial($US, $numreg, $pag)
     {
         require_once '../com.sine.common/pagination.php';
-        session_start();
         $idlogin = $_SESSION[sha1("idusuario")];
         $permisos = explode("</tr>", $this->getPermisosUsuarioAsig($idlogin));
 
@@ -91,7 +91,7 @@ class ControladorUsuario
                             <span class='fas fa-ellipsis-v text-muted'></span>
                             <span class='caret'></span>
                         </button>
-                        <ul class='dropdown-menu dropdown-menu-right'>
+                        <ul class='dropdown-menu dropdown-menu-right z-1'>
                             <li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' onclick='editarUsuario($id_usuario)'>Editar usuario <span class='text-muted fas fa-edit small'></span></a></li>";
                 if ($permisos[0] == '1') {
                     $datos .= "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' onclick='eliminarUsuario($id_usuario)'>Eliminar usuario <span class='text-muted fas fa-times'></span></a></li>";
@@ -166,7 +166,6 @@ class ControladorUsuario
         $usuario = $this->getUsuarioById($idusuario);
         $datos = "";
         foreach ($usuario as $usuarioactual) {
-            session_start();
             $usuariologin = $_SESSION[sha1("idusuario")];
             $tipologin = $_SESSION[sha1("tipousuario")];
             $idusuario = $usuarioactual['idusuario'];
@@ -487,7 +486,6 @@ class ControladorUsuario
 
     public function getTipoLogin()
     {
-        session_start();
         $usuariologin = $_SESSION[sha1("idusuario")];
         $tipologin = $_SESSION[sha1("tipousuario")];
         return $tipologin;
@@ -606,12 +604,11 @@ class ControladorUsuario
         $usuario = $this->getUsuarioById($idusuario);
         $datos = "";
         foreach ($usuario as $usuarioactual) {
-            session_start();
             $usuariologin = $_SESSION[sha1("idusuario")];
             $idusuario = $usuarioactual['idusuario'];
             $nombreusuario = $usuarioactual['nombre'] . ' ' . $usuarioactual['apellido_paterno'] . ' ' . $usuarioactual['apellido_materno'];
 
-            $datos = "$idusuario</tr>$nombreusuario</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>1</tr>$usuariologin";
+            $datos = "$idusuario</tr>$nombreusuario</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>0</tr>1</tr>$usuariologin";
             break;
         }
         return $datos;
@@ -623,7 +620,6 @@ class ControladorUsuario
         $datos = "";
 
         foreach ($usuario as $usuarioactual) {
-            session_start();
             $usuariologin = $_SESSION[sha1("idusuario")];
 
             $idusuario = $usuarioactual['permiso_idusuario'];

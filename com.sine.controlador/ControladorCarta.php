@@ -12,6 +12,7 @@ use SWServices\Stamp\StampService as StampService;
 use SWServices\Cancelation\CancelationService as CancelationService;
 use SWServices\SatQuery\SatQueryService as consultaCfdiSAT;
 use PHPMailer\PHPMailer\PHPMailer;
+use chillerlan\QRCode\QRCode;
 
 date_default_timezone_set("America/Mexico_City");
 
@@ -1504,7 +1505,7 @@ class ControladorCarta {
                 "tag" => $tag
             );
             $insertado .= $this->consultas->execute($consulta, $val);
-            rename('../temporal/tmp/' . $evactual['imgtmp'], '../cartaporte/' . $evactual['imgtmp']);
+            rename('../temporal/tmp/' . $evactual['imgtmp'], '../img/cartaporte/' . $evactual['imgtmp']);
         }
         
         return $insertado;
@@ -1559,65 +1560,31 @@ class ControladorCarta {
         return $existe;
     }
 
-    public function checkCarta($tag, $type, $num) {
+    public function checkCarta($tag) {
         $check = $this->checkCartaAux($tag);
         if ($check) {
-            if($type == "t"){
-                $datos = $this->nuevosRegistrosTransporte($tag);
-            } else if($type == "o"){
-                $datos = $this->nuevosRegistrosOperador($tag);
-            } else if($type == "r"){
-                $datos = $this->nuevosRegistrosRemolque($tag, $num);
-            }
+            $datos = $this->nuevosRegistros($tag);
         }
         return $datos;
     }
 
-    /*private function nuevosRegistrosTransporte($tag) {
+    private function nuevosRegistros($tag){
         $vehiculo = false;
-        $datoscarta = $this->getDatosCarta($tag);
-    
-        foreach ($datoscarta as $datactual) {
-            $placa = $datactual['carta_placa'];
-            $nombre = $datactual['nombrevehiculo'] ?: $placa;
-            $numpermiso = $datactual['carta_numpermiso'];
-            $tipopermiso = $datactual['carta_tipopermiso'];
-            $tipotransporte = $datactual['carta_conftransporte'];
-            $anhomod = $datactual['carta_anhomod'];
-            $segurocivil = $datactual['carta_segurocivil'];
-            $polizaseguro = $datactual['carta_polizaseguro'];
-    
-            $checkv = $this->checkVehiculo($placa);
-            $checks = $this->checkStatusVehiculo($placa);
-    
-            if ($checkv == '0' || ($checkv != '0' && $checks == '0')) {
-                $consulta = ($checkv == '0') ?
-                    "INSERT INTO `transporte` VALUES (:id, :nombre, :numpermiso, :tipopermiso, :conftransporte, :anho, :placa, :segurorc, :polizarc, :seguroma, :polizama, :segurocg, :polizacg, :st);" :
-                    "UPDATE `transporte` SET nombrevehiculo=:nombre, numeropermiso=:numpermiso,tipopermiso=:tipopermiso, conftransporte=:conftransporte, anhomodelo=:anho, placavehiculo=:placa, segurorCivil=:segurorc, polizarcCivil=:polizarc, seguroAmbiente=:seguroma, polizaAmbiente=:polizama, seguroCarga=:segurocg, polizaCarga=:polizacg, status='1' WHERE placavehiculo=:placa;";
-    
-                $val = array(
-                    "id" => null,
-                    "nombre" => $nombre,
-                    "numpermiso" => $numpermiso,
-                    "tipopermiso" => $tipotransporte,
-                    "conftransporte" => $tipotransporte,
-                    "anho" => $anhomod,
-                    "placa" => $placa,
-                    "segurorc" => $segurocivil,
-                    "polizarc" => $polizaseguro,
-                    "seguroma" => '',
-                    "polizama" => '',
-                    "segurocg" => '',
-                    "polizacg" => '',
-                    "st" => '1'
-                );
-                $vehiculo = $this->consultas->execute($consulta, $val);
-            } else {
-                $vehiculo = "Ya existe un registro de vehículo con el número de placas $placa.";
-            }
-        }
-        return $vehiculo;
-    }*/
+        $vehiculo = $this->nuevosRegistrosTransporte($tag);
+
+        $remolque1 = false;
+        $remolque1 = $this->nuevosRegistrosRemolque($tag, '1');
+
+        $remolque2 = false;
+        $remolque2 = $this->nuevosRegistrosRemolque($tag, '2');
+
+        $remolque3 = false;
+        $remolque3 = $this->nuevosRegistrosRemolque($tag, '3');
+
+        $operador = false;
+        $operador = $this->nuevosRegistrosOperador($tag);
+        return "$vehiculo</tr>$remolque1</tr>$remolque2</tr>$remolque3</tr>$operador";
+    }
 
     private function nuevosRegistrosTransporte($tag){
         $vehiculo = "";
@@ -1660,7 +1627,7 @@ class ControladorCarta {
                 } else if($checkv != "0" && $checks == "1") {
                     return $vehiculo = "Ya existe un registro de vehículo con el número de placas $placa.";
                 } else if($checkv != "0" && $checks == "0"){
-                    $consulta = "UPDATE `transporte` SET nombrevehiculo=:nombre, numeropermiso=:numpermiso, tipopermiso=:tipopermiso, conftransporte=:conftransporte, anhomodelo=:anho, placavehiculo=:placa, seguroCivil=:segurorc, polizarcCivil=:polizarc, seguroAmbiente=:seguroma, polizaAmbiente=:polizama, seguroCarga=:segurocg, polizaCarga=:polizacg, status='1' WHERE placavehiculo=:placa;";
+                    $consulta = "UPDATE `transporte` SET nombrevehiculo=:nombre, numeropermiso=:numpermiso, tipopermiso=:tipopermiso, conftransporte=:conftransporte, anhomodelo=:anho, placavehiculo=:placa, seguroCivil=:segurorc, polizaCivil=:polizarc, seguroAmbiente=:seguroma, polizaAmbiente=:polizama, seguroCarga=:segurocg, polizaCarga=:polizacg, status='1' WHERE placavehiculo=:placa;";
                     $val = array(
                         "nombre" => $nombre,
                         "numpermiso" => $numpermiso,
@@ -1681,7 +1648,7 @@ class ControladorCarta {
                 if($checkv != "0" && $checks == "1"){
                     return $vehiculo = "Ya existe un registro de vehículo con el número de placas $placa.";
                 } else if($checkv != "0" && $checks == "0"){
-                    $consulta = "UPDATE `transporte` SET nombrevehiculo=:nombre, numeropermiso=:numpermiso, tipopermiso=:tipopermiso, conftransporte=:conftransporte, anhomodelo=:anho, placavehiculo=:placa, seguroCivil=:segurorc, polizarcCivil=:polizarc, seguroAmbiente=:seguroma, polizaAmbiente=:polizama, seguroCarga=:segurocg, polizaCarga=:polizacg, status='1' WHERE placavehiculo=:placa;";
+                    $consulta = "UPDATE `transporte` SET nombrevehiculo=:nombre, numeropermiso=:numpermiso, tipopermiso=:tipopermiso, conftransporte=:conftransporte, anhomodelo=:anho, placavehiculo=:placa, seguroCivil=:segurorc, polizaCivil=:polizarc, seguroAmbiente=:seguroma, polizaAmbiente=:polizama, seguroCarga=:segurocg, polizaCarga=:polizacg, status='1' WHERE placavehiculo=:placa;";
                     $val = array(
                         "nombre" => $nombre,
                         "numpermiso" => $numpermiso,
@@ -1703,7 +1670,6 @@ class ControladorCarta {
         return $vehiculo;
     }
     
-
     private function nuevosRegistrosOperador($tag){
         $operador = false;
 
@@ -1732,7 +1698,7 @@ class ControladorCarta {
                     $apaternoop = $divnm[2];
                     $amaternoop = $divnm[3];
                 } else {
-                    $apaternoop = $divnm[1];
+                    $apaternoop = $divnm[1] ?? '';
                     $amaternoop = $divnm[2] ?? '';
                 }
             }
@@ -1868,142 +1834,7 @@ class ControladorCarta {
     }
 
     
-    /*private function nuevosRegistros($tag){
-        $remolque1 = false;
-        $remolque2 = false;
-        $remolque3 = false;
-        $operador = false;
-
-        $datoscarta = $this->getDatosCarta($tag);
-        foreach ($datoscarta as $datactual) {
-            $idvehiculo = $datactual['carta_idvehiculo'];
-            $idremolque1 = $datactual['carta_idremolque1'];
-            $idremolque2 = $datactual['carta_idremolque2'];
-            $idremolque3 = $datactual['carta_idremolque3'];
-
-            $placa = $datactual['carta_placa'];
-            if ($idvehiculo == '0') {
-                $nombre = $datactual['nombrevehiculo'];
-                $numpermiso = $datactual['carta_numpermiso'];
-                $tipopermiso = $datactual['carta_tipopermiso'];
-                $tipotransporte = $datactual['carta_conftransporte'];
-                $anhomod = $datactual['carta_anhomod'];
-                $segurocivil = $datactual['carta_segurocivil'];
-                $polizaseguro = $datactual['carta_polizaseguro'];
-
-                $nombre = ($nombre == '') ? $placa : $nombre;
-
-                $checkv = $this->checkVehiculo($placa);
-                if ($checkv == '0') {
-                    $consulta = "INSERT INTO `transporte` VALUES (:id, :nombre, :numpermiso, :tipopermiso, :conftransporte, :anho, :placa, :segurorc, :polizarc, :seguroma, :polizama, :segurocg, :polizacg, :st);";
-                    $val = array(
-                        "id" => null,
-                        "nombre" => $nombre,
-                        "numpermiso" => $numpermiso,
-                        "tipopermiso" => $tipopermiso,
-                        "conftransporte" => $tipotransporte,
-                        "anho" => $anhomod,
-                        "placa" => $placa,
-                        "segurorc" => $segurocivil,
-                        "polizarc" => $polizaseguro,
-                        "seguroma" => '',
-                        "polizama" => '',
-                        "segurocg" => '',
-                        "polizacg" => '',
-                        "st" => '1'
-                    );
-                    $vehiculo = $this->consultas->execute($consulta, $val);
-                } else {
-                    $vehiculo = "Ya existe un registro de vehículo con el número de placas $placa.";
-                }
-            } else {
-                $checkv = $this->checkVehiculo($placa);
-                if($checkv != "0"){
-                    $vehiculo = "Ya existe un registro de vehículo con el número de placas $placa.";
-                }
-            }
-
-            $placaremolque1 = $datactual['carta_placaremolque1'];
-            $nmremolque1 = $datactual['carta_nmremolque1'];
-            $tiporemolque1 = $datactual['carta_tiporemolque1'];
-
-            $remolque1 = $this->insertarNuevoRemolque($idremolque1, $placaremolque1, $nmremolque1, $tiporemolque1, '1');
-
-
-            $nmremolque2 = $datactual['carta_nmremolque2'];
-            $tiporemolque2 = $datactual['carta_tiporemolque2'];
-            $placaremolque2 = $datactual['carta_placaremolque2'];
-            $remolque2 = $this->insertarNuevoRemolque($idremolque2, $placaremolque2, $nmremolque2, $tiporemolque2, '2');
-
-
-            $nmremolque3 = $datactual['carta_nmremolque3'];
-            $tiporemolque3 = $datactual['carta_tiporemolque3'];
-            $placaremolque3 = $datactual['carta_placaremolque3'];
-            $remolque3 = $this->insertarNuevoRemolque($idremolque3, $placaremolque3, $nmremolque3, $tiporemolque3, '3');
-
-            $operadores = $this->getOperadores($tag);
-            foreach ($operadores as $actual) {
-                $idop = $actual['operador_id'];
-                $rfc = $actual["operador_rfc"];
-
-                if ($idop == '0') {
-                    $nombreop = $actual['operador_nombre'];
-                    $lic = $actual['operador_numlic'];
-                    $idestado = $actual["operador_idestado"];
-                    $nombre_estado = $actual["nombre_estado"];
-                    $calle = $actual["operador_calle"];
-                    $cp = $actual['operador_cp'];
-
-                    if ($nombreop == '') {
-                        $nmop = $rfc;
-                        $apaternoop = '';
-                        $amaternoop = "";
-                    } else {
-                        $divnm = explode(" ", $nombreop);
-                        $nmop = $divnm[0];
-                        if (isset($divnm[3])) {
-                            $apaternoop = $divnm[2];
-                            $amaternoop = $divnm[3];
-                        } else {
-                            $apaternoop = $divnm[1];
-                            $amaternoop = $divnm[2];
-                        }
-                    }
-
-                    $checkop = $this->checkOperador($rfc);
-                    if ($checkop == '0') {
-                        $consulta = "INSERT INTO `operador` VALUES (:id, :nombre, :apaterno, :amaterno, :licencia, :rfc, :empresa, :idestado, :nombre_estado, :idmunicipio, :nombre_municipio, :calle, :cp, :st);";
-                        $valores = array(
-                            "id" => null,
-                            "nombre" => $nmop,
-                            "apaterno" => $apaternoop,
-                            "amaterno" => $amaternoop,
-                            "licencia" => $lic,
-                            "rfc" => $rfc,
-                            "empresa" => '',
-                            "idestado" => $idestado,
-                            "nombre_estado" => $nombre_estado,
-                            "idmunicipio" => '0',
-                            "nombre_municipio" => '',
-                            "calle" => $calle,
-                            "cp" => $cp,
-                            "st" => '1'
-                        );
-                        $operador = $this->consultas->execute($consulta, $valores);
-                    } else{
-                        $operador = "Ya existe un registro de operador con el RFC $rfc.";
-                    }
-                } else {
-                    $checkop = $this->checkOperador($rfc);
-                    if($checkop != "0"){
-                        $operador = "Ya existe un registro de operador con el RFC $rfc.";
-                    }
-                }
-            }
-            return "$vehiculo</tr>$remolque1</tr>$remolque2</tr>$remolque3</tr>$operador";
-        }
-    }
-    */
+    
 
     private function getTMPEvidencias($sid) {
         $consultado = false;
@@ -2828,12 +2659,12 @@ class ControladorCarta {
     }
 
     private function bodyMail($asunto, $saludo, $nombre, $msg, $logo) {
-        $archivo = "../com.sine.dao/configuracion.ini";
+        $archivo = $_SESSION[sha1("database")].".ini";
         $ajustes = parse_ini_file($archivo, true);
         if (!$ajustes) {
             throw new Exception("No se puede abrir el archivo " . $archivo);
         }
-        $rfcfolder = 'NAGA021226FJ0';//$ajustes['cron']['rfcfolder'];
+        $rfcfolder = $ajustes['cron']['rfcfolder'];
 
         $txt = str_replace("<corte>", "</p><p style='font-size:18px; text-align: justify;'>", $msg);
         $message = "<html>
@@ -2888,7 +2719,7 @@ class ControladorCarta {
                 "sid" => $sid);
 
             $insertado = $this->consultas->execute($consulta, $valores);
-            copy("../cartaporte/$imgnm", "../temporal/tmp/$imgnm");
+            copy("../img/cartaporte/$imgnm", "../temporal/tmp/$imgnm");
         }
         return $insertado;
     }
@@ -3565,7 +3396,8 @@ class ControladorCarta {
         $attr = $comprobante[0]->attributes();
         $sello = $attr['Sello'];
         $subsello = substr($sello, -8);
-        $soapUrl = "https://pruebacfdiconsultaqr.cloudapp.net/ConsultaCFDIService.svc"; //"https://consultaqr.facturaelectronica.sat.gob.mx/ConsultaCFDIService.svc";//productivo
+        $soapUrl = "https://pruebacfdiconsultaqr.cloudapp.net/ConsultaCFDIService.svc"; 
+        //"https://consultaqr.facturaelectronica.sat.gob.mx/ConsultaCFDIService.svc";//productivo
         //$soapUrl = "https://pruebacfdiconsultaqr.cloudapp.net/ConsultaCFDIService.svc";//pruebas
         $consultaCfdi = consultaCfdiSAT::ServicioConsultaSAT($soapUrl, $emisor, $receptor, $total, $uuid, $subsello);
         $codstatus = $consultaCfdi->CodigoEstatus;

@@ -33,7 +33,7 @@ if (isset($_POST['transaccion'])) {
             $c->setNumcert($numcert);
             $actualizado = $cu->saveDatos($c);
             if ($actualizado != "") {
-                echo "Empresa insertada correctamente.";
+                echo $actualizado;
             } else {
                 echo "0Error: no se insertó el registro";
             }

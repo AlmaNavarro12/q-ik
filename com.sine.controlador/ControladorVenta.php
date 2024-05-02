@@ -34,7 +34,7 @@ class ControladorVenta
         $tab = "<button id='tab-$tag' class='sm-tab sub-tab-active' data-tab='$tag' name='tab' >Ticket $ticket &nbsp; <span  class='close-button' data-tab='$tag' type='button' aria-label='Close'><span aria-hidden='true'>&times;</span></span></button>
                 <cut>
                     <div id='ticket-$tag' class='sub-div'>
-                        <table id='prod-$tag' class='table tab-hover table-condensed table-responsive table-row table-venta'>
+                        <table id='prod-$tag' class='table table-hover table-condensed table-responsive table-row table-venta'>
                             <thead class='sin-paddding'>
                                 <tr>
                                     <th class='text-center'>COD.BARRAS</th>
@@ -997,7 +997,7 @@ class ControladorVenta
 
         $consulta = "INSERT INTO datos_venta VALUES 
         (:id, :serie, :letra, :folio, :tag, :fecha, :hora, :percentDescuento, :descuento, :total, 
-        :fmpago, :tarjeta, :pago, :cambio, :refventa, :uid, :status, :idcancelado, :fecha_cancelado, :hora_cancelada, 
+        :fmpago, :tarjeta, :pago, :cambio, :refventa, :uid, :status, :idcancelado, :fecha_cancelado, :hora_cancelada, :motivo_cancelacion,
         :tagfactura);";
         $val = array(
             "id" => null,
@@ -1020,6 +1020,7 @@ class ControladorVenta
             "idcancelado" => '0',
             "fecha_cancelado" => null,
             "hora_cancelada" => null,
+            "motivo_cancelacion" => "",
             "tagfactura" => null
         );
         $insertar = $this->consultas->execute($consulta, $val);
@@ -1079,7 +1080,6 @@ class ControladorVenta
     //-------------------------------------TICKETS ANTIGUOS
     private function getNumrowsAux($condicion)
     {
-        echo $condicion;
         $consultado = false;
         $consulta = "SELECT count(iddatos_venta) numrows FROM datos_venta $condicion;";
         $consultado = $this->consultas->getResults($consulta, null);
@@ -1231,9 +1231,9 @@ class ControladorVenta
                 $estado = "Entregado";
                 $cancelar = "";
                 $exportar = "";
-                if ($div[1] == '1') {
-                    $cancelar = "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' onclick='cancelarTicket($idventa);'>Cancelar ticket <i class='text-muted fas fa-times'></i></a></li>";
-                }
+                $funcion = "";
+                
+                $cancelar = "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' onclick='modalCancelar($idventa);'>Cancelar ticket <i class='text-muted fas fa-times'></i></a></li>";
 
                 if ($div[2] == '1') {
                     $exportar = "<li class='notification-link py-1 ps-3'><a class='text-decoration-none text-secondary-emphasis' onclick='exportarTicket($idventa);'>Exportar a factura <span class='fas fa-edit text-muted small'></span></a></li>";
@@ -1242,10 +1242,10 @@ class ControladorVenta
                 $sello = "";
                 $horaFormateada = date('h:i A', strtotime($hora));
 
-
                 if ($status == 0) {
-                    $color = "#910024";
+                    $color = "#910024; cursos:pointer;";
                     $estado = "Cancelado";
+                    $funcion = "onclick='verCancelacion($idventa)'";
                     $cancelar = "";
                     $exportar = "";
                     $sello = "../img/TicketCancelado.png";
@@ -1262,7 +1262,7 @@ class ControladorVenta
                            <td class='fw-semibold text-center'>$fecha </td>
                            <td class='fw-semibold text-center'>$horaFormateada</td>
                            <td class='fw-semibold text-center'>$formapago</td>
-                           <td class='fw-semibold text-center'><font style='color: $color'><b>$estado</b></font></td>
+                           <td class='fw-semibold text-center' $funcion><font style='color: $color'><b>$estado</b></font></td>
                            <td class='fw-semibold text-center'>$ " . number_format($totalventa, 2, '.', ',') . "</td>
                            <td class='text-center'>
                               <div class='dropdown'>
@@ -1410,14 +1410,12 @@ class ControladorVenta
         return $datos;
     }
 
-    public function cancelarTicked($id)
-    {
+    public function cancelarTicked($id, $motivo, $uid){
         $cancelado = false;
         $fechaHoy = date("Y-m-d");
         $horaActual = date("H:i:s");
-        $uid = $_SESSION[sha1("idusuario")];
-        $consulta = "UPDATE datos_venta SET status_venta = '0', fecha_cancelado = :fecha, hora_cancelada = :hora, idcancelado=:uid WHERE (iddatos_venta = :id)";
-        $val = array("id" => $id, "fecha" => $fechaHoy, "hora" => $horaActual, "uid" => $uid);
+        $consulta = "UPDATE datos_venta SET status_venta = '0', fecha_cancelado = :fecha, hora_cancelada = :hora, idcancelado=:uid, motivo_cancelacion=:motivo WHERE (iddatos_venta = :id)";
+        $val = array("id" => $id, "fecha" => $fechaHoy, "hora" => $horaActual, "motivo"=>$motivo, "uid" => $uid);
         $cancelado = $this->consultas->execute($consulta, $val);
         $this->retornarInventario($id);
         return $cancelado;
@@ -1981,6 +1979,38 @@ class ControladorVenta
         return $bandera;
     }
 
+    public function validarCancelacion($usuario, $contrasena)
+    {
+        $bandera = "";
+        $contrasenaencriptada = sha1($contrasena);
+        $consulta = "SELECT u.*, p.cancelarventa 
+                 FROM usuario u 
+                 INNER JOIN usuariopermiso p ON u.idusuario = p.permiso_idusuario 
+                 WHERE u.usuario = :usuario AND u.password = :contrasena 
+                 LIMIT 1";
+
+        $valores = array(
+            "usuario" => $usuario,
+            "contrasena" => $contrasenaencriptada
+        );
+
+        $resultados = $this->consultas->getResults($consulta, $valores);
+
+        if (empty($resultados)) {
+            $bandera = "0Credenciales incorrectas";
+        } else {
+            foreach ($resultados as $resultado) {
+                if ($resultado['cancelarventa'] == 1) {
+                    $bandera .= $resultado['cancelarventa'] . "<tr>" . $resultado['idusuario'];
+                } else {
+                    $bandera = "0No tiene permiso para cancelar un ticket.";
+                }
+            }
+        }
+
+        return $bandera;
+    }
+
     public function insertarCorte($c, $pagos)
     {
         $insertado = false;
@@ -2520,9 +2550,9 @@ class ControladorVenta
                 "hora" => $hora,
                 "uid" => $uid,
             );
-            $resultado = $this->consultas->getResults($consulta, $valores);
+            $resultados = $this->consultas->getResults($consulta, $valores);
 
-            foreach ($resultado as $resultado) {
+            foreach ($resultados as $resultado) {
                 $ventas[] = $resultado;
             }
         }
@@ -2664,9 +2694,9 @@ class ControladorVenta
                 "fecha" => $fecha,
                 "uid" => $uid,
             );
-            $resultado = $this->consultas->getResults($consulta, $valores);
+            $resultados = $this->consultas->getResults($consulta, $valores);
 
-            foreach ($resultado as $resultado) {
+            foreach ($resultados as $resultado) {
                 $ventas[] = $resultado;
             }
         }
@@ -2676,11 +2706,9 @@ class ControladorVenta
     public function obtenerDetallesVentaPorTag($tag)
     {
         $consulta = "SELECT venta_precio, venta_cant, venta_traslados, venta_retencion FROM detalle_venta WHERE tagdetallev= :tagventa";
-
         $valores = array(
             "tagventa" => $tag
         );
-
         $resultado = $this->consultas->getResults($consulta, $valores);
         return $resultado;
     }
@@ -2803,5 +2831,54 @@ class ControladorVenta
         $val = array("tag" => $tag, "sid" => $sid);
         $insertado = $this->consultas->execute($consulta, $val);
         return $insertado;
+    }
+
+
+
+    public function listaCancelacion($idventa)
+    {
+        $datos = "<thead class='sin-paddding'>
+                    <tr>
+                        <th class='text-center col-md-3'>Persona canceló </th>
+                        <th class='text-center'>Fecha de cancelación </th>
+                        <th class='text-center'>Hora de cancelación </th>
+                        <th class='text-center'>Motivo</th>
+                        <th class='text-center'>Opción </th>
+                    </tr>
+                </thead>
+                <tbody>";
+
+        $cancelacion = $this->getMotivoCancelacion($idventa);
+        foreach ($cancelacion as $actual) {
+            $tagventa = $actual['tagventa'];
+            $idusuario = $this->getNameUser($actual['idcancelado']);
+            $fechacan = $actual['fecha_cancelado'];
+            $horacan = $actual['hora_cancelada'];
+            $motivo = $actual['motivo_cancelacion'];
+        }
+        $div = explode("-", $fechacan);
+        $mes = $this->translateMonth($div[1]);
+        $fechacan = $div[2] . ' de ' . $mes;
+
+        $sello = "../img/TicketCancelado.png";
+        $datos .= "
+            <tr>
+                <td class='text-center'>$idusuario</td>
+                <td class='text-center'>$fechacan</td>
+                <td class='text-center'>" . date("g:i A", strtotime($horacan)) . "</td>
+                <td class='text-center'>$motivo</td>
+                <td align='center'><a class='btn button-list' title='Descagar PDF' onclick=\"imprimirTicket('$tagventa','$sello');\"><span class='fas fa-list-alt mt-1'></span></a></td>
+            </tr>
+             ";
+        return $datos;
+    }
+
+    private function getMotivoCancelacion($idventa)
+    {
+        $consulta = false;
+        $consulta = "SELECT * FROM datos_venta WHERE iddatos_venta = :idventa";
+        $valores = array("idventa" => $idventa);
+        $resultado = $this->consultas->getResults($consulta, $valores);
+        return $resultado;
     }
 }

@@ -184,7 +184,7 @@ function loadOpcionesBanco(id = "", selectValue = "") {
 
 //---------------------------------------CODIGO POSTAL
 function getEstadoMunicipioByCodP() {
-    var cp = $("#codigo_postal").val();
+    var cp = $("#codigo_postal").val();0
     if (cp !== "") {
         if (isNumber(cp, "codigo_postal")) {
             cargandoHide();
@@ -461,7 +461,7 @@ function checarRemolque(remolque) {
         changeText("#requiere-remolque", "* Es necesario añadir como mínimo un remolque.");
     } else if (remolque === "0, 1") {
         $("#trans-remolque").show('slow');
-        changeText("#requiere-remolque", "* Se puede o no añadir datos de remolques (Dejar vacíos si no los requieres).");
+        changeText("#requiere-remolque", "* Se puede o no añadir datos de remolques (Dejar vacíos si no se requieren).");
     } else {
         $("#trans-remolque").hide('slow');
         changeText("#requiere-remolque", "");

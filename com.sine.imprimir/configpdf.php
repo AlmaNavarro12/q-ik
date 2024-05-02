@@ -8,7 +8,8 @@ require_once '../com.sine.controlador/ControladorConfiguracion.php';
 
 setlocale(LC_MONETARY, 'es_MX.UTF-8');
 
-class PDF extends FPDF {
+class PDF extends FPDF
+{
 
     var $titulopagina;
     var $idencabezado;
@@ -57,54 +58,65 @@ class PDF extends FPDF {
     var $razonsocial = '';
     var $direccion = '';
     var $RFC = '';
+    var $fondosubtitulo;
+    var $colorsubtitulos;
 
-    function RowWithColor($data, $colors, $estadoIndex) {
+    function RowWithColor($data, $colors, $estadoIndex)
+    {
         $x = $this->GetX();
         $y = $this->GetY();
         $estado = $data[$estadoIndex];
         $color = isset($colors[$estado]) ? $colors[$estado] : array(0, 0, 0); // Color por defecto: negro
         foreach ($data as $i => $value) {
-        if ($i === $estadoIndex) {
-        $this->SetFillColor($color[0], $color[1], $color[2]);
-        } else {
-        $this->SetFillColor(255, 255, 255); 
-        }
-        $this->SetTextColor(0, 0, 0); 
-        $this->Cell($this->widths[$i], 7, $value, 1, 0, 'C', true);
+            if ($i === $estadoIndex) {
+                $this->SetFillColor($color[0], $color[1], $color[2]);
+            } else {
+                $this->SetFillColor(255, 255, 255);
+            }
+            $this->SetTextColor(0, 0, 0);
+            $this->Cell($this->widths[$i], 7, $value, 1, 0, 'C', true);
         }
         $this->SetXY($x, $y + 7);
     }
-   
-    function SetWidths($w) {
+
+    function SetWidths($w)
+    {
         $this->widths = $w;
     }
 
-    function SetAligns($a) {
+    function SetAligns($a)
+    {
         $this->aligns = $a;
     }
 
-    function SetStyles($s = '') {
+    function SetStyles($s = '')
+    {
         $this->styles = $s;
     }
 
-    function setRowColorText($t = "#000000") {
+    function setRowColorText($t = "#000000")
+    {
         $this->rowtextcolor = $t;
     }
 
-    function SetSizes($sz = 9) {
+    function SetSizes($sz = 9)
+    {
         $this->sizes = $sz;
     }
 
-    function SetLineHeight($h) {
+    function SetLineHeight($h)
+    {
         $this->lineHeight = $h;
     }
 
-    function SetRowBorder($b = 'NB', $f = 'D') {
+    function SetRowBorder($b = 'NB', $f = 'D')
+    {
         $this->rowborder = $b;
         $this->borderfill = $f;
     }
 
-    function Row($data) {
+    function Row($data)
+    {
         require_once '../com.sine.controlador/ControladorConfiguracion.php';
         $cc = new ControladorConfiguracion();
         // number of line
@@ -154,7 +166,8 @@ class PDF extends FPDF {
         $this->Ln($h);
     }
 
-    function RowT($data) {
+    function RowT($data)
+    {
         // number of line
         $nb = 0;
         // loop each data to find out greatest line number in a row.
@@ -189,7 +202,8 @@ class PDF extends FPDF {
         $this->Ln($h);
     }
 
-    function RowC($data) {
+    function RowC($data)
+    {
         // number of line
         $nb = 0;
         // loop each data to find out greatest line number in a row.
@@ -224,7 +238,8 @@ class PDF extends FPDF {
         $this->Ln($h);
     }
 
-    function RowNBCount($data) {
+    function RowNBCount($data)
+    {
         // number of line
         $nb = 0;
         // loop each data to find out greatest line number in a row.
@@ -247,7 +262,7 @@ class PDF extends FPDF {
             //Save the current position
             $x = $this->GetX();
             $y = $this->GetY();
-            
+
             $this->MultiCell($w, 4.5, $data[$i], 0, $a);
             //Put the position to the right of the cell
             $this->SetXY($x + $w, $y);
@@ -257,7 +272,8 @@ class PDF extends FPDF {
         $this->heightB += $h;
     }
 
-    function RowNBTitle($data) {
+    function RowNBTitle($data)
+    {
         // number of line
         $nb = 0;
         // loop each data to find out greatest line number in a row.
@@ -281,7 +297,7 @@ class PDF extends FPDF {
             //Save the current position
             $x = $this->GetX();
             $y = $this->GetY();
-           
+
             $this->MultiCell($w, $lh, $data[$i], 0, $a);
             //Put the position to the right of the cell
             $this->SetXY($x + $w, $y);
@@ -290,7 +306,8 @@ class PDF extends FPDF {
         $this->Ln($h);
     }
 
-    function RowNB($data) {
+    function RowNB($data)
+    {
         // number of line
         $nb = 0;
         // loop each data to find out greatest line number in a row.
@@ -314,7 +331,7 @@ class PDF extends FPDF {
             //Save the current position
             $x = $this->GetX();
             $y = $this->GetY();
-            
+
             $this->MultiCell($w, $lh, $data[$i], 0, $a);
             //Put the position to the right of the cell
             $this->SetXY($x + $w, $y);
@@ -323,7 +340,8 @@ class PDF extends FPDF {
         $this->Ln($h);
     }
 
-    function RowNBC($data) {
+    function RowNBC($data)
+    {
         // number of line
         $nb = 0;
         // loop each data to find out greatest line number in a row.
@@ -346,7 +364,7 @@ class PDF extends FPDF {
             //Save the current position
             $x = $this->GetX();
             $y = $this->GetY();
-            
+
             $this->MultiCell($w, 4.5, $data[$i], 0, $a);
             //Put the position to the right of the cell
             $this->SetXY($x + $w, $y);
@@ -355,7 +373,8 @@ class PDF extends FPDF {
         $this->Ln($h);
     }
 
-    function RowRTitle($data) {
+    function RowRTitle($data)
+    {
         // number of line
         $nb = 0;
         // loop each data to find out greatest line number in a row.
@@ -379,7 +398,7 @@ class PDF extends FPDF {
             //Save the current position
             $x = $this->GetX();
             $y = $this->GetY();
-            
+
             $this->RoundedRect($x, $y, $w, $h, 4, 'F');
             //Print the text
             $this->MultiCell($w, $h2, $data[$i], 0, $a);
@@ -390,7 +409,8 @@ class PDF extends FPDF {
         $this->Ln($h);
     }
 
-    function RowR($data) {
+    function RowR($data)
+    {
         // number of line
         $nb = 0;
         // loop each data to find out greatest line number in a row.
@@ -414,7 +434,7 @@ class PDF extends FPDF {
             //Save the current position
             $x = $this->GetX();
             $y = $this->GetY();
-           
+
             $this->RoundedRect($x, $y, $w, $h, 2, 'D');
             //Print the text
             $this->MultiCell($w, $h2, $data[$i], 0, $a);
@@ -425,12 +445,14 @@ class PDF extends FPDF {
         $this->Ln($h);
     }
 
-    function CheckPageBreak($h) {
+    function CheckPageBreak($h)
+    {
         if ($this->GetY() + $h > $this->PageBreakTrigger)
             $this->AddPage($this->CurOrientation);
     }
 
-    function NbLines($w, $txt) {
+    function NbLines($w, $txt)
+    {
         //calculate the number of lines a MultiCell of width w will take
         $cw = &$this->CurrentFont['cw'];
         if ($w == 0)
@@ -474,7 +496,8 @@ class PDF extends FPDF {
         return $nl;
     }
 
-    function RoundedRect($x, $y, $w, $h, $r, $style = '', $angle = '1234') {
+    function RoundedRect($x, $y, $w, $h, $r, $style = '', $angle = '1234')
+    {
         $k = $this->k;
         $hp = $this->h;
         if ($style == 'F')
@@ -521,12 +544,14 @@ class PDF extends FPDF {
         $this->_out($op);
     }
 
-    function _Arc($x1, $y1, $x2, $y2, $x3, $y3) {
+    function _Arc($x1, $y1, $x2, $y2, $x3, $y3)
+    {
         $h = $this->h;
         $this->_out(sprintf('%.2f %.2f %.2f %.2f %.2f %.2f c ', $x1 * $this->k, ($h - $y1) * $this->k, $x2 * $this->k, ($h - $y2) * $this->k, $x3 * $this->k, ($h - $y3) * $this->k));
     }
 
-    function Header() {
+    function Header()
+    {
         if ($this->idencabezado == '12') {
             $this->SetFont('Arial', '', 19);
             $rgbc = explode("-", $this->celdatitulo);
@@ -541,81 +566,130 @@ class PDF extends FPDF {
             $width = $dimensiones[0];
             $height = $dimensiones[1];
             $height = ($height * 20) / $width;
-            
+
             if ($height > 25) {
                 $height = 25;
             }
 
-            if($this->chkdata == 1) {
-                
+            if ($this->chkdata == 1) {
+
                 $this->SetRowBorder('NB');
                 $this->setRowColorText(array($this->clrtitulo));
                 $this->SetY(3);
                 $this->SetX($this->margen);
-                $this->SetWidths(Array(bcdiv(($this->body * 0.33),'1',0), bcdiv(($this->body * 0.66),'1',0)+1));
-                if($this->body >= 76){
+                $this->SetWidths(array(bcdiv(($this->body * 0.33), '1', 0), bcdiv(($this->body * 0.66), '1', 0) + 1));
+                if ($this->body >= 76) {
                     $this->SetSizes(array(1, 10));
                     $this->SetLineHeight(5);
-                }else {
+                } else {
                     $this->SetSizes(array(1, 7));
                     $this->SetLineHeight(4);
-                }                
-                
+                }
+
                 $this->SetStyles(array('', 'B'));
                 $this->SetAligns('C');
-                if($this->body >= 76){
-                    $this->Row(Array($this->Image($logo,($this->margen+5), 3, 20, $height), iconv("utf-8","windows-1252",$this->nombreempresa)));
-                }else{
-                    $this->Row(Array($this->Image($logo,($this->margen), 3, bcdiv(($this->body * 0.33),'1',0), $height), iconv("utf-8","windows-1252",$this->nombreempresa)));
+                if ($this->body >= 76) {
+                    $this->Row(array($this->Image($logo, ($this->margen + 5), 3, 20, $height), iconv("utf-8", "windows-1252", $this->nombreempresa)));
+                } else {
+                    $this->Row(array($this->Image($logo, ($this->margen), 3, bcdiv(($this->body * 0.33), '1', 0), $height), iconv("utf-8", "windows-1252", $this->nombreempresa)));
                 }
-                
+
                 $this->SetX($this->margen);
-                $this->Row(Array('', iconv("utf-8","windows-1252",$this->razonsocial)));
+                $this->Row(array('', iconv("utf-8", "windows-1252", $this->razonsocial)));
                 $this->SetX($this->margen);
-                $this->Row(Array('', iconv("utf-8","windows-1252",$this->direccion)));
+                $this->Row(array('', iconv("utf-8", "windows-1252", $this->direccion)));
                 $this->SetX($this->margen);
-                $this->Row(Array('', iconv("utf-8","windows-1252",$this->RFC)));
+                $this->Row(array('', iconv("utf-8", "windows-1252", $this->RFC)));
                 $this->SetX($this->margen);
                 $this->RoundedRect($this->margen, 30, $this->body, 2, 1, 'F');
-    
-            } else if($this->chkdata == 2) {
-                
+            } else if ($this->chkdata == 2) {
+
                 $this->SetRowBorder('NB');
                 $this->SetY(3);
                 $this->SetX($this->margen);
-                $this->SetWidths(Array($this->body));
+                $this->SetWidths(array($this->body));
                 $this->SetSizes(array(10));
                 $this->SetLineHeight(25);
                 $this->SetAligns('C');
-                $this->Row(Array($this->Image($logo,(bcdiv(($this->body * 0.33),'1',0)+2), 3, 20, $height)));
+                $this->Row(array($this->Image($logo, (bcdiv(($this->body * 0.33), '1', 0) + 2), 3, 20, $height)));
                 $this->RoundedRect($this->margen, 30, $this->body, 2, 1, 'F');
-    
-            } else if($this->chkdata == 3){
-    
+            } else if ($this->chkdata == 3) {
+
                 $this->SetRowBorder('NB');
                 $this->setRowColorText(array($this->clrtitulo));
                 $this->SetY(3);
                 $this->SetX($this->margen);
-                $this->SetWidths(Array($this->body));
-                if($this->body >= 76){
+                $this->SetWidths(array($this->body));
+                if ($this->body >= 76) {
                     $this->SetSizes(array(12));
-                }else{
+                } else {
                     $this->SetSizes(array(9));
-                }                
+                }
                 $this->SetLineHeight(5);
                 $this->SetStyles(array('B'));
                 $this->SetAligns('C');
-                $this->Row(Array(iconv("utf-8","windows-1252",$this->nombreempresa)));
+                $this->Row(array(iconv("utf-8", "windows-1252", $this->nombreempresa)));
                 $this->SetX($this->margen);
-                $this->Row(Array(iconv("utf-8","windows-1252",$this->razonsocial)));
+                $this->Row(array(iconv("utf-8", "windows-1252", $this->razonsocial)));
                 $this->SetX($this->margen);
-                $this->Row(Array(iconv("utf-8","windows-1252",$this->direccion)));
+                $this->Row(array(iconv("utf-8", "windows-1252", $this->direccion)));
                 $this->SetX($this->margen);
-                $this->Row(Array(iconv("utf-8","windows-1252",$this->RFC)));
+                $this->Row(array(iconv("utf-8", "windows-1252", $this->RFC)));
                 $this->SetX($this->margen);
                 $this->RoundedRect($this->margen, 30, $this->body, 2, 1, 'F');
-    
             }
+        } else if ($this->idencabezado == '16') {
+
+            require_once '../com.sine.controlador/ControladorConfiguracion.php';
+            $cc = new ControladorConfiguracion();
+
+            $this->SetY(5);
+            $this->SetFont('Arial', '', 20);
+            $rgbt = explode("-", $cc->hex2rgb($this->clrtitulo));
+            $rgbc = explode("-", $cc->hex2rgb($this->colorcelda));
+            $this->SetFillColor($rgbc[0], $rgbc[1], $rgbc[2]);
+            $this->SetTextColor($rgbt[0], $rgbt[1], $rgbt[2]);
+            $logo = "../temporal/tmp/$this->imglogo";
+            if (!file_exists($logo)) {
+                $logo = "../img/logo/$this->imglogo";
+            };
+            $dimensiones = getimagesize($logo);
+            $width = $dimensiones[0];
+            $height = $dimensiones[1];
+            $height = ($height * 20) / $width;
+            if ($height > 25) {
+                $height = 25;
+            }
+            $this->Cell(25, 5, $this->Image($logo, $this->GetX() + 2.5, $this->GetY(), 20, $height), 0, 0, 'C', false);
+            $this->RoundedRect(35, $this->GetY(), 120, 8, 4, 'F');
+            $this->SetX(38);
+            $this->Write(8, iconv("utf-8", "windows-1252", $this->titulo));
+
+            $this->SetY(15);
+            echo print_r($this->fondosubtitulo);
+            $rgbcs = explode("-", $this->fondosubtitulo);
+            $rgbts = explode("-", $this->colorsubtitulos);
+            $this->SetFillColor($rgbcs[0], $rgbcs[1], $rgbcs[2]);
+            $this->SetTextColor($rgbts[0], $rgbts[1], $rgbts[2]);
+            $this->SetFont('Arial', 'B', 13);
+            $this->RoundedRect(35, $this->GetY(), 120, 8, 4, 'F');
+            $this->SetX(37);
+            $this->Write(8, "Fecha de servicio: 01/05/2024 a 6:30 PM");
+
+            $this->SetY(5);
+            $this->SetFillColor($rgbc[0], $rgbc[1], $rgbc[2]);
+            $this->SetTextColor($rgbt[0], $rgbt[1], $rgbt[2]);
+            $this->SetX(160);
+            $this->RoundedRect(160, $this->GetY(), 45, 8, 4, 'F');
+            $this->SetX(173.5);
+            $this->Write(8, 'Orden');
+
+            $this->SetY(14);
+            $this->SetX(160);
+            $this->SetTextColor(255, 0, 0);
+            $this->SetFont('Arial', 'B', 18);
+            $this->Cell(45, 8, iconv("utf-8", "windows-1252", "001"), 0, 0, 'C', false);
+            $this->Ln(22);
         } else {
             require_once '../com.sine.controlador/ControladorConfiguracion.php';
             $cc = new ControladorConfiguracion();
@@ -640,7 +714,7 @@ class PDF extends FPDF {
             $this->Cell(25, 5, $this->Image($logo, $this->GetX() + 2.5, $this->GetY(), 20, $height), 0, 0, 'C', false);
             $this->RoundedRect(35, $this->GetY(), 120, 8, 4, 'F');
             $this->SetX(38);
-            $this->Write(8, $this->titulo);
+            $this->Write(8, iconv("utf-8", "windows-1252", $this->titulo));
 
             $this->SetX(160);
             $this->RoundedRect(160, $this->GetY(), 45, 8, 4, 'F');
@@ -651,22 +725,45 @@ class PDF extends FPDF {
             $this->SetX(160);
             $this->SetTextColor(255, 0, 0);
             $this->SetFont('Arial', 'B', 14);
-            $this->Cell(45, 8, iconv("utf-8","windows-1252",'001'), 0, 0, 'C', false);
+            $this->Cell(45, 8, iconv("utf-8", "windows-1252", '001'), 0, 0, 'C', false);
 
             $this->Ln(26);
         }
     }
 
-    function Footer() {
-        if ($this->idencabezado == '12') {
-            
+    function Footer()
+    {
+        if ($this->idencabezado == '16') {
+            $this->SetY(-29);
+            $this->SetFillColor(255, 255, 255);
+            $this->RoundedRect(145, ($this->GetY() - 30), 60, 40, 3, 'D');
+            if ($this->firma != "") {
+                $this->Image($this->firma, 150, ($this->GetY() - 25), 60, 0, 'png');
+            }
+            $this->SetX(150);
+            $this->SetTextColor(0, 0, 0);
+            $this->SetFont('Arial', 'B', 8);
+            $this->Write(4, iconv("utf-8", "windows-1252", "Juan Perez"));
+            $this->Ln();
+            $this->SetX(150);
+            $this->Write(4, "Firma encargado");
+            $this->Ln();
+            $this->SetFont('Arial', '', 6.5);
+            $this->Ln(2.5);
+            $this->Write(3, iconv("utf-8", "windows-1252", "El cliente acepta lo reflejado en este documento, y también acepta que la empresa que ofreció el servicio, así como sus empleados no se hacen responsables por daños causados antes, durante o después de la instalación. Para conservar la Garantía del Sistema de Rastreo Satelital GPS es muy importante evitar que éste sea manipulado o alterado por personal ajeno a que ofreció el servicio y esto incluye a técnicos de agencias de vehículos nuevos. La empresa no responderá por ningún tipo de daño si el dispositivo o su instalación fueron previamente intervenidos por terceros. La empresa no se hace responsable por la pérdida o robo de objetos de valor personales dentro del vehículo."));
+            $this->Ln(1.7);
+            $this->SetTextColor(0, 0, 0);
+            $this->SetFont('Arial', 'B', 8);
+            $this->Cell(65, 10, '', 0, 0, 'L');
+            $this->Cell(65, 10, iconv("utf-8", "windows-1252", 'Página ' . $this->PageNo() . ' de {nb}'), 0, 0, 'C');
+            $this->Cell(65, 10, '', 0, 0, 'R');
         } else {
             require_once '../com.sine.controlador/ControladorConfiguracion.php';
             $cc = new ControladorConfiguracion();
             $rgb = explode("-", $cc->hex2rgb($this->clrpie));
             $pagin = "";
             if ($this->chnum == '1') {
-                $pagin = iconv("utf-8","windows-1252",'Pagina ' . $this->PageNo() . ' de {nb}');
+                $pagin = iconv("utf-8", "windows-1252", 'Pagina ' . $this->PageNo() . ' de {nb}');
             }
 
             $this->SetY(-18);
@@ -693,7 +790,8 @@ class PDF extends FPDF {
         }
     }
 
-    function myCell($w, $h, $x, $t) {
+    function myCell($w, $h, $x, $t)
+    {
         $height = $h / 3;
         $first = $height + 2;
         $second = $height + $height + $height + 3;
@@ -712,7 +810,8 @@ class PDF extends FPDF {
         }
     }
 
-    function myCellD($w, $h, $x, $t) {
+    function myCellD($w, $h, $x, $t)
+    {
         $height = $h / 3;
         $first = $height + 2;
         $second = $height + $height + $height + 3;
@@ -731,7 +830,8 @@ class PDF extends FPDF {
         }
     }
 
-    function TextWithDirection($x, $y, $txt, $direction = 'R') {
+    function TextWithDirection($x, $y, $txt, $direction = 'R')
+    {
         if ($direction == 'R')
             $s = sprintf('BT %.2F %.2F %.2F %.2F %.2F %.2F Tm (%s) Tj ET', 1, 0, 0, 1, $x * $this->k, ($this->h - $y) * $this->k, $this->_escape($txt));
         elseif ($direction == 'L')
@@ -747,7 +847,8 @@ class PDF extends FPDF {
         $this->_out($s);
     }
 
-    function TextWithRotation($x, $y, $txt, $txt_angle, $font_angle = 0) {
+    function TextWithRotation($x, $y, $txt, $txt_angle, $font_angle = 0)
+    {
         $font_angle += 90 + $txt_angle;
         $txt_angle *= M_PI / 180;
         $font_angle *= M_PI / 180;
@@ -762,7 +863,6 @@ class PDF extends FPDF {
             $s = 'q ' . $this->TextColor . ' ' . $s . ' Q';
         $this->_out($s);
     }
-
 }
 
 
@@ -805,16 +905,16 @@ $rgbtxt = explode("-", $cc->hex2rgb($clrtxt));
 $rgbt = explode("-", $cc->hex2rgb($colorhtabla));
 $rgbtt = explode("-", $cc->hex2rgb($tittabla));
 
-if( $idencabezado == 12){
+if ($idencabezado == 12) {
     $pdf = new PDF('P', 'mm', array($anchoTicket, 150));
-    if($anchoTicket >= 80){
+    if ($anchoTicket >= 80) {
         $pdf->margen = bcdiv(($anchoTicket - 76) / 2, '1', 1);
         $pdf->body = 76;
-    }else{
+    } else {
         $pdf->margen = 5;
         $pdf->body = ($anchoTicket - 10);
     }
-    
+
     $pdf->chkdata = $chkdata;
     $pdf->nombreempresa = $nombreempresa;
     $pdf->razonsocial = $razonsocial;
@@ -831,6 +931,8 @@ $pdf->clrtitulo = $clrtitulo;
 $pdf->colorcelda = $colorcelda;
 $pdf->colortitulo = $cc->hex2rgb($clrtitulo);
 $pdf->celdatitulo = $cc->hex2rgb($colorcelda);
+$pdf->colorsubtitulos = $cc->hex2rgb($clrsub);
+$pdf->fondosubtitulo = $cc->hex2rgb($clrcuadro);
 
 $pdf->pagina = $pagina;
 $pdf->correo = $correo;
@@ -851,10 +953,10 @@ $pdf->SetTextColor($rgbs[0], $rgbs[1], $rgbs[2]);
 
 switch ($idencabezado) {
     case 1:
-        $pdf->SetWidths(Array(80));
+        $pdf->SetWidths(array(80));
         $pdf->SetLineHeight(8);
         $pdf->SetY(36.3);
-        $pdf->RowT(Array("Datos del Emisor"));
+        $pdf->RowT(array("Datos del Emisor"));
         $pdf->Ln(1);
 
         $pdf->SetFillColor($rgbfd[0], $rgbfd[1], $rgbfd[2]);
@@ -865,59 +967,59 @@ switch ($idencabezado) {
         $pdf->SetY(45.3);
 
         $pdf->SetX(10);
-        $pdf->SetWidths(Array(15, 94.5, 30, 55));
+        $pdf->SetWidths(array(15, 94.5, 30, 55));
         $pdf->SetRowBorder('');
         $pdf->setRowColorText(array($txtbold, $clrtxt, $txtbold, $clrtxt));
         $pdf->SetLineHeight(0.1);
-        $pdf->Row(Array('', '', '', ''));
+        $pdf->Row(array('', '', '', ''));
         $pdf->SetStyles(array('B', '', 'B', ''));
         $pdf->SetLineHeight(4.5);
-        $pdf->Row(Array('Nombre', iconv("utf-8","windows-1252",'Contribuyente'), 'No Certificado', iconv("utf-8","windows-1252",'007')));
+        $pdf->Row(array('Nombre', iconv("utf-8", "windows-1252", 'Contribuyente'), 'No Certificado', iconv("utf-8", "windows-1252", '007')));
 
         $pdf->SetX(10);
         $pdf->setRowColorText(array($txtbold, $clrtxt, $txtbold, $clrtxt));
         $pdf->SetStyles(array('B', '', 'B', ''));
-        $pdf->Row(Array('RFC', iconv("utf-8","windows-1252",'XAXX010101000'), 'Regimen Fiscal', iconv("utf-8","windows-1252",'01 Regimen')));
+        $pdf->Row(array('RFC', iconv("utf-8", "windows-1252", 'XAXX010101000'), 'Regimen Fiscal', iconv("utf-8", "windows-1252", '01 Regimen')));
 
         $pdf->SetX(10);
         $pdf->SetStyles(array('B', '', 'B', ''));
         $pdf->setRowColorText(array($txtbold, $clrtxt, $txtbold, $clrtxt));
-        $pdf->Row(Array('Fecha', iconv("utf-8","windows-1252",'01/01/2021'), 'T. Comprobante', iconv("utf-8","windows-1252",'I Ingreso')));
+        $pdf->Row(array('Fecha', iconv("utf-8", "windows-1252", '01/01/2021'), 'T. Comprobante', iconv("utf-8", "windows-1252", 'I Ingreso')));
 
-        $pdf->SetWidths(Array(35, 77.5, 25, 58));
+        $pdf->SetWidths(array(35, 77.5, 25, 58));
         $pdf->SetStyles(array('B', '', 'B', ''));
         $pdf->setRowColorText(array($txtbold, $clrtxt, $txtbold, $clrtxt));
-        $pdf->Row(Array('Lugar de Expedicion', iconv("utf-8","windows-1252",'76800'), '', ''));
+        $pdf->Row(array('Lugar de Expedicion', iconv("utf-8", "windows-1252", '76800'), '', ''));
         $pdf->Ln(1);
 
         $pdf->SetFillColor($rgbc[0], $rgbc[1], $rgbc[2]);
         $pdf->SetTextColor($rgbs[0], $rgbs[1], $rgbs[2]);
         $pdf->SetFont('Arial', '', 15);
-        $pdf->SetWidths(Array(80));
+        $pdf->SetWidths(array(80));
         $pdf->SetLineHeight(8);
-        $pdf->RowT(Array("Datos del Cliente"));
+        $pdf->RowT(array("Datos del Cliente"));
 
         $pdf->SetFillColor($rgbfd[0], $rgbfd[1], $rgbfd[2]);
         $pdf->RoundedRect(10, ($pdf->GetY() + 0.7), 195, 14, 2, 'F');
 
         $pdf->SetY(($pdf->GetY() + 0.7));
-        $pdf->SetWidths(Array(17, 94.5, 23, 60));
+        $pdf->SetWidths(array(17, 94.5, 23, 60));
         $pdf->SetLineHeight(0.1);
-        $pdf->Row(Array('', '', '', ''));
+        $pdf->Row(array('', '', '', ''));
         $pdf->SetLineHeight(4.5);
         $pdf->SetStyles(array('B', '', 'B', ''));
         $pdf->setRowColorText(array($txtbold, $clrtxt, $txtbold, $clrtxt));
-        $pdf->Row(Array('Nombre', 'Receptor', 'Uso de CFDI', 'P01 Por Definir'));
+        $pdf->Row(array('Nombre', 'Receptor', 'Uso de CFDI', 'P01 Por Definir'));
 
         $pdf->SetStyles(array('B', '', 'B', ''));
         $pdf->setRowColorText(array($txtbold, $clrtxt, $txtbold, $clrtxt));
-        $pdf->Row(Array('RFC', 'XAXX010101000', '', ''));
+        $pdf->Row(array('RFC', 'XAXX010101000', '', ''));
 
-        $pdf->SetWidths(Array(17, 174.5));
+        $pdf->SetWidths(array(17, 174.5));
         $pdf->SetLineHeight(4.5);
         $pdf->SetStyles(array('B', ''));
         $pdf->setRowColorText(array($txtbold, $clrtxt));
-        $pdf->Row(Array('Direccion', iconv("utf-8","windows-1252",'Calle Falsa #123, Colonia: desconocida, Municipio, Estado')));
+        $pdf->Row(array('Direccion', iconv("utf-8", "windows-1252", 'Calle Falsa #123, Colonia: desconocida, Municipio, Estado')));
         $pdf->Ln(1);
 
         $pdf->SetFont('Arial', 'B', 12);
@@ -939,7 +1041,7 @@ switch ($idencabezado) {
         $pdf->Cell(22, 6, 'Importe', 1, 0, 'C', 1);
         $pdf->Ln(6);
         $pdf->SetTextColor(0, 0, 0);
-        $pdf->SetWidths(Array(15, 20, 25, 46, 45, 22, 22));
+        $pdf->SetWidths(array(15, 20, 25, 46, 45, 22, 22));
         $pdf->SetLineHeight(4.5);
 
         $pdf->SetFont('Arial', '', 9);
@@ -947,7 +1049,7 @@ switch ($idencabezado) {
         $pdf->setRowColorText();
         $pdf->SetRowBorder('B');
         $pdf->SetAligns('C');
-        $pdf->Row(Array('1', '01', 'H87 Pieza', 'Descripcion de Producto', '', '$ 100.00', '$ 100.00'));
+        $pdf->Row(array('1', '01', 'H87 Pieza', 'Descripcion de Producto', '', '$ 100.00', '$ 100.00'));
 
         $pdf->Cell(151, 8, '', 0, 0, 'C', 0);
         $pdf->SetFont('Arial', 'B', 9);
@@ -974,7 +1076,7 @@ switch ($idencabezado) {
         $pdf->Cell(30, 8, 'Importe con Letra ', 0, 0, 'C', 0);
         $pdf->SetFont('Arial', '', 9);
         $letras = NumeroALetras::convertir(bcdiv(116.00, '1', 2), 'pesos', 'centavos');
-        $pdf->Cell(26, 8, iconv("utf-8","windows-1252","$letras 00/100 M.N."), 0, 0, 'L', 0);
+        $pdf->Cell(26, 8, iconv("utf-8", "windows-1252", "$letras 00/100 M.N."), 0, 0, 'L', 0);
         $pdf->Ln(8);
 
 
@@ -982,16 +1084,16 @@ switch ($idencabezado) {
         $pdf->RoundedRect(10, $pdf->GetY(), 195, 3, 1.5, 'F');
         break;
     case 2:
-         
-        $pdf->SetWidths(Array(80));
+
+        $pdf->SetWidths(array(80));
         $pdf->SetLineHeight(8);
         $pdf->SetY(36.3);
-        $pdf->RowT(Array("Datos del Emisor"));
+        $pdf->RowT(array("Datos del Emisor"));
         $pdf->Ln(1);
 
         $pdf->SetFillColor($rgbfd[0], $rgbfd[1], $rgbfd[2]);
         $pdf->RoundedRect(10, 45.3, 195, 15, 2, 'F');
-        $pdf->SetWidths(Array(24, 113, 22, 35.5));
+        $pdf->SetWidths(array(24, 113, 22, 35.5));
         $pdf->SetLineHeight(4.5);
 
         $pdf->SetY(45);
@@ -1004,7 +1106,7 @@ switch ($idencabezado) {
         $pdf->SetFont('Arial', '', 8);
         $pdf->SetTextColor($rgbtxt[0], $rgbtxt[1], $rgbtxt[2]);
         $pdf->SetX(10);
-        $pdf->RowNB(Array('', iconv("utf-8","windows-1252",'Contribuyente'), '', iconv("utf-8","windows-1252",'XAXX010101000')));
+        $pdf->RowNB(array('', iconv("utf-8", "windows-1252", 'Contribuyente'), '', iconv("utf-8", "windows-1252", 'XAXX010101000')));
 
         $pdf->SetFont('Arial', 'B', 8);
         $pdf->SetTextColor($rgbbld[0], $rgbbld[1], $rgbbld[2]);
@@ -1014,25 +1116,25 @@ switch ($idencabezado) {
         $pdf->SetFont('Arial', '', 8);
         $pdf->SetTextColor($rgbtxt[0], $rgbtxt[1], $rgbtxt[2]);
         $pdf->SetX(10);
-        $pdf->RowNB(Array('', iconv("utf-8","windows-1252",'01-Regimen'), '', iconv("utf-8","windows-1252",'01-01-2021')));
+        $pdf->RowNB(array('', iconv("utf-8", "windows-1252", '01-Regimen'), '', iconv("utf-8", "windows-1252", '01-01-2021')));
 
         $pdf->SetFont('Arial', 'B', 8);
-        $pdf->SetWidths(Array(24, 170.5));
+        $pdf->SetWidths(array(24, 170.5));
         $pdf->SetTextColor($rgbbld[0], $rgbbld[1], $rgbbld[2]);
         $pdf->Write(5, 'Direccion');
         $pdf->SetFont('Arial', '', 8);
         $pdf->SetTextColor($rgbtxt[0], $rgbtxt[1], $rgbtxt[2]);
         $pdf->SetX(10);
-        $pdf->RowNB(Array('', iconv("utf-8","windows-1252",'Calle Falsa #123, Colonia: desconocida, Municipio, Estado')));
+        $pdf->RowNB(array('', iconv("utf-8", "windows-1252", 'Calle Falsa #123, Colonia: desconocida, Municipio, Estado')));
 
         $pdf->Ln(1);
 
         $pdf->SetFont('Arial', '', 15);
         $pdf->SetFillColor($rgbc[0], $rgbc[1], $rgbc[2]);
         $pdf->SetTextColor($rgbs[0], $rgbs[1], $rgbs[2]);
-        $pdf->SetWidths(Array(80));
+        $pdf->SetWidths(array(80));
         $pdf->SetLineHeight(8);
-        $pdf->RowT(Array("Datos del Cliente"));
+        $pdf->RowT(array("Datos del Cliente"));
 
         $pdf->Ln(0.5);
         $pdf->SetTextColor(0, 0, 0);
@@ -1041,7 +1143,7 @@ switch ($idencabezado) {
         $pdf->RoundedRect(10, ($pdf->GetY() + 0.4), 195, 25, 2, 'F');
 
         $pdf->SetY(($pdf->GetY() + 0.4));
-        $pdf->SetWidths(Array(30, 110, 23, 31.5));
+        $pdf->SetWidths(array(30, 110, 23, 31.5));
         $pdf->SetLineHeight(4.5);
 
         $pdf->SetFont('Arial', 'B', 8);
@@ -1052,7 +1154,7 @@ switch ($idencabezado) {
         $pdf->SetFont('Arial', '', 8);
         $pdf->SetTextColor($rgbtxt[0], $rgbtxt[1], $rgbtxt[2]);
         $pdf->SetX(10);
-        $pdf->RowNB(Array('', iconv("utf-8","windows-1252",'Cliente'), '', iconv("utf-8","windows-1252",'XAXX010101000')));
+        $pdf->RowNB(array('', iconv("utf-8", "windows-1252", 'Cliente'), '', iconv("utf-8", "windows-1252", 'XAXX010101000')));
 
         $pdf->SetFont('Arial', 'B', 8);
         $pdf->SetTextColor($rgbbld[0], $rgbbld[1], $rgbbld[2]);
@@ -1062,7 +1164,7 @@ switch ($idencabezado) {
         $pdf->SetFont('Arial', '', 8);
         $pdf->SetTextColor($rgbtxt[0], $rgbtxt[1], $rgbtxt[2]);
         $pdf->SetX(10);
-        $pdf->RowNB(Array('', iconv("utf-8","windows-1252",'P01-Por Definir'), '', iconv("utf-8","windows-1252",'01-01-2021')));
+        $pdf->RowNB(array('', iconv("utf-8", "windows-1252", 'P01-Por Definir'), '', iconv("utf-8", "windows-1252", '01-01-2021')));
 
         $pdf->SetFont('Arial', 'B', 8);
         $pdf->SetTextColor($rgbbld[0], $rgbbld[1], $rgbbld[2]);
@@ -1072,7 +1174,7 @@ switch ($idencabezado) {
         $pdf->SetFont('Arial', '', 8);
         $pdf->SetTextColor($rgbtxt[0], $rgbtxt[1], $rgbtxt[2]);
         $pdf->SetX(10);
-        $pdf->RowNB(Array('', 'XAXX010101000', '', iconv("utf-8","windows-1252",'MXN')));
+        $pdf->RowNB(array('', 'XAXX010101000', '', iconv("utf-8", "windows-1252", 'MXN')));
 
         $pdf->SetFont('Arial', 'B', 8);
         $pdf->SetTextColor($rgbbld[0], $rgbbld[1], $rgbbld[2]);
@@ -1080,17 +1182,17 @@ switch ($idencabezado) {
         $pdf->SetFont('Arial', '', 8);
         $pdf->SetTextColor($rgbtxt[0], $rgbtxt[1], $rgbtxt[2]);
         $pdf->SetX(10);
-        $pdf->RowNB(Array('', iconv("utf-8","windows-1252",'PPD-Pago en parcialidades o diferido '), '', ''));
+        $pdf->RowNB(array('', iconv("utf-8", "windows-1252", 'PPD-Pago en parcialidades o diferido '), '', ''));
 
         $pdf->SetFont('Arial', 'B', 8);
         $pdf->SetTextColor($rgbbld[0], $rgbbld[1], $rgbbld[2]);
         $pdf->Write(5, 'Direccion');
         $pdf->SetFont('Arial', '', 8);
-        $pdf->SetWidths(Array(30, 177.8));
+        $pdf->SetWidths(array(30, 177.8));
         $pdf->SetLineHeight(4.5);
         $pdf->SetTextColor($rgbtxt[0], $rgbtxt[1], $rgbtxt[2]);
         $pdf->SetX(10);
-        $pdf->RowNB(Array('', iconv("utf-8","windows-1252",'Calle Falsa #123, Colonia: desconocida, Municipio, Estado')));
+        $pdf->RowNB(array('', iconv("utf-8", "windows-1252", 'Calle Falsa #123, Colonia: desconocida, Municipio, Estado')));
         $pdf->Ln(1.2);
 
         $pdf->SetFont('Arial', 'B', 12);
@@ -1099,116 +1201,118 @@ switch ($idencabezado) {
         $pdf->RoundedRect(10, $pdf->GetY(), 195, 5.5, 2, 'FD');
         $pdf->Cell(195, 6, 'CFDIS RELACIONADOS', 0, 0, 'C');
         $pdf->Ln(7);
-        $pdf->SetWidths(Array(30, 24, 20, 23, 17, 16.7, 25, 20, 20));
+        $pdf->SetWidths(array(30, 24, 20, 23, 17, 16.7, 25, 20, 20));
         $pdf->SetLineHeight(4.5);
         $pdf->SetFont('Arial', 'B', 8);
         $pdf->SetFillColor($rgbt[0], $rgbt[1], $rgbt[2]);
         $pdf->SetTextColor($rgbtt[0], $rgbtt[1], $rgbtt[2]);
         $pdf->RoundedRect(10, $pdf->GetY(), 195, 9, 2, 'FD');
-        $pdf->RowNBC(Array(iconv("utf-8","windows-1252",'UUID'), iconv("utf-8","windows-1252",'FOLIO'), iconv("utf-8","windows-1252",'METODO PAGO'), iconv("utf-8","windows-1252",'TOTAL FACTURA'), iconv("utf-8","windows-1252",'MONEDA/CAMBIO'), iconv("utf-8","windows-1252",'PARC.'), iconv("utf-8","windows-1252",'ANTERIOR'), iconv("utf-8","windows-1252",'PAGADO'), iconv("utf-8","windows-1252",'RESTANTE')));
+        $pdf->RowNBC(array(iconv("utf-8", "windows-1252", 'UUID'), iconv("utf-8", "windows-1252", 'FOLIO'), iconv("utf-8", "windows-1252", 'METODO PAGO'), iconv("utf-8", "windows-1252", 'TOTAL FACTURA'), iconv("utf-8", "windows-1252", 'MONEDA/CAMBIO'), iconv("utf-8", "windows-1252", 'PARC.'), iconv("utf-8", "windows-1252", 'ANTERIOR'), iconv("utf-8", "windows-1252", 'PAGADO'), iconv("utf-8", "windows-1252", 'RESTANTE')));
         //cambios nuevos 
         $pdf->setRowColorText($clrtxt);
         $pdf->SetStyles('');
         $pdf->SetAligns('C');
         $pdf->SetRowBorder('B');
-        $pdf->Row(Array('123e4567-e89b-12d3-a456-42661417','ABC123DEF456GHI789','targeta Debito','12,34.00','MXN','P1','12,34.00','12,00.00','34.00'));
-        $pdf->Row(Array('123e4567-e89b-12d3-a456-42661417','ABC123DEF456GHI789','targeta Debito','34.00','MXN','P2','34.00','33.00','10.00'));
-       
+        $pdf->Row(array('123e4567-e89b-12d3-a456-42661417', 'ABC123DEF456GHI789', 'targeta Debito', '12,34.00', 'MXN', 'P1', '12,34.00', '12,00.00', '34.00'));
+        $pdf->Row(array('123e4567-e89b-12d3-a456-42661417', 'ABC123DEF456GHI789', 'targeta Debito', '34.00', 'MXN', 'P2', '34.00', '33.00', '10.00'));
+
         $pdf->SetFont('Arial', 'B', 9);
         $pdf->SetX(140.7);
-        $pdf->SetWidths(Array(25, 20, 20));
+        $pdf->SetWidths(array(25, 20, 20));
         $pdf->SetLineHeight(4.5);
         $pdf->SetAligns(array('R', 'C', 'C'));
-        $pdf->Row(Array(iconv("utf-8","windows-1252","Total Pagado: "), iconv("utf-8","windows-1252","$ " . number_format('1234.00', 2, '.', ',')), iconv("utf-8","windows-1252",'MXN')));
+        $pdf->Row(array(iconv("utf-8", "windows-1252", "Total Pagado: "), iconv("utf-8", "windows-1252", "$ " . number_format('1234.00', 2, '.', ',')), iconv("utf-8", "windows-1252", 'MXN')));
         $pdf->Ln(2);
 
         $pdf->SetFont('Arial', 'BI', 8);
-            $pdf->Write(10, iconv("utf-8","windows-1252","*Este documento no posee efectos fiscales"), '');
-       
-            $pdf->SetFillColor($rgbfd[0], $rgbfd[1], $rgbfd[2]);
-            $pdf->RoundedRect(10, $pdf->GetY(), 95, 30, 2, 'F');
-            $pdf->SetTextColor(0, 0, 0);
+        $pdf->Write(10, iconv("utf-8", "windows-1252", "*Este documento no posee efectos fiscales"), '');
 
-            $pdf->SetFont('Arial', 'B', 8);
-            $pdf->SetX(40);
-            $pdf->SetTextColor($rgbbld[0], $rgbbld[1], $rgbbld[2]);
-            $pdf->Write(10, iconv("utf-8","windows-1252","Folio Fiscal (UUID): "), '');
-            $pdf->Ln(4);
-            $pdf->SetFont('Arial', '', 8);
-            $pdf->SetX(40);
-            $pdf->SetTextColor($rgbtxt[0], $rgbtxt[1], $rgbtxt[2]);
-            $pdf->Write(10, iconv("utf-8","windows-1252",'123e4567-e89b-12d3-a456-42661417'), '');
-            $pdf->Ln(4);
-            $pdf->SetFont('Arial', 'B', 8);
-            $pdf->SetX(40);
-            $pdf->SetTextColor($rgbbld[0], $rgbbld[1], $rgbbld[2]);
-            $pdf->Write(10, iconv("utf-8","windows-1252","N° Certificado SAT: "), '');
-            $pdf->Ln(4);
-            $pdf->SetFont('Arial', '', 8);
-            $pdf->SetX(40);
-            $pdf->SetTextColor($rgbtxt[0], $rgbtxt[1], $rgbtxt[2]);
-            $pdf->Write(10, iconv("utf-8","windows-1252",'ABC123DEF456GHI789'), '');
-            $pdf->Ln(4);
-            $pdf->SetFont('Arial', 'B', 8);
-            $pdf->SetX(40);
-            $pdf->SetTextColor($rgbbld[0], $rgbbld[1], $rgbbld[2]);
-            $pdf->Write(10, iconv("utf-8","windows-1252","Fecha de Certificacion: "), '');
-            $pdf->Ln(4);
-            $pdf->SetFont('Arial', '', 8);
-            $pdf->SetX(40);
-            $pdf->SetTextColor($rgbtxt[0], $rgbtxt[1], $rgbtxt[2]);
-            $pdf->Write(10, iconv("utf-8","windows-1252",'2024-02-10'), '');
-            $pdf->Ln(11.5);
+        $pdf->SetFillColor($rgbfd[0], $rgbfd[1], $rgbfd[2]);
+        $pdf->RoundedRect(10, $pdf->GetY(), 95, 30, 2, 'F');
+        $pdf->SetTextColor(0, 0, 0);
 
-            $pdf->SetFont('Arial', 'B', 9);
+        $pdf->SetFont('Arial', 'B', 8);
+        $pdf->SetX(40);
+        $pdf->SetTextColor($rgbbld[0], $rgbbld[1], $rgbbld[2]);
+        $pdf->Write(10, iconv("utf-8", "windows-1252", "Folio Fiscal (UUID): "), '');
+        $pdf->Ln(4);
+        $pdf->SetFont('Arial', '', 8);
+        $pdf->SetX(40);
+        $pdf->SetTextColor($rgbtxt[0], $rgbtxt[1], $rgbtxt[2]);
+        $pdf->Write(10, iconv("utf-8", "windows-1252", '123e4567-e89b-12d3-a456-42661417'), '');
+        $pdf->Ln(4);
+        $pdf->SetFont('Arial', 'B', 8);
+        $pdf->SetX(40);
+        $pdf->SetTextColor($rgbbld[0], $rgbbld[1], $rgbbld[2]);
+        $pdf->Write(10, iconv("utf-8", "windows-1252", "N° Certificado SAT: "), '');
+        $pdf->Ln(4);
+        $pdf->SetFont('Arial', '', 8);
+        $pdf->SetX(40);
+        $pdf->SetTextColor($rgbtxt[0], $rgbtxt[1], $rgbtxt[2]);
+        $pdf->Write(10, iconv("utf-8", "windows-1252", 'ABC123DEF456GHI789'), '');
+        $pdf->Ln(4);
+        $pdf->SetFont('Arial', 'B', 8);
+        $pdf->SetX(40);
+        $pdf->SetTextColor($rgbbld[0], $rgbbld[1], $rgbbld[2]);
+        $pdf->Write(10, iconv("utf-8", "windows-1252", "Fecha de Certificacion: "), '');
+        $pdf->Ln(4);
+        $pdf->SetFont('Arial', '', 8);
+        $pdf->SetX(40);
+        $pdf->SetTextColor($rgbtxt[0], $rgbtxt[1], $rgbtxt[2]);
+        $pdf->Write(10, iconv("utf-8", "windows-1252", '2024-02-10'), '');
+        $pdf->Ln(11.5);
 
-            $pdf->SetFillColor($rgbc[0], $rgbc[1], $rgbc[2]);
-            $pdf->SetTextColor($rgbs[0], $rgbs[1], $rgbs[2]);
-            $pdf->RoundedRect(10, $pdf->GetY(), 35, 5, 2, 'F');
-            $pdf->SetX(12);
-            $pdf->Write(5, iconv("utf-8","windows-1252","Sello CFDI"), '');
+        $pdf->SetFont('Arial', 'B', 9);
 
-            $pdf->RoundedRect(75, $pdf->GetY(), 35, 5, 2, 'F');
-            $pdf->SetX(77);
-            $pdf->Write(5, iconv("utf-8","windows-1252","Sello SAT"), '');
+        $pdf->SetFillColor($rgbc[0], $rgbc[1], $rgbc[2]);
+        $pdf->SetTextColor($rgbs[0], $rgbs[1], $rgbs[2]);
+        $pdf->RoundedRect(10, $pdf->GetY(), 35, 5, 2, 'F');
+        $pdf->SetX(12);
+        $pdf->Write(5, iconv("utf-8", "windows-1252", "Sello CFDI"), '');
 
-            $pdf->RoundedRect(140, $pdf->GetY(), 35, 5, 2, 'F');
-            $pdf->SetX(142);
-            $pdf->Write(5, iconv("utf-8","windows-1252","Cadena Original"), '');
-            $pdf->Ln(5);
-            $pdf->SetWidths(Array(62.5, 2.5, 62.5, 2.5, 65));
-            $pdf->SetLineHeight(2.5);
-            $pdf->SetFont('Arial', '', 5);
-            $pdf->rgbfd0 = $rgbfd[0];
-            $pdf->rgbfd1 = $rgbfd[1];
-            $pdf->rgbfd2 = $rgbfd[2];
-            $pdf->SetTextColor($rgbtxt[0], $rgbtxt[1], $rgbtxt[2]);
-            $pdf->RowR(Array(iconv("utf-8","windows-1252",'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'), "",
-                             iconv("utf-8","windows-1252",'0987654321ZYXWVUTSRQPONMLKJIHGFEDCBA'), "",
-                             iconv("utf-8","windows-1252",'1234567890ABCDEFGHI')));
-            $pdf->SetFont('Arial', '', 9);
-            $pdf->Write(8, iconv("utf-8","windows-1252","Este documento es una representacion impresa de un cfdi-."), '');
-        
-            $pdf->SetFont('Arial', 'BI', 8);
-            $pdf->SetTextColor(0, 0, 0);
-            $pdf->Cell(10, 3, '*El pago ' , '$foliopago' , ' ha sido oficialmente cancelado', 0, 0, 'L');
-        
-            $pdf->isFinished = true;
-       
+        $pdf->RoundedRect(75, $pdf->GetY(), 35, 5, 2, 'F');
+        $pdf->SetX(77);
+        $pdf->Write(5, iconv("utf-8", "windows-1252", "Sello SAT"), '');
+
+        $pdf->RoundedRect(140, $pdf->GetY(), 35, 5, 2, 'F');
+        $pdf->SetX(142);
+        $pdf->Write(5, iconv("utf-8", "windows-1252", "Cadena Original"), '');
+        $pdf->Ln(5);
+        $pdf->SetWidths(array(62.5, 2.5, 62.5, 2.5, 65));
+        $pdf->SetLineHeight(2.5);
+        $pdf->SetFont('Arial', '', 5);
+        $pdf->rgbfd0 = $rgbfd[0];
+        $pdf->rgbfd1 = $rgbfd[1];
+        $pdf->rgbfd2 = $rgbfd[2];
+        $pdf->SetTextColor($rgbtxt[0], $rgbtxt[1], $rgbtxt[2]);
+        $pdf->RowR(array(
+            iconv("utf-8", "windows-1252", 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'), "",
+            iconv("utf-8", "windows-1252", '0987654321ZYXWVUTSRQPONMLKJIHGFEDCBA'), "",
+            iconv("utf-8", "windows-1252", '1234567890ABCDEFGHI')
+        ));
+        $pdf->SetFont('Arial', '', 9);
+        $pdf->Write(8, iconv("utf-8", "windows-1252", "Este documento es una representacion impresa de un cfdi-."), '');
+
+        $pdf->SetFont('Arial', 'BI', 8);
+        $pdf->SetTextColor(0, 0, 0);
+        $pdf->Cell(10, 3, '*El pago ', '$foliopago', ' ha sido oficialmente cancelado', 0, 0, 'L');
+
+        $pdf->isFinished = true;
+
 
         break;
     case 3:
         $pdf->SetFont('Arial', 'B', 10);
-        $pdf->SetWidths(Array(40));
+        $pdf->SetWidths(array(40));
         $pdf->SetLineHeight(8);
         $pdf->SetY(36.3);
-        $pdf->RowT(Array("FECHA: 01/01/2021"));
+        $pdf->RowT(array("FECHA: 01/01/2021"));
 
         $pdf->SetTextColor($rgbs[0], $rgbs[1], $rgbs[2]);
         $pdf->SetFont('Arial', '', 15);
-        $pdf->SetWidths(Array(80));
+        $pdf->SetWidths(array(80));
         $pdf->SetLineHeight(8);
-        $pdf->RowT(Array("Datos de la Cotizacion"));
+        $pdf->RowT(array("Datos de la Cotizacion"));
 
         $pdf->SetWidths(array(15, 72, 32, 75.5));
         $pdf->SetLineHeight(4.5);
@@ -1221,7 +1325,7 @@ switch ($idencabezado) {
         $pdf->SetX(10);
         $pdf->SetFillColor($rgbfd[0], $rgbfd[1], $rgbfd[2]);
         $pdf->RoundedRect(10, $pdf->GetY(), 195, 10, 2, 'F');
-        $pdf->Row(Array("Nombre", iconv("utf-8","windows-1252",'Cliente cotizacion'), "Lugar de Expedicion", iconv("utf-8","windows-1252",'Calle Falsa #123, Colonia: Imaginaria, Municipio, Estado')));
+        $pdf->Row(array("Nombre", iconv("utf-8", "windows-1252", 'Cliente cotizacion'), "Lugar de Expedicion", iconv("utf-8", "windows-1252", 'Calle Falsa #123, Colonia: Imaginaria, Municipio, Estado')));
 
         $pdf->Ln(3);
         $pdf->SetFont('Arial', 'B', 12);
@@ -1234,10 +1338,10 @@ switch ($idencabezado) {
         $pdf->SetFillColor($rgbt[0], $rgbt[1], $rgbt[2]);
         $pdf->SetTextColor($rgbtt[0], $rgbtt[1], $rgbtt[2]);
         $pdf->SetFont('Arial', 'B', 9);
-        $pdf->SetWidths(Array(10, 22, 25, 19, 44, 35, 20, 20));
+        $pdf->SetWidths(array(10, 22, 25, 19, 44, 35, 20, 20));
         $pdf->SetLineHeight(4.5);
         $pdf->RoundedRect(10, $pdf->GetY(), 195, 4.5, 2, 'FD');
-        $pdf->RowNBC(Array("Cant", "Codigo", "Imagen", "Unidad", "Descripcion", "Observaciones", "Precio", "Importe"));
+        $pdf->RowNBC(array("Cant", "Codigo", "Imagen", "Unidad", "Descripcion", "Observaciones", "Precio", "Importe"));
         $pdf->SetTextColor(0, 0, 0);
 
         $file = '../img/monitor.jpg';
@@ -1263,21 +1367,21 @@ switch ($idencabezado) {
         $pdf->SetStyles('');
         $pdf->SetAligns('C');
         $pdf->SetRowBorder('B');
-        $pdf->Row(Array('1', iconv("utf-8","windows-1252",'01'), $img, 'E48', iconv("utf-8","windows-1252",'Producto'), iconv("utf-8","windows-1252",''), iconv("utf-8","windows-1252",'$ ' . number_format('100', 2, '.', ',')), iconv("utf-8","windows-1252",'$ ' . number_format('100', 2, '.', ','))));
+        $pdf->Row(array('1', iconv("utf-8", "windows-1252", '01'), $img, 'E48', iconv("utf-8", "windows-1252", 'Producto'), iconv("utf-8", "windows-1252", ''), iconv("utf-8", "windows-1252", '$ ' . number_format('100', 2, '.', ',')), iconv("utf-8", "windows-1252", '$ ' . number_format('100', 2, '.', ','))));
 
-        $pdf->SetWidths(Array(20, 20));
+        $pdf->SetWidths(array(20, 20));
         $pdf->SetFont('Arial', 'B', 9);
         $pdf->SetX(165);
-        $pdf->Row(Array('Subtotal', iconv("utf-8","windows-1252",'$ ' . number_format('100', 2, '.', ''))));
+        $pdf->Row(array('Subtotal', iconv("utf-8", "windows-1252", '$ ' . number_format('100', 2, '.', ''))));
 
         $pdf->SetX(165);
-        $pdf->Row(Array('IVA', iconv("utf-8","windows-1252",'$ ' . number_format('16', 2, '.', ''))));
+        $pdf->Row(array('IVA', iconv("utf-8", "windows-1252", '$ ' . number_format('16', 2, '.', ''))));
 
         $pdf->SetX(165);
-        $pdf->Row(Array('Ret IVA', iconv("utf-8","windows-1252",'$ ' . number_format('4', 2, '.', ''))));
+        $pdf->Row(array('Ret IVA', iconv("utf-8", "windows-1252", '$ ' . number_format('4', 2, '.', ''))));
 
         $pdf->SetX(165);
-        $pdf->Row(Array('Total', iconv("utf-8","windows-1252",'$ ' . number_format('112', 2, '.', ''))));
+        $pdf->Row(array('Total', iconv("utf-8", "windows-1252", '$ ' . number_format('112', 2, '.', ''))));
         $pdf->Ln(2);
 
         $pdf->SetFillColor($rgbc[0], $rgbc[1], $rgbc[2]);
@@ -1287,36 +1391,36 @@ switch ($idencabezado) {
         $pdf->SetTextColor(0, 0, 0);
         $pdf->SetFont('Arial', '', 10);
         $obser = str_replace("<ent>", "\n", $observaciones);
-        $pdf->Write(3, iconv("utf-8","windows-1252",'Observaciones: ' . $obser));
+        $pdf->Write(3, iconv("utf-8", "windows-1252", 'Observaciones: ' . $obser));
 
         $pdf->Ln(5);
         $pdf->SetFont('Arial', 'I', 9);
-        $pdf->SetWidths(Array(85, 85));
+        $pdf->SetWidths(array(85, 85));
         $pdf->SetLineHeight(4.5);
         $pdf->SetFillColor(255, 255, 255);
-        $pdf->RowR(Array('Datos Fiscales:', 'Datos Transferencia Bancaria: '));
+        $pdf->RowR(array('Datos Fiscales:', 'Datos Transferencia Bancaria: '));
 
-        $pdf->SetWidths(Array(85, 85));
+        $pdf->SetWidths(array(85, 85));
         $pdf->SetLineHeight(4.5);
-        $pdf->RowR(Array(iconv("utf-8","windows-1252","RFC: XAXX010101000 \nRazon Social: Publico en General \nCalle: Calle Falsa #123 Col. Imaginaria \nLocalidad: Municipio \nEstado: Estado \nCodigo Postal: 76800 \nCorreo: ejemplo@ejemplo \nTel: 4271234567"), iconv("utf-8","windows-1252","Banco: Banco Olmeca    Sucursal: 123 \nBeneficiario: Yo \nCuenta: 7...8 \nClabe:0987654321  \nN° Tarjeta: Olmecard")));
+        $pdf->RowR(array(iconv("utf-8", "windows-1252", "RFC: XAXX010101000 \nRazon Social: Publico en General \nCalle: Calle Falsa #123 Col. Imaginaria \nLocalidad: Municipio \nEstado: Estado \nCodigo Postal: 76800 \nCorreo: ejemplo@ejemplo \nTel: 4271234567"), iconv("utf-8", "windows-1252", "Banco: Banco Olmeca    Sucursal: 123 \nBeneficiario: Yo \nCuenta: 7...8 \nClabe:0987654321  \nN° Tarjeta: Olmecard")));
         break;
     case 4:
         $pdf->SetFont('Arial', 'B', 12);
-        $pdf->SetWidths(Array(65));
+        $pdf->SetWidths(array(65));
         $pdf->SetLineHeight(8);
         $pdf->SetX(140);
-        $pdf->RowT(Array(iconv("utf-8","windows-1252",'BUENO POR: $' . bcdiv('100', 1, 2))));
+        $pdf->RowT(array(iconv("utf-8", "windows-1252", 'BUENO POR: $' . bcdiv('100', 1, 2))));
 
         $pdf->SetFont('Arial', 'B', 12);
-        $pdf->SetWidths(Array(125));
+        $pdf->SetWidths(array(125));
         $pdf->SetLineHeight(8);
         $pdf->SetX(80);
-        $pdf->RowT(Array(iconv("utf-8","windows-1252",'San Juan del Rio, Queretaro a 01 de Enero de 2021')));
+        $pdf->RowT(array(iconv("utf-8", "windows-1252", 'San Juan del Rio, Queretaro a 01 de Enero de 2021')));
 
         $pdf->Ln(8);
         $pdf->SetFont('Arial', '', 15);
         $pdf->SetTextColor(0, 0, 0);
-        $pdf->Write(8, iconv("utf-8","windows-1252",'Se recibio de Rodrigo Antonio Moran-Clarion la cantidad de $ 555.61 (QUINIENTOS CINCUENTA Y CINCO  PESOS CON SESENTA Y UN  CENTAVOS 61/100 M.N.) por concepto del 50% de anticipo por la cotizacion de servicios con folio COT0008.'));
+        $pdf->Write(8, iconv("utf-8", "windows-1252", 'Se recibio de Rodrigo Antonio Moran-Clarion la cantidad de $ 555.61 (QUINIENTOS CINCUENTA Y CINCO  PESOS CON SESENTA Y UN  CENTAVOS 61/100 M.N.) por concepto del 50% de anticipo por la cotizacion de servicios con folio COT0008.'));
 
         $pdf->Ln(4);
         $pdf->SetFont('courier', 'B', 18);
@@ -1327,23 +1431,23 @@ switch ($idencabezado) {
         break;
     case 5:
         $pdf->SetFont('Arial', 'B', 12);
-        $pdf->SetWidths(Array(125));
+        $pdf->SetWidths(array(125));
         $pdf->SetLineHeight(6);
         $pdf->SetY(36.3);
         $pdf->SetX(80);
-        $pdf->RowT(Array(iconv("utf-8","windows-1252",'San Juan del Rio, Queretaro a 01 de Ene de 2021')));
+        $pdf->RowT(array(iconv("utf-8", "windows-1252", 'San Juan del Rio, Queretaro a 01 de Ene de 2021')));
 
         $pdf->Ln(2);
         $pdf->SetFont('Arial', 'B', 12);
         $pdf->SetTextColor(0, 0, 0);
-        $pdf->SetWidths(Array(195));
-        $pdf->RowNBC(Array(iconv("utf-8","windows-1252",'Comunicado')));
+        $pdf->SetWidths(array(195));
+        $pdf->RowNBC(array(iconv("utf-8", "windows-1252", 'Comunicado')));
 
         $pdf->Ln(3);
         $pdf->SetFont('Arial', '', 12);
         $pdf->SetTextColor($rgbtxt[0], $rgbtxt[1], $rgbtxt[2]);
         //ANGELGM $espL
-        $pdf->Write(0 , iconv("utf-8","windows-1252",'Por medio de este comunicado le proporcionamos la siguiente informacion.'));
+        $pdf->Write(0, iconv("utf-8", "windows-1252", 'Por medio de este comunicado le proporcionamos la siguiente informacion.'));
         $pdf->Ln(5);
 
         $pdf->Cell(195, 80, '', 0, 0, 'C', 0);
@@ -1351,14 +1455,14 @@ switch ($idencabezado) {
         $pdf->TextWithRotation(25.5, 223, '01 01 2021', 25.5, 0);
         $pdf->Image('../img/SelloSine2.png', 10, 180, 70);
         break;
-    case 6:     
-        
+    case 6:
+
         $pdf->SetFont('Arial', '', 15);
         $pdf->SetFillColor($rgbc[0], $rgbc[1], $rgbc[2]);
         $pdf->SetTextColor($rgbs[0], $rgbs[1], $rgbs[2]);
-        $pdf->SetWidths(Array(195));
+        $pdf->SetWidths(array(195));
         $pdf->SetLineHeight(8);
-        $pdf->RowT(Array('Facturas generadas en el periodo:'));
+        $pdf->RowT(array('Facturas generadas en el periodo:'));
         $pdf->SetFont('Arial', 'B', 12);
         $pdf->SetTextColor(23, 23, 124);
         $pdf->RoundedRect(10, $pdf->GetY(), 195, 5.5, 2, 'D');
@@ -1369,100 +1473,101 @@ switch ($idencabezado) {
         $pdf->SetFillColor($rgbt[0], $rgbt[1], $rgbt[2]);
         $pdf->SetTextColor($rgbtt[0], $rgbtt[1], $rgbtt[2]);
         $pdf->SetFont('Arial', 'B', 9);
-        $pdf->SetWidths(Array(20, 26, 30, 30, 28, 18, 18, 25));
+        $pdf->SetWidths(array(20, 26, 30, 30, 28, 18, 18, 25));
         $pdf->SetLineHeight(5);
         $pdf->RoundedRect(10, $pdf->GetY(), 195, 5, 2, 'FD');
-        $pdf->RowNBC(Array("Folio", "Fecha creacion", "Emisor", "Cliente", "RFC", "Tipo", "Estado", "Total"));
+        $pdf->RowNBC(array("Folio", "Fecha creacion", "Emisor", "Cliente", "RFC", "Tipo", "Estado", "Total"));
         $pdf->SetTextColor(0, 0, 0);
 
         $pdf->RowWithColor(
-            array('ABC1234567','26/Dic/2023',' Ficticia S.A. de C.V.','INOV S.A. de C.V.','GEMA841210ABC ','Factura',"Pendiente",'$ 4,755.86 MXN '), 
+            array('ABC1234567', '26/Dic/2023', ' Ficticia S.A. de C.V.', 'INOV S.A. de C.V.', 'GEMA841210ABC ', 'Factura', "Pendiente", '$ 4,755.86 MXN '),
             array(
                 'Pendiente' => array(255, 255, 0), // Amarillo
                 'Cancelada' => array(255, 0, 0), // Rojo
                 'Pagada' => array(0, 128, 0) // Verde
-            ), 
+            ),
             6 // Índice de la columna "Estado"
         );
-        
+
         $pdf->RowWithColor(
-            array('DEF4567890','18/Dic/2023',' Ficticia S.A. de C.V.','INOV S.A. de C.V.','VEMA841210ABC','Factura',"Cancelada",'$ 1,456.00 MXN '), 
+            array('DEF4567890', '18/Dic/2023', ' Ficticia S.A. de C.V.', 'INOV S.A. de C.V.', 'VEMA841210ABC', 'Factura', "Cancelada", '$ 1,456.00 MXN '),
             array(
                 'Pendiente' => array(255, 255, 0), // Amarillo
                 'Cancelada' => array(255, 0, 0), // Rojo
                 'Pagada' => array(0, 128, 0) // Verde
-            ), 
+            ),
             6 // Índice de la columna "Estado"
         );
-        
+
         $pdf->RowWithColor(
-            array('GHI7890123','15/Dic/2023',' Ficticia S.A. de C.V.','INOV S.A. de C.V.','XEMA841210ABC','Factura',"Pagada",'$ 2,560.75 MXN '), 
+            array('GHI7890123', '15/Dic/2023', ' Ficticia S.A. de C.V.', 'INOV S.A. de C.V.', 'XEMA841210ABC', 'Factura', "Pagada", '$ 2,560.75 MXN '),
             array(
                 'Pendiente' => array(255, 255, 0), // Amarillo
                 'Cancelada' => array(255, 0, 0), // Rojo
                 'Pagada' => array(0, 128, 0) // Verde
-            ), 
+            ),
             6 // Índice de la columna "Estado"
         );
-            
+
         $pdf->Ln(3);
         $pdf->SetFont('Arial', 'B', 9);
         $pdf->SetTextColor(23, 23, 124);
-        $pdf->SetWidths(Array(45, 45, 45));
+        $pdf->SetWidths(array(45, 45, 45));
         $pdf->SetLineHeight(6);
         $pdf->SetX(70);
-        $pdf->RowR(Array('Total Facturas Pagadas', 'Total Facturas Pendientes', 'Total Facturas Canceladas'));
+        $pdf->RowR(array('Total Facturas Pagadas', 'Total Facturas Pendientes', 'Total Facturas Canceladas'));
 
         //$pdf->SetFillColor(255, 255, 255);
         $pdf->SetTextColor(0, 0, 0);
         $pdf->SetX(70);
-        $pdf->RowR(Array(
-            iconv("utf-8","windows-1252",'$ ' . number_format(22222, 2, '.', ',') . ' ' . '120'), 
-            iconv("utf-8","windows-1252",'$ ' . number_format(44444, 2, '.', ',') . ' ' . '130'), 
-            iconv("utf-8","windows-1252",'$ ' . number_format(55555, 2, '.', ',') . ' ' . '140')));
+        $pdf->RowR(array(
+            iconv("utf-8", "windows-1252", '$ ' . number_format(22222, 2, '.', ',') . ' ' . '120'),
+            iconv("utf-8", "windows-1252", '$ ' . number_format(44444, 2, '.', ',') . ' ' . '130'),
+            iconv("utf-8", "windows-1252", '$ ' . number_format(55555, 2, '.', ',') . ' ' . '140')
+        ));
 
-        
-            $pdf->Ln(8);
-            $pdf->SetFillColor($rgbt[0], $rgbt[1], $rgbt[2]);
-            $pdf->SetTextColor($rgbtt[0], $rgbtt[1], $rgbtt[2]);
-            $pdf->Cell(120, 8, '', 0, 0, 'C', 0);
-            $pdf->Cell(40, 8, 'Impuestos Trasladados', 1, 0, 'C', 1);
-            $pdf->SetTextColor(0, 0, 0);
-            $pdf->Cell(35, 8, iconv("utf-8","windows-1252",'$ ' . number_format(1234.56, 2, '.', ',')), 1, 0, 'C', 0);
-        
-            $pdf->Ln(8);
-            $pdf->SetFillColor($rgbt[0], $rgbt[1], $rgbt[2]);
-            $pdf->SetTextColor($rgbtt[0], $rgbtt[1], $rgbtt[2]);
-            $pdf->Cell(120, 8, '', 0, 0, 'C', 0);
-            $pdf->Cell(40, 8, 'Impuestos Retenidos', 1, 0, 'C', 1);
-            $pdf->SetTextColor(0, 0, 0);
-            $pdf->Cell(35, 8, iconv("utf-8","windows-1252",'$ ' . number_format(1234.56, 2, '.', ',')), 1, 0, 'C', 0);
-        
-            $pdf->Ln(8);
-            $pdf->SetFillColor($rgbt[0], $rgbt[1], $rgbt[2]);
-            $pdf->SetTextColor($rgbtt[0], $rgbtt[1], $rgbtt[2]);
-            $pdf->Cell(120, 8, '', 0, 0, 'C', 0);
-            $pdf->Cell(40, 8, 'Total Descuentos', 1, 0, 'C', 1);
-            $pdf->SetTextColor(0, 0, 0);
-            $pdf->Cell(35, 8, iconv("utf-8","windows-1252",'$ ' . number_format(1234.56, 2, '.', ',')), 1, 0, 'C', 0);
-        
-            $pdf->Ln(8);
-            $pdf->SetFillColor($rgbt[0], $rgbt[1], $rgbt[2]);
-            $pdf->SetTextColor($rgbtt[0], $rgbtt[1], $rgbtt[2]);
-            $pdf->Cell(120, 8, '', 0, 0, 'C', 0);
-            $pdf->Cell(40, 8, 'Total del Periodo en ' . 'MXN', 1, 0, 'C', 1);
-            $pdf->SetTextColor(0, 0, 0);
-            $pdf->Cell(35, 8, iconv("utf-8","windows-1252",'$ ' . number_format(1234.56, 2, '.', ',')), 1, 0, 'C', 0);
-    
+
+        $pdf->Ln(8);
+        $pdf->SetFillColor($rgbt[0], $rgbt[1], $rgbt[2]);
+        $pdf->SetTextColor($rgbtt[0], $rgbtt[1], $rgbtt[2]);
+        $pdf->Cell(120, 8, '', 0, 0, 'C', 0);
+        $pdf->Cell(40, 8, 'Impuestos Trasladados', 1, 0, 'C', 1);
+        $pdf->SetTextColor(0, 0, 0);
+        $pdf->Cell(35, 8, iconv("utf-8", "windows-1252", '$ ' . number_format(1234.56, 2, '.', ',')), 1, 0, 'C', 0);
+
+        $pdf->Ln(8);
+        $pdf->SetFillColor($rgbt[0], $rgbt[1], $rgbt[2]);
+        $pdf->SetTextColor($rgbtt[0], $rgbtt[1], $rgbtt[2]);
+        $pdf->Cell(120, 8, '', 0, 0, 'C', 0);
+        $pdf->Cell(40, 8, 'Impuestos Retenidos', 1, 0, 'C', 1);
+        $pdf->SetTextColor(0, 0, 0);
+        $pdf->Cell(35, 8, iconv("utf-8", "windows-1252", '$ ' . number_format(1234.56, 2, '.', ',')), 1, 0, 'C', 0);
+
+        $pdf->Ln(8);
+        $pdf->SetFillColor($rgbt[0], $rgbt[1], $rgbt[2]);
+        $pdf->SetTextColor($rgbtt[0], $rgbtt[1], $rgbtt[2]);
+        $pdf->Cell(120, 8, '', 0, 0, 'C', 0);
+        $pdf->Cell(40, 8, 'Total Descuentos', 1, 0, 'C', 1);
+        $pdf->SetTextColor(0, 0, 0);
+        $pdf->Cell(35, 8, iconv("utf-8", "windows-1252", '$ ' . number_format(1234.56, 2, '.', ',')), 1, 0, 'C', 0);
+
+        $pdf->Ln(8);
+        $pdf->SetFillColor($rgbt[0], $rgbt[1], $rgbt[2]);
+        $pdf->SetTextColor($rgbtt[0], $rgbtt[1], $rgbtt[2]);
+        $pdf->Cell(120, 8, '', 0, 0, 'C', 0);
+        $pdf->Cell(40, 8, 'Total del Periodo en ' . 'MXN', 1, 0, 'C', 1);
+        $pdf->SetTextColor(0, 0, 0);
+        $pdf->Cell(35, 8, iconv("utf-8", "windows-1252", '$ ' . number_format(1234.56, 2, '.', ',')), 1, 0, 'C', 0);
+
         break;
     case 7:
         $pdf->SetFont('Arial', '', 15);
         $pdf->SetY(36.3);
         $pdf->SetFillColor($rgbc[0], $rgbc[1], $rgbc[2]);
         $pdf->SetTextColor($rgbs[0], $rgbs[1], $rgbs[2]);
-        $pdf->SetWidths(Array(195));
+        $pdf->SetWidths(array(195));
         $pdf->SetLineHeight(8);
-        $pdf->RowT(Array('Pagos generados en el periodo:'));
+        $pdf->RowT(array('Pagos generados en el periodo:'));
         $pdf->SetFont('Arial', 'B', 12);
         $pdf->SetTextColor(23, 23, 124);
         $pdf->RoundedRect(10, $pdf->GetY(), 195, 5.5, 2, 'D');
@@ -1474,18 +1579,18 @@ switch ($idencabezado) {
         $pdf->SetFillColor($rgbt[0], $rgbt[1], $rgbt[2]);
         $pdf->SetTextColor($rgbtt[0], $rgbtt[1], $rgbtt[2]);
         $pdf->SetFont('Arial', 'B', 9);
-        $pdf->SetWidths(Array(20, 30, 32, 32, 30, 25, 26));
+        $pdf->SetWidths(array(20, 30, 32, 32, 30, 25, 26));
         $pdf->SetLineHeight(5);
         $pdf->RoundedRect(10, $pdf->GetY(), 195, 5, 2, 'FD');
-        $pdf->RowNBC(Array(iconv("utf-8","windows-1252","N° de Folio") ,"Facturas Pagadas","Emisor","Cliente", "RFC Cliente", "Fecha de Pago", "Total Pago"));
+        $pdf->RowNBC(array(iconv("utf-8", "windows-1252", "N° de Folio"), "Facturas Pagadas", "Emisor", "Cliente", "RFC Cliente", "Fecha de Pago", "Total Pago"));
 
         $pdf->setRowColorText($clrtxt);
         $pdf->SetStyles('');
         $pdf->SetAligns('C');
         $pdf->SetRowBorder('B');
-        $pdf->Row(Array('ABC12', 'FCT-12345 - FCT-67890 - FCT-24680 - FCT-13579 - FCT-ABCDE ', 'Comercializadora Ficticia S.A.', 'Inversiones del Norte S.A. de C.V.', 'EMIF920518ABC', '20/Dic/2023 00:00', '$1000.00 MXN'));
-        $pdf->Row(Array('ABC12', 'FCT-67890 - FCT-24680 - FCT-13579 - FCT-ABCDE ', 'Comercializadora Ficticia S.A.', 'Inversiones del Norte S.A. de C.V.', 'EMIF920518ABC', '23/Ene/2023 00:00', '$1089.00 MXN'));
-        $pdf->Row(Array('ABC12', 'FCT-12345 - FCT-67890 - FCT-ABCDE ', 'Comercializadora Ficticia S.A.', 'Inversiones del Norte S.A. de C.V.', 'EMIF920518ABC', '26/Ago/2023 00:00', '$1560.00 MXN'));
+        $pdf->Row(array('ABC12', 'FCT-12345 - FCT-67890 - FCT-24680 - FCT-13579 - FCT-ABCDE ', 'Comercializadora Ficticia S.A.', 'Inversiones del Norte S.A. de C.V.', 'EMIF920518ABC', '20/Dic/2023 00:00', '$1000.00 MXN'));
+        $pdf->Row(array('ABC12', 'FCT-67890 - FCT-24680 - FCT-13579 - FCT-ABCDE ', 'Comercializadora Ficticia S.A.', 'Inversiones del Norte S.A. de C.V.', 'EMIF920518ABC', '23/Ene/2023 00:00', '$1089.00 MXN'));
+        $pdf->Row(array('ABC12', 'FCT-12345 - FCT-67890 - FCT-ABCDE ', 'Comercializadora Ficticia S.A.', 'Inversiones del Norte S.A. de C.V.', 'EMIF920518ABC', '26/Ago/2023 00:00', '$1560.00 MXN'));
 
         $pdf->Ln(8);
         $pdf->SetFillColor($rgbt[0], $rgbt[1], $rgbt[2]);
@@ -1493,7 +1598,7 @@ switch ($idencabezado) {
         $pdf->Cell(120, 8, '', 0, 0, 'C', 0);
         $pdf->Cell(40, 8, 'Total del Periodo en MXN:', 1, 0, 'C', 1);
         $pdf->SetTextColor(0, 0, 0);
-        $pdf->Cell(35, 8, iconv("utf-8","windows-1252",'$ ' . number_format(3649.00, 2, '.', ',')), 1, 0, 'C', 0);
+        $pdf->Cell(35, 8, iconv("utf-8", "windows-1252", '$ ' . number_format(3649.00, 2, '.', ',')), 1, 0, 'C', 0);
         //$pdf->Output('Reporte' . $fechainicio . '-' . $fechafin . '' . $nombrecliente . '.pdf', 'I');
 
         break;
@@ -1502,16 +1607,16 @@ switch ($idencabezado) {
         $pdf->SetFillColor($rgbc[0], $rgbc[1], $rgbc[2]);
         $pdf->SetTextColor($rgbs[0], $rgbs[1], $rgbs[2]);
 
-        $pdf->SetWidths(Array(195));
+        $pdf->SetWidths(array(195));
         $pdf->SetLineHeight(8);
         $pdf->SetY(36.3);
-        $pdf->RowT(Array("Reporte Bimestral de Impuestos facturados y de recargo"));
+        $pdf->RowT(array("Reporte Bimestral de Impuestos facturados y de recargo"));
         $pdf->Ln(1);
 
         $type = 2; //añad la varibale erronea
         $pic = "../img/graficaa.jpeg";
 
-        if ($type == "1" ) {
+        if ($type == "1") {
             $pdf->Image($pic, 8, 45, 96, 0, 'png');
             $pdf->Image($pic2, 110, 45, 96, 0, 'png');
             $pdf->Ln(76);
@@ -1526,23 +1631,23 @@ switch ($idencabezado) {
         $pdf->SetFillColor($rgbc[0], $rgbc[1], $rgbc[2]);
         $pdf->SetTextColor($rgbs[0], $rgbs[1], $rgbs[2]);
         $pdf->SetY(36.3);
-        $pdf->SetWidths(Array(195));
+        $pdf->SetWidths(array(195));
         $pdf->SetLineHeight(8);
-        $pdf->RowT(Array('Reporte de IVA facturado y de recargo'));
+        $pdf->RowT(array('Reporte de IVA facturado y de recargo'));
         $pdf->SetFont('Arial', 'B', 12);
         $pdf->SetTextColor(23, 23, 124);
         $pdf->SetLineHeight(6);
-        $pdf->RowR(Array('Periodo: ' .  "Diciembre/2024" ));
+        $pdf->RowR(array('Periodo: ' .  "Diciembre/2024"));
         $pdf->Ln(5);
-        
+
         $pdf->SetFont('Arial', 'B', 12);
         $pdf->SetFillColor($rgbt[0], $rgbt[1], $rgbt[2]);
         $pdf->SetTextColor($rgbtt[0], $rgbtt[1], $rgbtt[2]);
-        $pdf->SetWidths(Array(40, 30, 40, 30, 35, 20));
+        $pdf->SetWidths(array(40, 30, 40, 30, 35, 20));
         $pdf->SetLineHeight(4.5);
         $pdf->SetFont('Arial', 'B', 9);
         $pdf->RoundedRect(10, $pdf->GetY(), 195, 6, 2, 'FD');
-        $pdf->RowNBC(Array(iconv("utf-8","windows-1252",'UUID'), iconv("utf-8","windows-1252",'RFC Emisor'), iconv("utf-8","windows-1252",'Nombre Emisor'), iconv("utf-8","windows-1252",'RFC Receptor'), iconv("utf-8","windows-1252",'Fecha Emision'), iconv("utf-8","windows-1252",'Monto')));
+        $pdf->RowNBC(array(iconv("utf-8", "windows-1252", 'UUID'), iconv("utf-8", "windows-1252", 'RFC Emisor'), iconv("utf-8", "windows-1252", 'Nombre Emisor'), iconv("utf-8", "windows-1252", 'RFC Receptor'), iconv("utf-8", "windows-1252", 'Fecha Emision'), iconv("utf-8", "windows-1252", 'Monto')));
         $pdf->Ln(1.5);
         $pdf->SetFont('Arial', '', 9);
         $pdf->SetTextColor(0, 0, 0);
@@ -1551,35 +1656,35 @@ switch ($idencabezado) {
         $pdf->SetStyles('');
         $pdf->SetAligns('C');
         $pdf->SetRowBorder('B');
-        $pdf->Row(Array('XXXCXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX','ABC000000DEF','XYZ BANCO INTERNACIONALS.A.INSTITUCION DE BANCA MULTIPLEGRUPO FINANCIERO XYZ','JALJ020500ABC','2022-12-31 03:28:55','$ 3.0'));
-        $pdf->Row(Array('XXXCXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX','ABC000000DEF','XYZ BANCO INTERNACIONALS.A.INSTITUCION DE BANCA MULTIPLEGRUPO FINANCIERO XYZ','JALJ020500ABC','2022-12-31 03:28:55','$ 2.0'));
-        $pdf->Row(Array('XXXCXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX','ABC000000DEF','XYZ BANCO INTERNACIONALS.A.INSTITUCION DE BANCA MULTIPLEGRUPO FINANCIERO XYZ','JALJ020500ABC','2022-12-31 03:28:55','$ 5.0'));
-        $pdf->Row(Array('XXXCXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX','ABC000000DEF','XYZ BANCO INTERNACIONALS.A.INSTITUCION DE BANCA MULTIPLEGRUPO FINANCIERO XYZ','JALJ020500ABC','2022-12-31 03:28:55','$ 8.0'));
-        break;  
+        $pdf->Row(array('XXXCXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX', 'ABC000000DEF', 'XYZ BANCO INTERNACIONALS.A.INSTITUCION DE BANCA MULTIPLEGRUPO FINANCIERO XYZ', 'JALJ020500ABC', '2022-12-31 03:28:55', '$ 3.0'));
+        $pdf->Row(array('XXXCXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX', 'ABC000000DEF', 'XYZ BANCO INTERNACIONALS.A.INSTITUCION DE BANCA MULTIPLEGRUPO FINANCIERO XYZ', 'JALJ020500ABC', '2022-12-31 03:28:55', '$ 2.0'));
+        $pdf->Row(array('XXXCXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX', 'ABC000000DEF', 'XYZ BANCO INTERNACIONALS.A.INSTITUCION DE BANCA MULTIPLEGRUPO FINANCIERO XYZ', 'JALJ020500ABC', '2022-12-31 03:28:55', '$ 5.0'));
+        $pdf->Row(array('XXXCXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX', 'ABC000000DEF', 'XYZ BANCO INTERNACIONALS.A.INSTITUCION DE BANCA MULTIPLEGRUPO FINANCIERO XYZ', 'JALJ020500ABC', '2022-12-31 03:28:55', '$ 8.0'));
+        break;
     case 10:
 
         $pdf->SetFont('Arial', '', 15);
         $pdf->SetFillColor($rgbc[0], $rgbc[1], $rgbc[2]);
         $pdf->SetTextColor($rgbs[0], $rgbs[1], $rgbs[2]);
-        $pdf->SetWidths(Array(195));
+        $pdf->SetWidths(array(195));
         $pdf->SetLineHeight(8);
         $pdf->SetY(36.3);
-        $pdf->RowT(Array("Ventas generadas en el periodo:"));
+        $pdf->RowT(array("Ventas generadas en el periodo:"));
         $pdf->SetTextColor(23, 23, 124);
         $pdf->SetFont('Arial', 'B', 12);
         $pdf->SetFillColor(255, 255, 255);
         $pdf->SetLineHeight(6);
-        $pdf->RowR(Array('Del 01/12/2023 al 31/12/2023')); 
+        $pdf->RowR(array('Del 01/12/2023 al 31/12/2023'));
         $pdf->Ln(4);
 
         $pdf->SetFont('Arial', 'B', 12);
         $pdf->SetFillColor($rgbt[0], $rgbt[1], $rgbt[2]);
         $pdf->SetTextColor($rgbtt[0], $rgbtt[1], $rgbtt[2]);
-        $pdf->SetWidths(Array(25, 30, 30, 30, 40, 40, 40));
+        $pdf->SetWidths(array(25, 30, 30, 30, 40, 40, 40));
         $pdf->SetLineHeight(4.5);
         $pdf->SetFont('Arial', 'B', 9);
         $pdf->RoundedRect(10, $pdf->GetY(), 195, 6, 2, 'FD');
-        $pdf->RowNBC(Array(iconv("utf-8","windows-1252",'Folio'),  iconv("utf-8","windows-1252",'Fecha creacion'), iconv("utf-8","windows-1252",'Realizo'), iconv("utf-8","windows-1252",'Total Cot'), iconv("utf-8","windows-1252",'Folio Factura'), iconv("utf-8","windows-1252",'Cliente')));
+        $pdf->RowNBC(array(iconv("utf-8", "windows-1252", 'Folio'),  iconv("utf-8", "windows-1252", 'Fecha creacion'), iconv("utf-8", "windows-1252", 'Realizo'), iconv("utf-8", "windows-1252", 'Total Cot'), iconv("utf-8", "windows-1252", 'Folio Factura'), iconv("utf-8", "windows-1252", 'Cliente')));
         $pdf->Ln(1.5);
         $pdf->SetFont('Arial', '', 9);
         $pdf->SetTextColor(0, 0, 0);
@@ -1591,32 +1696,32 @@ switch ($idencabezado) {
         $pdf->SetStyles('');
         $pdf->SetAligns('C');
         $pdf->SetRowBorder('B');
-        $pdf->Row(Array('ABCD1234', '05/12/2023', 'Sofia Garcia', '$ 3,255.72', 'FACT-123456', 'Ana Martinez'));
-        $pdf->Row(Array('EFGH5678', '08/12/2023', 'Maria Rodriguez', '$ 1,158.84', 'INV-789012', 'Innovacorp S.A. de C.V.'));
-        $pdf->Row(Array('JKLM1234', '14/12/2023', 'Alejandro Perez', '$ 8,886.96', 'FCT-345678', 'Carlos Lopez'));
-        $pdf->Row(Array('PQRS9012', '26/12/2023', 'Andrea Lopez', '$ 40,114.95', 'REC-901234', 'carolina adviento'));
-        $pdf->Row(Array('XYWZ5678', '08/12/2023', 'Daniel Hernandez', '$ 1,158.84', 'FAC-567890', 'patitosgood S.A de C.V'));
-        $pdf->Row(Array('XYXZ5678', '18/12/2023', 'Juan Martinez', '$ 3,428.67', 'NTF-123ABC', 'Laura Rodriguez'));
+        $pdf->Row(array('ABCD1234', '05/12/2023', 'Sofia Garcia', '$ 3,255.72', 'FACT-123456', 'Ana Martinez'));
+        $pdf->Row(array('EFGH5678', '08/12/2023', 'Maria Rodriguez', '$ 1,158.84', 'INV-789012', 'Innovacorp S.A. de C.V.'));
+        $pdf->Row(array('JKLM1234', '14/12/2023', 'Alejandro Perez', '$ 8,886.96', 'FCT-345678', 'Carlos Lopez'));
+        $pdf->Row(array('PQRS9012', '26/12/2023', 'Andrea Lopez', '$ 40,114.95', 'REC-901234', 'carolina adviento'));
+        $pdf->Row(array('XYWZ5678', '08/12/2023', 'Daniel Hernandez', '$ 1,158.84', 'FAC-567890', 'patitosgood S.A de C.V'));
+        $pdf->Row(array('XYXZ5678', '18/12/2023', 'Juan Martinez', '$ 3,428.67', 'NTF-123ABC', 'Laura Rodriguez'));
 
         $pdf->SetFont('Arial', 'B', 12);
         $pdf->SetFillColor($rgbt[0], $rgbt[1], $rgbt[2]);
         $pdf->SetTextColor($rgbtt[0], $rgbtt[1], $rgbtt[2]);
-        $pdf->SetWidths(Array(195)); 
+        $pdf->SetWidths(array(195));
         $pdf->SetLineHeight(4.5);
         $pdf->SetTextColor(23, 23, 124);
         $pdf->SetFont('Arial', 'B', 12);
         $pdf->SetFillColor(255, 255, 255);
         $pdf->SetLineHeight(6);
-        $pdf->RowR(Array('Ventas Individuales')); 
+        $pdf->RowR(array('Ventas Individuales'));
         $pdf->Ln(4);
 
         //$pdf->Output('Reporte' . $fechainicio . '-' . $fechafin . '.pdf', 'I');
         break;
     case 11:
-        $pdf->SetWidths(Array(80));
+        $pdf->SetWidths(array(80));
         $pdf->SetLineHeight(8);
         $pdf->SetY(36.3);
-        $pdf->RowT(Array("Datos del Emisor"));
+        $pdf->RowT(array("Datos del Emisor"));
         $pdf->Ln(1);
 
         $pdf->SetFillColor($rgbfd[0], $rgbfd[1], $rgbfd[2]);
@@ -1627,59 +1732,59 @@ switch ($idencabezado) {
         $pdf->SetY(45.3);
 
         $pdf->SetX(10);
-        $pdf->SetWidths(Array(15, 94.5, 30, 55));
+        $pdf->SetWidths(array(15, 94.5, 30, 55));
         $pdf->SetRowBorder('');
         $pdf->setRowColorText(array($txtbold, $clrtxt, $txtbold, $clrtxt));
         $pdf->SetLineHeight(0.1);
-        $pdf->Row(Array('', '', '', ''));
+        $pdf->Row(array('', '', '', ''));
         $pdf->SetStyles(array('B', '', 'B', ''));
         $pdf->SetLineHeight(4.5);
-        $pdf->Row(Array('Nombre', iconv("utf-8","windows-1252",'Contribuyente'), 'No Certificado', iconv("utf-8","windows-1252",'007')));
+        $pdf->Row(array('Nombre', iconv("utf-8", "windows-1252", 'Contribuyente'), 'No Certificado', iconv("utf-8", "windows-1252", '007')));
 
         $pdf->SetX(10);
         $pdf->setRowColorText(array($txtbold, $clrtxt, $txtbold, $clrtxt));
         $pdf->SetStyles(array('B', '', 'B', ''));
-        $pdf->Row(Array('RFC', iconv("utf-8","windows-1252",'XAXX010101000'), 'Regimen Fiscal', iconv("utf-8","windows-1252",'01 Regimen')));
+        $pdf->Row(array('RFC', iconv("utf-8", "windows-1252", 'XAXX010101000'), 'Regimen Fiscal', iconv("utf-8", "windows-1252", '01 Regimen')));
 
         $pdf->SetX(10);
         $pdf->SetStyles(array('B', '', 'B', ''));
         $pdf->setRowColorText(array($txtbold, $clrtxt, $txtbold, $clrtxt));
-        $pdf->Row(Array('Fecha', iconv("utf-8","windows-1252",'01/01/2021'), 'T. Comprobante', iconv("utf-8","windows-1252",'I Ingreso')));
+        $pdf->Row(array('Fecha', iconv("utf-8", "windows-1252", '01/01/2021'), 'T. Comprobante', iconv("utf-8", "windows-1252", 'I Ingreso')));
 
-        $pdf->SetWidths(Array(35, 77.5, 25, 58));
+        $pdf->SetWidths(array(35, 77.5, 25, 58));
         $pdf->SetStyles(array('B', '', 'B', ''));
         $pdf->setRowColorText(array($txtbold, $clrtxt, $txtbold, $clrtxt));
-        $pdf->Row(Array('Lugar de Expedicion', iconv("utf-8","windows-1252",'76800'), '', ''));
+        $pdf->Row(array('Lugar de Expedicion', iconv("utf-8", "windows-1252", '76800'), '', ''));
         $pdf->Ln(1);
 
         $pdf->SetFillColor($rgbc[0], $rgbc[1], $rgbc[2]);
         $pdf->SetTextColor($rgbs[0], $rgbs[1], $rgbs[2]);
         $pdf->SetFont('Arial', '', 15);
-        $pdf->SetWidths(Array(80));
+        $pdf->SetWidths(array(80));
         $pdf->SetLineHeight(8);
-        $pdf->RowT(Array("Datos del Cliente"));
+        $pdf->RowT(array("Datos del Cliente"));
 
         $pdf->SetFillColor($rgbfd[0], $rgbfd[1], $rgbfd[2]);
         $pdf->RoundedRect(10, ($pdf->GetY() + 0.7), 195, 14, 2, 'F');
 
         $pdf->SetY(($pdf->GetY() + 0.7));
-        $pdf->SetWidths(Array(17, 94.5, 23, 60));
+        $pdf->SetWidths(array(17, 94.5, 23, 60));
         $pdf->SetLineHeight(0.1);
-        $pdf->Row(Array('', '', '', ''));
+        $pdf->Row(array('', '', '', ''));
         $pdf->SetLineHeight(4.5);
         $pdf->SetStyles(array('B', '', 'B', ''));
         $pdf->setRowColorText(array($txtbold, $clrtxt, $txtbold, $clrtxt));
-        $pdf->Row(Array('Nombre', 'Receptor', 'Uso de CFDI', 'P01 Por Definir'));
+        $pdf->Row(array('Nombre', 'Receptor', 'Uso de CFDI', 'P01 Por Definir'));
 
         $pdf->SetStyles(array('B', '', 'B', ''));
         $pdf->setRowColorText(array($txtbold, $clrtxt, $txtbold, $clrtxt));
         $pdf->Row(array('RFC', 'XAXX010101000', '', ''));
 
-        $pdf->SetWidths(Array(17, 174.5));
+        $pdf->SetWidths(array(17, 174.5));
         $pdf->SetLineHeight(4.5);
         $pdf->SetStyles(array('B', ''));
         $pdf->setRowColorText(array($txtbold, $clrtxt));
-        $pdf->Row(Array('Direccion', iconv("utf-8","windows-1252",'Calle Falsa #123, Colonia: desconocida, Municipio, Estado')));
+        $pdf->Row(array('Direccion', iconv("utf-8", "windows-1252", 'Calle Falsa #123, Colonia: desconocida, Municipio, Estado')));
         $pdf->Ln(1);
 
         $pdf->SetFont('Arial', 'B', 12);
@@ -1701,7 +1806,7 @@ switch ($idencabezado) {
         $pdf->Cell(22, 6, 'Importe', 1, 0, 'C', 1);
         $pdf->Ln(6);
         $pdf->SetTextColor(0, 0, 0);
-        $pdf->SetWidths(Array(15, 20, 25, 46, 45, 22, 22));
+        $pdf->SetWidths(array(15, 20, 25, 46, 45, 22, 22));
         $pdf->SetLineHeight(4.5);
 
         $pdf->SetFont('Arial', '', 9);
@@ -1709,7 +1814,7 @@ switch ($idencabezado) {
         $pdf->setRowColorText();
         $pdf->SetRowBorder('B');
         $pdf->SetAligns('C');
-        $pdf->Row(Array('1', '01', 'H87 Pieza', 'Descripcion de Producto', '', '$ 100.00', '$ 100.00'));
+        $pdf->Row(array('1', '01', 'H87 Pieza', 'Descripcion de Producto', '', '$ 100.00', '$ 100.00'));
 
         $pdf->Cell(151, 8, '', 0, 0, 'C', 0);
         $pdf->SetFont('Arial', 'B', 9);
@@ -1736,7 +1841,7 @@ switch ($idencabezado) {
         $pdf->Cell(30, 8, 'Importe con Letra ', 0, 0, 'C', 0);
         $pdf->SetFont('Arial', '', 9);
         $letras = NumeroALetras::convertir(bcdiv(116.00, '1', 2), 'pesos', 'centavos');
-        $pdf->Cell(26, 8, iconv("utf-8","windows-1252","$letras 00/100 M.N."), 0, 0, 'L', 0);
+        $pdf->Cell(26, 8, iconv("utf-8", "windows-1252", "$letras 00/100 M.N."), 0, 0, 'L', 0);
         $pdf->Ln(8);
 
         $pdf->SetFillColor($rgbc[0], $rgbc[1], $rgbc[2]);
@@ -1752,32 +1857,32 @@ switch ($idencabezado) {
 
         $pdf->SetY(36.3);
         $pdf->SetFont('Arial', '', 9);
-        $pdf->SetWidths(Array(40, 66, 46, 43));
+        $pdf->SetWidths(array(40, 66, 46, 43));
         $pdf->SetLineHeight(4.5);
         $pdf->SetStyles(array('B', '', 'B', ''));
         $pdf->SetRowBorder();
         $pdf->SetAligns(array('L'));
         $pdf->setRowColorText(array($txtbold, $clrtxt, $txtbold, $clrtxt));
-        $pdf->Row(Array('Version', iconv("utf-8","windows-1252",'2.0'), 'Distancia Total Recorrida', iconv("utf-8","windows-1252",'100')));
+        $pdf->Row(array('Version', iconv("utf-8", "windows-1252", '2.0'), 'Distancia Total Recorrida', iconv("utf-8", "windows-1252", '100')));
 
         $pdf->SetStyles(array('B', '', 'B', ''));
         $pdf->SetRowBorder();
         $pdf->SetAligns(array('L'));
-        $pdf->setRowColorText(Array($txtbold, $clrtxt, $txtbold, $clrtxt));
-        $pdf->Row(Array('Transporte Internacional', iconv("utf-8","windows-1252",'No'), 'Entrada/Salida de mercancia', iconv("utf-8","windows-1252",'Entrada')));
+        $pdf->setRowColorText(array($txtbold, $clrtxt, $txtbold, $clrtxt));
+        $pdf->Row(array('Transporte Internacional', iconv("utf-8", "windows-1252", 'No'), 'Entrada/Salida de mercancia', iconv("utf-8", "windows-1252", 'Entrada')));
         $pdf->Ln(2);
 
         $pdf->SetFont('Helvetica', '', 15);
         $pdf->SetFillColor($rgbc[0], $rgbc[1], $rgbc[2]);
         $pdf->SetTextColor($rgbs[0], $rgbs[1], $rgbs[2]);
-        $pdf->SetWidths(Array(80));
+        $pdf->SetWidths(array(80));
         $pdf->SetLineHeight(8);
         $pdf->SetAligns(array('C'));
-        $pdf->RowT(Array("Mercancias"));
+        $pdf->RowT(array("Mercancias"));
         $pdf->Ln(1);
 
         $pdf->setRowColorText();
-        $pdf->SetWidths(Array(20, 45, 15, 25, 25, 30, 35));
+        $pdf->SetWidths(array(20, 45, 15, 25, 25, 30, 35));
         $pdf->SetLineHeight(4);
         $pdf->SetAligns(array('C'));
         $pdf->SetFillColor($rgbt[0], $rgbt[1], $rgbt[2]);
@@ -1785,26 +1890,26 @@ switch ($idencabezado) {
         $pdf->SetRowBorder('B', 'FD');
         $pdf->SetFont('Arial', '', 9);
         $pdf->SetStyles('B');
-        $pdf->Row(Array("Clave Fiscal", "Descripcion", "Cant", "Unidad", "Peso en Kg", "Material Peligroso", "Embalaje"));
+        $pdf->Row(array("Clave Fiscal", "Descripcion", "Cant", "Unidad", "Peso en Kg", "Material Peligroso", "Embalaje"));
 
         $pdf->SetFont('Arial', '', 9);
         $pdf->SetRowBorder('B');
         $pdf->SetStyles();
         $pdf->setRowColorText();
-        $pdf->Row(Array(iconv("utf-8","windows-1252",'01'), iconv("utf-8","windows-1252",'Mercancia'), '1', iconv("utf-8","windows-1252",'Pieza'), '10', iconv("utf-8","windows-1252",'No'), iconv("utf-8","windows-1252",'')));
+        $pdf->Row(array(iconv("utf-8", "windows-1252", '01'), iconv("utf-8", "windows-1252", 'Mercancia'), '1', iconv("utf-8", "windows-1252", 'Pieza'), '10', iconv("utf-8", "windows-1252", 'No'), iconv("utf-8", "windows-1252", '')));
         $pdf->Ln(2);
 
         $pdf->SetFont('Helvetica', '', 15);
         $pdf->SetFillColor($rgbc[0], $rgbc[1], $rgbc[2]);
         $pdf->SetTextColor($rgbs[0], $rgbs[1], $rgbs[2]);
-        $pdf->SetWidths(Array(80));
+        $pdf->SetWidths(array(80));
         $pdf->SetAligns(array('C'));
         $pdf->SetLineHeight(8);
-        $pdf->RowT(Array("Origenes"));
+        $pdf->RowT(array("Origenes"));
 
-        $pdf->SetWidths(Array(28, 66, 33, 68));
+        $pdf->SetWidths(array(28, 66, 33, 68));
         $pdf->SetLineHeight(4.5);
-        $pdf->setRowColorText(Array($txtbold, $clrtxt, $txtbold, $clrtxt));
+        $pdf->setRowColorText(array($txtbold, $clrtxt, $txtbold, $clrtxt));
         $pdf->SetStyles(array('B', '', 'B', ''));
         $pdf->SetAligns(array('L'));
         $pdf->SetRowBorder();
@@ -1812,30 +1917,30 @@ switch ($idencabezado) {
         $pdf->SetX(10);
         $pdf->SetFillColor($rgbfd[0], $rgbfd[1], $rgbfd[2]);
         $pdf->RoundedRect(10, $pdf->GetY(), 195, 20, 2, 'F');
-        $pdf->Row(Array("Remitente", iconv("utf-8","windows-1252",'Nombre Remitente'), "RFC Remitente", iconv("utf-8","windows-1252",'XAXX010101000')));
-        $pdf->Row(Array("Tipo", iconv("utf-8","windows-1252",'Origen'), "Distancia Recorrida", iconv("utf-8","windows-1252",'0')));
-        $pdf->Row(Array("Fecha Salida", iconv("utf-8","windows-1252",'01/01/2021 12:00'), "", ""));
+        $pdf->Row(array("Remitente", iconv("utf-8", "windows-1252", 'Nombre Remitente'), "RFC Remitente", iconv("utf-8", "windows-1252", 'XAXX010101000')));
+        $pdf->Row(array("Tipo", iconv("utf-8", "windows-1252", 'Origen'), "Distancia Recorrida", iconv("utf-8", "windows-1252", '0')));
+        $pdf->Row(array("Fecha Salida", iconv("utf-8", "windows-1252", '01/01/2021 12:00'), "", ""));
 
-        $pdf->SetWidths(Array(20, 167));
+        $pdf->SetWidths(array(20, 167));
         $pdf->SetLineHeight(5);
-        $pdf->setRowColorText(Array($txtbold, $clrtxt));
+        $pdf->setRowColorText(array($txtbold, $clrtxt));
         $pdf->SetStyles(array('B', ''));
         $pdf->SetAligns(array('L'));
         $pdf->SetRowBorder();
-        $pdf->Row(Array("Direccion", iconv("utf-8","windows-1252",'Calle Falsa #123, Colonia: desconocida, Municipio, Estado')));
+        $pdf->Row(array("Direccion", iconv("utf-8", "windows-1252", 'Calle Falsa #123, Colonia: desconocida, Municipio, Estado')));
         $pdf->Ln(1.5);
 
         $pdf->SetFont('Helvetica', '', 15);
         $pdf->SetFillColor($rgbc[0], $rgbc[1], $rgbc[2]);
         $pdf->SetTextColor($rgbs[0], $rgbs[1], $rgbs[2]);
-        $pdf->SetWidths(Array(80));
+        $pdf->SetWidths(array(80));
         $pdf->SetAligns(array('C'));
         $pdf->SetLineHeight(8);
-        $pdf->RowT(Array("Destinos"));
+        $pdf->RowT(array("Destinos"));
 
-        $pdf->SetWidths(Array(28, 66, 33, 68));
+        $pdf->SetWidths(array(28, 66, 33, 68));
         $pdf->SetLineHeight(4.5);
-        $pdf->setRowColorText(Array($txtbold, $clrtxt, $txtbold, $clrtxt));
+        $pdf->setRowColorText(array($txtbold, $clrtxt, $txtbold, $clrtxt));
         $pdf->SetStyles(array('B', '', 'B', ''));
         $pdf->SetAligns(array('L'));
         $pdf->SetRowBorder();
@@ -1843,31 +1948,31 @@ switch ($idencabezado) {
         $pdf->SetX(10);
         $pdf->SetFillColor($rgbfd[0], $rgbfd[1], $rgbfd[2]);
         $pdf->RoundedRect(10, $pdf->GetY(), 195, 20, 2, 'F');
-        $pdf->Row(Array("Destino", iconv("utf-8","windows-1252",'Nombre Remitente'), "RFC Destinatario", iconv("utf-8","windows-1252",'XAXX010101000')));
-        $pdf->Row(Array("Tipo", iconv("utf-8","windows-1252",'Destino'), "Distancia Recorrida", iconv("utf-8","windows-1252",'100')));
-        $pdf->Row(Array("Fecha Llegada", iconv("utf-8","windows-1252",'02/01/2021 12:00'), "", ""));
+        $pdf->Row(array("Destino", iconv("utf-8", "windows-1252", 'Nombre Remitente'), "RFC Destinatario", iconv("utf-8", "windows-1252", 'XAXX010101000')));
+        $pdf->Row(array("Tipo", iconv("utf-8", "windows-1252", 'Destino'), "Distancia Recorrida", iconv("utf-8", "windows-1252", '100')));
+        $pdf->Row(array("Fecha Llegada", iconv("utf-8", "windows-1252", '02/01/2021 12:00'), "", ""));
 
-        $pdf->SetWidths(Array(20, 167));
+        $pdf->SetWidths(array(20, 167));
         $pdf->SetLineHeight(5);
-        $pdf->setRowColorText(Array($txtbold, $clrtxt));
+        $pdf->setRowColorText(array($txtbold, $clrtxt));
         $pdf->SetStyles(array('B', ''));
         $pdf->SetAligns(array('L'));
         $pdf->SetRowBorder();
-        $pdf->Row(Array("Direccion", iconv("utf-8","windows-1252",'Calle Falsa #123, Colonia: desconocida, Municipio, Estado')));
+        $pdf->Row(array("Direccion", iconv("utf-8", "windows-1252", 'Calle Falsa #123, Colonia: desconocida, Municipio, Estado')));
         $pdf->Ln(1.5);
 
         $pdf->SetFont('Helvetica', '', 15);
         $pdf->SetFillColor($rgbc[0], $rgbc[1], $rgbc[2]);
         $pdf->SetTextColor($rgbs[0], $rgbs[1], $rgbs[2]);
-        $pdf->SetWidths(Array(80));
+        $pdf->SetWidths(array(80));
         $pdf->SetAligns(array('C'));
         $pdf->SetLineHeight(8);
-        $pdf->RowT(Array("Autotransporte Federal"));
+        $pdf->RowT(array("Autotransporte Federal"));
 
         $pdf->SetFont('Arial', '', 9);
-        $pdf->SetWidths(Array(30, 70, 27, 68));
+        $pdf->SetWidths(array(30, 70, 27, 68));
         $pdf->SetLineHeight(5);
-        $pdf->setRowColorText(Array($txtbold, $clrtxt, $txtbold, $clrtxt));
+        $pdf->setRowColorText(array($txtbold, $clrtxt, $txtbold, $clrtxt));
         $pdf->SetStyles(array('B', '', 'B', ''));
         $pdf->SetAligns(array('L'));
         $pdf->SetRowBorder();
@@ -1876,24 +1981,24 @@ switch ($idencabezado) {
         $pdf->RoundedRect(10, $pdf->GetY(), 195, 21, 2, 'F');
 
         $pdf->SetY($pdf->GetY());
-        $pdf->Row(Array("Num Permiso", iconv("utf-8","windows-1252",'1234567'), "Tipo permiso", iconv("utf-8","windows-1252",'01')));
-        $pdf->Row(Array(iconv("utf-8","windows-1252","Año Vehiculo"), iconv("utf-8","windows-1252",'2000'), "Placa Vehiculo", iconv("utf-8","windows-1252",'XYZ321')));
-        $pdf->Row(Array(iconv("utf-8","windows-1252","Tipo Transporte"), iconv("utf-8","windows-1252",'Camion'), "", ''));
-        $pdf->Row(Array(iconv("utf-8","windows-1252","Aseguradora"), iconv("utf-8","windows-1252",'Seguros Polilla'), "Num Poliza", iconv("utf-8","windows-1252",'012421954')));
+        $pdf->Row(array("Num Permiso", iconv("utf-8", "windows-1252", '1234567'), "Tipo permiso", iconv("utf-8", "windows-1252", '01')));
+        $pdf->Row(array(iconv("utf-8", "windows-1252", "Año Vehiculo"), iconv("utf-8", "windows-1252", '2000'), "Placa Vehiculo", iconv("utf-8", "windows-1252", 'XYZ321')));
+        $pdf->Row(array(iconv("utf-8", "windows-1252", "Tipo Transporte"), iconv("utf-8", "windows-1252", 'Camion'), "", ''));
+        $pdf->Row(array(iconv("utf-8", "windows-1252", "Aseguradora"), iconv("utf-8", "windows-1252", 'Seguros Polilla'), "Num Poliza", iconv("utf-8", "windows-1252", '012421954')));
 
         $pdf->Ln(1.5);
 
         $pdf->SetFont('Helvetica', '', 15);
         $pdf->SetFillColor($rgbc[0], $rgbc[1], $rgbc[2]);
         $pdf->SetTextColor($rgbs[0], $rgbs[1], $rgbs[2]);
-        $pdf->SetWidths(Array(80));
+        $pdf->SetWidths(array(80));
         $pdf->SetAligns(array('C'));
         $pdf->SetLineHeight(8);
-        $pdf->RowT(Array("Operadores"));
+        $pdf->RowT(array("Operadores"));
 
-        $pdf->SetWidths(Array(25, 70, 25, 70));
+        $pdf->SetWidths(array(25, 70, 25, 70));
         $pdf->SetLineHeight(4.5);
-        $pdf->setRowColorText(Array($txtbold, $clrtxt, $txtbold, $clrtxt));
+        $pdf->setRowColorText(array($txtbold, $clrtxt, $txtbold, $clrtxt));
         $pdf->SetStyles(array('B', '', 'B', ''));
         $pdf->SetAligns(array('L'));
         $pdf->SetRowBorder();
@@ -1911,51 +2016,51 @@ switch ($idencabezado) {
         $pdf->SetStyles(array('B', '', 'B', ''));
         $pdf->SetAligns(array('L'));
         $pdf->SetRowBorder();
-        $pdf->Row(Array("Nombre", iconv("utf-8","windows-1252",'Ramiro Perez Martinez'), "RFC", iconv("utf-8","windows-1252",'XAXX010101000')));
-        $pdf->Row(Array("Num Licencia", iconv("utf-8","windows-1252",'1234567'), "", ""));
+        $pdf->Row(array("Nombre", iconv("utf-8", "windows-1252", 'Ramiro Perez Martinez'), "RFC", iconv("utf-8", "windows-1252", 'XAXX010101000')));
+        $pdf->Row(array("Num Licencia", iconv("utf-8", "windows-1252", '1234567'), "", ""));
 
-        $pdf->SetWidths(Array(25, 170));
+        $pdf->SetWidths(array(25, 170));
         $pdf->SetLineHeight(4.5);
-        $pdf->setRowColorText(Array($txtbold, $clrtxt));
+        $pdf->setRowColorText(array($txtbold, $clrtxt));
         $pdf->SetStyles(array('B', ''));
         $pdf->SetAligns(array('L'));
         $pdf->SetRowBorder();
-        $pdf->Row(array("Direccion", iconv("utf-8","windows-1252",'Calle Falsa #123, Colonia: desconocida, Municipio, Estado')));
+        $pdf->Row(array("Direccion", iconv("utf-8", "windows-1252", 'Calle Falsa #123, Colonia: desconocida, Municipio, Estado')));
         $pdf->Ln(1.5);
         break;
-    
+
     case 12:
         $pdf->SetY(34.3);
         $pdf->SetX($pdf->margen);
-        $pdf->SetWidths(Array($pdf->body));
+        $pdf->SetWidths(array($pdf->body));
         $pdf->SetRowBorder('NB');
         $pdf->SetStyles(array(''));
         $pdf->setRowColorText(array($clrtitulo));
-        if($pdf->body >= 76){
+        if ($pdf->body >= 76) {
             $pdf->SetSizes(array(15));
             $pdf->SetLineHeight(7);
-        }else{
+        } else {
             $pdf->SetSizes(array(13));
             $pdf->SetLineHeight(4);
         }
         $pdf->SetAligns('C');
-        $pdf->Row(Array(iconv("utf-8","windows-1252", $titulo)));
+        $pdf->Row(array(iconv("utf-8", "windows-1252", $titulo)));
         $pdf->Ln(3);
 
         $pdf->SetX($pdf->margen);
-        $pdf->SetWidths(Array($pdf->body));
+        $pdf->SetWidths(array($pdf->body));
         $pdf->setRowColorText(array($clrtxt));
-        if($pdf->body >= 76){
+        if ($pdf->body >= 76) {
             $pdf->SetSizes(array(10));
             $pdf->SetLineHeight(5);
-        }else{
+        } else {
             $pdf->SetSizes(array(6));
             $pdf->SetLineHeight(4);
         }
         $pdf->SetAligns('L');
-        $pdf->Row(Array(iconv("utf-8","windows-1252",'VENTA: 0001')));
+        $pdf->Row(array(iconv("utf-8", "windows-1252", 'VENTA: 0001')));
         $pdf->SetX($pdf->margen);
-        $pdf->SetWidths(array(bcdiv(($pdf->body / 2),'1',1), bcdiv(($pdf->body / 2),'1',1)));
+        $pdf->SetWidths(array(bcdiv(($pdf->body / 2), '1', 1), bcdiv(($pdf->body / 2), '1', 1)));
         $pdf->SetSizes(array(1, 1));
         $pdf->SetLineHeight(1);
         $pdf->Row(array('', ''));
@@ -1963,103 +2068,101 @@ switch ($idencabezado) {
         $pdf->SetX($pdf->margen);
         $pdf->SetStyles(array('B', ''));
         $pdf->SetAligns(array('L', 'L'));
-        if($pdf->body >= 76){
+        if ($pdf->body >= 76) {
             $pdf->SetSizes(array(8, 8));
             $pdf->SetLineHeight(5);
-        }else{
+        } else {
             $pdf->SetSizes(array(6, 6));
             $pdf->SetLineHeight(4);
         }
         $pdf->Row(array('FECHA VENTA', '01/01/2023  00:00'));
 
-        
+
         $pdf->SetX($pdf->margen);
         $pdf->SetStyles(array('B', ''));
         $pdf->SetAligns(array('L', 'L'));
-        $pdf->Row(Array('FECHA IMPRESION',  '01/01/2023  00:00'));
+        $pdf->Row(array('FECHA IMPRESION',  '01/01/2023  00:00'));
         $pdf->Ln(1);
         $pdf->Rect($pdf->margen, $pdf->GetY(), $pdf->body, 0.2);
         $pdf->Ln(1);
 
         $pdf->SetX($pdf->margen);
         //$pdf->SetWidths(Array(32, 16, 12, 16));
-        $pdf->SetWidths(Array(bcdiv(($pdf->body * 0.42),'1',1), bcdiv(($pdf->body * 0.20),'1',1), bcdiv(($pdf->body * 0.15),'1',1), bcdiv(($pdf->body * 0.23),'1',1)));
+        $pdf->SetWidths(array(bcdiv(($pdf->body * 0.42), '1', 1), bcdiv(($pdf->body * 0.20), '1', 1), bcdiv(($pdf->body * 0.15), '1', 1), bcdiv(($pdf->body * 0.23), '1', 1)));
         $pdf->SetStyles('');
         $pdf->setRowColorText(array($clrtxt));
-        if($pdf->body >= 76){
+        if ($pdf->body >= 76) {
             $pdf->SetSizes(array(8, 8, 8, 8));
             $pdf->SetLineHeight(5);
-        }else{
+        } else {
             $pdf->SetSizes(array(5.6, 5.6, 5, 5.6));
             $pdf->SetLineHeight(2);
-        } 
+        }
         $pdf->SetAligns(array('L', 'L', 'C', 'L'));
-        $pdf->Row(Array(iconv("utf-8","windows-1252",'PRODUCTO'), iconv("utf-8","windows-1252",'UNIT'), iconv("utf-8","windows-1252",'CANT'), iconv("utf-8","windows-1252",'IMP')));
+        $pdf->Row(array(iconv("utf-8", "windows-1252", 'PRODUCTO'), iconv("utf-8", "windows-1252", 'UNIT'), iconv("utf-8", "windows-1252", 'CANT'), iconv("utf-8", "windows-1252", 'IMP')));
         $pdf->Ln(1);
 
-        if($pdf->body >= 76){
+        if ($pdf->body >= 76) {
             $pdf->SetSizes(array(8, 8, 8, 8));
-        }else{
+        } else {
             $pdf->SetSizes(array(5.6, 5.6, 5.6, 5.6));
-        } 
+        }
         $pdf->SetX($pdf->margen);
         $pdf->SetLineHeight(4);
-        $pdf->Row(Array(iconv("utf-8","windows-1252",'010101010101 Nombre Producto'), iconv("utf-8","windows-1252",'$275.00'), iconv("utf-8","windows-1252",'2'), iconv("utf-8","windows-1252",'$550.00')));
-        $pdf->Ln(1);        
+        $pdf->Row(array(iconv("utf-8", "windows-1252", '010101010101 Nombre Producto'), iconv("utf-8", "windows-1252", '$275.00'), iconv("utf-8", "windows-1252", '2'), iconv("utf-8", "windows-1252", '$550.00')));
+        $pdf->Ln(1);
 
         $pdf->Rect($pdf->margen, $pdf->GetY(), $pdf->body, 0.2);
         $pdf->Ln(1);
 
         $pdf->SetX($pdf->margen);
-        $pdf->SetWidths(Array(bcdiv(($pdf->body * 0.62),'1',1), bcdiv(($pdf->body * 0.38),'1',1)));
+        $pdf->SetWidths(array(bcdiv(($pdf->body * 0.62), '1', 1), bcdiv(($pdf->body * 0.38), '1', 1)));
         $pdf->SetStyles('B');
         $pdf->SetAligns(array('R', 'L'));
         $pdf->Row(array('CANT :', '   2'));
         $pdf->Ln(1);
 
         $pdf->SetX($pdf->margen);
-        $pdf->Row(array('SUBTOTAL:', iconv("utf-8","windows-1252",'   $ 550.00')));
+        $pdf->Row(array('SUBTOTAL:', iconv("utf-8", "windows-1252", '   $ 550.00')));
         $pdf->Ln(1);
 
         $pdf->SetX($pdf->margen);
-        $pdf->Row(array('DESCUENTO:', iconv("utf-8","windows-1252",'   $ 0.00')));
+        $pdf->Row(array('DESCUENTO:', iconv("utf-8", "windows-1252", '   $ 0.00')));
         $pdf->Ln(1);
 
         $pdf->SetX($pdf->margen);
-        $pdf->Row(array('TOTAL VENTA:', iconv("utf-8","windows-1252",'   $ s550.00')));
+        $pdf->Row(array('TOTAL VENTA:', iconv("utf-8", "windows-1252", '   $ s550.00')));
         $pdf->Ln(1.5);
         $pdf->Rect($pdf->margen, $pdf->GetY(), $pdf->body, 0.2);
         $pdf->Ln(1);
 
         $pdf->SetX($pdf->margen);
         $pdf->SetStyles('B');
-        $pdf->SetWidths(array(bcdiv(($pdf->body / 2),'1',1), bcdiv(($pdf->body / 2),'1',1)));
+        $pdf->SetWidths(array(bcdiv(($pdf->body / 2), '1', 1), bcdiv(($pdf->body / 2), '1', 1)));
         $pdf->SetAligns(array('L', 'L'));
 
-        
+
         $pdf->Row(array('FORMA DE PAGO:', 'Efectivo'));
         $pdf->SetX($pdf->margen);
-        $pdf->Row(array('EFECTIVO:', iconv("utf-8","windows-1252",'$ 600.00')));
+        $pdf->Row(array('EFECTIVO:', iconv("utf-8", "windows-1252", '$ 600.00')));
         $pdf->SetX($pdf->margen);
-        $pdf->Row(array('CAMBIO:', iconv("utf-8","windows-1252",'$ 50.00')));
+        $pdf->Row(array('CAMBIO:', iconv("utf-8", "windows-1252", '$ 50.00')));
         $pdf->Ln(1);
         $pdf->Rect($pdf->margen, $pdf->GetY(), $pdf->body, 0.2);
         $pdf->Ln(1);
 
         $pdf->SetX($pdf->margen);
-        $pdf->SetWidths(Array($pdf->body));
+        $pdf->SetWidths(array($pdf->body));
         $pdf->SetStyles('B');
         $pdf->SetAligns(array('C'));
         $pdf->Row(array($observaciones));
         $pdf->Ln(3);
 
         $pdf->SetX($pdf->margen);
-        $pdf->SetWidths(array(bcdiv(($pdf->body / 2),'1',1), bcdiv(($pdf->body / 2),'1',1)));
+        $pdf->SetWidths(array(bcdiv(($pdf->body / 2), '1', 1), bcdiv(($pdf->body / 2), '1', 1)));
         $pdf->SetStyles('B');
         $pdf->SetAligns(array('L', 'R'));
         $pdf->Row(array($pdf->pagina, $pdf->correo));
-
-      
         break;
     case 13:
 
@@ -2067,75 +2170,75 @@ switch ($idencabezado) {
         $pdf->SetFillColor($rgbc[0], $rgbc[1], $rgbc[2]);
         $pdf->SetTextColor($rgbs[0], $rgbs[1], $rgbs[2]);
 
-        $pdf->SetWidths(Array(80));
+        $pdf->SetWidths(array(80));
         $pdf->SetLineHeight(8);
         $pdf->SetY(36.3);
-        $dateformat='12/23/2002';
-        $pdf->RowT(Array("Fecha de Corte " . $dateformat));
+        $dateformat = '12/23/2002';
+        $pdf->RowT(array("Fecha de Corte " . $dateformat));
         $pdf->SetY(48);
-           
-           
-        $pdf->SetWidths(Array(22, 173));
+
+
+        $pdf->SetWidths(array(22, 173));
         $pdf->SetRowBorder('NB');
         $pdf->SetLineHeight(4.5);
         $pdf->SetSizes(array(13, 13));
         $pdf->SetStyles(array('B', ''));
         $pdf->setRowColorText(array($txtbold, $clrtxt));
-        $pdf->Row(Array('Usuario', iconv("utf-8","windows-1252",'Maximiliano')));//sustituir
+        $pdf->Row(array('Usuario', iconv("utf-8", "windows-1252", 'Maximiliano'))); //sustituir
         $pdf->Ln(2);
-        
+
 
         $pdf->SetFillColor($rgbfd[0], $rgbfd[1], $rgbfd[2]);
-        $pdf->SetWidths(Array(45, 50, 5, 45, 50));
+        $pdf->SetWidths(array(45, 50, 5, 45, 50));
         $pdf->SetLineHeight(0.1);
-        $pdf->Row(Array('', '','', '', ''));
+        $pdf->Row(array('', '', '', '', ''));
 
         $pdf->SetRowBorder('NB');
         $pdf->SetLineHeight(4.5);
         $pdf->SetSizes(array(13, 13, 13, 13, 13));
-        $pdf->SetStyles(array('B', '','', 'B', ''));
+        $pdf->SetStyles(array('B', '', '', 'B', ''));
         $pdf->setRowColorText(array($txtbold, $clrtxt, '', $txtbold, $clrtxt));
         $totventas = 34242; //valor
         $totganancia = 4212; //valor
-        $pdf->Row(Array('Ventas totales:', "$ " . number_format($totventas, 2, '.', ','),'', 'Ganancias:', "$ " . number_format($totganancia, 2, '.', ',')));
+        $pdf->Row(array('Ventas totales:', "$ " . number_format($totventas, 2, '.', ','), '', 'Ganancias:', "$ " . number_format($totganancia, 2, '.', ',')));
 
         $pdf->Ln(3);
         $pdf->SetAligns('C');
         $pdf->SetRowBorder('NB');
         $pdf->SetLineHeight(6);
         $pdf->SetSizes(array(13, 13, 13));
-        $pdf->SetWidths(Array(95, 5, 95));
+        $pdf->SetWidths(array(95, 5, 95));
         $pdf->SetStyles(array('B', '', 'B'));
         $pdf->setRowColorText(array($txtbold, $clrtxt, $txtbold));
-        $pdf->Row(Array('Entradas de efectivo', '', 'Dinero en caja'));
+        $pdf->Row(array('Entradas de efectivo', '', 'Dinero en caja'));
         $y_entradas = $pdf->GetY();
 
         $pdf->SetAligns(array('L', 'C'));
         $pdf->SetSizes(array(9, 9));
-        $pdf->SetWidths(Array(40, 55));
+        $pdf->SetWidths(array(40, 55));
         $pdf->SetStyles(array('B', ''));
         $pdf->setRowColorText(array($txtbold, $clrtxt));
         $pdf->SetLineHeight(0.1);
         $pdf->SetRowBorder('NB');
-        $pdf->Row(Array('', ''));
+        $pdf->Row(array('', ''));
 
         $pdf->SetRowBorder('B');
         $pdf->SetLineHeight(4.5);
-        $pdf->Row(Array('Dinero inicial en caja:', '$ 2,000.00'));
-        $pdf->Row(Array('Efectivo:', '$ 540.50'));
-        $pdf->Row(Array('PEDIDO DON MAXI:', '$ 767.00'));
-        $pdf->Row(Array('Total:', '$ 3,307.50'));
+        $pdf->Row(array('Dinero inicial en caja:', '$ 2,000.00'));
+        $pdf->Row(array('Efectivo:', '$ 540.50'));
+        $pdf->Row(array('PEDIDO DON MAXI:', '$ 767.00'));
+        $pdf->Row(array('Total:', '$ 3,307.50'));
         $y_salidas = $pdf->GetY();
 
         $pdf->SetY($y_entradas);
         $pdf->SetX(110);
-        $pdf->Row(Array(iconv("utf-8","windows-1252",'Ventas en efectivo:'), '$ 34,242.00'));
+        $pdf->Row(array(iconv("utf-8", "windows-1252", 'Ventas en efectivo:'), '$ 34,242.00'));
         $pdf->SetX(110);
-        $pdf->Row(Array(iconv("utf-8","windows-1252",'Entradas:'), '$ 3,307.50'));
+        $pdf->Row(array(iconv("utf-8", "windows-1252", 'Entradas:'), '$ 3,307.50'));
         $pdf->SetX(110);
-        $pdf->Row(Array(iconv("utf-8","windows-1252",'Salidas:'), '$ 18,270.00'));
+        $pdf->Row(array(iconv("utf-8", "windows-1252", 'Salidas:'), '$ 18,270.00'));
         $pdf->SetX(110);
-        $pdf->Row(Array(iconv("utf-8","windows-1252",'Total:'), '$ 19,279.50'));
+        $pdf->Row(array(iconv("utf-8", "windows-1252", 'Total:'), '$ 19,279.50'));
         $pdf->SetY($y_salidas);
 
 
@@ -2144,35 +2247,183 @@ switch ($idencabezado) {
         $pdf->SetRowBorder('NB');
         $pdf->SetLineHeight(6);
         $pdf->SetSizes(array(13));
-        $pdf->SetWidths(Array(95));
+        $pdf->SetWidths(array(95));
         $pdf->SetStyles(array('B', '', 'B'));
         $pdf->setRowColorText(array($txtbold));
-        $pdf->Row(Array('Salidas de efectivo'));
+        $pdf->Row(array('Salidas de efectivo'));
 
 
         $pdf->SetAligns(array('L', 'C'));
         $pdf->SetSizes(array(9, 9));
-        $pdf->SetWidths(Array(40, 55));
+        $pdf->SetWidths(array(40, 55));
         $pdf->SetStyles(array('B', ''));
         $pdf->setRowColorText(array($txtbold, $clrtxt));
         $pdf->SetLineHeight(0.1);
         $pdf->SetRowBorder('NB');
-        $pdf->Row(Array('', ''));
+        $pdf->Row(array('', ''));
 
         $salidas = 0;
         $pdf->SetRowBorder('B');
         $pdf->SetLineHeight(4.5);
-        $pdf->Row(Array('trapitos:', '$ 2,250.00'));
-        $pdf->Row(Array('acuarelas:', '$ 1,000.00'));
-        $pdf->Row(Array('plumon:', '$ 20.00'));
-        $pdf->Row(Array('salsas valentina:', '$ 15,000.00'));
-        $pdf->Row(Array('Total:', '$ 18,270.00'));
+        $pdf->Row(array('trapitos:', '$ 2,250.00'));
+        $pdf->Row(array('acuarelas:', '$ 1,000.00'));
+        $pdf->Row(array('plumon:', '$ 20.00'));
+        $pdf->Row(array('salsas valentina:', '$ 15,000.00'));
+        $pdf->Row(array('Total:', '$ 18,270.00'));
+        $pdf->isFinished = true;
+        break;
+    case 14:
+        break;
+    case 15:
+        break;
+    case 16:
+        $pdf->SetFont('Helvetica', '', 14);
+        $pdf->SetFillColor($rgbc[0], $rgbc[1], $rgbc[2]);
+        $pdf->SetTextColor($rgbs[0], $rgbs[1], $rgbs[2]);
+        $pdf->SetFont('Arial', '', 14);
+        $pdf->SetFillColor($rgbt[0], $rgbt[1], $rgbt[2]);
+        $pdf->SetTextColor($rgbtt[0], $rgbtt[1], $rgbtt[2]);
+        $pdf->SetWidths(array(80));
+        $pdf->SetLineHeight(8);
+        $pdf->RowT(array("Datos del cliente"));
+        $pdf->SetWidths(array(120, 75));
+        $pdf->SetLineHeight(4.5);
+        $pdf->SetRowBorder('B');
+        $pdf->SetFont('Arial', 'B', 9);
+        $pdf->SetTextColor($rgbbld[0], $rgbbld[1], $rgbbld[2]);
+        $pdf->Write(4.5, "Cliente:");
+        $pdf->SetX(130);
+        $pdf->SetTextColor($rgbbld[0], $rgbbld[1], $rgbbld[2]);
+        $pdf->Write(4.5, "RFC:");
+        $pdf->SetFont('Arial', '', 9);
+        $pdf->SetX(10);
+        $pdf->setRowColorText(array($clrtxt, $clrtxt));
+        $pdf->Row(array("\n" . "Juan Perez", "\n" . "XXXX0101XXXX"));
+
+        $pdf->SetWidths(array(60, 60, 75));
+        $pdf->SetLineHeight(4.5);
+
+        $pdf->SetFont('Arial', 'B', 9);
+        $pdf->SetTextColor($rgbbld[0], $rgbbld[1], $rgbbld[2]);
+        $pdf->Write(4.5, "Contacto:");
+        $pdf->SetX(70);
+        $pdf->SetTextColor($rgbbld[0], $rgbbld[1], $rgbbld[2]);
+        $pdf->Write(4.5, "Tel. Oficina:");
+        $pdf->SetX(130);
+        $pdf->SetTextColor($rgbbld[0], $rgbbld[1], $rgbbld[2]);
+        $pdf->Write(4.5, "E-mail");
+        $pdf->SetFont('Arial', '', 9);
+        $pdf->SetX(10);
+        $pdf->Row(array("\n" . iconv('UTF-8', 'windows-1252', "Luis Gomez"), "\n" . iconv('UTF-8', 'windows-1252', "4271234567"), "\n" . iconv('UTF-8', 'windows-1252', "example@gmail.com")));
+
+        $pdf->SetWidths(array(195));
+        $pdf->SetLineHeight(4.5);
+
+        $pdf->SetFont('Arial', 'B', 9);
+        $pdf->SetTextColor($rgbbld[0], $rgbbld[1], $rgbbld[2]);
+        $pdf->Write(4.5, iconv('UTF-8', 'windows-1252', "Dirección"));
+        $pdf->SetFont('Arial', '', 9);
+        $pdf->SetX(10);
+        $pdf->Row(array(iconv('UTF-8', 'windows-1252', "\n Calle Azul #5, Col. Centro, San Juan del Rio, Qro.")));
+
+        $pdf->Ln(5);
+        $pdf->SetFont('Arial', '', 14);
+        $pdf->SetFillColor($rgbt[0], $rgbt[1], $rgbt[2]);
+        $pdf->SetTextColor($rgbtt[0], $rgbtt[1], $rgbtt[2]);
+        $pdf->SetWidths(array(80));
+        $pdf->SetLineHeight(8);
+        $pdf->RowT(array("Datos de la unidad"));
+
+        $pdf->SetWidths(array(65, 65, 20, 45));
+        $pdf->SetLineHeight(4.5);
+
+        $pdf->SetFont('Arial', 'B', 9);
+        $pdf->SetTextColor($rgbbld[0], $rgbbld[1], $rgbbld[2]);
+        $pdf->Write(4.5, "Marca:");
+        $pdf->SetX(75);
+        $pdf->SetTextColor($rgbbld[0], $rgbbld[1], $rgbbld[2]);
+        $pdf->Write(4.5, "Modelo:");
+        $pdf->SetX(140);
+        $pdf->SetTextColor($rgbbld[0], $rgbbld[1], $rgbbld[2]);
+        $pdf->Write(4.5, iconv('UTF-8', 'windows-1252', "Año"));
+        $pdf->SetX(160);
+        $pdf->SetTextColor($rgbbld[0], $rgbbld[1], $rgbbld[2]);
+        $pdf->Write(4.5, "Color");
+        $pdf->SetFont('Arial', '', 9);
+        $pdf->SetX(10);
+        $pdf->Row(array("\n" . iconv('UTF-8', 'windows-1252', "Toyota"), "\n" . iconv('UTF-8', 'windows-1252', "Corolla"), "\n 2022", "\n" . iconv('UTF-8', 'windows-1252', "Rojo")));
+        $pdf->SetWidths(array(65, 65, 35, 30));
+        $pdf->SetLineHeight(4.5);
+        $pdf->SetFont('Arial', 'B', 9);
+        $pdf->SetTextColor($rgbbld[0], $rgbbld[1], $rgbbld[2]);
+        $pdf->Write(4.5, "Serie:");
+        $pdf->SetX(75);
+        $pdf->SetTextColor($rgbbld[0], $rgbbld[1], $rgbbld[2]);
+        $pdf->Write(4.5, "Placas:");
+        $pdf->SetX(140);
+        $pdf->SetTextColor($rgbbld[0], $rgbbld[1], $rgbbld[2]);
+        $pdf->Write(4.5, iconv('UTF-8', 'windows-1252', "Eco:"));
+        $pdf->SetX(175);
+        $pdf->SetTextColor($rgbbld[0], $rgbbld[1], $rgbbld[2]);
+        $pdf->Write(4.5, "KM:");
+        $pdf->SetFont('Arial', '', 9);
+        $pdf->SetX(10);
+        $pdf->Row(array("\n" . iconv('UTF-8', 'windows-1252', "ABC123456DEF"), "\n" . iconv('UTF-8', 'windows-1252', "XYZ-987"), "\n" . iconv('UTF-8', 'windows-1252', "1234"), "\n" . iconv('UTF-8', 'windows-1252', "50000")));
+
+        $pdf->Ln(5);
+        $pdf->SetFont('Arial', '', 14);
+        $pdf->SetFillColor($rgbt[0], $rgbt[1], $rgbt[2]);
+        $pdf->SetTextColor($rgbtt[0], $rgbtt[1], $rgbtt[2]);
+        $pdf->SetWidths(array(80));
+        $pdf->SetLineHeight(8);
+        $pdf->RowT(array("Datos del equipo"));
+        $pdf->SetWidths(array(65, 65, 65));
+        $pdf->SetLineHeight(4.5);
+        $pdf->SetFont('Arial', 'B', 9);
+        $pdf->SetTextColor($rgbbld[0], $rgbbld[1], $rgbbld[2]);
+        $pdf->Write(4.5, "Modelo:");
+        $pdf->SetX(75);
+        $pdf->SetTextColor($rgbbld[0], $rgbbld[1], $rgbbld[2]);
+        $pdf->Write(4.5, "IMEI:");
+        $pdf->SetX(140);
+        $pdf->SetTextColor($rgbbld[0], $rgbbld[1], $rgbbld[2]);
+        $pdf->Write(4.5, iconv('UTF-8', 'windows-1252', "No. Telefónico"));
+        $pdf->SetFont('Arial', '', 9);
+        $pdf->SetX(10);
+        $pdf->Row(array("\n" . iconv('UTF-8', 'windows-1252', "GPS-123"), "\n" . iconv('UTF-8', 'windows-1252', "123456789012345"), "\n" . "4271234567"));
+
+        $pdf->SetWidths(array(195));
+        $pdf->SetLineHeight(4.5);
+        $pdf->Ln(5);
+        $pdf->SetFont('Arial', '', 13);
+        $pdf->SetFillColor($rgbt[0], $rgbt[1], $rgbt[2]);
+        $pdf->SetTextColor($rgbtt[0], $rgbtt[1], $rgbtt[2]);
+        $pdf->SetWidths(array(80));
+        $pdf->SetLineHeight(8);
+        $pdf->RowT(array("Datos del servicio"));
+        $pdf->Ln(1);
+
+        $pdf->SetWidths(array(195));
+        $pdf->SetLineHeight(4.5);
+
+        $pdf->SetFont('Arial', 'B', 9);
+        $pdf->SetTextColor($rgbbld[0], $rgbbld[1], $rgbbld[2]);
+        $pdf->Write(4.5, "Servicio:");
+        $pdf->SetX(10);
+        $pdf->SetFont('Arial', '', 9);
+        $pdf->SetTextColor($rgbtxt[0], $rgbtxt[1], $rgbtxt[2]);
+        $pdf->Row(array("\n" . iconv('UTF-8', 'windows-1252', "Reubicación, Revisión")));
+        $pdf->SetWidths(array(195));
+        $pdf->SetFont('Arial', 'B', 9);
+        $pdf->SetTextColor($rgbbld[0], $rgbbld[1], $rgbbld[2]);
+        $pdf->Write(4.5, "Instalador:");
+        $pdf->SetX(10);
+        $pdf->SetFont('Arial', '', 9);
+        $pdf->SetLineHeight(4.5);
+        $pdf->SetTextColor($rgbtxt[0], $rgbtxt[1], $rgbtxt[2]);
+        $pdf->Row(array("\n" . iconv('UTF-8', 'windows-1252', "José Rodriguez")));
         $pdf->isFinished = true;
         break;
 }
-
-
-
-
- $pdf->isFinished = true;
+$pdf->isFinished = true;
 $pdf->Output('./ejemplo.pdf', 'F');

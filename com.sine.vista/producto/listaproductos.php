@@ -24,7 +24,7 @@ include("modals.php");
 </div>
 
 <div class="scrollX div-form mw-100 bg-light mx-3 border border-secondary-subtle" id="tablaContenedor">
-    <table class="table tab-hover table-condensed table-responsive table-row table-head" id="body-lista-productos-altas">
+    <table class="table table-hover table-condensed table-responsive table-row table-head" id="body-lista-productos-altas">
         <thead class="p-0">
             <tr>
                 <th class="col-auto">Empresa</th>

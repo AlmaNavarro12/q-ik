@@ -970,8 +970,8 @@ function checkRemolque(number) {
     }
 }
 
-function checkOperador() {
-    var rfc = $("#rfc-operador").val();
+function checkOperador(rfcop = "") {
+    var rfc = (rfcop == "") ? $("#rfc-operador").val() : rfcop;
     if (rfc != '') {
         $.ajax({
             url: "com.sine.enlace/enlacecarta.php",
@@ -1174,6 +1174,7 @@ function autocompletarVehiculo() {
             $("#tipo-permiso").val(tipopermiso);
             aucompletarConfigTransporte(1);
             $("#conf-transporte").val(tipoautot);
+            loadRemolques(tipoautot);
             $("#anho-modelo").val(anho);
             $("#placa-vehiculo").val(placa);
             $("#seguro-respcivil").val(seguro);
@@ -1252,6 +1253,7 @@ function autocompletarOperador() {
             $("#estado-operador").val(idestado);
             $("#direccion-operador").val(calle);
             $("#cp-operador").val(codpostal);
+            checkOperador(rfc);
             loadOpcionesEstado('contenedor-estado-op', 'estado-operador', idestado);
             loadOpcionesMunicipioOperador(idmunicipio, idestado);
         }
@@ -1385,7 +1387,7 @@ function agregarMercancia(tid = null) {
     var unidad = $("#unidad-mercancia").val();
     var peso = $("#peso-mercancia").val();
     var condicional = $("#peligro-mercancia").val();
-    var peligro = $("#material-peligroso").val();
+    var peligro = $("#material-peligroso").val() || 0;
     var clvmaterial = $("#clv-peligro").val();
     var embalaje = $("#clv-embalaje").val();
 
@@ -1965,6 +1967,7 @@ function setValoresEditarOperador(datos) {
     $("#id-operador").val(array[1]);
     $("#nombre-operador").val(array[2]);
     $("#rfc-operador").val(array[3]);
+    checkOperador(array[3]);
     $("#num-licencia").val(array[4]);
     $("#direccion-operador").val(array[6]);
     loadOpcionesEstado('contenedor-estado-op', 'estado-operador', array[5]);
@@ -2074,6 +2077,8 @@ function insertarFacturaCarta(tag = null) {
     var tiporemolque3 = $("#tipo-remolque3").val();
     var placaremolque3 = $("#placa-remolque3").val();
     var flagoperador = $("#flag-operador").val() || 0;
+    var idoperador = $("#id-operador").val() || 0;
+    var rfcoperador = $("#rfc-operador").val();
 
     var observaciones = $("#observaciones-carta").val();
     var txtbd = observaciones.replace(new RegExp("\n", 'g'), '<ent>');
@@ -2167,23 +2172,14 @@ function insertarFacturaCarta(tag = null) {
                          || (idremolque2 == "0" && (nombreremolque2 != "" || tiporemolque2 != "" || placaremolque2 !="")) 
                          || (idremolque3 == "0" && (nombreremolque3 != "" || tiporemolque3 != "" || placaremolque3 !="")) 
                          || flagoperador == '0') {
-                            checkNuevoRegistro(tag);
+                            console.log(idvehiculo);
+                            console.log(idremolque1);
+                            console.log(idremolque2);
+                            console.log(idremolque3);
+                            console.log(idoperador);
+                            console.log(flagoperador);
+                            checkNuevoRegistro(tagins);
                         }
-                        /*if (idvehiculo == "0") {
-                            checkNuevoRegistroTransporte(tagins);
-                        }
-                        if (idremolque1 == "0" && (nombreremolque1 != "" || tiporemolque1 != "" || placaremolque1 !="")) {
-                            checkNuevoRegistroRemolque(tagins, "1");
-                        }
-                        if (idremolque2 == "0" && (nombreremolque2 != "" || tiporemolque2 != "" || placaremolque2 !="")) {
-                            checkNuevoRegistroRemolque(tagins, "2");
-                        }
-                        if (idremolque3 == "0" && (nombreremolque3 != "" || tiporemolque3 != "" || placaremolque3 !="")) {
-                            checkNuevoRegistroRemolque(tagins, "3");
-                        }
-                        if (flagoperador == "0") {
-                            checkNuevoRegistroOperador(tagins);
-                        }*/
                     }
                     
                 }
@@ -2194,7 +2190,7 @@ function insertarFacturaCarta(tag = null) {
 }
 
 function checkNuevoRegistro(tag) {
-    alertify.confirm("¿Deseas guardar los nuevos datos registrados?", function () {
+    alertify.confirm("¿Deseas guardar los nuevos datos registrados en el formulario anterior?", function () {
         cargandoHide();
         cargandoShow();
         $.ajax({
@@ -2322,7 +2318,7 @@ function editarCarta(cid) {
                 alertify.error(res);
                 cargandoHide();
             } else {
-                loadView('carta');
+                loadView('carta'); 
                 window.setTimeout("setValoresEditarCarta('" + datos + "')", 900);
             }
         }
@@ -2392,8 +2388,6 @@ function setValoresEditarCarta(datos) {
     var observaciones = array[55];
 	var cfdisrel = array[56];
 	var pesovehicular = array[57];
-
-    console.log(tipotransporte);
 	var pesobruto = array[58];
     
     var txt = observaciones.replace(new RegExp("<ent>", 'g'), "\n");
@@ -2719,6 +2713,10 @@ function setvaloresRegistrarPago(datos) {
                 var array = datos.split("<comp>");
                 comp = array.length;
                 for (i = 0; i < array.length; i++) {
+                    if (array[array.length - 1] === "") {
+                        array.pop();
+                    }
+
                     var comps = array[i].split("<cut>");
                     $("#tabs").append(comps[0]);
                     $("#complementos").append(comps[1]);
@@ -2738,7 +2736,6 @@ function setvaloresRegistrarPago(datos) {
                     loadFormaPago(tag1, forma);
                     loadMonedaComplemento(tag1, moneda);
                     disableCuenta(tag1, forma);
-                    loadFormaPago(tag1, forma);
                     loadMonedaComplemento(tag1, moneda);
                     loadFactura(idfactura, 'c', tag1);
                 }
@@ -3029,7 +3026,7 @@ function verEvidencias(id) {
 }
 
 function visutab(archivo, ext) {
-    var ruta = "./cartaporte/" + archivo;
+    var ruta = "./img/cartaporte/" + archivo;
     if (ext == "jpg" || ext == "png" || ext == "jpeg" || ext == "gif") {
         $("#fotito").html('<img src="' + ruta + '"/>')
     } else {

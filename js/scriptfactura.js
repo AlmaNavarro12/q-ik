@@ -379,7 +379,6 @@ function setValoresEditarProducto(datos, idtmp) {
     $("#muestraimagen").html('');
     changeText("#titulo-alerta-editar-producto", "Editar producto en factura");
     var array = datos.split("</tr>");
-    console.log(array);
     var tipo = array[10];
     var imagen = array[14];
     var chinventario = array[15];
@@ -460,7 +459,7 @@ function actualizarProductoFactura(idproducto, idtmp) {
     var porcentaje = $("#porganancia").val();
     var ganancia = $("#ganancia").val();
     var pventa = $("#pventa").val();
-    var idproveedor = $("#id-proveedor").val();
+    var idproveedor = $("#id-proveedor").val() || 0;
     var imagen = $('#filename').val();
     var imgactualizar = $("#imgactualizar").val();
     var chinventario = 0;
@@ -743,6 +742,10 @@ function setvaloresRegistrarPago(datos) {
                 var array = datos.split("<comp>");
                 comp = array.length;
                 for (i = 0; i < array.length; i++) {
+                    if (array[array.length - 1] === "") {
+                        array.pop();
+                    }
+                    
                     var comps = array[i].split("<cut>");
                     $("#tabs").append(comps[0]);
                     $("#complementos").append(comps[1]);
@@ -765,11 +768,11 @@ function setvaloresRegistrarPago(datos) {
                     loadFormaPago(tag1, forma);
                     loadMonedaComplemento(tag1, moneda);
                     loadFactura(idfactura, 'f', tag1);
+                    loadFolioPago(iddatosfacturacion);
                 }
             }
         }
     });
-    loadFolioPago();
     cargandoHide();
 }
 

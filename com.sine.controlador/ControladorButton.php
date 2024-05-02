@@ -59,6 +59,7 @@ class ControladorButton{
             'carta' => ['crearcarta', 'carta', 'Crear Carta'],
             'ventas' => ['crearventa', 'puntodeventa', 'Nueva venta'],
             'listacortes' => ['cortedecaja', 'listacortes', 'Visualizar registros'],
+            'equipos' => ['creargps', 'equipos', 'Agregar equipo']
         ];
     
         $btn = "";
@@ -97,7 +98,14 @@ class ControladorButton{
                         break;
                     }
                 }
-            }else {
+            } else if ($view == 'equipos') {
+                foreach ($permisos as $usuarioactual) {
+                    if ($usuarioactual[$permiso] == '1') {
+                        $btn = "<button class='button-create text-uppercase' onclick='nuevoGPS()'><span class='fas fa-plus'></span> Agregar Equipo</button>";
+                        break;
+                    }
+                }
+            } else {
                 list($permiso, $accion, $texto) = $botones[$view];
                 if ($accion == 'folio') {
                     foreach ($permisos as $usuarioactual) {

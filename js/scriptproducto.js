@@ -1,6 +1,4 @@
 function buscarProducto(pag = "") {
-    cargandoHide();
-    cargandoShow();
     $.ajax({
         url: "com.sine.enlace/enlaceproducto.php",
         type: "POST",
@@ -20,8 +18,6 @@ function buscarProducto(pag = "") {
 }
 
 function loadListaProductosaltas(pag = "") {
-    cargandoHide();
-    cargandoShow();
     $.ajax({
         url: "com.sine.enlace/enlaceproducto.php",
         type: "POST",

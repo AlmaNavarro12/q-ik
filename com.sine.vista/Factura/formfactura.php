@@ -322,7 +322,7 @@ include("buscarProductos.php");
         </div>
         
         <div class="row scrollX" style="max-width: 100%;">
-            <table id="resultados" class="table tab-hover table-condensed table-responsive table-row table-head mt-3">
+            <table id="resultados" class="table table-hover table-condensed table-responsive table-row table-head mt-3">
             </table>
         </div>
         <div class="row">

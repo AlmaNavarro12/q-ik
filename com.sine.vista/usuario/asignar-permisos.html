@@ -792,12 +792,19 @@
                                 </div>
                                 <div id="reporteinventario-errors"></div>
                             </div>
-                            <label class="label-form col-4" for="reportepuntoventa">Reporte pagos:</label>
+                            <label class="label-form col-4" for="reportepuntoventa">Reporte ventas:</label>
                             <div class="col-2">
                                 <div class="input-group">
                                     <input class="input-check" id="reportepuntoventa" name="reportepuntoventa" type="checkbox" />
                                 </div>
                                 <div id="reportepuntoventa-errors"></div>
+                            </div>
+                            <label class="label-form col-4" for="reportecorte">Reporte corte de caja:</label>
+                            <div class="col-2">
+                                <div class="input-group">
+                                    <input class="input-check" id="reportecorte" name="reportecorte" type="checkbox" />
+                                </div>
+                                <div id="reportecorte-errors"></div>
                             </div>
                         </div>
                     </div>
@@ -806,6 +813,156 @@
         </div>
 
         <div class="row">
+            
+            <div class="col-md-6">
+                <div class="card shadow-sm rounded-1 mt-4">
+                    <a class="text-decoration-none" href="#collapse-ventas" data-bs-toggle="collapse" role="button"
+                        aria-expanded="false">
+                        <div class="ps-5 panel-head-style" role="tab" id='heading1'>
+                            <span class="fas fa-list small mx-1"></span> Puntos de venta
+                        </div>
+                    </a>
+                    <div id="collapse-ventas" class="panel-collapse collapse collapse-permission">
+                        <div class="card-body row g-2 mx-auto">
+                            <label class="label-form col-4" for="crearventa">Crear venta:</label>
+                            <div class="col-2">
+                                <div class="input-group">
+                                    <input class="input-check" id="crearventa" name="crearventa" type="checkbox" />
+                                </div>
+                                <div id="crearventa-errors"></div>
+                            </div>
+                            <label class="label-form col-4" for="cancelarventa">Cancelar venta:</label>
+                            <div class="col-2">
+                                <div class="input-group">
+                                    <input class="input-check" id="cancelarventa" name="cancelarventa"
+                                        type="checkbox" />
+                                </div>
+                                <div id="cancelarventa-errors"></div>
+                            </div>
+                            <label class="label-form col-4" for="exportarventa">Exportar a factura:</label>
+                            <div class="col-2">
+                                <div class="input-group">
+                                    <input class="input-check" id="exportarventa" name="exportarventa" type="checkbox" />
+                                </div>
+                                <div id="exportarventa-errors"></div>
+                            </div>
+                            <label class="label-form col-4" for="listaventa">Lista de ventas:</label>
+                            <div class="col-2">
+                                <div class="input-group">
+                                    <input class="input-check" id="listaventa" name="listaventa" type="checkbox" />
+                                </div>
+                                <div id="listaventa-errors"></div>
+                            </div>
+                            <label class="label-form col-4" for="registrarentrada">Registrar entradas:</label>
+                            <div class="col-2">
+                                <div class="input-group">
+                                    <input class="input-check" id="registrarentrada" name="registrarentrada" type="checkbox" />
+                                </div>
+                                <div id="registrarentrada-errors"></div>
+                            </div>
+                            <label class="label-form col-4" for="registrarsalida">Registrar salidas:</label>
+                            <div class="col-2">
+                                <div class="input-group">
+                                    <input class="input-check" id="registrarsalida" name="registrarsalida" type="checkbox" />
+                                </div>
+                                <div id="registrarsalida-errors"></div>
+                            </div>
+                            <label class="label-form col-4" for="cortedecaja">Supervisor de corte de caja:</label>
+                            <div class="col-2">
+                                <div class="input-group">
+                                    <input class="input-check" id="cortedecaja" name="cortedecaja" type="checkbox" />
+                                </div>
+                                <div id="cortedecaja-errors"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card shadow-sm rounded-1 mt-4">
+                    <a class="text-decoration-none" href="#collapse-instalacion" data-bs-toggle="collapse" role="button"
+                        aria-expanded="false">
+                        <div class="ps-5 panel-head-style" role="tab" id='heading1'>
+                            <span class="fas fa-list small mx-1"></span> Instalación GPS
+                        </div>
+                    </a>
+                    <div id="collapse-instalacion" class="panel-collapse collapse collapse-permission">
+                        <div class="card-body row g-2 mx-auto">
+                            <label class="label-form col-4" for="creargps">Registrar equipo GPS:</label>
+                            <div class="col-2">
+                                <div class="input-group">
+                                    <input class="input-check" id="creargps" name="creargps" type="checkbox" />
+                                </div>
+                                <div id="creargps-errors"></div>
+                            </div>
+                            <label class="label-form col-4" for="editargps">Editar equipo GPS:</label>
+                            <div class="col-2">
+                                <div class="input-group">
+                                    <input class="input-check" id="editargps" name="editargps"
+                                        type="checkbox" />
+                                </div>
+                                <div id="editargps-errors"></div>
+                            </div>
+                            <label class="label-form col-4" for="eliminargps">Eliminar equipo GPS:</label>
+                            <div class="col-2">
+                                <div class="input-group">
+                                    <input class="input-check" id="eliminargps" name="eliminargps" type="checkbox" />
+                                </div>
+                                <div id="eliminargps-errors"></div>
+                            </div>
+                            <label class="label-form col-4" for="listagps">Listado de equipos GPS:</label>
+                            <div class="col-2">
+                                <div class="input-group">
+                                    <input class="input-check" id="listagps" name="listagps" type="checkbox" />
+                                </div>
+                                <div id="listagps-errors"></div>
+                            </div>
+                            <label class="label-form col-4" for="crearinstalacion">Crear instalación:</label>
+                            <div class="col-2">
+                                <div class="input-group">
+                                    <input class="input-check" id="crearinstalacion" name="crearinstalacion" type="checkbox" />
+                                </div>
+                                <div id="crearinstalacion-errors"></div>
+                            </div>
+                            <label class="label-form col-4" for="editarinicio">Editar inicio instalación:</label>
+                            <div class="col-2">
+                                <div class="input-group">
+                                    <input class="input-check" id="editarinicio" name="editarinicio" type="checkbox" />
+                                </div>
+                                <div id="editarinicio-errors"></div>
+                            </div>
+                            <label class="label-form col-4" for="editarpasos">Editar pasos instalación:</label>
+                            <div class="col-2">
+                                <div class="input-group">
+                                    <input class="input-check" id="editarpasos" name="editarpasos" type="checkbox" />
+                                </div>
+                                <div id="editarpasos-errors"></div>
+                            </div>
+                            <label class="label-form col-4" for="cancelarinstalacion">Cancelar instalación:</label>
+                            <div class="col-2">
+                                <div class="input-group">
+                                    <input class="input-check" id="cancelarinstalacion" name="cancelarinstalacion" type="checkbox" />
+                                </div>
+                                <div id="cancelarinstalacion-errors"></div>
+                            </div>
+                            <label class="label-form col-4" for="eliminarinstalacion">Eliminar instalación:</label>
+                            <div class="col-2">
+                                <div class="input-group">
+                                    <input class="input-check" id="eliminarinstalacion" name="eliminarinstalacion" type="checkbox" />
+                                </div>
+                                <div id="eliminarinstalacion-errors"></div>
+                            </div>
+                            <label class="label-form col-4" for="listainstalacion">Historial de instalaciones:</label>
+                            <div class="col-2">
+                                <div class="input-group">
+                                    <input class="input-check" id="listainstalacion" name="listainstalacion" type="checkbox" />
+                                </div>
+                                <div id="listainstalacion-errors"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="col-md-6">
                 <div class="card shadow-sm rounded-1 mt-4">
                     <a class="text-decoration-none" href="#collapse-cartaporte" data-bs-toggle="collapse" role="button"
@@ -995,78 +1152,12 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-6">
-                <div class="card shadow-sm rounded-1 mt-4">
-                    <a class="text-decoration-none" href="#collapse-ventas" data-bs-toggle="collapse" role="button"
-                        aria-expanded="false">
-                        <div class="ps-5 panel-head-style" role="tab" id='heading1'>
-                            <span class="fas fa-list small mx-1"></span> Puntos de venta
-                        </div>
-                    </a>
-                    <div id="collapse-ventas" class="panel-collapse collapse collapse-permission">
-                        <div class="card-body row g-2 mx-auto">
-                            <label class="label-form col-4" for="crearventa">Crear venta:</label>
-                            <div class="col-2">
-                                <div class="input-group">
-                                    <input class="input-check" id="crearventa" name="crearventa" type="checkbox" />
-                                </div>
-                                <div id="crearventa-errors"></div>
-                            </div>
-                            <label class="label-form col-4" for="cancelarventa">Cancelar venta:</label>
-                            <div class="col-2">
-                                <div class="input-group">
-                                    <input class="input-check" id="cancelarventa" name="cancelarventa"
-                                        type="checkbox" />
-                                </div>
-                                <div id="cancelarventa-errors"></div>
-                            </div>
-                            <label class="label-form col-4" for="exportarventa">Exportar a factura:</label>
-                            <div class="col-2">
-                                <div class="input-group">
-                                    <input class="input-check" id="exportarventa" name="exportarventa" type="checkbox" />
-                                </div>
-                                <div id="exportarventa-errors"></div>
-                            </div>
-                            <label class="label-form col-4" for="listaventa">Lista de ventas:</label>
-                            <div class="col-2">
-                                <div class="input-group">
-                                    <input class="input-check" id="listaventa" name="listaventa" type="checkbox" />
-                                </div>
-                                <div id="listaventa-errors"></div>
-                            </div>
-                            <label class="label-form col-4" for="registrarentrada">Registrar entradas:</label>
-                            <div class="col-2">
-                                <div class="input-group">
-                                    <input class="input-check" id="registrarentrada" name="registrarentrada" type="checkbox" />
-                                </div>
-                                <div id="registrarentrada-errors"></div>
-                            </div>
-                            <label class="label-form col-4" for="registrarsalida">Registrar salidas:</label>
-                            <div class="col-2">
-                                <div class="input-group">
-                                    <input class="input-check" id="registrarsalida" name="registrarsalida" type="checkbox" />
-                                </div>
-                                <div id="registrarsalida-errors"></div>
-                            </div>
-                            <label class="label-form col-4" for="cortedecaja">Supervisor de corte de caja:</label>
-                            <div class="col-2">
-                                <div class="input-group">
-                                    <input class="input-check" id="cortedecaja" name="cortedecaja" type="checkbox" />
-                                </div>
-                                <div id="cortedecaja-errors"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
-        <!--
             <div class="col-12 text-end">
-            <button id="ir-arriba" class="ir-arriba" onclick="scrollToTop()">
-                <i class="fas fa-arrow-up small"></i>
-              </button>
-        </div>
-        -->
+                <button id="ir-arriba" class="ir-arriba" onclick="scrollToTop()">
+                    <i class="fas fa-arrow-up small"></i>
+                </button>
+            </div>
     </form>
 </div>
 <script type="text/javascript" src="js/scriptusuario.js"></script>

@@ -20,7 +20,7 @@
     </div>
 </div>
 <div class="scrollX div-form mw-100 bg-light mx-3 border border-secondary-subtle">
-    <table class="table tab-hover table-condensed table-responsive table-row table-head" id="body-lista-empresa">
+    <table class="table table-hover table-condensed table-responsive table-row table-head" id="body-lista-empresa">
         <thead class="sin-paddding">
             <tr>
             <th></th>

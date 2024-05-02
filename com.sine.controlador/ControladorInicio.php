@@ -627,7 +627,7 @@ class ControladorInicio {
     }
 
     private function bodyMail($nombre, $telefono, $chwhats, $correo, $msg) {
-        $archivo = "../com.sine.dao/configuracion.ini";
+        $archivo = $_SESSION[sha1("database")].".ini";
         $ajustes = parse_ini_file($archivo, true);
         if (!$ajustes) {
             throw new Exception("No se puede abrir el archivo " . $archivo);

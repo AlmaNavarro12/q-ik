@@ -554,27 +554,6 @@ function imprimirTicket(tab = "", cancelado = "") {
     cargandoHide();
 }
 
-function cancelarTicket(id) {
-    alertify.confirm("¿Estás seguro que deseas cancelar este ticket?", function () {
-        $.ajax({
-            url: 'com.sine.enlace/enlaceventa.php',
-            type: 'POST',
-            data: {transaccion: 'cancelarTicked', id: id},
-            success: function (datos) {
-                var texto = datos.toString();
-                var bandera = texto.substring(0, 1);
-                var res = texto.substring(1, 5000);
-                if (bandera == '0') {
-                    alertify.error(res);
-                } else {
-                    alertify.success("Ticket cancelado. Inventario restaurado.");
-                    filtrarVentas();
-                }
-            }
-        });
-    }).set({title: "Q-ik"});
-}
-
 function habilitarDescuento(){
     if( $('#ChkDescuento').is(':checked') ){
         $('#Spndescuento').removeClass('far fa-square');
@@ -952,16 +931,16 @@ $('#comentarios-extras').on('click', function () {
 });
 
 function insertarCorte(idsupervisor = ""){
-    var totalventas = $("#ventas_totales").val();
-    var totalentradas = $("#total_entradas").val();
-    var totalsalidas = $("#total_salidas").val();
-    var fondoinicio = $("#fondo_inicio").val();
+    var totalventas = $("#ventas_totales").val() || 0;
+    var totalentradas = $("#total_entradas").val() || 0;
+    var totalsalidas = $("#total_salidas").val() || 0;
+    var fondoinicio = $("#fondo_inicio").val() || 0;
     var usuario = $("#usuario-corte").val();
     var fechaventa = $("#fecha-corte").val();
-    var totalganancias = $("#ganancias_totales").val();
+    var totalganancias = $("#ganancias_totales").val() || 0;
     var comentarios = $("#comentarios").val();
-    var totalfaltantes = $("#total_faltantes").val();
-    var totalsobrantes = $("#total_sobrantes").val();
+    var totalfaltantes = $("#total_faltantes").val() || 0;
+    var totalsobrantes = $("#total_sobrantes").val() || 0;
     var pago = $("#pago").is(":checked") ? 1 : 0;
 
     $.ajax({
@@ -1139,4 +1118,81 @@ function asignarTag(sid){
         }
     });
     cargandoHide();
+}
+
+function modalCancelar(idventa){
+    $("#nombre-vendedor").val('');
+    $("#contrasena-vendedor").val('');
+    $("#motivo-cancelar").val('');
+    $("#idventa").val(idventa);
+    $("#modal-cancelacion").modal('show');
+}
+
+function validarCancelacion() {
+    var usuario = $("#nombre-vendedor").val();
+    var contrasena = $("#contrasena-vendedor").val();
+    var motivo = $("#motivo-cancelar").val();
+    if (isnEmpty(usuario, "nombre-vendedor") && isnEmpty(contrasena, "contrasena-vendedor") && isnEmpty(motivo, "motivo-cancelar")) {
+        $.ajax({
+            url: "com.sine.enlace/enlaceventa.php",
+            type: "POST",
+            data: {transaccion: "validarcancelacion", usuario: usuario, contrasena: contrasena},
+            success: function (datos) {
+                var array = datos.split("<tr>");
+                var texto = datos.toString();
+                var bandera = texto.substring(0, 1);
+                var res = texto.substring(1, 1000);
+                if (bandera == '0') {
+                    alertify.error(res);
+                } else {
+                    insertarCancelacion(array[1]);
+                }
+            }
+        });
+    }
+}
+
+function insertarCancelacion(idusuario){
+    var id = $("#idventa").val();
+    var motivo = $("#motivo-cancelar").val();
+
+    alertify.confirm("¿Estás seguro que deseas cancelar este ticket?", function () {
+        $.ajax({
+            url: 'com.sine.enlace/enlaceventa.php',
+            type: 'POST',
+            data: {transaccion: 'cancelarTicked', id: id, motivo:motivo, idusuario:idusuario},
+            success: function (datos) {
+                var texto = datos.toString();
+                var bandera = texto.substring(0, 1);
+                var res = texto.substring(1, 5000);
+                if (bandera == '0') {
+                    alertify.error(res);
+                } else {
+                    $("#modal-cancelacion").modal('hide');
+                    alertify.success("Ticket cancelado. Inventario restaurado.");
+                    filtrarVentas();
+                }
+            }
+        });
+    }).set({title: "Q-ik"});
+}
+
+function verCancelacion(idventa){
+    $("#cancelaciones").modal('show');
+    $.ajax({
+        url: 'com.sine.enlace/enlaceventa.php',
+        type: 'POST',
+        data: {transaccion: 'listacancelacion', idventa: idventa},
+        success: function (datos) {
+            var texto = datos.toString();
+            var bandera = texto.substring(0, 1);
+            var res = texto.substring(1, 5000);
+            if (bandera == '0') {
+                alertify.error(res);
+            } else {
+                $("#cancelaciontabla").html(datos);
+            }
+            cargandoHide();
+        }
+    });
 }
