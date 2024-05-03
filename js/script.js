@@ -812,7 +812,7 @@ function loadView(vista) {
         'equipos': ['loadListaGPS()', 300, "loadBtnCrear('equipos')", 300],
         'pasosvehiculo' : ["firmaInstalacion(1)", 300], 
         'pasoscaja': ["firmaInstalacion(2)", 300],
-
+        'reportecorte': ["loadOpcionesUsuario()", 300],
 
         'nuevoproducto': ["truncateTmp()", 300, "truncateTmpCot()", 350, "loadOpcionesProveedor()", 350, "getOptionsTaxes()", 300,],
         'listaproductoaltas': ["truncateTmp()", 300, "truncateTmpCot()", 350, "loadBtnCrear('producto')", 370, "loadListaProductosaltas()", 400,],

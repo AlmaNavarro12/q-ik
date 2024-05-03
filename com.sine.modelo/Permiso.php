@@ -658,7 +658,7 @@ class Permiso {
     }
 
     function getReporteCorte() {
-        return $this->creartransporte;
+        return $this->reportecorte;
     }
 
     function getConfiguracion() {

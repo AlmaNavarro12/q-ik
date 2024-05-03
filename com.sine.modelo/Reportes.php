@@ -13,6 +13,9 @@ class Reportes {
     //nuevo
     private $metodopago;
     private $formapago;
+    private $estadoInventario;
+    private $ticketexp;
+    private $formpago;
 
     function __construct() {
         
@@ -97,5 +100,28 @@ class Reportes {
     function getFormapago() {
         return $this->formapago;
     }
-        
+
+    function setInventario($estadoInventario) {
+        return $this->estadoInventario = $estadoInventario;    
+    }
+
+    function getInventario() {
+        return $this->estadoInventario;
+    }
+
+    function setTicketexp($ticketexp){
+        return $this->ticketexp = $ticketexp;
+    }
+
+    function getTicketexp(){
+        return $this->ticketexp;
+    }
+
+    function setFormpago( $formpago ) {
+        return $this->formpago = $formpago;
+    }
+
+    function getFormpago() {
+        return $this->formpago;
+    }
 }

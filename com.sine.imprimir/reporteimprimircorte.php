@@ -1,7 +1,7 @@
 <?php
 
 require_once '../com.sine.modelo/TMP.php';
-require_once '../com.sine.controlador/ControladorVenta.php';
+require_once '../com.sine.controlador/ControladorReportes.php';
 require '../pdf/fpdf/fpdf.php';
 setlocale(LC_MONETARY, 'es_MX.UTF-8');
 
@@ -34,6 +34,8 @@ class PDF extends FPDF
     var $supervisor;
     var $fecha;
     var $hora;
+    var $horafin;
+
     var $total;
     var $ganancias;
     var $rfc;
@@ -556,30 +558,17 @@ class PDF extends FPDF
             $height = 25;
         }
         $this->Cell(25, 5, $this->Image($logo, $this->GetX() + 2.5, $this->GetY(), 20, $height), 0, 0, 'C', false);
-        $this->RoundedRect(35, $this->GetY(), 120, 8, 4, 'F');
+        $this->RoundedRect(35, $this->GetY(), 170, 8, 4, 'F');
         $this->SetX(38);
         $this->Write(8, $this->titulopagina);
 
-        $this->SetX(160);
-        $this->RoundedRect(160, $this->GetY(), 45, 8, 4, 'F');
-        $this->SetX(173.5);
-        $this->Write(8, 'Folio');
-
-        $this->SetY(18);
-        $this->SetX(160);
-        $this->SetTextColor(255, 0, 0);
-        $this->SetFont('Arial', 'B', 14);
-        $this->Cell(45, 8, iconv("utf-8", "windows-1252", $this->Tfolio), 0, 0, 'C', false);
-        $this->Ln(26);
-
-
-        $this->SetFont('Helvetica', 'B', 15);
+        $this->SetFont('Helvetica', 'B', 14);
         $this->SetFillColor($rgbc[0], $rgbc[1], $rgbc[2]);
         $this->SetTextColor($rgbt[0], $rgbt[1], $rgbt[2]);
-        $this->SetWidths(array(120));
+        $this->SetWidths(array(155));
         $this->SetLineHeight(8);
         $this->SetY(36.3);
-        $this->RowT(array("Fecha de corte: " . $this->fecha . " a las " . $this->hora . "."));
+        $this->RowT(array("Fecha de corte: " . $this->fecha . " entre " . $this->hora . " a ". $this->horafin ."."));
         $this->Ln(26);
 
         if ($this->uid != '0') {
@@ -594,13 +583,6 @@ class PDF extends FPDF
             $this->Cell(0, 8, iconv("utf-8", "windows-1252", $this->usuario), 0, 0, 'L', false);
             $this->SetY(51);
             $this->SetX(10);
-            $this->SetTextColor($this->cse[0], $this->cse[1], $this->cse[2]);
-            $this->SetFont('Arial', 'B', 12);
-            $this->Cell(0, 8, "Datos de supervisor: ", 0, 0, 'L', false);
-            $this->SetTextColor($this->cnombreu[0], $this->cnombreu[1], $this->cnombreu[2]);
-            $this->SetY(51);
-            $this->SetX(60);
-            $this->Cell(0, 8, iconv("utf-8", "windows-1252", $this->supervisor), 0, 0, 'L', false);
             $this->Ln(15);
         }
 
@@ -694,15 +676,13 @@ class PDF extends FPDF
     }
 }
 
-$cv = new ControladorVenta();
+$cr = new ControladorReportes();
 
 $uid = $_GET['u'];
 $fecha = $_GET['f'];
-$hora = $_GET['h'];
-$tag = $_GET['t'];
-$id = $_GET['i'];
-$horacance = $_GET['h'];
-$super = $_GET['s'];
+$horainicio = $_GET['hi'];
+$horafin = $_GET['hf'];
+$pago = $_GET['p'];
 
 if (!$fecha) {
     $date = getdate();
@@ -719,22 +699,12 @@ if (!$fecha) {
     $fecha = "$y-$m-$d";
 }
 
-if ($id < 10) {
-    $id = "000$id";
-} else if ($id >= 10 && $id < 100) {
-    $id = "00$id";
-} else if ($id >= 100 && $id < 1000) {
-    $id = "0$id";
-}
-
-
-
 $divF = explode("-", $fecha);
-$mon = $cv->translateMonth($divF[1]);
+$mon = $cr->translateMonth($divF[1]);
 $dateformat = $divF[2] . "/" . $mon . "/" . $divF[0];
-$usuario = $cv->getUserbyID($uid);
+$usuario = $cr->getUserbyID($uid);
 
-$datos = $cv->printCorteCaja($tag, $fecha, $_GET['h'], $uid);
+$datos = $cr->getCorteCaja($uid, $pago, $fecha, $horainicio, $horafin);
 $div = explode("<cut>", $datos);
 $totventas = $div[0];
 $totganancia = $div[1];
@@ -770,7 +740,7 @@ foreach ($encabezado as $actual) {
 }
 
 $pdf = new PDF('P', 'mm', 'Letter');
-$pdf->titulopagina = $titulo;
+$pdf->titulopagina = "Datos de caja";
 $pdf->imglogo = $imglogo;
 $pdf->colortitulo = $colortitulo;
 $pdf->celdatitulo = $celdatitulo;
@@ -780,14 +750,14 @@ $pdf->telefono1 = $telefono1;
 $pdf->telefono2 = $telefono2;
 $pdf->chnum = $chnum;
 $pdf->colorpie = $colorpie;
-$pdf->Tfolio = $id;
+$pdf->Tfolio = 0;
 $pdf->cse = $rgbbld;
 $pdf->cnombreu = $rgbtxt;
 $pdf->fecha = $dateformat;
-$pdf->hora = date('h:i A', strtotime($hora));
-$pdf->usuario = $cv->getUserbyID($uid);
-$pdf->supervisor = $cv->getUserbyID($super);
-$pdf->uid = $cv->getUserbyID($uid);
+$pdf->hora = date('h:i A', strtotime($horainicio));
+$pdf->horafin = date('h:i A', strtotime($horafin));
+$pdf->usuario = $cr->getUserbyID($uid);
+$pdf->uid = $cr->getUserbyID($uid);
 $pdf->total = $totventas;
 $pdf->ganancias = $totganancia;
 
@@ -807,7 +777,7 @@ $y = $pdf->GetY();
 
 $fondo = 0;
 $total = 0;
-$datf = $cv->getFondoCajaByTag($tag);
+$datf = $cr->getFondoCaja($uid, $fecha, $horainicio, $horafin);
 foreach ($datf as $actual) {
     $fondo += $actual['fondo'];
     $total += $actual['fondo'];
@@ -825,11 +795,11 @@ $pdf->SetRowBorder('B');
 $pdf->SetLineHeight(4.5);
 $pdf->Row(array('Dinero inicial en caja:', "$" . number_format($fondo, 2, '.', ',')));
 
-$entradas = $cv->getMovEfectivoByTag('1', $tag, $uid);
+$entradas = $cr->getMovEfectivo('1', $fecha, $uid, $horainicio, $horafin);
 foreach ($entradas as $actual) {
-    $concepto =  iconv("utf-8", "windows-1252", $actual['concepto']);
-    $monto = $actual['monto'];
-    $total += $actual['monto'];
+    $concepto =  iconv("utf-8", "windows-1252", $actual['conceptomov']);
+    $monto = $actual['montomov'];
+    $total += $actual['montomov'];
     $pdf->Row(array(iconv("utf-8", "windows-1252", $concepto) . ":", "$" . number_format($monto, 2, '.', ',')));
 }
 
@@ -842,20 +812,20 @@ $tarjeta = 0;
 $vales = 0;
 $entradas = 0;
 $salidas = 0;
-$datf = $cv->getVentasByTipoTag($tag, 'cash', $uid, $fecha, $_GET['h']);
+$datf = $cr->getVentasByTipo($fecha, 'cash', $uid,  $horainicio, $horafin);
 foreach ($datf as $actual) {
-    $total += $actual;
-    $efectivo += $actual;
+    $total += $actual['totalventa'];
+    $efectivo += $actual['totalventa'];
 }
 
 $pdf->SetY($y);
 $pdf->SetX(110);
 $pdf->Row(array(iconv("utf-8", "windows-1252", 'Ventas en efectivo:'), "$" . number_format($efectivo, 2, '.', ',')));
 
-$datcd = $cv->getVentasByTipoTag($tag, 'card', $uid, $fecha, $_GET['h']);
+$datcd = $cr->getVentasByTipo($fecha, 'card', $uid,  $horainicio, $horafin);
 foreach ($datcd as $actual) {
-    $total += $actual;
-    $tarjeta += $actual;
+    $total += $actual['totalventa'];
+    $tarjeta += $actual['totalventa'];
 }
 
 if ($tarjeta > 0) {
@@ -863,10 +833,10 @@ if ($tarjeta > 0) {
     $pdf->Row(array(iconv("utf-8", "windows-1252", 'Ventas con tarjeta:'), "$" . number_format($tarjeta, 2, '.', ',')));
 }
 
-$datvl = $cv->getVentasByTipoTag($tag, 'val', $uid, $fecha, $_GET['h']);
+$datvl = $cr->getVentasByTipo($fecha, 'val', $uid, $horainicio, $horafin);
 foreach ($datvl as $actual) {
-    $total += $actual;
-    $vales += $actual;
+    $total += $actual['totalventa'];
+    $vales += $actual['totalventa'];
 }
 
 if ($vales > 0) {
@@ -875,16 +845,16 @@ if ($vales > 0) {
 }
 
 
-$datf = $cv->getFondoCajaByTag($tag);
+$datf = $cr->getFondoCaja($uid, $fecha, $horainicio, $horafin);
 foreach ($datf as $actual) {
     $total += $actual['fondo'];
     $entradas += $actual['fondo'];
 }
 
-$ent = $cv->getMovEfectivoByTag('1', $tag, $uid);
+$ent = $cr->getMovEfectivoByTag('1',  $uid, $fecha, $horainicio, $horafin);
 foreach ($ent as $actual) {
-    $entradas += $actual['monto'];
-    $total += $actual['monto'];
+    $entradas += $actual['montomov'];
+    $total += $actual['montomov'];
 }
 
 if ($entradas > 0) {
@@ -894,10 +864,10 @@ if ($entradas > 0) {
     $pdf->setRowColorText(array($txtbold, $clrtxt, $txtbold));
 }
 
-$out = $cv->getMovEfectivoByTag('2', $tag, $uid);
+$out = $cr->getMovEfectivoByTag('2',  $uid, $fecha, $horainicio, $horafin);
 foreach ($out as $actual) {
-    $salidas += $actual['monto'];
-    $total -= $actual['monto'];
+    $salidas += $actual['montomov'];
+    $total -= $actual['montomov'];
 }
 
 if ($salidas > 0) {
@@ -940,11 +910,11 @@ $pdf->Row(array('', ''));
 $salidas = 0;
 $pdf->SetRowBorder('B');
 $pdf->SetLineHeight(4.5);
-$out = $cv->getMovEfectivoByTag('2', $tag, $uid);
+$out =  $cr->getMovEfectivoByTag('2',  $uid, $fecha, $horainicio, $horafin);
 foreach ($out as $actual) {
-    $concepto = $actual['concepto'];
-    $monto = $actual['monto'];
-    $salidas += $actual['monto'];
+    $concepto = $actual['conceptomov'];
+    $monto = $actual['montomov'];
+    $salidas += $actual['montomov'];
 
     $pdf->Row(array(iconv("utf-8", "windows-1252", $concepto . ":"), "$" . number_format($monto, 2, '.', ',')));
 }
@@ -954,12 +924,12 @@ $y1 = $pdf->GetY();
 
 $cancelaciones = 0;
 $pdf->SetY($y);
-$can = $cv->getCancelacionesByTag($tag, $uid, $fecha, $hora);
+$can = $cr->getCancelacionesCorte($uid, $fecha, $horainicio, $horafin);
 foreach ($can as $actual) {
     $pdf->SetX(110);
-    $concepto = $actual['concepto'];
-    $monto = $actual['monto'];
-    $cancelaciones += $actual['monto'];
+    $concepto = $actual['conceptomov'];
+    $monto = $actual['montomov'];
+    $cancelaciones += $actual['montomov'];
     $pdf->Row(array(iconv("utf-8", "windows-1252", $concepto . ":"), "$" . number_format($monto, 2, '.', ',')));
 }
 $pdf->SetX(110);
@@ -971,47 +941,9 @@ if ($y1 > $y2) {
     $ylast = $y1;
 }
 
-
-$info = $cv->obtenerComentariosCorte($id);
-if ($info[0]["comentarios"] != "") {
-    $pdf->Ln(18);
-    $pdf->SetAligns('L');
-    $pdf->SetRowBorder('NB');
-    $pdf->SetLineHeight(6);
-    $pdf->SetSizes(array(13, 13, 13));
-    $pdf->SetWidths(array(95, 5, 95));
-    $pdf->SetStyles(array('B', '', 'B'));
-    $pdf->setRowColorText(array($txtbold, $clrtxt, $txtbold));
-    $pdf->Row(array('Comentarios adicionales'));
-
-    $y = $pdf->GetY();
-
-
-    $pdf->SetAligns(array('L', 'C', 'C'));
-    $pdf->SetSizes(array(9, 9, 9));
-    $pdf->SetWidths(array(105, 45, 45));
-    $pdf->SetStyles(array('B', '', ''));
-    $pdf->setRowColorText(array($txtbold, $clrtxt, $clrtxt));
-    $pdf->SetLineHeight(0.1);
-    $pdf->SetRowBorder('NB');
-    $pdf->Row(array('', '', ''));
-
-    $pdf->SetRowBorder('B');
-    $pdf->SetLineHeight(4.5);
-    $pdf->Row(array(iconv("utf-8", "windows-1252", "Comentario"), iconv("utf-8", "windows-1252", "Total Sobrantes"), iconv("utf-8", "windows-1252", "Total Faltantes")));
-
-    foreach ($info as $actual) {
-        $comentario = ($actual['comentarios'] == "") ? "Sin comentarios" : $actual['comentarios'];
-        $comentario = $actual['comentarios'];
-        $faltantes = $actual['total_faltantes'];
-        $sobrantes = $actual['total_sobrantes'];
-        $pdf->Row(array(iconv("utf-8", "windows-1252", $comentario), " " . number_format($faltantes, 2, '.', ','), " " . number_format($sobrantes, 2, '.', ',')));
-    }
-}
-
 //------------------------------------------PAGINA 2
 $pdf->AddPage();
-$fondo = $cv->getFondoCajaByTag($tag);
+$fondo = $cr->getFondoCaja($uid, $fecha, $horainicio, $horafin);
 if (!empty($fondo)) {
     $pdf->Ln(3);
     $pdf->SetRowBorder('NB');
@@ -1037,7 +969,7 @@ if (!empty($fondo)) {
     }
 }
 
-$entrada = $cv->getMovEfectivoByTag('1', $tag, $uid);
+$entrada =  $cr->getMovEfectivo('1', $fecha, $uid, $horainicio, $horafin);
 if (!empty($entrada)) {
     $total = 0;
     $pdf->Ln(8);
@@ -1058,10 +990,10 @@ if (!empty($entrada)) {
     $pdf->SetLineHeight(6.5);
     $pdf->SetRowBorder('B');
     foreach ($entrada as $actual) {
-        $concepto =  iconv("utf-8", "windows-1252", $actual['concepto']);
-        $monto = $actual['monto'];
-        $horam = $actual['hora'];
-        $total += $actual['monto'];
+        $concepto =  iconv("utf-8", "windows-1252", $actual['conceptomov']);
+        $monto = $actual['montomov'];
+        $horam = $actual['horamov'];
+        $total += $actual['montomov'];
         $pdf->Row(array(iconv("utf-8", "windows-1252", $concepto), iconv("utf-8", "windows-1252", date('h:i A', strtotime($horam))), "$" . number_format($monto, 2, '.', ',')));
     }
     $pdf->SetFont('Arial', 'B', 10);
@@ -1069,7 +1001,7 @@ if (!empty($entrada)) {
     $pdf->Cell(45, 6.5, "$" . number_format($total, 2, '.', ','), 1, 1, 'C');
 }
 
-$salida = $cv->getMovEfectivoByTag('2', $tag, $uid);
+$salida =  $cr->getMovEfectivoByTag('2',  $uid, $fecha, $horainicio, $horafin);
 if (!empty($salida)) {
     $total = 0;
     $pdf->Ln(8);
@@ -1090,10 +1022,10 @@ if (!empty($salida)) {
     $pdf->SetLineHeight(6.5);
     $pdf->SetRowBorder('B');
     foreach ($salida as $actual) {
-        $concepto =  iconv("utf-8", "windows-1252", $actual['concepto']);
-        $monto = $actual['monto'];
-        $horam = $actual['hora'];
-        $total += $actual['monto'];
+        $concepto =  iconv("utf-8", "windows-1252", $actual['conceptomov']);
+        $monto = $actual['montomov'];
+        $horam = $actual['horamov'];
+        $total += $actual['montomov'];
         $pdf->Row(array(iconv("utf-8", "windows-1252", $concepto), iconv("utf-8", "windows-1252", date('h:i A', strtotime($horam))), "$" . number_format($monto, 2, '.', ',')));
     }
     $pdf->SetFont('Arial', 'B', 10);
@@ -1120,7 +1052,7 @@ $pdf->setRowColorText(array($txtbold, $txtbold, $txtbold, $txtbold, $txtbold, $t
 $pdf->SetLineHeight(6);
 $pdf->SetRowBorder('B');
 
-$ventas = $cv->obtenerDetallesVentas($tag, $fecha, $_GET['h'], $uid);
+$ventas = $cr->obtenerDetallesVentas($uid, $fecha, $horainicio, $horafin);
 if (empty($ventas)) {
     $pdf->SetAligns(array('C'));
     $pdf->SetWidths(array(190));
@@ -1170,7 +1102,7 @@ if (empty($ventas)) {
         $totalVentas += $total;
         $totalDes += $descuento;
 
-        $detalles_venta = $cv->obtenerDetallesVentaPorTag($tags);
+        $detalles_venta = $cr->obtenerDetallesVentaPorTag($tags);
         $cantidad = 0;
         $subtotal = 0;
         $sumatras = 0;
@@ -1251,7 +1183,7 @@ $pdf->setRowColorText(array($txtbold, $txtbold, $txtbold, $txtbold, $txtbold, $t
 $pdf->SetLineHeight(5.5);
 $pdf->SetRowBorder('B');
 
-$ventas = $cv->obtenerDetallesVentasCanceladas($tag, $fecha, $_GET['h'], $uid);
+$ventas = $cr->obtenerDetallesVentasCanceladas($fecha, $horainicio, $horafin, $uid);
 if (empty($ventas)) {
     $pdf->SetAligns(array('C'));
     $pdf->SetWidths(array(190));
@@ -1306,7 +1238,7 @@ if (empty($ventas)) {
         $totalVentas += $total;
         $totalFinDes += $desc;
 
-        $detalles_venta = $cv->obtenerDetallesVentaPorTag($tags);
+        $detalles_venta = $cr->obtenerDetallesVentaPorTag($tags);
         $cantidad = 0;
         $subtotal = 0;
         $sumatras = 0;
@@ -1382,7 +1314,7 @@ $pdf->SetWidths(array(150));
 $pdf->SetAligns(array('L',));
 $pdf->Row(array('Detalle pagos de facturas:'));
 $pdf->Ln(8);
-$detallesPagosPorForma  = $cv->obtenerDetallesPagosPorForma($tag, $fecha, $_GET['h'], $uid);
+$detallesPagosPorForma  = $cr->obtenerDetallesPagosPorForma($uid, $fecha, $horainicio, $horafin);
 if (empty($detallesPagosPorForma)) {
     if ($pdf->GetY() + 10 > $pdf->getPageBreakTrigger()) {
         $pdf->AddPage();

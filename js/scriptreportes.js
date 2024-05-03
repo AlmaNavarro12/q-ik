@@ -1478,3 +1478,57 @@ function imprimirVentasExcl() {
         window.open('./com.sine.imprimir/imprimirreporteventas.php?fechainicio=' + fechainicio + '&& fechafin=' + fechafin + '&& idcliente=' + idcliente + '&& estado=' + estado + '&& datos=' + datos + '&& usuario=' + usuario, '_blank');
     }
 }
+
+//-----------------------------------CAMBIOS EN EL REPORTE DE CORTE DE CAJA
+function buscarCorte(){
+    var usuario = $('#usuario-corte').val() || 0;
+    (usuario == "0") ? $("#pago_factura").hide('slow') : $("#pago_factura").show('slow');
+    var fecha = $('#fecha-creacion').val();
+    var horainicio = $('#horainicio').val();
+    var horafin = $("#horafin").val();
+    var pago = $("#pago").is(":checked") ? 1 : 0;
+
+    if (isnEmpty(usuario, "usuario-corte") && dateEmpty(fecha, "fecha-creacion") && isnEmpty(horainicio, "horainicio") && isnEmpty(horafin, "horafin")) {
+        $.ajax({
+            url: 'com.sine.enlace/enlacereporte.php',
+            type: 'POST',
+            data: {transaccion: 'cortecaja', usuario: usuario, pago:pago, fecha:fecha, horainicio:horainicio, horafin:horafin},
+            success: function (datos) {
+                var texto = datos.toString();
+                var bandera = texto.substring(0, 1);
+                var res = texto.substring(1, 5000);
+                if (bandera == '') {
+                    alertify.error(res);
+                } else {
+                    var array = datos.split("<cut>");
+                    var ventas = array[0];
+                    var ganancias = array[1];
+                    var entradas = array[2];
+                    var caja = array[3];
+                    var salidas = array[4];
+    
+                    $("#lbl-ventas").text("$" + ventas);
+                    $("#ventas_totales").val(ventas);
+                    $("#lbl-ganancia").text("$" + ganancias);
+                    $("#ganancias_totales").val(ganancias);
+                    $("#tab-entradas").html(entradas);
+                    $("#tab-caja").html(caja);
+                    $("#tab-salidas").html(salidas);
+                    cargandoHide();
+                }
+            }
+        });
+    }
+}
+
+function generarPDFCorte() {
+    var usuario = $('#usuario-corte').val();
+    var fecha = $('#fecha-creacion').val();
+    var horainicio = $('#horainicio').val();
+    var horafin = $("#horafin").val();
+    var pago = $("#pago").is(":checked") ? 1 : 0;
+    cargandoHide();
+    cargandoShow();
+    VentanaCentrada('./com.sine.imprimir/reporteimprimircorte.php?u=' + usuario + '&&f=' + fecha + '&&hi=' + horainicio +'&&hf=' + horafin +'&&p=' + pago, 'Corte Caja', '', '1024', '768', 'true');
+    cargandoHide();
+}

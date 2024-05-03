@@ -1863,7 +1863,7 @@ class ControladorVenta
         return $datos;
     }
 
-    public function getCorteCaja($user, $pago){
+    public function getCorteCaja($user, $pago, $horainicio = "", $horafin=""){
         $totventas = 0;
         $totganancia = 0;
         $entefec = 0;
@@ -2346,18 +2346,66 @@ class ControladorVenta
     }
 
     //-------------------------------------IMPRIMIR CORTE DE CAJAS
-    public function printCorteCaja($tag, $fecha, $hora, $uid)
+    public function printCorteCaja($tag, $fecha, $hora, $uid) //CAMBIO 02 DE MAYO
     {
         $totventas = 0;
         $totganancia = 0;
+        $pagos = 0;
             $ventas = $this->obtenerDetallesVentas($tag, $fecha, $hora, $uid);
             foreach ($ventas as $venta) {
                 $totventas += $venta['totalventa'];
             }
+
+        $listapagos = $this->obtenerDetallesPagos($tag, $fecha, $hora, $uid);
+        if (!empty($listapagos)) {
+            $pagos = $listapagos;
+        }
+        $totalventas = $totventas + $pagos;
         $totganancia = $this->obtenerGananciasPorTag($tag, $fecha, $hora, $uid);
-        $datos = $totventas . "<cut>" . $totganancia . "<cut>";
+        $datos = $totalventas . "<cut>" . $totganancia . "<cut>";
         return $datos;
     }
+
+    public function obtenerDetallesPagos($tag, $fecha, $hora, $uid) //CAMBIO 02 DE MAYO
+    {
+        $datos = 0;
+        $idPagos = $this->obtenerIdPagosByTag($tag);
+        foreach($idPagos as $actual){
+            $id = $actual['idpago'];
+            $consulta = "SELECT totalpagado FROM pagos WHERE idpago =:idpago AND fechacreacion = :fecha";
+
+            if (!empty($hora)) {
+                $consulta .= " AND hora_creacion < :hora";
+            }
+
+            if (!empty($user) && $user != '0') {
+                $consulta .= " AND sessionid = :uid";
+            }
+
+            $val = array(
+                "idpago" => $id,
+                "fecha" => $fecha,
+                "hora" => $hora,
+                "uid" => $uid
+            );
+            $pagos = $this->consultas->getResults($consulta, $val);
+            foreach ($pagos as $actual) {
+                $datos += $actual['totalpagado'];
+            }
+        }
+        return $datos;
+    }
+
+    private function obtenerIdPagosByTag($tag){ //CAMBIO 02 DE MAYO
+        $consultado = false;
+        $consulta = "SELECT idpago FROM detalle_corte WHERE tagcorte = :tag AND idpago IS NOT NULL;";
+        $valores = array(
+            "tag" => $tag
+        );
+        $consultado = $this->consultas->getResults($consulta, $valores);
+        return $consultado;
+    }
+
 
     public function obtenerGananciasPorTag($tag, $fecha, $hora, $uid)
     {
@@ -2414,6 +2462,7 @@ class ControladorVenta
         return $datos;
     }
 
+    
     public function getMovEfectivoByTag($t, $tag, $uid)
     {
         $idMovimientos = $this->obtenerIdMovimientoByTag($tag);
@@ -2541,7 +2590,7 @@ class ControladorVenta
             WHERE cv.iddatos_venta = dv.iddatos_venta
               AND cv.fecha_cancelado = :fecha
               AND cv.hora_cancelada < :hora
-          );
+          ) 
         ";
         foreach ($idsDatosVenta as $idactual) {
             $valores = array(
@@ -2636,6 +2685,7 @@ class ControladorVenta
     
     foreach ($idPagosAgrupados as $formaPago => $pagos) {
         foreach ($pagos as $pago) {
+
             $valores = array(
                 "idpago" => $pago["idpago"],
                 "fecha" => $fecha,

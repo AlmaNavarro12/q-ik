@@ -669,6 +669,7 @@ class ControladorInstalacion {
                         $videos
                         $copiar
                         $firmar
+                        $enviar
                         </ul>
                         </div></td>
                     </tr>";

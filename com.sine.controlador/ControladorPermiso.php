@@ -50,7 +50,7 @@ class ControladorPermiso {
             $nombreusuario = str_replace($search, $replace, $usuarioactual['nombre'] . ' ' . $usuarioactual['apellido_paterno']);
             $modulos = $this->getAcceso($usuarioactual['paquete']);
     
-            $fields = ['facturas', 'pago', 'nomina', 'listaempleado', 'listanomina', 'cartaporte', 'listaubicacion', 'listatransporte', 'listaremolque', 'listaoperador', 'listacarta', 'cotizacion', 'cliente', 'listacliente', 'comunicado', 'producto', 'proveedor', 'impuesto', 'datosfacturacion', 'contrato', 'listausuario', 'reporte', 'reportefactura', 'reportepago', 'reportegrafica', 'reporteiva', 'datosiva', 'reporteventa', 'reporteinventario', 'reportepuntoventa', 'configuracion', 'ventas', 'crearventa', 'listaventa', 'registrarentrada', 'registrarsalida', 'instalaciongps', 'listagps', 'crearinstalacion', 'listainstalacion', 'acceso', 'imgperfil'];
+            $fields = ['facturas', 'pago', 'nomina', 'listaempleado', 'listanomina', 'cartaporte', 'listaubicacion', 'listatransporte', 'listaremolque', 'listaoperador', 'listacarta', 'cotizacion', 'cliente', 'listacliente', 'comunicado', 'producto', 'proveedor', 'impuesto', 'datosfacturacion', 'contrato', 'listausuario', 'reporte', 'reportefactura', 'reportepago', 'reportegrafica', 'reporteiva', 'datosiva', 'reporteventa', 'reporteinventario', 'reportepuntoventa', 'reportecorte', 'configuracion', 'ventas', 'crearventa', 'listaventa', 'registrarentrada', 'registrarsalida', 'instalaciongps', 'listagps', 'crearinstalacion', 'listainstalacion', 'acceso', 'imgperfil'];
             $datos .= "$uid</tr>$nombreusuario</tr>";
     
             foreach ($fields as $field) {

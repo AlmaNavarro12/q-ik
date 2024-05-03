@@ -960,7 +960,7 @@ function insertarCorte(idsupervisor = ""){
                 alertify.success('Corte de caja registrado, espere un momento para visualizar cambios.');
                 cargandoHide();
                 setTimeout(function() {
-                    var nuevaVentana = imprimirCorteCaja(array[0], array[1], array[2], array[3], array[4], array[5]);
+                    var nuevaVentana = imprimirCorteCaja(array[0], array[1], array[2], array[3], array[4], array[5], pago);
                     nuevaVentana.focus();
                 }, 2000);
             }

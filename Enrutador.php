@@ -73,6 +73,9 @@ class Enrutador
                 case 'reportepuntoventa':
                     include_once '../com.sine.vista/reporte/reportepuntoventa.php';
                     break;
+                case 'reportecorte':
+                    include_once '../com.sine.vista/reporte/reportecorte.php';
+                    break;
                 case 'reportesat':
                     include_once '../com.sine.vista/reporte/reportesat.php';
                     break;
